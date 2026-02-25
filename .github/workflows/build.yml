@@ -52,6 +52,9 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Enable Flutter Web
+        run: flutter config --enable-web
+
       - name: Build Web
         run: flutter build web --base-href "/bharatheeyamapp/"
 
