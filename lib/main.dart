@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'screens/input_screen.dart';
 
@@ -16,12 +16,12 @@ class BharatheeyamApp extends StatelessWidget {
     return MaterialApp(
       title: 'ಭಾರತೀಯಮ್',
       debugShowCheckedModeBanner: false,
-      theme: _buildTheme(),
+      theme: _buildTheme(context),
       home: const InputScreen(),
     );
   }
 
-  ThemeData _buildTheme() {
+  ThemeData _buildTheme(BuildContext context) {
     return ThemeData(
       useMaterial3: true,
       scaffoldBackgroundColor: const Color(0xFFFFFDF7),
@@ -32,15 +32,26 @@ class BharatheeyamApp extends StatelessWidget {
         secondary: const Color(0xFFDD6B20),
         surface: const Color(0xFFFFFFFF),
       ),
-      textTheme: const TextTheme(
-        bodyMedium: TextStyle(color: Color(0xFF2D3748), fontSize: 14),
-        bodyLarge: TextStyle(color: Color(0xFF2D3748), fontSize: 16, fontWeight: FontWeight.w600),
+      textTheme: Theme.of(context).textTheme.copyWith(
+        bodyMedium: TextStyle(
+          color: const Color(0xFF2D3748),
+          fontSize: 14,
+        ),
+        bodyLarge: TextStyle(
+          color: const Color(0xFF2D3748),
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -58,24 +69,24 @@ class BharatheeyamApp extends StatelessWidget {
           borderSide: const BorderSide(color: Color(0xFF4A00E0), width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        labelStyle: const TextStyle(color: Color(0xFF718096)),
+        labelStyle: TextStyle(color: const Color(0xFF718096)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFDD6B20),
           foregroundColor: Colors.white,
-          textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+          textStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           padding: const EdgeInsets.symmetric(vertical: 14),
           elevation: 4,
         ),
       ),
-      tabBarTheme: const TabBarTheme(
-        labelColor: Color(0xFF047857),
-        unselectedLabelColor: Color(0xFF718096),
+      tabBarTheme: TabBarTheme(
+        labelColor: const Color(0xFF047857),
+        unselectedLabelColor: const Color(0xFF718096),
         labelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
         unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-        indicatorColor: Color(0xFF047857),
+        indicatorColor: const Color(0xFF047857),
         indicatorSize: TabBarIndicatorSize.tab,
       ),
     );

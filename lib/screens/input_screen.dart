@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -24,8 +24,8 @@ class _InputScreenState extends State<InputScreen> {
   int _hour          = DateTime.now().hour % 12 == 0 ? 12 : DateTime.now().hour % 12;
   int _minute        = DateTime.now().minute;
   String _ampm       = DateTime.now().hour < 12 ? 'AM' : 'PM';
-  String _ayanamsa   = 'à²²à²¾à²¹à²¿à²°à²¿';
-  String _nodeMode   = 'à²¨à²¿à²œ à²°à²¾à²¹à³';
+  String _ayanamsa   = 'ಲಾಹಿರಿ';
+  String _nodeMode   = 'ನಿಜ ರಾಹು';
   bool _loading      = false;
   bool _geoLoading   = false;
   String _geoStatus  = '';
@@ -76,14 +76,14 @@ class _InputScreenState extends State<InputScreen> {
           setState(() {
             _latCtrl.text = lat.toStringAsFixed(4);
             _lonCtrl.text = lon.toStringAsFixed(4);
-            _geoStatus    = 'ðŸ“ ${data[0]['display_name']}';
+            _geoStatus    = '📍 ${data[0]['display_name']}';
           });
         } else {
-          setState(() => _geoStatus = 'à²¸à³à²¥à²³ à²•à²‚à²¡à³à²¬à²‚à²¦à²¿à²²à³à²².');
+          setState(() => _geoStatus = 'ಸ್ಥಳ ಕಂಡುಬಂದಿಲ್ಲ.');
         }
       }
     } catch (_) {
-      setState(() => _geoStatus = 'à²¸à³à²¥à²³ à²¸à²‚à²ªà²°à³à²• à²¦à³‹à²·. à²¨à³‡à²°à²µà²¾à²—à²¿ à²…à²•à³à²·à²¾à²‚à²¶/à²°à³‡à²–à²¾à²‚à²¶ à²¨à²®à³‚à²¦à²¿à²¸à²¿.');
+      setState(() => _geoStatus = 'ಸ್ಥಳ ಸಂಪರ್ಕ ದೋಷ. ನೇರವಾಗಿ ಅಕ್ಷಾಂಶ/ರೇಖಾಂಶ ನಮೂದಿಸಿ.');
     }
     setState(() => _geoLoading = false);
   }
@@ -100,9 +100,9 @@ class _InputScreenState extends State<InputScreen> {
       if (_ampm == 'AM' && _hour == 12) h24 = 0;
       final localHour = h24 + _minute / 60.0;
 
-      final aynMode = _ayanamsa == 'à²°à²¾à²®à²¨à³'
-          ? 'raman' : _ayanamsa == 'à²•à³†.à²ªà²¿' ? 'kp' : 'lahiri';
-      final trueNode = _nodeMode == 'à²¨à²¿à²œ à²°à²¾à²¹à³';
+      final aynMode = _ayanamsa == 'ರಾಮನ್'
+          ? 'raman' : _ayanamsa == 'ಕೆ.ಪಿ' ? 'kp' : 'lahiri';
+      final trueNode = _nodeMode == 'ನಿಜ ರಾಹು';
 
       final result = await Future.microtask(() => AstroCalculator.calculate(
         year: _dob.year, month: _dob.month, day: _dob.day,
@@ -129,10 +129,10 @@ class _InputScreenState extends State<InputScreen> {
           ),
         ));
       } else {
-        _showError('à²œà²¾à²¤à²• à²²à³†à²•à³à²•à²¾à²šà²¾à²°à²¦à²²à³à²²à²¿ à²µà²¿à²«à²². à²¦à²¿à²¨à²¾à²‚à²•/à²¸à²®à²¯ à²ªà²°à²¿à²¶à³€à²²à²¿à²¸à²¿.');
+        _showError('ಜಾತಕ ಲೆಕ್ಕಾಚಾರದಲ್ಲಿ ವಿಫಲ. ದಿನಾಂಕ/ಸಮಯ ಪರಿಶೀಲಿಸಿ.');
       }
     } catch (e) {
-      _showError('à²¦à³‹à²·: $e');
+      _showError('ದೋಷ: $e');
     }
     setState(() => _loading = false);
   }
@@ -183,31 +183,17 @@ class _InputScreenState extends State<InputScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('ðŸ“‚ à²‰à²³à²¿à²¸à²¿à²¦ à²œà²¾à²¤à²•', style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    )),
+          Text('📂 ಉಳಿಸಿದ ಜಾತಕ', style: TextStyle(
+            fontWeight: FontWeight.w800, fontSize: 15, color: const Color(0xFF2B6CB0))),
           const SizedBox(height: 12),
           Row(children: [
             Expanded(
               child: DropdownButtonFormField<String>(
                 value: _selName,
-                hint: Text('à²†à²¯à³à²•à³†à²®à²¾à²¡à²¿', style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ),
+                hint: Text('ಆಯ್ಕೆಮಾಡಿ', style: const TextStyle()),
                 items: _savedProfiles.keys.map((n) => DropdownMenuItem(
                   value: n,
-                  child: Text(n, style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ),
+                  child: Text(n, style: const TextStyle()),
                 )).toList(),
                 onChanged: (v) => setState(() => _selName = v),
                 decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
@@ -219,12 +205,7 @@ class _InputScreenState extends State<InputScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: kTeal,
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14)),
-              child: Text('à²¤à³†à²—à³†à²¯à²¿à²°à²¿', style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ),
+              child: Text('ತೆಗೆಯಿರಿ', style: TextStyle(fontWeight: FontWeight.w800)),
             ),
           ]),
         ],
@@ -237,19 +218,15 @@ class _InputScreenState extends State<InputScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('âœ¨ à²¹à³Šà²¸ à²œà²¾à²¤à²•', style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    )),
+          Text('✨ ಹೊಸ ಜಾತಕ', style: TextStyle(
+            fontWeight: FontWeight.w800, fontSize: 15, color: const Color(0xFF2B6CB0))),
           const SizedBox(height: 16),
 
           // Name
           TextField(
             controller: _nameCtrl,
             decoration: InputDecoration(
-              labelText: 'à²¹à³†à²¸à²°à³',
+              labelText: 'ಹೆಸರು',
               prefixIcon: const Icon(Icons.person_outline),
             ),
           ),
@@ -269,13 +246,8 @@ class _InputScreenState extends State<InputScreen> {
                 const Icon(Icons.calendar_today, color: kMuted),
                 const SizedBox(width: 10),
                 Text(
-                  'à²¦à²¿à²¨à²¾à²‚à²•: ${_dob.day.toString().padLeft(2,'0')}-${_dob.month.toString().padLeft(2,'0')}-${_dob.year}',
-                  style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ,
+                  'ದಿನಾಂಕ: ${_dob.day.toString().padLeft(2,'0')}-${_dob.month.toString().padLeft(2,'0')}-${_dob.year}',
+                  style: TextStyle(fontSize: 14, color: kText),
                 ),
               ]),
             ),
@@ -288,7 +260,7 @@ class _InputScreenState extends State<InputScreen> {
               child: TextField(
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(labelText: 'à²—à²‚à²Ÿà³† (1-12)'),
+                decoration: const InputDecoration(labelText: 'ಗಂಟೆ (1-12)'),
                 onChanged: (v) {
                   final n = int.tryParse(v);
                   if (n != null && n >= 1 && n <= 12) setState(() => _hour = n);
@@ -301,7 +273,7 @@ class _InputScreenState extends State<InputScreen> {
               child: TextField(
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(labelText: 'à²¨à²¿à²®à²¿à²· (0-59)'),
+                decoration: const InputDecoration(labelText: 'ನಿಮಿಷ (0-59)'),
                 onChanged: (v) {
                   final n = int.tryParse(v);
                   if (n != null && n >= 0 && n <= 59) setState(() => _minute = n);
@@ -314,14 +286,9 @@ class _InputScreenState extends State<InputScreen> {
               child: DropdownButtonFormField<String>(
                 value: _ampm,
                 items: ['AM','PM'].map((v) => DropdownMenuItem(
-                  value: v, child: Text(v, style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ))).toList(),
+                  value: v, child: Text(v, style: TextStyle(fontWeight: FontWeight.w700)))).toList(),
                 onChanged: (v) => setState(() => _ampm = v!),
-                decoration: const InputDecoration(labelText: 'à²¬à³†à²³à²¿à²—à³à²—à³†/à²¸à²‚à²œà³†'),
+                decoration: const InputDecoration(labelText: 'ಬೆಳಿಗ್ಗೆ/ಸಂಜೆ'),
               ),
             ),
           ]),
@@ -332,7 +299,7 @@ class _InputScreenState extends State<InputScreen> {
             Expanded(
               child: TextField(
                 controller: _placeCtrl,
-                decoration: const InputDecoration(labelText: 'à²Šà²°à³ à²¹à³à²¡à³à²•à²¿', prefixIcon: Icon(Icons.search)),
+                decoration: const InputDecoration(labelText: 'ಊರು ಹುಡುಕಿ', prefixIcon: Icon(Icons.search)),
               ),
             ),
             const SizedBox(width: 10),
@@ -343,22 +310,12 @@ class _InputScreenState extends State<InputScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14)),
               child: _geoLoading
                   ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : Text('à²¹à³à²¡à³à²•à²¿', style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ),
+                  : Text('ಹುಡುಕಿ', style: TextStyle(fontWeight: FontWeight.w800)),
             ),
           ]),
           if (_geoStatus.isNotEmpty) ...[
             const SizedBox(height: 6),
-            Text(_geoStatus, style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ),
+            Text(_geoStatus, style: TextStyle(fontSize: 12, color: kGreen)),
           ],
           const SizedBox(height: 14),
 
@@ -368,7 +325,7 @@ class _InputScreenState extends State<InputScreen> {
               child: TextField(
                 controller: _latCtrl,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-                decoration: const InputDecoration(labelText: 'à²…à²•à³à²·à²¾à²‚à²¶'),
+                decoration: const InputDecoration(labelText: 'ಅಕ್ಷಾಂಶ'),
               ),
             ),
             const SizedBox(width: 10),
@@ -376,7 +333,7 @@ class _InputScreenState extends State<InputScreen> {
               child: TextField(
                 controller: _lonCtrl,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-                decoration: const InputDecoration(labelText: 'à²°à³‡à²–à²¾à²‚à²¶'),
+                decoration: const InputDecoration(labelText: 'ರೇಖಾಂಶ'),
               ),
             ),
           ]),
@@ -386,26 +343,16 @@ class _InputScreenState extends State<InputScreen> {
           Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
-              title: Text('âš™ï¸ à²¸à³à²§à²¾à²°à²¿à²¤ à²†à²¯à³à²•à³†à²—à²³à³', style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ),
+              title: Text('⚙️ ಸುಧಾರಿತ ಆಯ್ಕೆಗಳು', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
               children: [
                 const SizedBox(height: 8),
                 Row(children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       value: _ayanamsa,
-                      decoration: const InputDecoration(labelText: 'à²…à²¯à²¨à²¾à²‚à²¶'),
-                      items: ['à²²à²¾à²¹à²¿à²°à²¿','à²°à²¾à²®à²¨à³','à²•à³†.à²ªà²¿'].map((v) => DropdownMenuItem(
-                        value: v, child: Text(v, style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ))).toList(),
+                      decoration: const InputDecoration(labelText: 'ಅಯನಾಂಶ'),
+                      items: ['ಲಾಹಿರಿ','ರಾಮನ್','ಕೆ.ಪಿ'].map((v) => DropdownMenuItem(
+                        value: v, child: Text(v, style: const TextStyle()))).toList(),
                       onChanged: (v) => setState(() => _ayanamsa = v!),
                     ),
                   ),
@@ -413,14 +360,9 @@ class _InputScreenState extends State<InputScreen> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       value: _nodeMode,
-                      decoration: const InputDecoration(labelText: 'à²°à²¾à²¹à³'),
-                      items: ['à²¨à²¿à²œ à²°à²¾à²¹à³','à²¸à²°à²¾à²¸à²°à²¿ à²°à²¾à²¹à³'].map((v) => DropdownMenuItem(
-                        value: v, child: Text(v, style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ))).toList(),
+                      decoration: const InputDecoration(labelText: 'ರಾಹು'),
+                      items: ['ನಿಜ ರಾಹು','ಸರಾಸರಿ ರಾಹು'].map((v) => DropdownMenuItem(
+                        value: v, child: Text(v, style: const TextStyle()))).toList(),
                       onChanged: (v) => setState(() => _nodeMode = v!),
                     ),
                   ),
@@ -440,19 +382,9 @@ class _InputScreenState extends State<InputScreen> {
                   ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
                       const SizedBox(width: 12),
-                      Text('à²²à³†à²•à³à²•à²¾à²šà²¾à²° à²®à²¾à²¡à³à²¤à³à²¤à²¿à²¦à³†...', style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ),
+                      Text('ಲೆಕ್ಕಾಚಾರ ಮಾಡುತ್ತಿದೆ...', style: TextStyle(fontWeight: FontWeight.w800)),
                     ])
-                  : Text('à²œà²¾à²¤à²• à²°à²šà²¿à²¸à²¿', style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ),
+                  : Text('ಜಾತಕ ರಚಿಸಿ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
             ),
           ),
         ],

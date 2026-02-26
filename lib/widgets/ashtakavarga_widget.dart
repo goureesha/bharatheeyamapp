@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../constants/strings.dart';
 import 'common.dart';
 import 'kundali_chart.dart';
@@ -14,9 +14,9 @@ class AshtakavargaWidget extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          SectionTitle('à²¸à²°à³à²µà²¾à²·à³à²Ÿà²•à²µà²°à³à²— (SAV)', color: kOrange),
+          SectionTitle('ಸರ್ವಾಷ್ಟಕವರ್ಗ (SAV)', color: kOrange),
           _SavGrid(savBindus: savBindus),
-          SectionTitle('ðŸ“ à²¬à²¿à²¨à³à²¨à²¾à²·à³à²Ÿà²•à²µà²°à³à²— (BAV)', color: const Color(0xFF2B6CB0)),
+          SectionTitle('📝 ಬಿನ್ನಾಷ್ಟಕವರ್ಗ (BAV)', color: const Color(0xFF2B6CB0)),
           _BavTable(savBindus: savBindus, bavBindus: bavBindus),
           const SizedBox(height: 24),
         ],
@@ -77,20 +77,11 @@ class _SavGrid extends StatelessWidget {
           Positioned(
             top: -12, left: 2,
             child: Text(knRashi[idx],
-              style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    , fontWeight: FontWeight.w900)),
+              style: TextStyle(fontSize: 9, color: const Color(0xFF2F855A), fontWeight: FontWeight.w900)),
           ),
           Text(bindu.toString(),
-            style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ),
+            style: TextStyle(
+              fontSize: 22, fontWeight: FontWeight.w900, color: kOrange)),
         ],
       ),
     );
@@ -104,18 +95,10 @@ class _SavGrid extends StatelessWidget {
         border: Border.all(color: Colors.white, width: 2),
       ),
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Text('à²’à²Ÿà³à²Ÿà³', style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    )),
-        Text(total.toString(), style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    )),
+        Text('ಒಟ್ಟು', style: TextStyle(
+          fontSize: 12, fontWeight: FontWeight.w800, color: const Color(0xFF742A2A))),
+        Text(total.toString(), style: TextStyle(
+          fontSize: 20, fontWeight: FontWeight.w900, color: const Color(0xFFE53E3E))),
       ]),
     );
   }
@@ -124,8 +107,8 @@ class _SavGrid extends StatelessWidget {
 class _BavTable extends StatelessWidget {
   final List<int> savBindus;
   final Map<String, List<int>> bavBindus;
-  static const _planets = ['à²°à²µà²¿','à²šà²‚à²¦à³à²°','à²•à³à²œ','à²¬à³à²§','à²—à³à²°à³','à²¶à³à²•à³à²°','à²¶à²¨à²¿'];
-  static const _short   = ['à²°','à²šà²‚','à²•à³','à²¬à³','à²—à³','à²¶à³','à²¶'];
+  static const _planets = ['ರವಿ','ಚಂದ್ರ','ಕುಜ','ಬುಧ','ಗುರು','ಶುಕ್ರ','ಶನಿ'];
+  static const _short   = ['ರ','ಚಂ','ಕು','ಬು','ಗು','ಶು','ಶ'];
 
   const _BavTable({required this.savBindus, required this.bavBindus});
 
@@ -142,49 +125,19 @@ class _BavTable extends StatelessWidget {
             horizontalMargin: 10,
             headingRowColor: WidgetStateProperty.all(const Color(0xFFEDF2F7)),
             columns: [
-              DataColumn(label: Text('à²°à²¾à²¶à²¿', style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    )),
-              ..._short.map((s) => DataColumn(label: Text(s, style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ))),
-              DataColumn(label: Text('à²’à²Ÿà³à²Ÿà³', style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    )),
+              DataColumn(label: Text('ರಾಶಿ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11))),
+              ..._short.map((s) => DataColumn(label: Text(s, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11)))),
+              DataColumn(label: Text('ಒಟ್ಟು', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11))),
             ],
             rows: List.generate(12, (i) {
               return DataRow(cells: [
-                DataCell(Text(knRashi[i], style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    )),
+                DataCell(Text(knRashi[i], style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11))),
                 ..._planets.map((p) {
                   final v = bavBindus[p]?[i] ?? 0;
-                  return DataCell(Text(v.toString(), style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ));
+                  return DataCell(Text(v.toString(), style: TextStyle(fontSize: 11)));
                 }),
                 DataCell(Text(savBindus[i].toString(),
-                  style:  
-        param($m)
-        $inner = $m.Groups[1].Value
-        if ($inner -eq "") { "const TextStyle()" }
-        else { "TextStyle($inner)" }
-    ))),
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: const Color(0xFFE53E3E)))),
               ]);
             }),
           ),
