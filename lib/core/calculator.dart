@@ -1,4 +1,4 @@
-import 'dart:math';
+﻿import 'dart:math';
 import '../constants/strings.dart';
 import 'ephemeris.dart';
 
@@ -114,11 +114,11 @@ String formatDeg(double deg) {
   int mn = (tSec % 3600) ~/ 60;
   int sc = tSec % 60;
   if (dg == 30) { dg = 29; mn = 59; sc = 59; }
-  return '$dg° ${mn.toString().padLeft(2, '0')}\' ${sc.toString().padLeft(2, '0')}"';
+  return '$dgÂ° ${mn.toString().padLeft(2, '0')}\' ${sc.toString().padLeft(2, '0')}"';
 }
 
 // ============================================================
-// MAIN CALCULATOR  — exact port of Python logic
+// MAIN CALCULATOR  â€” exact port of Python logic
 // ============================================================
 class AstroCalculator {
   static const double _nakSize = 13.333333333;
@@ -127,18 +127,18 @@ class AstroCalculator {
 
   static double normDeg(double d) => ((d % 360) + 360) % 360;
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Nakshatra info from longitude
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static (String nak, int pada) nakFromDeg(double deg) {
     final idx = (deg / _nakSize).floor() % 27;
     final pada = ((deg % _nakSize) / (_nakSize / 4)).floor() + 1;
     return (knNak[idx], pada.clamp(1, 4));
   }
 
-  // ─────────────────────────────────────────────
-  // MANDI calculation — exact Python port
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // MANDI calculation â€” exact Python port
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static double calcMandi({
     required double jdBirth,
     required double lat,
@@ -204,9 +204,9 @@ class AstroCalculator {
     }
   }
 
-  // ─────────────────────────────────────────────
-  // Find nakshatra boundary (binary search) — Python port
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Find nakshatra boundary (binary search) â€” Python port
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static double findNakLimit(double jd, double targetDeg, String ayanamsaMode) {
     double low = jd - 1.2, high = jd + 1.2;
     for (int i = 0; i < 20; i++) {
@@ -221,32 +221,32 @@ class AstroCalculator {
     return (low + high) / 2;
   }
 
-  // ─────────────────────────────────────────────
-  // ASHTAKAVARGA — exact Python port
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ASHTAKAVARGA â€” exact Python port
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static (List<int> sav, Map<String, List<int>> bav) calcAshtakavarga(
       Map<String, double> positions) {
     // P_KEYS in order: Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Lagna
-    final pKeys = ['ರವಿ', 'ಚಂದ್ರ', 'ಕುಜ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ', 'ಲಗ್ನ'];
+    final pKeys = ['à²°à²µà²¿', 'à²šà²‚à²¦à³à²°', 'à²•à³à²œ', 'à²¬à³à²§', 'à²—à³à²°à³', 'à²¶à³à²•à³à²°', 'à²¶à²¨à²¿', 'à²²à²—à³à²¨'];
     final rIdx = {for (var k in pKeys) k: (positions[k]! / 30).floor()};
 
     final sav = List<int>.filled(12, 0);
     final bav = {
-      for (var p in ['ರವಿ', 'ಚಂದ್ರ', 'ಕುಜ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ'])
+      for (var p in ['à²°à²µà²¿', 'à²šà²‚à²¦à³à²°', 'à²•à³à²œ', 'à²¬à³à²§', 'à²—à³à²°à³', 'à²¶à³à²•à³à²°', 'à²¶à²¨à²¿'])
         p: List<int>.filled(12, 0)
     };
 
     const bavRules = {
-      'ರವಿ': [[1,2,4,7,8,9,10,11],[3,6,10,11],[1,2,4,7,8,9,10,11],[3,5,6,9,10,11,12],[5,6,9,11],[6,7,12],[1,2,4,7,8,9,10,11],[3,4,6,10,11,12]],
-      'ಚಂದ್ರ': [[3,6,7,8,10,11],[1,3,6,7,10,11],[2,3,5,6,9,10,11],[1,3,4,5,7,8,10,11],[1,4,7,8,10,11,12],[3,4,5,7,9,10,11],[3,5,6,11],[3,6,10,11]],
-      'ಕುಜ': [[3,5,6,10,11],[3,6,11],[1,2,4,7,8,10,11],[3,5,6,11],[6,10,11,12],[6,8,11,12],[1,4,7,8,9,10,11],[1,3,6,10,11]],
-      'ಬುಧ': [[5,6,9,11,12],[2,4,6,8,10,11],[1,2,4,7,8,9,10,11],[1,3,5,6,9,10,11,12],[6,8,11,12],[1,2,3,4,5,8,9,11],[1,2,4,7,8,9,10,11],[1,2,4,6,8,10,11]],
-      'ಗುರು': [[1,2,3,4,7,8,9,10,11],[2,5,7,9,11],[1,2,4,7,8,10,11],[1,2,4,5,6,9,10,11],[1,2,3,4,7,8,10,11],[2,5,6,9,10,11],[3,5,6,12],[1,2,4,5,6,9,10,11]],
-      'ಶುಕ್ರ': [[8,11,12],[1,2,3,4,5,8,9,11,12],[3,5,6,9,11,12],[3,5,6,9,11],[5,8,9,10,11],[1,2,3,4,5,8,9,10,11],[3,4,5,8,9,10,11],[1,2,3,4,5,8,9,11]],
-      'ಶನಿ': [[1,2,4,7,8,10,11],[3,6,11],[3,5,6,10,11,12],[6,8,9,10,11,12],[5,6,11,12],[6,11,12],[3,5,6,11],[1,3,4,6,10,11]],
+      'à²°à²µà²¿': [[1,2,4,7,8,9,10,11],[3,6,10,11],[1,2,4,7,8,9,10,11],[3,5,6,9,10,11,12],[5,6,9,11],[6,7,12],[1,2,4,7,8,9,10,11],[3,4,6,10,11,12]],
+      'à²šà²‚à²¦à³à²°': [[3,6,7,8,10,11],[1,3,6,7,10,11],[2,3,5,6,9,10,11],[1,3,4,5,7,8,10,11],[1,4,7,8,10,11,12],[3,4,5,7,9,10,11],[3,5,6,11],[3,6,10,11]],
+      'à²•à³à²œ': [[3,5,6,10,11],[3,6,11],[1,2,4,7,8,10,11],[3,5,6,11],[6,10,11,12],[6,8,11,12],[1,4,7,8,9,10,11],[1,3,6,10,11]],
+      'à²¬à³à²§': [[5,6,9,11,12],[2,4,6,8,10,11],[1,2,4,7,8,9,10,11],[1,3,5,6,9,10,11,12],[6,8,11,12],[1,2,3,4,5,8,9,11],[1,2,4,7,8,9,10,11],[1,2,4,6,8,10,11]],
+      'à²—à³à²°à³': [[1,2,3,4,7,8,9,10,11],[2,5,7,9,11],[1,2,4,7,8,10,11],[1,2,4,5,6,9,10,11],[1,2,3,4,7,8,10,11],[2,5,6,9,10,11],[3,5,6,12],[1,2,4,5,6,9,10,11]],
+      'à²¶à³à²•à³à²°': [[8,11,12],[1,2,3,4,5,8,9,11,12],[3,5,6,9,11,12],[3,5,6,9,11],[5,8,9,10,11],[1,2,3,4,5,8,9,10,11],[3,4,5,8,9,10,11],[1,2,3,4,5,8,9,11]],
+      'à²¶à²¨à²¿': [[1,2,4,7,8,10,11],[3,6,11],[3,5,6,10,11,12],[6,8,9,10,11,12],[5,6,11,12],[6,11,12],[3,5,6,11],[1,3,4,6,10,11]],
     };
 
-    for (final target in ['ರವಿ', 'ಚಂದ್ರ', 'ಕುಜ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ']) {
+    for (final target in ['à²°à²µà²¿', 'à²šà²‚à²¦à³à²°', 'à²•à³à²œ', 'à²¬à³à²§', 'à²—à³à²°à³', 'à²¶à³à²•à³à²°', 'à²¶à²¨à²¿']) {
       final rules = bavRules[target]!;
       for (int refIdx = 0; refIdx < pKeys.length; refIdx++) {
         final refRashi = rIdx[pKeys[refIdx]]!;
@@ -260,9 +260,9 @@ class AstroCalculator {
     return (sav, bav);
   }
 
-  // ─────────────────────────────────────────────
-  // VIMSHOTTARI DASHA — exact Python port
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // VIMSHOTTARI DASHA â€” exact Python port
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static List<DashaEntry> calcDasha(DateTime birthDate, int nIdx, double perc) {
     final List<DashaEntry> result = [];
     DateTime cur = birthDate;
@@ -297,9 +297,9 @@ class AstroCalculator {
     return result;
   }
 
-  // ─────────────────────────────────────────────
-  // FULL CALCULATION — main entry point
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // FULL CALCULATION â€” main entry point
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static KundaliResult? calculate({
     required int year,
     required int month,
@@ -323,9 +323,9 @@ class AstroCalculator {
       final Map<String, double> positions = {};
       final Map<String, double> speeds = {};
       const engToKn = {
-        'Sun': 'ರವಿ', 'Moon': 'ಚಂದ್ರ', 'Mercury': 'ಬುಧ', 'Venus': 'ಶುಕ್ರ',
-        'Mars': 'ಕುಜ', 'Jupiter': 'ಗುರು', 'Saturn': 'ಶನಿ',
-        'Rahu': 'ರಾಹು', 'Ketu': 'ಕೇತು',
+        'Sun': 'à²°à²µà²¿', 'Moon': 'à²šà²‚à²¦à³à²°', 'Mercury': 'à²¬à³à²§', 'Venus': 'à²¶à³à²•à³à²°',
+        'Mars': 'à²•à³à²œ', 'Jupiter': 'à²—à³à²°à³', 'Saturn': 'à²¶à²¨à²¿',
+        'Rahu': 'à²°à²¾à²¹à³', 'Ketu': 'à²•à³‡à²¤à³',
       };
 
       for (final entry in rawPlanets.entries) {
@@ -336,14 +336,14 @@ class AstroCalculator {
 
       // Lagna (Ascendant)
       final cusps = Ephemeris.placidusHouses(jdBirth, lat, lon, ayn);
-      positions['ಲಗ್ನ'] = cusps[0];
-      speeds['ಲಗ್ನ'] = 0;
+      positions['à²²à²—à³à²¨'] = cusps[0];
+      speeds['à²²à²—à³à²¨'] = 0;
 
       // Mandi
       final mandiDeg = calcMandi(
           jdBirth: jdBirth, lat: lat, lon: lon, dob: dob, ayanamsaMode: ayanamsaMode);
-      positions['ಮಾಂದಿ'] = mandiDeg;
-      speeds['ಮಾಂದಿ'] = 0;
+      positions['à²®à²¾à²‚à²¦à²¿'] = mandiDeg;
+      speeds['à²®à²¾à²‚à²¦à²¿'] = 0;
 
       // Create PlanetInfo for each
       final Map<String, PlanetInfo> planetInfoMap = {};
@@ -363,8 +363,8 @@ class AstroCalculator {
       }
 
       // Panchang
-      final mDeg = positions['ಚಂದ್ರ']!;
-      final sDeg = positions['ರವಿ']!;
+      final mDeg = positions['à²šà²‚à²¦à³à²°']!;
+      final sDeg = positions['à²°à²µà²¿']!;
       final tIdx = (((mDeg - sDeg + 360) % 360) / 12).floor().clamp(0, 29);
       final nIdx  = (mDeg / _nakSize).floor() % 27;
       final yDeg  = (mDeg + sDeg) % 360;
@@ -372,12 +372,12 @@ class AstroCalculator {
 
       final kIdx  = (((mDeg - sDeg + 360) % 360) / 6).floor();
       String kName;
-      if (kIdx == 0) kName = 'ಕಿಂಸ್ತುಘ್ನ';
-      else if (kIdx == 57) kName = 'ಶಕುನಿ';
-      else if (kIdx == 58) kName = 'ಚತುಷ್ಪಾದ';
-      else if (kIdx == 59) kName = 'ನಾಗ';
+      if (kIdx == 0) kName = 'à²•à²¿à²‚à²¸à³à²¤à³à²˜à³à²¨';
+      else if (kIdx == 57) kName = 'à²¶à²•à³à²¨à²¿';
+      else if (kIdx == 58) kName = 'à²šà²¤à³à²·à³à²ªà²¾à²¦';
+      else if (kIdx == 59) kName = 'à²¨à²¾à²—';
       else {
-        const kArr = ['ಬವ', 'ಬಾಲವ', 'ಕೌಲವ', 'ತೈತಿಲ', 'ಗರ', 'ವಣಿಜ', 'ಭದ್ರಾ (ವಿಷ್ಟಿ)'];
+        const kArr = ['à²¬à²µ', 'à²¬à²¾à²²à²µ', 'à²•à³Œà²²à²µ', 'à²¤à³ˆà²¤à²¿à²²', 'à²—à²°', 'à²µà²£à²¿à²œ', 'à²­à²¦à³à²°à²¾ (à²µà²¿à²·à³à²Ÿà²¿)'];
         kName = kArr[(kIdx - 1) % 7];
       }
 
@@ -413,7 +413,7 @@ class AstroCalculator {
         gataGhati: gataGhati,
         paramaGhati: paramaGhati,
         shesha: sheshaGhati,
-        dashaBalance: '${bal.floor()}ವ ${((bal % 1) * 12).floor()}ತಿ',
+        dashaBalance: '${bal.floor()}à²µ ${((bal % 1) * 12).floor()}à²¤à²¿',
         dashaLord: dashaLord,
         nakshatraIndex: nIdx,
         nakPercent: perc,
@@ -425,15 +425,15 @@ class AstroCalculator {
       // Ashtakavarga
       final (sav, bav) = calcAshtakavarga(positions);
 
-      // Advanced Sphutas (16) — exact Python port
-      final S   = positions['ರವಿ']!;
-      final M   = positions['ಚಂದ್ರ']!;
-      final J   = positions['ಗುರು']!;
-      final V   = positions['ಶುಕ್ರ']!;
-      final Ma  = positions['ಕುಜ']!;
-      final R   = positions['ರಾಹು']!;
-      final Asc = positions['ಲಗ್ನ']!;
-      final Md  = positions['ಮಾಂದಿ']!;
+      // Advanced Sphutas (16) â€” exact Python port
+      final S   = positions['à²°à²µà²¿']!;
+      final M   = positions['à²šà²‚à²¦à³à²°']!;
+      final J   = positions['à²—à³à²°à³']!;
+      final V   = positions['à²¶à³à²•à³à²°']!;
+      final Ma  = positions['à²•à³à²œ']!;
+      final R   = positions['à²°à²¾à²¹à³']!;
+      final Asc = positions['à²²à²—à³à²¨']!;
+      final Md  = positions['à²®à²¾à²‚à²¦à²¿']!;
 
       final dhooma     = normDeg(S + 133.333333);
       final vyatipata  = normDeg(360 - dhooma);
@@ -453,12 +453,12 @@ class AstroCalculator {
       final sookshma   = normDeg(prana + deha + mrityu);
 
       final advSphutas = <String, double>{
-        'ಧೂಮ': dhooma, 'ವ್ಯತೀಪಾತ': vyatipata, 'ಪರಿವೇಷ': parivesha,
-        'ಇಂದ್ರಚಾಪ': indrachapa, 'ಉಪಕೇತು': upaketu, 'ಭೃಗು ಬಿ.': bhrigu,
-        'ಬೀಜ': beeja, 'ಕ್ಷೇತ್ರ': kshetra, 'ಯೋಗಿ': yogi,
-        'ತ್ರಿಸ್ಫುಟ': trisphuta, 'ಚತುಃಸ್ಫುಟ': chatusphuta,
-        'ಪಂಚಸ್ಫುಟ': panchasphuta, 'ಪ್ರಾಣ': prana, 'ದೇಹ': deha,
-        'ಮೃತ್ಯು': mrityu, 'ಸೂಕ್ಷ್ಮ ತ್ರಿ.': sookshma,
+        'à²§à³‚à²®': dhooma, 'à²µà³à²¯à²¤à³€à²ªà²¾à²¤': vyatipata, 'à²ªà²°à²¿à²µà³‡à²·': parivesha,
+        'à²‡à²‚à²¦à³à²°à²šà²¾à²ª': indrachapa, 'à²‰à²ªà²•à³‡à²¤à³': upaketu, 'à²­à³ƒà²—à³ à²¬à²¿.': bhrigu,
+        'à²¬à³€à²œ': beeja, 'à²•à³à²·à³‡à²¤à³à²°': kshetra, 'à²¯à³‹à²—à²¿': yogi,
+        'à²¤à³à²°à²¿à²¸à³à²«à³à²Ÿ': trisphuta, 'à²šà²¤à³à²ƒà²¸à³à²«à³à²Ÿ': chatusphuta,
+        'à²ªà²‚à²šà²¸à³à²«à³à²Ÿ': panchasphuta, 'à²ªà³à²°à²¾à²£': prana, 'à²¦à³‡à²¹': deha,
+        'à²®à³ƒà²¤à³à²¯à³': mrityu, 'à²¸à³‚à²•à³à²·à³à²® à²¤à³à²°à²¿.': sookshma,
       };
 
       return KundaliResult(
@@ -475,24 +475,24 @@ class AstroCalculator {
     }
   }
 
-  // ─────────────────────────────────────────────
-  // Planet popup detail (Vargas) — exact Python port
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Planet popup detail (Vargas) â€” exact Python port
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static Map<String, dynamic> getPlanetDetail(String pName, double deg, double speed, double sunDeg) {
     final degFmt = formatDeg(deg);
     bool isAsta = false;
-    String gati = 'ಅನ್ವಯಿಸುವುದಿಲ್ಲ';
+    String gati = 'à²…à²¨à³à²µà²¯à²¿à²¸à³à²µà³à²¦à²¿à²²à³à²²';
 
-    if (!['ರವಿ', 'ರಾಹು', 'ಕೇತು', 'ಲಗ್ನ', 'ಮಾಂದಿ'].contains(pName)) {
+    if (!['à²°à²µà²¿', 'à²°à²¾à²¹à³', 'à²•à³‡à²¤à³', 'à²²à²—à³à²¨', 'à²®à²¾à²‚à²¦à²¿'].contains(pName)) {
       double diff = (deg - sunDeg).abs();
       if (diff > 180) diff = 360 - diff;
-      const limits = {'ಚಂದ್ರ': 12, 'ಕುಜ': 17, 'ಬುಧ': 14, 'ಗುರು': 11, 'ಶುಕ್ರ': 10, 'ಶನಿ': 15};
+      const limits = {'à²šà²‚à²¦à³à²°': 12, 'à²•à³à²œ': 17, 'à²¬à³à²§': 14, 'à²—à³à²°à³': 11, 'à²¶à³à²•à³à²°': 10, 'à²¶à²¨à²¿': 15};
       if (diff <= (limits[pName] ?? 0)) isAsta = true;
-      gati = (pName == 'ಚಂದ್ರ') ? 'ನೇರ' : (speed < 0 ? 'ವಕ್ರಿ' : 'ನೇರ');
-    } else if (['ರಾಹು', 'ಕೇತು'].contains(pName)) {
-      gati = 'ವಕ್ರಿ';
-    } else if (pName == 'ರವಿ') {
-      gati = 'ನೇರ';
+      gati = (pName == 'à²šà²‚à²¦à³à²°') ? 'à²¨à³‡à²°' : (speed < 0 ? 'à²µà²•à³à²°à²¿' : 'à²¨à³‡à²°');
+    } else if (['à²°à²¾à²¹à³', 'à²•à³‡à²¤à³'].contains(pName)) {
+      gati = 'à²µà²•à³à²°à²¿';
+    } else if (pName == 'à²°à²µà²¿') {
+      gati = 'à²¨à³‡à²°';
     }
 
     final d1Idx = (deg / 30).floor() % 12;

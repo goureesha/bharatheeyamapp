@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+﻿import 'package:flutter/material.dart';
 import '../widgets/common.dart';
 
 class PlanetDetailSheet extends StatelessWidget {
@@ -30,28 +29,32 @@ class PlanetDetailSheet extends StatelessWidget {
             // Title
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Text('ಗ್ರಹದ ಸಂಪೂರ್ಣ ವಿವರ — $pName',
-                style: GoogleFonts.notoSansKannada(
-                  fontSize: 16, fontWeight: FontWeight.w800, color: kPurple2)),
+              child: Text('à²—à³à²°à²¹à²¦ à²¸à²‚à²ªà³‚à²°à³à²£ à²µà²¿à²µà²° â€” $pName',
+                style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ),
             ),
             Expanded(
               child: ListView(
                 controller: ctrl,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
-                  _section('📌 ಮೂಲ ವಿವರ', [
-                    ['ಸ್ಫುಟ',  detail['degFmt']],
-                    ['ಗತಿ',   detail['gati']],
-                    ['ಅಸ್ತ',  detail['isAsta'] == true ? 'ಹೌದು' : (detail['isAsta'] == false ? 'ಇಲ್ಲ' : 'ಅನ್ವಯಿಸುವುದಿಲ್ಲ')],
+                  _section('ðŸ“Œ à²®à³‚à²² à²µà²¿à²µà²°', [
+                    ['à²¸à³à²«à³à²Ÿ',  detail['degFmt']],
+                    ['à²—à²¤à²¿',   detail['gati']],
+                    ['à²…à²¸à³à²¤',  detail['isAsta'] == true ? 'à²¹à³Œà²¦à³' : (detail['isAsta'] == false ? 'à²‡à²²à³à²²' : 'à²…à²¨à³à²µà²¯à²¿à²¸à³à²µà³à²¦à²¿à²²à³à²²')],
                   ]),
                   const SizedBox(height: 8),
-                  _section('📊 ವರ್ಗಗಳು', [
-                    ['ರಾಶಿ (D1)',      detail['d1']],
-                    ['ಹೋರಾ (D2)',     detail['d2']],
-                    ['ದ್ರೇಕ್ಕಾಣ (D3)', detail['d3']],
-                    ['ನವಾಂಶ (D9)',    detail['d9']],
-                    ['ದ್ವಾದಶಾಂಶ (D12)',detail['d12']],
-                    ['ತ್ರಿಂಶಾಂಶ (D30)',detail['d30']],
+                  _section('ðŸ“Š à²µà²°à³à²—à²—à²³à³', [
+                    ['à²°à²¾à²¶à²¿ (D1)',      detail['d1']],
+                    ['à²¹à³‹à²°à²¾ (D2)',     detail['d2']],
+                    ['à²¦à³à²°à³‡à²•à³à²•à²¾à²£ (D3)', detail['d3']],
+                    ['à²¨à²µà²¾à²‚à²¶ (D9)',    detail['d9']],
+                    ['à²¦à³à²µà²¾à²¦à²¶à²¾à²‚à²¶ (D12)',detail['d12']],
+                    ['à²¤à³à²°à²¿à²‚à²¶à²¾à²‚à²¶ (D30)',detail['d30']],
                   ]),
                   const SizedBox(height: 24),
                 ],
@@ -71,18 +74,31 @@ class PlanetDetailSheet extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-            child: Text(title, style: GoogleFonts.notoSansKannada(
-              fontWeight: FontWeight.w800, fontSize: 14, color: const Color(0xFF2B6CB0))),
+            child: Text(title, style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    )),
           ),
           ...rows.map((r) => Container(
             decoration: const BoxDecoration(
               border: Border(top: BorderSide(color: Color(0xFFEDF2F7)))),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(children: [
-              Text(r[0], style: GoogleFonts.notoSansKannada(
-                fontWeight: FontWeight.w700, color: const Color(0xFF4A5568))),
+              Text(r[0], style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    )),
               const Spacer(),
-              Text(r[1], style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w700)),
+              Text(r[1], style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ),
             ]),
           )),
         ],

@@ -24,17 +24,25 @@ jobs:
           flutter-version: '3.27.4'
           channel: 'stable'
 
+      - name: Create fresh Flutter project (gets correct Android template)
+        run: flutter create --project-name bharatheeyam --org com.bharatheeyam /tmp/bharat_build
+
+      - name: Copy our source code into fresh project
+        run: |
+          cp -r lib/ /tmp/bharat_build/lib/
+          cp pubspec.yaml /tmp/bharat_build/pubspec.yaml
+
       - name: Get dependencies
-        run: flutter pub get
+        run: cd /tmp/bharat_build && flutter pub get
 
-      - name: Build APK (release)
-        run: flutter build apk --release --split-per-abi
+      - name: Build debug APK
+        run: cd /tmp/bharat_build && flutter build apk --debug
 
-      - name: Upload APK artifacts
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: bharatheeyam-apk
-          path: build/app/outputs/flutter-apk/*.apk
+          path: /tmp/bharat_build/build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 30
 
   build_web:
@@ -49,18 +57,23 @@ jobs:
           flutter-version: '3.27.4'
           channel: 'stable'
 
-      - name: Get dependencies
-        run: flutter pub get
+      - name: Create fresh Flutter project
+        run: flutter create --project-name bharatheeyam --org com.bharatheeyam /tmp/bharat_web
 
-      - name: Enable Flutter Web
-        run: flutter config --enable-web
+      - name: Copy our source code
+        run: |
+          cp -r lib/ /tmp/bharat_web/lib/
+          cp pubspec.yaml /tmp/bharat_web/pubspec.yaml
+
+      - name: Get dependencies
+        run: cd /tmp/bharat_web && flutter pub get
 
       - name: Build Web
-        run: flutter build web --base-href "/bharatheeyamapp/"
+        run: cd /tmp/bharat_web && flutter build web --base-href "/bharatheeyamapp/"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/web
+          publish_dir: /tmp/bharat_web/build/web
           publish_branch: gh-pages

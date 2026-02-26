@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+﻿import 'package:flutter/material.dart';
 import '../core/calculator.dart';
 import '../constants/strings.dart';
 import '../widgets/common.dart';
@@ -44,13 +43,13 @@ class _DashboardScreenState extends State<DashboardScreen>
   String _notes = '';
   bool _showSphutas = false;
   int _varga = 1;
-  String _chartMode = 'ರಾಶಿ';
+  String _chartMode = 'à²°à²¾à²¶à²¿';
   Map<String, int> _aroodhas = {};
 
   static const _tabs = [
-    'ಕುಂಡಲಿ', 'ಗ್ರಹ ಸ್ಫುಟ', 'ಉಪಗ್ರಹ ಸ್ಫುಟ', 'ಆರೂಢ',
-    'ದಶ', 'ಪಂಚಾಂಗ', 'ಭಾವ', 'ಅಷ್ಟಕವರ್ಗ',
-    'ಟಿಪ್ಪಣಿ', 'ಚಂದಾದಾರಿಕೆ', 'ಬಗ್ಗೆ'
+    'à²•à³à²‚à²¡à²²à²¿', 'à²—à³à²°à²¹ à²¸à³à²«à³à²Ÿ', 'à²‰à²ªà²—à³à²°à²¹ à²¸à³à²«à³à²Ÿ', 'à²†à²°à³‚à²¢',
+    'à²¦à²¶', 'à²ªà²‚à²šà²¾à²‚à²—', 'à²­à²¾à²µ', 'à²…à²·à³à²Ÿà²•à²µà²°à³à²—',
+    'à²Ÿà²¿à²ªà³à²ªà²£à²¿', 'à²šà²‚à²¦à²¾à²¦à²¾à²°à²¿à²•à³†', 'à²¬à²—à³à²—à³†'
   ];
 
   @override
@@ -86,9 +85,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ),
                   Expanded(
                     child: Text(
-                      widget.name.isNotEmpty ? widget.name : 'ಭಾರತೀಯಮ್',
-                      style: GoogleFonts.notoSansKannada(
-                        color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18),
+                      widget.name.isNotEmpty ? widget.name : 'à²­à²¾à²°à²¤à³€à²¯à²®à³',
+                      style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -97,8 +100,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                     onPressed: () {
                       widget.onSave();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('ಉಳಿಸಲಾಗಿದೆ!',
-                          style: GoogleFonts.notoSansKannada())));
+                        SnackBar(content: Text('à²‰à²³à²¿à²¸à²²à²¾à²—à²¿à²¦à³†!',
+                          style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    )));
                     },
                   ),
                 ],
@@ -140,9 +148,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TAB 1: KUNDALI
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _buildKundaliTab() {
     return SingleChildScrollView(
       child: Column(
@@ -156,29 +164,29 @@ class _DashboardScreenState extends State<DashboardScreen>
                 Expanded(
                   child: DropdownButtonFormField<int>(
                     value: _varga,
-                    decoration: const InputDecoration(labelText: 'ವರ್ಗ', contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+                    decoration: const InputDecoration(labelText: 'à²µà²°à³à²—', contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
                     items: const [
-                      DropdownMenuItem(value: 1, child: Text('ರಾಶಿ')),
-                      DropdownMenuItem(value: 2, child: Text('ಹೋರಾ')),
-                      DropdownMenuItem(value: 3, child: Text('ದ್ರೇಕ್ಕಾಣ')),
-                      DropdownMenuItem(value: 9, child: Text('ನವಾಂಶ')),
-                      DropdownMenuItem(value: 12, child: Text('ದ್ವಾದಶಾಂಶ')),
-                      DropdownMenuItem(value: 30, child: Text('ತ್ರಿಂಶಾಂಶ')),
+                      DropdownMenuItem(value: 1, child: Text('à²°à²¾à²¶à²¿')),
+                      DropdownMenuItem(value: 2, child: Text('à²¹à³‹à²°à²¾')),
+                      DropdownMenuItem(value: 3, child: Text('à²¦à³à²°à³‡à²•à³à²•à²¾à²£')),
+                      DropdownMenuItem(value: 9, child: Text('à²¨à²µà²¾à²‚à²¶')),
+                      DropdownMenuItem(value: 12, child: Text('à²¦à³à²µà²¾à²¦à²¶à²¾à²‚à²¶')),
+                      DropdownMenuItem(value: 30, child: Text('à²¤à³à²°à²¿à²‚à²¶à²¾à²‚à²¶')),
                     ],
-                    onChanged: (v) => setState(() { _varga = v!; _chartMode = 'ರಾಶಿ'; }),
+                    onChanged: (v) => setState(() { _varga = v!; _chartMode = 'à²°à²¾à²¶à²¿'; }),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _chartMode,
-                    decoration: const InputDecoration(labelText: 'ಚಾರ್ಟ್ ವಿಧ', contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-                    items: ['ರಾಶಿ','ಭಾವ','ನವಾಂಶ'].map((m) =>
+                    decoration: const InputDecoration(labelText: 'à²šà²¾à²°à³à²Ÿà³ à²µà²¿à²§', contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+                    items: ['à²°à²¾à²¶à²¿','à²­à²¾à²µ','à²¨à²µà²¾à²‚à²¶'].map((m) =>
                       DropdownMenuItem(value: m, child: Text(m))).toList(),
                     onChanged: (v) => setState(() {
                       _chartMode = v!;
-                      if (v == 'ಭಾವ') _varga = 1;
-                      if (v == 'ನವಾಂಶ') _varga = 9;
+                      if (v == 'à²­à²¾à²µ') _varga = 1;
+                      if (v == 'à²¨à²µà²¾à²‚à²¶') _varga = 9;
                     }),
                   ),
                 ),
@@ -187,8 +195,13 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 8),
           SwitchListTile(
-            title: Text('ಸ್ಫುಟಗಳನ್ನು ಕುಂಡಲಿಯಲ್ಲಿ ತೋರಿಸಿ',
-              style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF2B6CB0))),
+            title: Text('à²¸à³à²«à³à²Ÿà²—à²³à²¨à³à²¨à³ à²•à³à²‚à²¡à²²à²¿à²¯à²²à³à²²à²¿ à²¤à³‹à²°à²¿à²¸à²¿',
+              style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    )),
             value: _showSphutas,
             activeColor: kPurple2,
             onChanged: (v) => setState(() => _showSphutas = v),
@@ -201,15 +214,15 @@ class _DashboardScreenState extends State<DashboardScreen>
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: KundaliChart(
               result: widget.result,
-              varga: _chartMode == 'ಭಾವ' ? 1 : (_chartMode == 'ನವಾಂಶ' ? 9 : _varga),
-              isBhava: _chartMode == 'ಭಾವ',
+              varga: _chartMode == 'à²­à²¾à²µ' ? 1 : (_chartMode == 'à²¨à²µà²¾à²‚à²¶' ? 9 : _varga),
+              isBhava: _chartMode == 'à²­à²¾à²µ',
               showSphutas: _showSphutas,
             ),
           ),
           const SizedBox(height: 16),
 
           // Planet buttons
-          const SectionTitle('🔍 ಗ್ರಹಗಳ ವಿಸ್ತೃತ ವಿವರ'),
+          const SectionTitle('ðŸ” à²—à³à²°à²¹à²—à²³ à²µà²¿à²¸à³à²¤à³ƒà²¤ à²µà²¿à²µà²°'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: GridView.count(
@@ -225,7 +238,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 return ElevatedButton(
                   onPressed: () => _showPlanetDetail(p),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: p == 'ಲಗ್ನ' || p == 'ಮಾಂದಿ'
+                    backgroundColor: p == 'à²²à²—à³à²¨' || p == 'à²®à²¾à²‚à²¦à²¿'
                         ? kOrange.withOpacity(0.15) : Colors.white,
                     foregroundColor: kText,
                     elevation: 0,
@@ -233,9 +246,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                     padding: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: Text(p, style: GoogleFonts.notoSansKannada(
-                    fontSize: 12, fontWeight: FontWeight.w700,
-                    color: p == 'ಲಗ್ನ' || p == 'ಮಾಂದಿ' ? kOrange2 : const Color(0xFF2B6CB0))),
+                  child: Text(p, style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    )),
                 );
               }).toList(),
             ),
@@ -249,7 +265,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   void _showPlanetDetail(String pName) {
     final info = widget.result.planets[pName];
     if (info == null) return;
-    final sun = widget.result.planets['ರವಿ'];
+    final sun = widget.result.planets['à²°à²µà²¿'];
     final detail = AstroCalculator.getPlanetDetail(
       pName, info.longitude, info.speed, sun?.longitude ?? 0);
     showModalBottomSheet(
@@ -260,9 +276,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TAB 2: GRAHA SPHUTA TABLE
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _buildGrahaSphutas() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -270,7 +286,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         padding: EdgeInsets.zero,
         child: Column(
           children: [
-            _tableHeader(['ಗ್ರಹ', 'ಸ್ಫುಟ', 'ನಕ್ಷತ್ರ - ಪಾದ']),
+            _tableHeader(['à²—à³à²°à²¹', 'à²¸à³à²«à³à²Ÿ', 'à²¨à²•à³à²·à²¤à³à²° - à²ªà²¾à²¦']),
             ...planetOrder.map((p) {
               final info = widget.result.planets[p];
               if (info == null) return const SizedBox.shrink();
@@ -283,9 +299,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TAB 3: UPAGRAHA SPHUTA TABLE
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _buildUpagrahaTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -293,7 +309,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         padding: EdgeInsets.zero,
         child: Column(
           children: [
-            _tableHeader(['ಉಪಗ್ರಹ', 'ರಾಶಿ', 'ಅಂಶ', 'ನಕ್ಷತ್ರ']),
+            _tableHeader(['à²‰à²ªà²—à³à²°à²¹', 'à²°à²¾à²¶à²¿', 'à²…à²‚à²¶', 'à²¨à²•à³à²·à²¤à³à²°']),
             ...sphutas16Order.map((sp) {
               final deg = widget.result.advSphutas[sp];
               if (deg == null) return const SizedBox.shrink();
@@ -309,11 +325,11 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TAB 4: AROODHA
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _buildAroodhaTab() {
-    String _selAro = 'ಆರೂಢ';
+    String _selAro = 'à²†à²°à³‚à²¢';
     int _selRashiIdx = 0;
     return StatefulBuilder(builder: (ctx, setS) {
       return SingleChildScrollView(
@@ -323,15 +339,20 @@ class _DashboardScreenState extends State<DashboardScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SectionTitle('ಆರೂಢ ಚಕ್ರ'),
+                  const SectionTitle('à²†à²°à³‚à²¢ à²šà²•à³à²°'),
                   Row(children: [
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         value: _selAro,
-                        items: ['ಆರೂಢ','ಉದಯ','ಲಗ್ನಾಂಶ','ಛತ್ರ','ಸ್ಪೃಷ್ಟಾಂಗ','ಚಂದ್ರ','ತಾಂಬೂಲ']
-                          .map((a) => DropdownMenuItem(value: a, child: Text(a, style: GoogleFonts.notoSansKannada()))).toList(),
+                        items: ['à²†à²°à³‚à²¢','à²‰à²¦à²¯','à²²à²—à³à²¨à²¾à²‚à²¶','à²›à²¤à³à²°','à²¸à³à²ªà³ƒà²·à³à²Ÿà²¾à²‚à²—','à²šà²‚à²¦à³à²°','à²¤à²¾à²‚à²¬à³‚à²²']
+                          .map((a) => DropdownMenuItem(value: a, child: Text(a, style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ))).toList(),
                         onChanged: (v) => setS(() => _selAro = v!),
-                        decoration: const InputDecoration(labelText: 'ಆರೂಢ'),
+                        decoration: const InputDecoration(labelText: 'à²†à²°à³‚à²¢'),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -339,23 +360,38 @@ class _DashboardScreenState extends State<DashboardScreen>
                       child: DropdownButtonFormField<int>(
                         value: _selRashiIdx,
                         items: List.generate(12, (i) => DropdownMenuItem(
-                          value: i, child: Text(knRashi[i], style: GoogleFonts.notoSansKannada()))).toList(),
+                          value: i, child: Text(knRashi[i], style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ))).toList(),
                         onChanged: (v) => setS(() => _selRashiIdx = v!),
-                        decoration: const InputDecoration(labelText: 'ರಾಶಿ'),
+                        decoration: const InputDecoration(labelText: 'à²°à²¾à²¶à²¿'),
                       ),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () => setS(() => _aroodhas[_selAro] = _selRashiIdx),
                       style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10)),
-                      child: Text('ಸೇರಿಸಿ', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w800)),
+                      child: Text('à²¸à³‡à²°à²¿à²¸à²¿', style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ),
                     ),
                   ]),
                   if (_aroodhas.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     TextButton(
                       onPressed: () => setS(() => _aroodhas.clear()),
-                      child: Text('ತೆರವುಗೊಳಿಸಿ', style: GoogleFonts.notoSansKannada(color: Colors.red)),
+                      child: Text('à²¤à³†à²°à²µà³à²—à³Šà²³à²¿à²¸à²¿', style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ),
                     ),
                   ],
                 ],
@@ -369,7 +405,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 isBhava: false,
                 showSphutas: false,
                 aroodhas: _aroodhas,
-                centerLabel: 'ಆರೂಢ\nಚಕ್ರ',
+                centerLabel: 'à²†à²°à³‚à²¢\nà²šà²•à³à²°',
               ),
             ),
             const SizedBox(height: 24),
@@ -379,9 +415,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     });
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TAB 5: DASHA
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _buildDashaTab() {
     final pan = widget.result.panchang;
     return SingleChildScrollView(
@@ -389,9 +425,13 @@ class _DashboardScreenState extends State<DashboardScreen>
         children: [
           AppCard(
             child: Text(
-              'ಶಿಷ್ಟ ದಶೆ: ${pan.dashaLord}  ಉಳಿಕೆ: ${pan.dashaBalance}',
-              style: GoogleFonts.notoSansKannada(
-                color: kOrange, fontWeight: FontWeight.w900, fontSize: 14),
+              'à²¶à²¿à²·à³à²Ÿ à²¦à²¶à³†: ${pan.dashaLord}  à²‰à²³à²¿à²•à³†: ${pan.dashaBalance}',
+              style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ,
             ),
           ),
           DashaWidget(dashas: widget.result.dashas),
@@ -401,9 +441,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TAB 6: PANCHANG
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _buildPanchangTab() {
     final pan = widget.result.panchang;
     final dateStr = '${widget.dob.day.toString().padLeft(2,'0')}-${widget.dob.month.toString().padLeft(2,'0')}-${widget.dob.year}';
@@ -412,23 +452,23 @@ class _DashboardScreenState extends State<DashboardScreen>
       child: Column(
         children: [
           AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            _kv('ಸ್ಥಳ', widget.place),
-            _kv('ದಿನಾಂಕ', dateStr),
-            _kv('ಸಮಯ', timeStr),
+            _kv('à²¸à³à²¥à²³', widget.place),
+            _kv('à²¦à²¿à²¨à²¾à²‚à²•', dateStr),
+            _kv('à²¸à²®à²¯', timeStr),
           ])),
           AppCard(
             padding: EdgeInsets.zero,
             child: Column(children: [
-              _tableRow(['ವಾರ', pan.vara]),
-              _tableRow(['ತಿಥಿ', pan.tithi]),
-              _tableRow(['ನಕ್ಷತ್ರ', pan.nakshatra]),
-              _tableRow(['ಯೋಗ', pan.yoga]),
-              _tableRow(['ಕರಣ', pan.karana]),
-              _tableRow(['ಚಂದ್ರ ರಾಶಿ', pan.chandraRashi]),
-              _tableRow(['ಉದಯಾದಿ ಘಟಿ', pan.udayadiGhati]),
-              _tableRow(['ಗತ ಘಟಿ', pan.gataGhati]),
-              _tableRow(['ಪರಮ ಘಟಿ', pan.paramaGhati]),
-              _tableRow(['ಶೇಷ ಘಟಿ', pan.shesha]),
+              _tableRow(['à²µà²¾à²°', pan.vara]),
+              _tableRow(['à²¤à²¿à²¥à²¿', pan.tithi]),
+              _tableRow(['à²¨à²•à³à²·à²¤à³à²°', pan.nakshatra]),
+              _tableRow(['à²¯à³‹à²—', pan.yoga]),
+              _tableRow(['à²•à²°à²£', pan.karana]),
+              _tableRow(['à²šà²‚à²¦à³à²° à²°à²¾à²¶à²¿', pan.chandraRashi]),
+              _tableRow(['à²‰à²¦à²¯à²¾à²¦à²¿ à²˜à²Ÿà²¿', pan.udayadiGhati]),
+              _tableRow(['à²—à²¤ à²˜à²Ÿà²¿', pan.gataGhati]),
+              _tableRow(['à²ªà²°à²® à²˜à²Ÿà²¿', pan.paramaGhati]),
+              _tableRow(['à²¶à³‡à²· à²˜à²Ÿà²¿', pan.shesha]),
             ]),
           ),
           const SizedBox(height: 24),
@@ -437,9 +477,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TAB 7: BHAVA
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _buildBhavaTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -447,7 +487,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         padding: EdgeInsets.zero,
         child: Column(
           children: [
-            _tableHeader(['ಭಾವ', 'ಮಧ್ಯ ಸ್ಫುಟ', 'ರಾಶಿ']),
+            _tableHeader(['à²­à²¾à²µ', 'à²®à²§à³à²¯ à²¸à³à²«à³à²Ÿ', 'à²°à²¾à²¶à²¿']),
             ...List.generate(12, (i) {
               final deg = widget.result.bhavas[i];
               return _tableRow(
@@ -461,9 +501,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TAB 8: ASHTAKAVARGA
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _buildAshtakavargaTab() {
     return AshtakavargaWidget(
       savBindus: widget.result.savBindus,
@@ -471,9 +511,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TAB 9: NOTES
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _buildNotesTab() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -483,7 +523,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         onChanged: (v) => _notes = v,
         controller: TextEditingController(text: _notes),
         decoration: InputDecoration(
-          labelText: 'ಟಿಪ್ಪಣಿಗಳು',
+          labelText: 'à²Ÿà²¿à²ªà³à²ªà²£à²¿à²—à²³à³',
           alignLabelWithHint: true,
           fillColor: Colors.white,
           filled: true,
@@ -492,29 +532,43 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TAB 10: SUBSCRIPTION
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _buildSubscriptionTab() {
     return Center(
       child: AppCard(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('🚫', style: TextStyle(fontSize: 48)),
+            const Text('ðŸš«', style: TextStyle(fontSize: 48)),
             const SizedBox(height: 8),
-            Text('ಜಾಹೀರಾತು-ಮುಕ್ತ', style: GoogleFonts.notoSansKannada(
-              fontSize: 18, fontWeight: FontWeight.w800)),
+            Text('à²œà²¾à²¹à³€à²°à²¾à²¤à³-à²®à³à²•à³à²¤', style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ),
             const SizedBox(height: 8),
-            Text('ಜಾಹೀರಾತುಗಳಿಲ್ಲದೆ ನಿರಂತರವಾಗಿ ಆ್ಯಪ್ ಬಳಸಿ.',
-              style: GoogleFonts.notoSansKannada(color: kMuted), textAlign: TextAlign.center),
+            Text('à²œà²¾à²¹à³€à²°à²¾à²¤à³à²—à²³à²¿à²²à³à²²à²¦à³† à²¨à²¿à²°à²‚à²¤à²°à²µà²¾à²—à²¿ à²†à³à²¯à²ªà³ à²¬à²³à²¸à²¿.',
+              style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    , textAlign: TextAlign.center),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {},
-                child: Text('ಜಾಹೀರಾತು ತೆಗೆಯಿರಿ (₹99)',
-                  style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w800)),
+                child: Text('à²œà²¾à²¹à³€à²°à²¾à²¤à³ à²¤à³†à²—à³†à²¯à²¿à²°à²¿ (â‚¹99)',
+                  style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ),
               ),
             ),
           ],
@@ -523,30 +577,45 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // TAB 11: ABOUT
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _buildAboutTab() {
     return SingleChildScrollView(
       child: AppCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ಭಾರತೀಯಮ್', style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800)),
+            Text('à²­à²¾à²°à²¤à³€à²¯à²®à³', style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ),
             const SizedBox(height: 8),
-            Text('ಆವೃತ್ತಿ: 1.0.1', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w700)),
+            Text('à²†à²µà³ƒà²¤à³à²¤à²¿: 1.0.1', style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ),
             const SizedBox(height: 8),
-            Text('ನಿಖರವಾದ ವೈದಿಕ ಜ್ಯೋತಿಷ್ಯ ಲೆಕ್ಕಾಚಾರಗಳಿಗಾಗಿ ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ.',
-              style: GoogleFonts.notoSansKannada(color: kMuted, height: 1.6)),
+            Text('à²¨à²¿à²–à²°à²µà²¾à²¦ à²µà³ˆà²¦à²¿à²• à²œà³à²¯à³‹à²¤à²¿à²·à³à²¯ à²²à³†à²•à³à²•à²¾à²šà²¾à²°à²—à²³à²¿à²—à²¾à²—à²¿ à²µà²¿à²¨à³à²¯à²¾à²¸à²—à³Šà²³à²¿à²¸à²²à²¾à²—à²¿à²¦à³†.',
+              style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ),
           ],
         ),
       ),
     );
   }
 
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // HELPERS
-  // ─────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Widget _tableHeader(List<String> cols) {
     return Container(
       color: const Color(0xFFEDF2F7),
@@ -555,7 +624,12 @@ class _DashboardScreenState extends State<DashboardScreen>
           flex: e.key == 1 ? 2 : 1,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Text(e.value, style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w800, fontSize: 12)),
+            child: Text(e.value, style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    ),
           ),
         )).toList(),
       ),
@@ -570,9 +644,12 @@ class _DashboardScreenState extends State<DashboardScreen>
           flex: e.key == 1 ? 2 : 1,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Text(e.value, style: GoogleFonts.notoSansKannada(
-              fontSize: 13,
-              fontWeight: (e.key == 0 && bold0) ? FontWeight.w700 : FontWeight.normal,
+            child: Text(e.value, style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+     ? FontWeight.w700 : FontWeight.normal,
             )),
           ),
         )).toList(),
@@ -584,8 +661,18 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(children: [
-        Text('$k: ', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w800, color: const Color(0xFF2B6CB0))),
-        Expanded(child: Text(v, style: GoogleFonts.notoSansKannada())),
+        Text('$k: ', style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    )),
+        Expanded(child: Text(v, style:  
+        param($m)
+        $inner = $m.Groups[1].Value
+        if ($inner -eq "") { "const TextStyle()" }
+        else { "TextStyle($inner)" }
+    )),
       ]),
     );
   }
