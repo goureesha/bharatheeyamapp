@@ -1,4 +1,9 @@
 import 'package:sweph/sweph.dart';
+import 'dart:math';
+
+double _rad(double d) => d * pi / 180.0;
+double _deg(double r) => r * 180.0 / pi;
+double _norm(double d) => (d % 360.0 + 360.0) % 360.0;
 
 // ============================================================
 // CORE EPHEMERIS ENGINE - Powered by Swiss Ephemeris (sweph package)
@@ -114,7 +119,7 @@ class Ephemeris {
 
   static List<double> placidusHouses(double jd, double lat, double lng, double ayanamsa) {
     try {
-      final res = Sweph.swe_houses(jd, lat, lng, 'P');
+      final res = Sweph.swe_houses(jd, lat, lng, Hsys.P);
       final cusps = res.cusps;
       // cusps[1] is 1st house in Sweph, array size 13
       List<double> siderealCusps = [];
@@ -141,10 +146,10 @@ class Ephemeris {
 
     Map<String, List<double>> res = {};
 
-    List<double> _getPlanet(int planetId) {
+    List<double> _getPlanet(HeavenlyBody planet) {
       try {
-        final calc = Sweph.swe_calc_ut(jd, planetId, flags);
-        return [calc.longitude % 360.0, calc.longitudeSpeed];
+        final calc = Sweph.swe_calc_ut(jd, planet, flags);
+        return [calc.longitude % 360.0, calc.speedInLongitude];
       } catch (_) {
         return [0.0, 0.0];
       }
