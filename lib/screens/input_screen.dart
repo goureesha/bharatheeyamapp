@@ -104,14 +104,14 @@ class _InputScreenState extends State<InputScreen> {
           ? 'raman' : _ayanamsa == 'ಕೆ.ಪಿ' ? 'kp' : 'lahiri';
       final trueNode = _nodeMode == 'ನಿಜ ರಾಹು';
 
-      final result = await Future.microtask(() => AstroCalculator.calculate(
+      final result = await AstroCalculator.calculate(
         year: _dob.year, month: _dob.month, day: _dob.day,
         hourUtcOffset: 5.5,
         hour24: localHour,
         lat: lat, lon: lon,
         ayanamsaMode: aynMode,
         trueNode: trueNode,
-      ));
+      );
 
       if (result != null && mounted) {
         Navigator.push(context, MaterialPageRoute(
@@ -168,7 +168,7 @@ class _InputScreenState extends State<InputScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const AppHeader(),
-              if (_savedProfiles.isNotEmpty) _buildSavedCard(),
+              _buildSavedCard(),
               _buildInputCard(),
               const SizedBox(height: 32),
             ],
@@ -179,35 +179,60 @@ class _InputScreenState extends State<InputScreen> {
   }
 
   Widget _buildSavedCard() {
-    return AppCard(
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ElevatedButton.icon(
+        icon: const Icon(Icons.folder_open, color: Colors.white),
+        label: const Text('ಉಳಿಸಿದ ಜಾತಕ (Saved Profiles)', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Colors.white)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF2B6CB0),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.white,
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+            builder: (_) => _buildProfileListSheet(),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildProfileListSheet() {
+    return SafeArea(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text('📂 ಉಳಿಸಿದ ಜಾತಕ', style: TextStyle(
-            fontWeight: FontWeight.w800, fontSize: 15, color: const Color(0xFF2B6CB0))),
-          const SizedBox(height: 12),
-          Row(children: [
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                value: _selName,
-                hint: Text('ಆಯ್ಕೆಮಾಡಿ', style: const TextStyle()),
-                items: _savedProfiles.keys.map((n) => DropdownMenuItem(
-                  value: n,
-                  child: Text(n, style: const TextStyle()),
-                )).toList(),
-                onChanged: (v) => setState(() => _selName = v),
-                decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text('ಉಳಿಸಿದ ಜಾತಕಗಳು (Saved Profiles)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF2B6CB0))),
+          ),
+          if (_savedProfiles.isEmpty)
+            const Padding(padding: EdgeInsets.all(32), child: Text('ಯಾವುದೇ ಜಾತಕ ಉಳಿಸಿಲ್ಲ.'))
+          else
+            Flexible(
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: _savedProfiles.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (ctx, i) {
+                  final name = _savedProfiles.keys.elementAt(i);
+                  return ListTile(
+                    leading: const CircleAvatar(backgroundColor: Color(0xFFEDF2F7), child: Icon(Icons.person, color: Color(0xFF2B6CB0))),
+                    title: Text(name, style: const TextStyle(fontWeight: FontWeight.w800)),
+                    subtitle: Text('${_savedProfiles[name]!.date} | ${_savedProfiles[name]!.place}'),
+                    trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _loadProfile(name);
+                    },
+                  );
+                },
               ),
             ),
-            const SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: _selName == null ? null : () => _loadProfile(_selName!),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kTeal,
-                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14)),
-              child: Text('ತೆಗೆಯಿರಿ', style: TextStyle(fontWeight: FontWeight.w800)),
-            ),
-          ]),
         ],
       ),
     );

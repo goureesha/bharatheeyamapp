@@ -139,13 +139,13 @@ class AstroCalculator {
   // ─────────────────────────────────────────────
   // MANDI calculation — exact Python port
   // ─────────────────────────────────────────────
-  static double calcMandi({
+  static Future<double> calcMandi({
     required double jdBirth,
     required double lat,
     required double lon,
     required DateTime dob,
     required String ayanamsaMode,
-  }) {
+  }) async {
     final y = dob.year; final m = dob.month; final d = dob.day;
     final sr = Ephemeris.findSunrise(y, m, d, lat, lon);
     final ss = Ephemeris.findSunset(y, m, d, lat, lon);
@@ -313,7 +313,7 @@ class AstroCalculator {
   // ─────────────────────────────────────────────
   // FULL CALCULATION — main entry point
   // ─────────────────────────────────────────────
-  static KundaliResult? calculate({
+  static Future<KundaliResult?> calculate({
     required int year,
     required int month,
     required int day,
@@ -323,8 +323,9 @@ class AstroCalculator {
     required double lon,
     required String ayanamsaMode,  // 'lahiri','raman','kp'
     required bool trueNode,
-  }) {
+  }) async {
     try {
+      await Ephemeris.initSweph();
       // Julian Day (UT)
       final jdBirth = Ephemeris.julday(year, month, day, hour24 - hourUtcOffset);
       final dob = DateTime(year, month, day);
@@ -353,7 +354,7 @@ class AstroCalculator {
       speeds['ಲಗ್ನ'] = 0;
 
       // Mandi
-      final mandiDeg = calcMandi(
+      final mandiDeg = await calcMandi(
           jdBirth: jdBirth, lat: lat, lon: lon, dob: dob, ayanamsaMode: ayanamsaMode);
       positions['ಮಾಂದಿ'] = mandiDeg;
       speeds['ಮಾಂದಿ'] = 0;
