@@ -482,11 +482,19 @@ class _DashboardScreenState extends State<DashboardScreen>
         onChanged: (v) => _notes = v,
         controller: TextEditingController(text: _notes),
         decoration: InputDecoration(
-          labelText: 'ಟಿಪ್ಪಣಿಗಳು',
-          alignLabelWithHint: true,
+          hintText: 'ನಿಮ್ಮ ಟಿಪ್ಪಣಿಗಳನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ...',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          ),
           fillColor: Colors.white,
           filled: true,
         ),
+        style: const TextStyle(fontSize: 15, height: 1.5, color: Color(0xFF2D3748)),
       ),
     );
   }

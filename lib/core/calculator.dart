@@ -282,7 +282,20 @@ class AstroCalculator {
         if (i == 0) adY *= (1 - perc);
         final adDays = (adY * 365.25).round();
         final ae = cad.add(Duration(days: adDays));
-        antars.add(DashaEntry(lord: dashaLords[ia], start: cad, end: ae));
+        
+        final List<DashaEntry> pratyantars = [];
+        DateTime cpd = cad;
+        for (int k = 0; k < 9; k++) {
+          final ip = (ia + k) % 9;
+          double pdY = (dashaYears[im] * dashaYears[ia] * dashaYears[ip]) / (120.0 * 120.0);
+          if (i == 0) pdY *= (1 - perc);
+          final pdDays = (pdY * 365.25).round();
+          final pe = cpd.add(Duration(days: pdDays));
+          pratyantars.add(DashaEntry(lord: dashaLords[ip], start: cpd, end: pe));
+          cpd = pe;
+        }
+
+        antars.add(DashaEntry(lord: dashaLords[ia], start: cad, end: ae, antardashas: pratyantars));
         cad = ae;
       }
 

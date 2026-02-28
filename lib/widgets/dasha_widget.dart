@@ -37,11 +37,11 @@ class _MahaBlock extends StatelessWidget {
         ),
         child: ExpansionTile(
           title: Row(children: [
-            Text(md.lord, style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15)),
+            Text(md.lord, style: const TextStyle(
+              color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16)),
             const Spacer(),
-            Text(fmt(md.end), style: TextStyle(
-              color: Colors.white70, fontSize: 12)),
+            Text(fmt(md.end), style: const TextStyle(
+              color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600)),
           ]),
           iconColor: Colors.white,
           collapsedIconColor: Colors.white,
@@ -69,10 +69,10 @@ class _AntarBlock extends StatelessWidget {
             Container(width: 4, height: 24, color: const Color(0xFFFF9933),
               margin: const EdgeInsets.only(right: 10)),
             Text(ad.lord, style: TextStyle(
-              color: kOrange2, fontWeight: FontWeight.w800, fontSize: 14)),
+              color: kOrange2, fontWeight: FontWeight.w900, fontSize: 15)),
             const Spacer(),
             Text(fmt(ad.end), style: TextStyle(
-              color: kMuted, fontSize: 11)),
+              color: kMuted, fontSize: 12, fontWeight: FontWeight.w600)),
           ]),
           children: ad.antardashas.map((pd) => Container(
             decoration: const BoxDecoration(
@@ -84,10 +84,10 @@ class _AntarBlock extends StatelessWidget {
               Container(width: 3, height: 18, color: const Color(0xFF81E6D9),
                 margin: const EdgeInsets.only(right: 10)),
               Text(pd.lord, style: TextStyle(
-                color: kTeal, fontWeight: FontWeight.w700, fontSize: 13)),
+                color: kTeal, fontWeight: FontWeight.w800, fontSize: 14)),
               const Spacer(),
               Text(fmt(pd.end), style: TextStyle(
-                color: kMuted, fontSize: 11)),
+                color: kMuted, fontSize: 12, fontWeight: FontWeight.w600)),
             ]),
           )).toList(),
         ),

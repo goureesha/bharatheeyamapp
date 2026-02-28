@@ -2,7 +2,18 @@ import 'package:flutter/foundation.dart';
 
 // Pure in-memory storage — zero native dependencies. Guarantees 100% successful compile.
 class StorageService {
-  static final Map<String, Profile> _cache = {};
+  static final Map<String, Profile> _cache = {
+    'ಮಾದರಿ ಜಾತಕ (Sample)': Profile(
+      name: 'ಮಾದರಿ ಜಾತಕ (Sample)',
+      date: '1990-01-01',
+      hour: 12,
+      minute: 0,
+      ampm: 'PM',
+      lat: 14.98,
+      lon: 74.73,
+      place: 'Yellapur',
+    ),
+  };
 
   static Future<Map<String, Profile>> loadAll() async {
     return _cache;

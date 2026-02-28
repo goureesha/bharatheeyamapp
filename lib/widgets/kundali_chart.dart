@@ -120,19 +120,6 @@ class KundaliChart extends StatelessWidget {
       }
     }
 
-    // Build grid
-    bool centerDone = false;
-    final cells = _grid.map((idx) {
-      if (idx == null) {
-        if (!centerDone) {
-          centerDone = true;
-          return _centerBox();
-        }
-        return const SizedBox.shrink();
-      }
-      return _rashiBox(idx, boxes[idx]!);
-    }).toList();
-
     return AspectRatio(
       aspectRatio: 1.0,
       child: Container(
@@ -141,12 +128,33 @@ class KundaliChart extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         padding: const EdgeInsets.all(3),
-        child: GridView.count(
-          crossAxisCount: 4,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 3,
-          crossAxisSpacing: 3,
-          children: cells,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final dim = constraints.maxWidth;
+            final cw = dim / 4;
+            return Stack(
+              children: [
+                // Top Row
+                Positioned(top: 0, left: 0, width: cw, height: cw, child: _rashiBox(11, boxes[11]!)),
+                Positioned(top: 0, left: cw, width: cw, height: cw, child: _rashiBox(0, boxes[0]!)),
+                Positioned(top: 0, left: cw*2, width: cw, height: cw, child: _rashiBox(1, boxes[1]!)),
+                Positioned(top: 0, left: cw*3, width: cw, height: cw, child: _rashiBox(2, boxes[2]!)),
+                // Right Col
+                Positioned(top: cw, left: cw*3, width: cw, height: cw, child: _rashiBox(3, boxes[3]!)),
+                Positioned(top: cw*2, left: cw*3, width: cw, height: cw, child: _rashiBox(4, boxes[4]!)),
+                Positioned(top: cw*3, left: cw*3, width: cw, height: cw, child: _rashiBox(5, boxes[5]!)),
+                // Bottom Row
+                Positioned(top: cw*3, left: cw*2, width: cw, height: cw, child: _rashiBox(6, boxes[6]!)),
+                Positioned(top: cw*3, left: cw, width: cw, height: cw, child: _rashiBox(7, boxes[7]!)),
+                Positioned(top: cw*3, left: 0, width: cw, height: cw, child: _rashiBox(8, boxes[8]!)),
+                // Left Col
+                Positioned(top: cw*2, left: 0, width: cw, height: cw, child: _rashiBox(9, boxes[9]!)),
+                Positioned(top: cw, left: 0, width: cw, height: cw, child: _rashiBox(10, boxes[10]!)),
+                // Center big box
+                Positioned(top: cw, left: cw, width: cw*2, height: cw*2, child: _centerBox()),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -184,19 +192,28 @@ class KundaliChart extends StatelessWidget {
   Widget _centerBox() {
     final label = centerLabel ?? 'ಭಾರತೀಯಮ್';
     return Container(
+      margin: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFF6D365), Color(0xFFFDA085)],
-          begin: Alignment.topLeft, end: Alignment.bottomRight,
-        ),
+        color: const Color(0xFFFFF0EC),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Colors.white, width: 2),
+        border: Border.all(color: const Color(0xFFDD6B20), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Center(
         child: Text(label,
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 13, fontWeight: FontWeight.w900, color: const Color(0xFF742A2A))),
+          style: const TextStyle(
+            fontSize: 20, 
+            fontWeight: FontWeight.w900, 
+            color: Color(0xFFDD6B20),
+            letterSpacing: 1.2,
+          )),
       ),
     );
   }
