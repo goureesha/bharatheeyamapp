@@ -103,17 +103,17 @@ class Ephemeris {
   }
 
   static double ayanamsaLahiri(double jd) {
-    Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI, 0, 0);
+    Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
     return Sweph.swe_get_ayanamsa(jd);
   }
 
   static double ayanamsaRaman(double jd) {
-    Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_RAMAN, 0, 0);
+    Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_RAMAN);
     return Sweph.swe_get_ayanamsa(jd);
   }
 
   static double ayanamsaKP(double jd) {
-    Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_KRISHNAMURTI, 0, 0);
+    Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_KRISHNAMURTI);
     return Sweph.swe_get_ayanamsa(jd);
   }
 
@@ -171,5 +171,4 @@ class Ephemeris {
 
     return res;
   }
-}
 }
