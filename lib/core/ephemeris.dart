@@ -317,7 +317,8 @@ class Ephemeris {
     for (int i = 0; i < 32; i++) {
       final a1 = sunAltitude(cur, lat, lng);
       final a2 = sunAltitude(cur + step, lat, lng);
-      final threshold = -0.583;
+      // Vedic 'mid-limb' geometric sunrise (0.0 threshold, no refraction)
+      final threshold = 0.0;
       if (rising && a1 < threshold && a2 >= threshold) {
         // Binary search
         low = cur; high = cur + step;
