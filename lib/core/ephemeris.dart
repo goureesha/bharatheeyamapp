@@ -99,62 +99,61 @@ class Ephemeris {
   }
 
   // ─────────────────────────────────────────────
-  // Outer/Inner planet heliocentric longitudes via VSOP87 (truncated)
+  // 3D Keplerian Elements for Geocentric Planets
   // ─────────────────────────────────────────────
-  static double _marsLon(double t) {
-    final M = _rad(_norm(319.5294 + 19140.30268 * t));
-    final lon = _norm(355.433 + 19141.6964471 * t +
-        (10.691 + 0.012 * t) * sin(M) +
-        0.623 * sin(2 * M) +
-        0.050 * sin(3 * M) +
-        0.005 * sin(4 * M));
-    return lon;
+  static List<double> _kepler(double t, double a, double e, double iDeg, double lDeg, double wDeg, double nodeDeg) {
+    final L = _norm(lDeg);
+    final w = _norm(wDeg);
+    final node = _norm(nodeDeg);
+    final i = _rad(iDeg);
+
+    final M = _rad(_norm(L - w));
+    double E = M;
+    for (int k = 0; k < 10; k++) {
+      final delta = (E - e * sin(E) - M) / (1.0 - e * cos(E));
+      E -= delta;
+      if (delta.abs() < 1e-6) break;
+    }
+
+    final v = 2.0 * atan(sqrt((1.0 + e) / (1.0 - e)) * tan(E / 2.0));
+    final r = a * (1.0 - e * cos(E));
+
+    final vw = v + _rad(w - node);
+    final x = r * (cos(_rad(node)) * cos(vw) - sin(_rad(node)) * sin(vw) * cos(i));
+    final y = r * (sin(_rad(node)) * cos(vw) + cos(_rad(node)) * sin(vw) * cos(i));
+    final z = r * (sin(vw) * sin(i));
+    return [x, y, z];
   }
 
-  static double _jupiterLon(double t) {
-    final M = _rad(_norm(20.9 + 3034.906 * t));
-    final lon = _norm(34.351 + 3034.9057 * t +
-        5.343 * sin(M) +
-        0.154 * sin(2 * M));
-    return lon;
+  static List<double> _earth(double t) {
+    return _kepler(t, 1.00000011, 0.01671022 - 0.00003804 * t, 0.0, 100.466449 + 35999.3728519 * t, 102.937348 + 0.322565 * t, 0.0);
   }
 
-  static double _saturnLon(double t) {
-    final M = _rad(_norm(317.0 + 1222.114 * t));
-    final J = _rad(_norm(20.9 + 3034.906 * t));
-    final lon = _norm(50.077 + 1223.5110 * t +
-        6.392 * sin(M) +
-        0.359 * sin(2 * M) -
-        0.165 * sin(J));
-    return lon;
+  static double _geoLon(double t, List<double> Function(double) planetFunc) {
+    final e = _earth(t);
+    final p = planetFunc(t);
+    final lon = _deg(atan2(p[1] - e[1], p[0] - e[0]));
+    return _norm(lon);
   }
 
-  static double _mercuryLon(double t) {
-    final M = _rad(_norm(168.6562 + 4.0923344368 * t * 36525));
-    final lon = _norm(252.0504 + 4.09233445 * t * 36525 +
-        (23.4405 + 0.5 * t) * sin(M) +
-        2.9818 * sin(2 * M) +
-        0.5255 * sin(3 * M) +
-        0.1058 * sin(4 * M) +
-        0.0241 * sin(5 * M));
-    return lon;
+  static double _mercuryLonGeo(double t) {
+    return _geoLon(t, (t) => _kepler(t, 0.38709927, 0.20563069 + 0.00002527 * t, 7.004979, 252.250324 + 149472.674112 * t, 77.456450 + 0.16013 * t, 48.330761 + 0.31502 * t));
   }
 
-  static double _venusLon(double t) {
-    final M = _rad(_norm(212.7 + 1.6021302244 * t * 36525));
-    final lon = _norm(181.979 + 1.6021302244 * t * 36525 +
-        0.313 * sin(M) +
-        0.022 * sin(2 * M));
-    return lon;
+  static double _venusLonGeo(double t) {
+    return _geoLon(t, (t) => _kepler(t, 0.72333199, 0.00677323 - 0.00004938 * t, 3.394676, 181.979099 + 58517.815386 * t, 131.53298 + 0.04870 * t, 76.679842 + 0.27668 * t));
   }
 
-  // ─────────────────────────────────────────────
-  // Convert heliocentric to geocentric longitude
-  // for inner/outer planets
-  // ─────────────────────────────────────────────
-  static double _helioToGeo(double planetHLon, double sunLon) {
-    // Approximate geocentric lon = heliocentric + 180 - sun
-    return _norm(planetHLon + 180.0);
+  static double _marsLonGeo(double t) {
+    return _geoLon(t, (t) => _kepler(t, 1.52367934, 0.09340062 + 0.00009048 * t, 1.84969, 355.45332 + 19140.299300 * t, 336.04084 + 0.44441 * t, 49.559539 + 0.29257 * t));
+  }
+
+  static double _jupiterLonGeo(double t) {
+    return _geoLon(t, (t) => _kepler(t, 5.202603, 0.048498 + 0.0001639 * t, 1.303, 34.40438 + 3034.746128 * t, 14.75385 + 0.2114 * t, 100.46435 + 0.277 * t));
+  }
+
+  static double _saturnLonGeo(double t) {
+    return _geoLon(t, (t) => _kepler(t, 9.554909, 0.055546 - 0.0003455 * t, 2.488, 50.07744 + 1222.493622 * t, 92.43194 + 0.5282 * t, 113.66242 + 0.2522 * t));
   }
 
   // ─────────────────────────────────────────────
@@ -381,11 +380,11 @@ class Ephemeris {
 
     res['Sun']     = [sid(sunTr), sunSpeed * 1440];
     res['Moon']    = [sid(_moonLon(t)), 12.2];
-    res['Mercury'] = [sid(_mercuryLon(t)), 1.4];
-    res['Venus']   = [sid(_venusLon(t)), 1.2];
-    res['Mars']    = [sid(_marsLon(t)), 0.52];
-    res['Jupiter'] = [sid(_jupiterLon(t)), 0.083];
-    res['Saturn']  = [sid(_saturnLon(t)), 0.034];
+    res['Mercury'] = [sid(_mercuryLonGeo(t)), 1.4];
+    res['Venus']   = [sid(_venusLonGeo(t)), 1.2];
+    res['Mars']    = [sid(_marsLonGeo(t)), 0.52];
+    res['Jupiter'] = [sid(_jupiterLonGeo(t)), 0.083];
+    res['Saturn']  = [sid(_saturnLonGeo(t)), 0.034];
 
     final rahu = trueNode ? _rahuTrue(t) : _rahuMean(t);
     res['Rahu']    = [sid(rahu), -0.053];
