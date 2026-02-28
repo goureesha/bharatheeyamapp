@@ -40,6 +40,8 @@ jobs:
   build_web:
     name: 🌐 Build Flutter Web
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
