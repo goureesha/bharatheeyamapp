@@ -19,7 +19,7 @@ class Ephemeris {
   static double getAltitudeManual(double jd, double lat, double lng) {
     try {
       final calc = Sweph.swe_calc_ut(
-          jd, Sweph.Se_Sun, SwephFlag.Flg_Equatorial | SwephFlag.Flg_Swieph);
+          jd, HeavenlyBody.SE_SUN, SwephFlag.SEFLG_EQUATORIAL | SwephFlag.SEFLG_SWIEPH);
       final ra = calc.longitude; // Ra is in [0]
       final dec = calc.latitude; // Dec is in [1]
 
@@ -54,7 +54,7 @@ class Ephemeris {
   }
 
   static double _findCrossing(int year, int month, int day, double lat, double lng, bool rising) {
-    final jd0 = Sweph.swe_julday(year, month, day, 0.0, SwephFlag.Greg_Cal);
+    final jd0 = Sweph.swe_julday(year, month, day, 0.0, CalendarType.SE_GREG_CAL);
     double low = jd0 - 0.2;
     double high = jd0 + 1.0;
     double step = 1.0 / 24.0;
@@ -98,17 +98,17 @@ class Ephemeris {
   }
 
   static double ayanamsaLahiri(double jd) {
-    Sweph.swe_set_sid_mode(SwephFlag.Sidm_Lahiri, 0, 0);
+    Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI, 0, 0);
     return Sweph.swe_get_ayanamsa(jd);
   }
 
   static double ayanamsaRaman(double jd) {
-    Sweph.swe_set_sid_mode(SwephFlag.Sidm_Raman, 0, 0);
+    Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_RAMAN, 0, 0);
     return Sweph.swe_get_ayanamsa(jd);
   }
 
   static double ayanamsaKP(double jd) {
-    Sweph.swe_set_sid_mode(SwephFlag.Sidm_Krishnamurti, 0, 0);
+    Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_KRISHNAMURTI, 0, 0);
     return Sweph.swe_get_ayanamsa(jd);
   }
 
@@ -137,7 +137,7 @@ class Ephemeris {
       default: ayn = ayanamsaLahiri(jd); break;
     }
 
-    final flags = SwephFlag.Flg_Swieph | SwephFlag.Flg_Sidereal | SwephFlag.Flg_Speed;
+    final flags = SwephFlag.SEFLG_SWIEPH | SwephFlag.SEFLG_SIDEREAL | SwephFlag.SEFLG_SPEED;
 
     Map<String, List<double>> res = {};
 
@@ -150,15 +150,15 @@ class Ephemeris {
       }
     }
 
-    res['Sun']     = _getPlanet(Sweph.Se_Sun);
-    res['Moon']    = _getPlanet(Sweph.Se_Moon);
-    res['Mercury'] = _getPlanet(Sweph.Se_Mercury);
-    res['Venus']   = _getPlanet(Sweph.Se_Venus);
-    res['Mars']    = _getPlanet(Sweph.Se_Mars);
-    res['Jupiter'] = _getPlanet(Sweph.Se_Jupiter);
-    res['Saturn']  = _getPlanet(Sweph.Se_Saturn);
+    res['Sun']     = _getPlanet(HeavenlyBody.SE_SUN);
+    res['Moon']    = _getPlanet(HeavenlyBody.SE_MOON);
+    res['Mercury'] = _getPlanet(HeavenlyBody.SE_MERCURY);
+    res['Venus']   = _getPlanet(HeavenlyBody.SE_VENUS);
+    res['Mars']    = _getPlanet(HeavenlyBody.SE_MARS);
+    res['Jupiter'] = _getPlanet(HeavenlyBody.SE_JUPITER);
+    res['Saturn']  = _getPlanet(HeavenlyBody.SE_SATURN);
 
-    final nodeType = trueNode ? Sweph.Se_True_Node : Sweph.Se_Mean_Node;
+    final nodeType = trueNode ? HeavenlyBody.SE_TRUE_NODE : HeavenlyBody.SE_MEAN_NODE;
     final rahuCalc = _getPlanet(nodeType);
     
     res['Rahu']    = [rahuCalc[0], rahuCalc[1]];

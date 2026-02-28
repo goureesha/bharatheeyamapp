@@ -191,7 +191,7 @@ class AstroCalculator {
 
     //  Lagna at Mandi time = Mandi degree
     final ayn = _getAyanamsa(mandiJd, ayanamsaMode);
-    final gst = Ephemeris.gmst(mandiJd);
+    final gst = Sweph.swe_sidtime(mandiJd);
     final cusps = Ephemeris.placidusHouses(mandiJd, lat, lon, ayn);
     return cusps[0]; // Ascendant at Mandi time
   }
@@ -326,8 +326,7 @@ class AstroCalculator {
   }) async {
     try {
       await Ephemeris.initSweph();
-      // Julian Day (UT)
-      final jdBirth = Ephemeris.julday(year, month, day, hour24 - hourUtcOffset);
+      final jdBirth = Sweph.swe_julday(year, month, day, hour24 - hourUtcOffset, CalendarType.SE_GREG_CAL);
       final dob = DateTime(year, month, day);
       final ayn = _getAyanamsa(jdBirth, ayanamsaMode);
 
