@@ -20,7 +20,7 @@ const RESOURCES = {"assets/AssetManifest.json": "af38a6fa60749d030f4132c15e4b19f
 "assets/FontManifest.json": "7b2a36307916a9721811788013e65289",
 "index.html": "c2407aa10195f10ae326255938eb9282",
 "/": "c2407aa10195f10ae326255938eb9282",
-"flutter_bootstrap.js": "411be9f5b2c7fd15ca84e390a102f014",
+"flutter_bootstrap.js": "d5d54246efd696abd224546aef59d813",
 "main.dart.js": "a808ca1343094efeea99f7441ceaedb2",
 "flutter.js": "4b2350e14c6650ba82871f60906437ea",
 "canvaskit/skwasm.js.symbols": "96263e00e3c9bd9cd878ead867c04f3c",
