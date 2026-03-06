@@ -7191,14 +7191,14 @@ return i*180/3.141592653589793}catch(h){return 0}},
 auB(a,b,a0,a1,a2){var s,r,q,p,o,n,m,l,k,j,i,h,g=$.ij.bo().M3(a,b,a0,0,1),f=g+0.25,e=g+0.75,d=0.041666666666666664,c=g-0.3
 try{for(s=0;s<30;++s){r=A.a21(c,a1,a2)
 q=A.a21(c+d,a1,a2)
-if(r<-0.583&&q>=-0.583){p=c
+if(r<0&&q>=0){p=c
 o=c+d
 for(n=0;n<20;++n){m=(p+o)/2
-if(A.a21(m,a1,a2)<-0.583)p=m
-else o=m}f=o}if(r>-0.583&&q<=-0.583){l=c
+if(A.a21(m,a1,a2)<0)p=m
+else o=m}f=o}if(r>0&&q<=0){l=c
 k=c+d
 for(j=0;j<20;++j){i=(l+k)/2
-if(A.a21(i,a1,a2)>-0.583)l=i
+if(A.a21(i,a1,a2)>0)l=i
 else k=i}e=k}c+=d}}catch(h){}return A.a([f,e],t.n)},
 ayY(a,b,c){var s,r
 try{s=A.aNr(a,b,c,B.Hr)
