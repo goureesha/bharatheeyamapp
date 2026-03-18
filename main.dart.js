@@ -50002,8 +50002,8 @@ b=$.a8().aM()
 b.sah(e)
 b.sde(f)
 e4.hw(new A.k(d4+q*n,d5+q*m),new A.k(d4+e0*d,d5+e0*c),b)
-if(i)d2.J5(e4,""+k+"\xb0",d4+e1*Math.cos(j),d5+e1*Math.sin(j),A.a_(102,B.i.gk()>>>16&255,B.i.gk()>>>8&255,B.i.gk()&255),s,!1)}a=["\u0c95\u0cc7\u0ca4\u0cc1","\u0cb0\u0cbe\u0cb9\u0cc1","\u0cb6\u0ca8\u0cbf","\u0cb6\u0cc1\u0c95\u0ccd\u0cb0","\u0c97\u0cc1\u0cb0\u0cc1","\u0cac\u0cc1\u0ca7","\u0c95\u0cc1\u0c9c","\u0c9a\u0c82\u0ca6\u0ccd\u0cb0","\u0cb0\u0cb5\u0cbf","\u0cb2\u0c97\u0ccd\u0ca8"]
-for(e1=d7*0.032,s=e0*0.66,q=d2.b,n=e0*0.8,a0=e0*0.94,a1=0;a1<10;++a1){a2=a[a1]
+if(i)d2.J5(e4,""+k+"\xb0",d4+e1*Math.cos(j),d5+e1*Math.sin(j),A.a_(102,B.i.gk()>>>16&255,B.i.gk()>>>8&255,B.i.gk()&255),s,!1)}a=["\u0cb2\u0c97\u0ccd\u0ca8"]
+for(e1=d7*0.032,s=e0*0.66,q=d2.b,n=e0*0.8,a0=e0*0.94,a1=0;a1<1;++a1){a2=a[a1]
 a3=q.h(0,a2)
 if(a3==null)continue
 a4=a2==="\u0cb2\u0c97\u0ccd\u0ca8"
