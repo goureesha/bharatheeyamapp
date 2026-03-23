@@ -9199,12 +9199,12 @@ case 6:case 1:return A.t(q,r)
 case 2:return A.r(o,r)}})
 return A.u($async$ru,r)},
 Dh(a,b){return A.b8y(a,b)},
-b8y(c8,c9){var s=0,r=A.v(t.H),q,p=2,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,c0,c1,c2,c3,c4,c5,c6,c7
-var $async$Dh=A.w(function(d0,d1){if(d0===1){o=d1
+b8y(c7,c8){var s=0,r=A.v(t.H),q,p=2,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,c0,c1,c2,c3,c4,c5,c6
+var $async$Dh=A.w(function(c9,d0){if(c9===1){o=d0
 s=p}while(true)switch(s){case 0:p=4
 s=7
 return A.m(A.kw(),$async$Dh)
-case 7:n=d1
+case 7:n=d0
 if(n==null){s=1
 break}m=new A.DI(new A.ll(n,"https://www.googleapis.com/","calendar/v3/",$.rl()))
 l=new A.aq(Date.now(),0,!1)
@@ -9214,13 +9214,13 @@ b2=m.a
 b3=k.n1()
 s=8
 return A.m(new A.F_(b2).ay7("primary",250,"startTime",!0,j.n1(),b3),$async$Dh)
-case 8:i=d1
+case 8:i=d0
 if(i.e==null||i.e.length===0){s=1
 break}h=A.aM(t.N)
 for(b2=$.jc,b3=b2.length,b4=0;b4<b2.length;b2.length===b3||(0,A.U)(b2),++b4){g=b2[b4]
 f=""+A.ab(g.b)+"-"+B.d.aH(B.e.l(A.a8(g.b)),2,"0")+"-"+B.d.aH(B.e.l(A.aT(g.b)),2,"0")+"_"+g.c+"_"+g.e
 J.hv(h,f)}e=0
-b2=i.e,b3=b2.length,b5=c8.a,b6=t.F,b4=0
+b2=i.e,b3=b2.length,b5=c7.a,b6=t.F,b4=0
 case 9:if(!(b4<b2.length)){s=11
 break}d=b2[b4]
 b7=d.p4
@@ -9233,8 +9233,8 @@ b8=d.RG
 a=b8==null?"":b8
 b9=d.y
 a0=b9==null?"":b9
-a1=a
-if(J.b8c(a,"\u0c9c\u0cbe\u0ca4\u0c95 - "))a1=J.b8d(a,7)
+if(!J.b8c(a,"\u0c9c\u0cbe\u0ca4\u0c95 - ")){s=10
+break}a1=J.b8d(a,7)
 a2=""+A.ab(c)+"-"+B.d.aH(B.e.l(A.a8(c)),2,"0")+"-"+B.d.aH(B.e.l(A.aT(c)),2,"0")
 a3=B.d.aH(B.e.l(A.e_(c)),2,"0")+":"+B.d.aH(B.e.l(A.iT(c)),2,"0")
 a4=B.d.aH(B.e.l(A.e_(b)),2,"0")+":"+B.d.aH(B.e.l(A.iT(b)),2,"0")
@@ -9247,20 +9247,19 @@ c0=b7==null?null:B.d.dY(b7)
 a6=c0==null?"":c0}a8="booked"
 if(d.R8==="cancelled")a8="cancelled"
 b7=A.by(A.ab(c),A.a8(c),A.aT(c),0,0,0,0,0)
-c1=a1
-c2=a6
-c3=a8
-c4=A.cc("Phone:\\s*[+\\d\\s-]+",!0,!1,!1)
-a9=new A.dU("0",b7,a3,a4,c1,c2,c3,B.d.dY(A.d_(a0,c4,"")),new A.aq(Date.now(),0,!1).hR(),"")
+c1=a6
+c2=a8
+c3=A.cc("Phone:\\s*[+\\d\\s-]+",!0,!1,!1)
+a9=new A.dU("0",b7,a3,a4,a1,c1,c2,B.d.dY(A.d_(a0,c3,"")),new A.aq(Date.now(),0,!1).hR(),"")
 p=13
 s=16
-return A.m(new A.dg(b5).lg(new A.ei(null,null,A.a([a9.op()],b6)),c9,"Appointments!A:I","INSERT_ROWS","RAW"),$async$Dh)
+return A.m(new A.dg(b5).lg(new A.ei(null,null,A.a([a9.op()],b6)),c8,"Appointments!A:I","INSERT_ROWS","RAW"),$async$Dh)
 case 16:p=4
 s=15
 break
 case 13:p=12
-c6=o
-b0=A.a9(c6)
+c5=o
+b0=A.a9(c5)
 A.bO().$1("AppointmentService: Sync write error: "+A.l(b0))
 s=15
 break
@@ -9276,8 +9275,8 @@ p=2
 s=6
 break
 case 4:p=3
-c7=o
-b1=A.a9(c7)
+c6=o
+b1=A.a9(c6)
 A.bO().$1("AppointmentService: Calendar sync error: "+A.l(b1))
 s=6
 break
