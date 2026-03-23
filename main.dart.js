@@ -7658,7 +7658,7 @@ d5=!1
 if(!J.c(c7,"\u0cb0\u0cb5\u0cbf")&&!J.c(c7,"\u0c9a\u0c82\u0ca6\u0ccd\u0cb0")&&!J.c(c7,"\u0cb0\u0cbe\u0cb9\u0cc1")&&!J.c(c7,"\u0c95\u0cc7\u0ca4\u0cc1")&&!J.c(c7,"\u0cb2\u0c97\u0ccd\u0ca8")&&!J.c(c7,"\u0cae\u0cbe\u0c82\u0ca6\u0cbf")){d6=Math.abs(c8-c5)
 if(d6>180)d6=360-d6
 d7=0
-switch(c7){case"\u0cae\u0c82\u0c97\u0cb3":d7=17
+switch(c7){case"\u0c95\u0cc1\u0c9c":d7=17
 break
 case"\u0cac\u0cc1\u0ca7":d7=d3<0?12:14
 break
