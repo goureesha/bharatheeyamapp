@@ -53367,7 +53367,7 @@ c6.dV(b7,b8,s)
 r=c2-b3.c
 q=b8*0.92
 p=(b8+q)/2
-for(s=b8*0.048,o=0;o<12;++o){n=o*30
+for(s=b8*0.055,o=0;o<12;++o){n=o*30
 m=(n+r-90)*3.141592653589793/180
 l=c3.bo()
 l.cn(b5+q*Math.cos(m),b6+q*Math.sin(m))
@@ -53391,7 +53391,7 @@ s.sae(A.W(n,B.dg.gk()>>>16&255,B.dg.gk()>>>8&255,B.dg.gk()&255))
 s.sdz(B.aW)
 s.sdm(1)
 c6.dV(b7,q,s)
-for(h=b8*0.03,g=b8*0.08,f=b8*0.038,e=b8*0.72,d=b8*0.042,o=0;o<60;++o){c=(o*6-90)*3.141592653589793/180
+for(h=b8*0.03,g=b8*0.08,f=b8*0.046,e=b8*0.72,d=b8*0.052,o=0;o<60;++o){c=(o*6-90)*3.141592653589793/180
 b=B.e.E(o,5)===0
 a=b?g:h
 a0=b?2.5:0.8
@@ -53419,11 +53419,11 @@ s.sdm(0.5)
 c6.dV(b7,b8*0.62,s)
 s=b8*0.28
 a8=b6-s
-a9=b8*0.065
+a9=b8*0.085
 b3.mo(c6,""+b3.d+" : "+B.d.aH(B.e.l(b3.e),2,"0")+" : "+B.d.aH(B.e.l(b3.f),2,"0"),b5,a8,A.W(242,B.j.gk()>>>16&255,B.j.gk()>>>8&255,B.j.gk()&255),a9,!0)
-b3.mo(c6,"\u0c98\u0c9f\u0cbf    \u0cb5\u0cbf\u0c98\u0c9f\u0cbf   \u0c85\u0ca8\u0cc1\u0cb5\u0cbf\u0c98\u0c9f\u0cbf",b5,a8+a9*0.9,A.W(102,B.j.gk()>>>16&255,B.j.gk()>>>8&255,B.j.gk()&255),b8*0.028,!1)
+b3.mo(c6,"\u0c98\u0c9f\u0cbf    \u0cb5\u0cbf\u0c98\u0c9f\u0cbf   \u0c85\u0ca8\u0cc1\u0cb5\u0cbf\u0c98\u0c9f\u0cbf",b5,a8+a9*0.9,A.W(102,B.j.gk()>>>16&255,B.j.gk()>>>8&255,B.j.gk()&255),b8*0.035,!1)
 b0=b6+s
-b1=b8*0.035
+b1=b8*0.042
 s=b8*0.18
 b3.mo(c6,"\u2600 \u0c89\u0ca6\u0caf "+b3.r,b5-s,b0,B.I5,b1,!0)
 b3.mo(c6,"\ud83c\udf19 \u0c85\u0cb8\u0ccd\u0ca4 "+b3.w,b5+s,b0,B.HK,b1,!0)
@@ -53442,7 +53442,7 @@ c3=c3.aP()
 c3.sae(B.pG)
 c6.dV(b7,5,c3)
 b2=b6+b8*0.42
-c3=b8*0.032
+c3=b8*0.038
 b3.mo(c6,"\u25cf \u0c98\u0c9f\u0cbf",b5-b8*0.22,b2,B.fT,c3,!0)
 b3.mo(c6,"\u25cf \u0cb5\u0cbf\u0c98\u0c9f\u0cbf",b5,b2,B.ih,c3,!0)
 b3.mo(c6,"\u25cf \u0c85\u0ca8\u0cc1\u0cb5\u0cbf\u0c98\u0c9f\u0cbf",b5+b8*0.25,b2,B.pf,c3,!0)},
