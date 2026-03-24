@@ -7611,7 +7611,7 @@ d=A.a([a,a5,a6,a1,a9,b0,a2,b1,b2,a0,b3,b4],t.n)}J.hz(j,"\u0cb2\u0c97\u0ccd\u0ca8
 J.hz(i,"\u0cb2\u0c97\u0ccd\u0ca8",0)
 o0=n
 o1=m
-o2=A.afL(A.a8(o1),A.a6(o1),A.aN(o1),s4,s5)
+o2=A.afL(A.a8(o1),A.a6(o1),A.aN(o1),s4,s5,s3)
 o3=o2[0]
 o4=o2[1]
 o5=B.e.B(A.eC(o1)-1+1,7)
@@ -7621,11 +7621,11 @@ o8=o3
 o9=o5
 p0=o8}else if(o0<o3){o9=B.e.B(o5-1,7)
 p1=o1.co(-864e8)
-p2=A.afL(A.a8(p1),A.a6(p1),A.aN(p1),s4,s5)
+p2=A.afL(A.a8(p1),A.a6(p1),A.aN(p1),s4,s5,s3)
 p0=p2[1]
 o7=o3-p0
 o8=p2[0]}else{p3=o1.co(864e8)
-o7=A.afL(A.a8(p3),A.a6(p3),A.aN(p3),s4,s5)[0]-o4
+o7=A.afL(A.a8(p3),A.a6(p3),A.aN(p3),s4,s5,s3)[0]-o4
 o8=o3
 o9=o5
 p0=o4}o0=t.t
@@ -7755,7 +7755,7 @@ j2=e1<J.bu(j0)?J.ai(j0,e1):0
 j3=A.a(["\u0cb5\u0cb8\u0c82\u0ca4 \u0c8b\u0ca4\u0cc1","\u0cb5\u0cb8\u0c82\u0ca4 \u0c8b\u0ca4\u0cc1","\u0c97\u0ccd\u0cb0\u0cc0\u0cb7\u0ccd\u0cae \u0c8b\u0ca4\u0cc1","\u0c97\u0ccd\u0cb0\u0cc0\u0cb7\u0ccd\u0cae \u0c8b\u0ca4\u0cc1","\u0cb5\u0cb0\u0ccd\u0cb7\u0cbe \u0c8b\u0ca4\u0cc1","\u0cb5\u0cb0\u0ccd\u0cb7\u0cbe \u0c8b\u0ca4\u0cc1","\u0cb6\u0cb0\u0ca6\u0cc3\u0ca4\u0cc1","\u0cb6\u0cb0\u0ca6\u0cc3\u0ca4\u0cc1","\u0cb9\u0cc7\u0cae\u0c82\u0ca4 \u0c8b\u0ca4\u0cc1","\u0cb9\u0cc7\u0cae\u0c82\u0ca4 \u0c8b\u0ca4\u0cc1","\u0cb6\u0cbf\u0cb6\u0cbf\u0cb0 \u0c8b\u0ca4\u0cc1","\u0cb6\u0cbf\u0cb6\u0cbf\u0cb0 \u0c8b\u0ca4\u0cc1"],c6)
 j4=J.ai(j3,f9)
 j5=m.co(864e8)
-j6=A.afL(A.a8(j5),A.a6(j5),A.aN(j5),s4,s5)
+j6=A.afL(A.a8(j5),A.a6(j5),A.aN(j5),s4,s5,s3)
 j7=J.ai(j6,0)
 j8=(c0-b9)*24
 j9=(c0-b9)*60
@@ -8029,18 +8029,18 @@ k=n*3.141592653589793/180
 j=Math.sin(m)*Math.sin(l)+Math.cos(m)*Math.cos(l)*Math.cos(k)
 i=Math.asin(J.a7t(j,-1,1))
 return i*180/3.141592653589793}catch(h){return 0}},
-afL(a,b,a0,a1,a2){var s,r,q,p,o,n,m,l,k,j,i,h,g=$.iu.bb().A_(a,b,a0,0,1),f=g+0.25,e=g+0.75,d=0.041666666666666664,c=g-0.5
-try{for(s=0;s<48;++s){r=A.afM(c,a1,a2)
+afL(a,b,a0,a1,a2,a3){var s,r,q,p,o,n,m,l,k,j,i,h,g=$.iu.bb().A_(a,b,a0,0,1)-a3/24,f=g+0.25,e=g+0.75,d=0.041666666666666664,c=g-0.08333333333333333
+try{for(s=0;s<30;++s){r=A.afM(c,a1,a2)
 q=A.afM(c+d,a1,a2)
 if(r<0&&q>=0){p=c
 o=c+d
 for(n=0;n<20;++n){m=(p+o)/2
 if(A.afM(m,a1,a2)<0)p=m
-else o=m}if(Math.abs(o-g)<Math.abs(f-g))f=o}if(r>0&&q<=0){l=c
+else o=m}f=o}if(r>0&&q<=0){l=c
 k=c+d
 for(j=0;j<20;++j){i=(l+k)/2
 if(A.afM(i,a1,a2)>0)l=i
-else k=i}if(k>f)e=k}c+=d}}catch(h){}return A.a([f,e],t.n)},
+else k=i}e=k}c+=d}}catch(h){}return A.a([f,e],t.n)},
 b_a(a,b,c){var s,r
 try{s=A.bgT(a,b,c,B.Mo)
 return s}catch(r){return null}},
