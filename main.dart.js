@@ -8032,14 +8032,14 @@ return i*180/3.141592653589793}catch(h){return 0}},
 afL(a,b,a0,a1,a2,a3){var s,r,q,p,o,n,m,l,k,j,i,h,g=$.iu.bb().A_(a,b,a0,0,1)-a3/24,f=g+0.25,e=g+0.75,d=0.041666666666666664,c=g-0.08333333333333333
 try{for(s=0;s<30;++s){r=A.afM(c,a1,a2)
 q=A.afM(c+d,a1,a2)
-if(r<-0.8333&&q>=-0.8333){p=c
+if(r<-0.5667&&q>=-0.5667){p=c
 o=c+d
 for(n=0;n<20;++n){m=(p+o)/2
-if(A.afM(m,a1,a2)<-0.8333)p=m
-else o=m}f=o}if(r>-0.8333&&q<=-0.8333){l=c
+if(A.afM(m,a1,a2)<-0.5667)p=m
+else o=m}f=o}if(r>-0.5667&&q<=-0.5667){l=c
 k=c+d
 for(j=0;j<20;++j){i=(l+k)/2
-if(A.afM(i,a1,a2)>-0.8333)l=i
+if(A.afM(i,a1,a2)>-0.5667)l=i
 else k=i}e=k}c+=d}}catch(h){}return A.a([f,e],t.n)},
 b_a(a,b,c){var s,r
 try{s=A.bgT(a,b,c,B.Mo)
