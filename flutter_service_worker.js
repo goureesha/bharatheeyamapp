@@ -22,7 +22,7 @@ const RESOURCES = {"privacy_policy.html": "10094331e2887570d5e079618ca2fdc8",
 "assets/FontManifest.json": "7b2a36307916a9721811788013e65289",
 "index.html": "d2d8cd177c518fee28ef8acf5554a400",
 "/": "d2d8cd177c518fee28ef8acf5554a400",
-"flutter_bootstrap.js": "453f5d90fa5d9845c78b081c6cacd18c",
+"flutter_bootstrap.js": "71941930d244df4433fa0abc6d567749",
 "main.dart.js": "5e272a5bf14c4e86b8e6096efaf3165d",
 "flutter.js": "4b2350e14c6650ba82871f60906437ea",
 "canvaskit/skwasm.js.symbols": "96263e00e3c9bd9cd878ead867c04f3c",
@@ -35,7 +35,7 @@ const RESOURCES = {"privacy_policy.html": "10094331e2887570d5e079618ca2fdc8",
 "canvaskit/chromium/canvaskit.wasm": "ea5ab288728f7200f398f60089048b48",
 "canvaskit/chromium/canvaskit.js": "b7ba6d908089f706772b2007c37e6da4",
 "canvaskit/chromium/canvaskit.js.symbols": "e115ddcfad5f5b98a90e389433606502",
-"version.json": "d42069f9d3fa90813774f856598d0530"};
+"version.json": "74ffcff3c17d98f19ca9b76575b113bb"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
