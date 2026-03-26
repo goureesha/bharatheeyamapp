@@ -7614,7 +7614,7 @@ d=A.a([a,a5,a6,a1,a9,b0,a2,b1,b2,a0,b3,b4],t.n)}J.hI(j,"\u0cb2\u0c97\u0ccd\u0ca8
 J.hI(i,"\u0cb2\u0c97\u0ccd\u0ca8",0)
 o0=n
 o1=m
-o2=A.agc(A.ab(o1),A.aa(o1),A.aO(o1),s4,s5,s3)
+o2=A.agc(A.ab(o1),A.aa(o1),A.aO(o1),s4,s5,null)
 o3=o2[0]
 o4=o2[1]
 o5=B.e.u(A.es(o1)-1+1,7)
@@ -7624,11 +7624,11 @@ o8=o3
 o9=o5
 p0=o8}else if(o0<o3){o9=B.e.u(o5-1,7)
 p1=o1.cr(-864e8)
-p2=A.agc(A.ab(p1),A.aa(p1),A.aO(p1),s4,s5,s3)
+p2=A.agc(A.ab(p1),A.aa(p1),A.aO(p1),s4,s5,null)
 p0=p2[1]
 o7=o3-p0
 o8=p2[0]}else{p3=o1.cr(864e8)
-o7=A.agc(A.ab(p3),A.aa(p3),A.aO(p3),s4,s5,s3)[0]-o4
+o7=A.agc(A.ab(p3),A.aa(p3),A.aO(p3),s4,s5,null)[0]-o4
 o8=o3
 o9=o5
 p0=o4}o0=t.t
@@ -8034,18 +8034,27 @@ k=n*3.141592653589793/180
 j=Math.sin(m)*Math.sin(l)+Math.cos(m)*Math.cos(l)*Math.cos(k)
 i=Math.asin(J.Q8(j,-1,1))
 return i*180/3.141592653589793}catch(h){return 0}},
-agc(a,b,a0,a1,a2,a3){var s,r,q,p,o,n,m,l,k,j,i,h,g=$.hv.bb().vd(a,b,a0,0,1)-a3/24,f=g+0.25,e=g+0.75,d=0.041666666666666664,c=g-0.08333333333333333
-try{for(s=0;s<30;++s){r=A.agd(c,a1,a2)
-q=A.agd(c+d,a1,a2)
-if(r<-0.583&&q>=-0.583){p=c
-o=c+d
-for(n=0;n<20;++n){m=(p+o)/2
-if(A.agd(m,a1,a2)<-0.583)p=m
-else o=m}f=o}if(r>-0.583&&q<=-0.583){l=c
-k=c+d
-for(j=0;j<20;++j){i=(l+k)/2
-if(A.agd(i,a1,a2)>-0.583)l=i
-else k=i}e=k}c+=d}}catch(h){}return A.a([f,e],t.n)},
+agc(a1,a2,a3,a4,a5,a6){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c=$.hv.bb().vd(a1,a2,a3,0,1),b=null,a=null,a0=null
+if(a6!=null){f=c-a6/24
+e=f-0.08333333333333333
+b=f+0.25
+a=f+0.75
+a0=30}else{e=c-0.3
+b=c+0.25
+a=c+0.75
+a0=24}s=0.041666666666666664
+r=e
+try{for(q=0;q<a0;++q){p=A.agd(r,a4,a5)
+o=A.agd(r+s,a4,a5)
+if(p<-0.583&&o>=-0.583){n=r
+m=r+s
+for(l=0;l<20;++l){k=(n+m)/2
+if(A.agd(k,a4,a5)<-0.583)n=k
+else m=k}b=m}if(p>-0.583&&o<=-0.583){j=r
+i=r+s
+for(h=0;h<20;++h){g=(j+i)/2
+if(A.agd(g,a4,a5)>-0.583)j=g
+else i=g}a=i}r+=s}}catch(d){}return A.a([b,a],t.n)},
 age(a,b,c){var s,r,q,p,o,n,m,l,k,j,i,h
 try{s=A.AO(a,B.mt,B.Ei.ni(0,B.eA))
 r=s.a
