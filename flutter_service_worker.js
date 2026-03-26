@@ -22,7 +22,7 @@ const RESOURCES = {"privacy_policy.html": "10094331e2887570d5e079618ca2fdc8",
 "assets/FontManifest.json": "7b2a36307916a9721811788013e65289",
 "index.html": "b7df8837a65841ef76449bb0fbf5438c",
 "/": "b7df8837a65841ef76449bb0fbf5438c",
-"flutter_bootstrap.js": "83128f2da31287bff1d9314c5cbba14b",
+"flutter_bootstrap.js": "268fa93a47724aa2ac71ee0fa7d1d081",
 "main.dart.js": "83ea13880cdc6cfc3fdfffe6da1a7bfb",
 "flutter.js": "4b2350e14c6650ba82871f60906437ea",
 "canvaskit/skwasm.js.symbols": "96263e00e3c9bd9cd878ead867c04f3c",
@@ -35,7 +35,7 @@ const RESOURCES = {"privacy_policy.html": "10094331e2887570d5e079618ca2fdc8",
 "canvaskit/chromium/canvaskit.wasm": "ea5ab288728f7200f398f60089048b48",
 "canvaskit/chromium/canvaskit.js": "b7ba6d908089f706772b2007c37e6da4",
 "canvaskit/chromium/canvaskit.js.symbols": "e115ddcfad5f5b98a90e389433606502",
-"version.json": "280a8491aff241a1d779a9a6a0fd833b",
+"version.json": "2138047da45d3dce46c882919b36785d",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df"};
 // The application shell files that are downloaded before a service worker can
 // start.
