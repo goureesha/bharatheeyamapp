@@ -7705,15 +7705,15 @@ for(a2=i,a4=0;a4<9;++a4,a2=a8){a5=B.e.q(f+a4,9)
 a8=a2.cG(864e8*B.b.X(B.c3[p]*B.c3[f]*B.c3[a5]/14400*365.25))
 a0.push(new A.i9(B.eu[a5],a8,B.ns))}l.push(new A.i9(B.eu[f],a,a0))}b0.push(new A.i9(B.eu[p],m,l))}return b0},
 iB(a,b,c,d,e,f,g,h,i){return A.bal(a,b,c,d,e,f,g,h,i)},
-bal(s0,s1,s2,s3,s4,s5,s6,s7,s8){var s=0,r=A.u(t.M4),q,p=2,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,d0,d1,d2,d3,d4,d5,d6,d7,d8,d9,e0,e1,e2,e3,e4,e5,e6,e7,e8,e9,f0,f1,f2,f3,f4,f5,f6,f7,f8,f9,g0,g1,g2,g3,g4,g5,g6,g7,g8,g9,h0,h1,h2,h3,h4,h5,h6,h7,h8,h9,i0,i1,i2,i3,i4,i5,i6,i7,i8,i9,j0,j1,j2,j3,j4,j5,j6,j7,j8,j9,k0,k1,k2,k3,k4,k5,k6,k7,k8,k9,l0,l1,l2,l3,l4,l5,l6,l7,l8,l9,m0,m1,m2,m3,m4,m5,m6,m7,m8,m9,n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,o0,o1,o2,o3,o4,o5,o6,o7,o8,o9,p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,q0,q1,q2,q3,q4,q5,q6,q7,q8,q9,r0,r1,r2,r3,r4,r5,r6,r7,r8,r9
-var $async$iB=A.v(function(t0,t1){if(t0===1){o=t1
+bal(s1,s2,s3,s4,s5,s6,s7,s8,s9){var s=0,r=A.u(t.M4),q,p=2,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,d0,d1,d2,d3,d4,d5,d6,d7,d8,d9,e0,e1,e2,e3,e4,e5,e6,e7,e8,e9,f0,f1,f2,f3,f4,f5,f6,f7,f8,f9,g0,g1,g2,g3,g4,g5,g6,g7,g8,g9,h0,h1,h2,h3,h4,h5,h6,h7,h8,h9,i0,i1,i2,i3,i4,i5,i6,i7,i8,i9,j0,j1,j2,j3,j4,j5,j6,j7,j8,j9,k0,k1,k2,k3,k4,k5,k6,k7,k8,k9,l0,l1,l2,l3,l4,l5,l6,l7,l8,l9,m0,m1,m2,m3,m4,m5,m6,m7,m8,m9,n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,o0,o1,o2,o3,o4,o5,o6,o7,o8,o9,p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,q0,q1,q2,q3,q4,q5,q6,q7,q8,q9,r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,s0
+var $async$iB=A.v(function(t1,t2){if(t1===1){o=t2
 s=p}while(true)switch(s){case 0:p=4
 s=7
 return A.n(A.l5(),$async$iB)
-case 7:n=$.hv.bd().vn(s8,s6,s1,s2-s3,1)
-m=A.b8(s8,s6,s1,0,0,0,0,0)
-l=A.aZe(n,s0)
-k=A.ye(n,s0,s7)
+case 7:n=$.hv.bd().vn(s9,s7,s2,s3-s4,1)
+m=A.b8(s9,s7,s2,0,0,0,0,0)
+l=A.aZe(n,s1)
+k=A.ye(n,s1,s8)
 n8=t.N
 n9=t.i
 j=A.A(n8,n9)
@@ -7723,7 +7723,7 @@ o1=B.a3t.h(0,h.a)
 o1.toString
 g=o1
 J.fT(j,g,J.a4(h.b,0))
-J.fT(i,g,J.a4(h.b,1))}f=A.aV9(n,s4,s5)
+J.fT(i,g,J.a4(h.b,1))}f=A.aV9(n,s5,s6)
 e=0
 d=A.bq(12,0,!1,n9)
 if(f!=null&&f.b.length>=2){c=f.b[0]
@@ -7749,7 +7749,7 @@ d=A.a([a,a5,a6,a1,a9,b0,a2,b1,b2,a0,b3,b4],t.n)}J.fT(j,"\u0cb2\u0c97\u0ccd\u0ca8
 J.fT(i,"\u0cb2\u0c97\u0ccd\u0ca8",0)
 o0=n
 o1=m
-o2=A.tQ(A.a9(o1),A.a7(o1),A.aK(o1),s4,s5,null)
+o2=A.tQ(A.a9(o1),A.a7(o1),A.aK(o1),s5,s6,null)
 o3=o2[0]
 o4=o2[1]
 o5=B.e.q(A.es(o1)-1+1,7)
@@ -7759,11 +7759,11 @@ o8=o3
 o9=o5
 p0=o8}else if(o0<o3){o9=B.e.q(o5-1,7)
 p1=o1.cG(-864e8)
-p2=A.tQ(A.a9(p1),A.a7(p1),A.aK(p1),s4,s5,null)
+p2=A.tQ(A.a9(p1),A.a7(p1),A.aK(p1),s5,s6,null)
 p0=p2[1]
 o7=o3-p0
 o8=p2[0]}else{p3=o1.cG(864e8)
-o7=A.tQ(A.a9(p3),A.a7(p3),A.aK(p3),s4,s5,null)[0]-o4
+o7=A.tQ(A.a9(p3),A.a7(p3),A.aK(p3),s5,s6,null)[0]-o4
 o8=o3
 o9=o5
 p0=o4}o0=t.t
@@ -7773,8 +7773,8 @@ b7=A.cg(J.a4(b5,2))
 b8=A.bd(J.a4(b5,3))
 b9=A.cg(J.a4(b5,5))
 c0=A.cg(J.a4(b5,6))
-c1=A.aV9(b6,s4,s5)
-c2=A.aZe(b6,s0)
+c1=A.aV9(b6,s5,s6)
+c2=A.aZe(b6,s1)
 c3=0
 if(c1!=null)c3=B.b.q(B.b.q(J.a7Q(c1.b[0],c2),360)+360,360)
 J.fT(j,"\u0cae\u0cbe\u0c82\u0ca6\u0cbf",c3)
@@ -7835,8 +7835,8 @@ else if(J.c(e4,58))e5="\u0c9a\u0ca4\u0cc1\u0cb7\u0ccd\u0caa\u0cbe\u0ca6"
 else if(J.c(e4,59))e5="\u0ca8\u0cbe\u0c97"
 else e5=B.ZK[B.b.q(e4-1,7)]
 e6=A.a7f((n-b7)*60)
-e7=A.aZf(n,e1*13.333333333,s0)
-e8=A.aZf(n,(e1+1)*13.333333333,s0)
+e7=A.aZf(n,e1*13.333333333,s1)
+e8=A.aZf(n,(e1+1)*13.333333333,s1)
 e9=A.a7f((n-e7)*60)
 f0=A.a7f((e8-e7)*60)
 f1=A.a7f((e8-n)*60)
@@ -7858,7 +7858,7 @@ g5=A.Am(g4,B.hW,B.eS)
 g6=B.b.q(B.b.q(g5.a-l,360)+360,360)
 g7=B.e.q(B.b.aB(g6/30),12)
 if(!J.c(g7,f9)){g2=g3
-break}}g1=A.k(g2)}catch(s9){g1=B.e.k(B.b.aB(B.b.q(f5,30)))}g8=A.a(["\u0cb5\u0cc8\u0cb6\u0cbe\u0c96","\u0c9c\u0ccd\u0caf\u0cc7\u0cb7\u0ccd\u0ca0","\u0c86\u0cb7\u0cbe\u0ca2","\u0cb6\u0ccd\u0cb0\u0cbe\u0cb5\u0ca3","\u0cad\u0cbe\u0ca6\u0ccd\u0cb0\u0caa\u0ca6","\u0c86\u0cb6\u0ccd\u0cb5\u0cbf\u0ca8","\u0c95\u0cbe\u0cb0\u0ccd\u0ca4\u0cbf\u0c95","\u0cae\u0cbe\u0cb0\u0ccd\u0c97\u0cb6\u0cbf\u0cb0","\u0caa\u0cc1\u0cb7\u0ccd\u0caf","\u0cae\u0cbe\u0c98","\u0cab\u0cbe\u0cb2\u0ccd\u0c97\u0cc1\u0ca3","\u0c9a\u0cc8\u0ca4\u0ccd\u0cb0"],c6)
+break}}g1=A.k(g2)}catch(t0){g1=B.e.k(B.b.aB(B.b.q(f5,30)))}g8=A.a(["\u0cb5\u0cc8\u0cb6\u0cbe\u0c96","\u0c9c\u0ccd\u0caf\u0cc7\u0cb7\u0ccd\u0ca0","\u0c86\u0cb7\u0cbe\u0ca2","\u0cb6\u0ccd\u0cb0\u0cbe\u0cb5\u0ca3","\u0cad\u0cbe\u0ca6\u0ccd\u0cb0\u0caa\u0ca6","\u0c86\u0cb6\u0ccd\u0cb5\u0cbf\u0ca8","\u0c95\u0cbe\u0cb0\u0ccd\u0ca4\u0cbf\u0c95","\u0cae\u0cbe\u0cb0\u0ccd\u0c97\u0cb6\u0cbf\u0cb0","\u0caa\u0cc1\u0cb7\u0ccd\u0caf","\u0cae\u0cbe\u0c98","\u0cab\u0cbe\u0cb2\u0ccd\u0c97\u0cc1\u0ca3","\u0c9a\u0cc8\u0ca4\u0ccd\u0cb0"],c6)
 g9=""
 h0=""
 try{h1=0.9843529666666666
@@ -7876,9 +7876,9 @@ i2=!J.c(h8,i1)
 i3=J.a4(g8,h8)
 g9=i3
 if(!i2)h0="\u0c85\u0ca7\u0cbf\u0c95 "+A.k(i3)
-else h0="\u0ca8\u0cbf\u0c9c "+A.k(i3)}catch(s9){h0=J.a4(g8,f9)
+else h0="\u0ca8\u0cbf\u0c9c "+A.k(i3)}catch(t0){h0=J.a4(g8,f9)
 g9=J.a4(g8,f9)}i4=A.a(["\u0caa\u0ccd\u0cb0\u0cad\u0cb5","\u0cb5\u0cbf\u0cad\u0cb5","\u0cb6\u0cc1\u0c95\u0ccd\u0cb2","\u0caa\u0ccd\u0cb0\u0cae\u0ccb\u0ca6\u0cc2\u0ca4","\u0caa\u0ccd\u0cb0\u0c9c\u0ccb\u0ca4\u0ccd\u0caa\u0ca4\u0ccd\u0ca4\u0cbf","\u0c86\u0c82\u0c97\u0cc0\u0cb0\u0cb8","\u0cb6\u0ccd\u0cb0\u0cc0\u0cae\u0cc1\u0c96","\u0cad\u0cbe\u0cb5","\u0caf\u0cc1\u0cb5","\u0ca7\u0cbe\u0ca4\u0cc3","\u0c88\u0cb6\u0ccd\u0cb5\u0cb0","\u0cac\u0cb9\u0cc1\u0ca7\u0cbe\u0ca8\u0ccd\u0caf","\u0caa\u0ccd\u0cb0\u0cae\u0cbe\u0ca5\u0cbf","\u0cb5\u0cbf\u0c95\u0ccd\u0cb0\u0cae","\u0cb5\u0cc3\u0cb7","\u0c9a\u0cbf\u0ca4\u0ccd\u0cb0\u0cad\u0cbe\u0ca8\u0cc1","\u0cb8\u0cc1\u0cad\u0cbe\u0ca8\u0cc1","\u0ca4\u0cbe\u0cb0\u0ca3","\u0caa\u0cbe\u0cb0\u0ccd\u0ca5\u0cbf\u0cb5","\u0cb5\u0ccd\u0caf\u0caf","\u0cb8\u0cb0\u0ccd\u0cb5\u0c9c\u0cbf\u0ca4\u0ccd","\u0cb8\u0cb0\u0ccd\u0cb5\u0ca7\u0cbe\u0cb0\u0cbf","\u0cb5\u0cbf\u0cb0\u0ccb\u0ca7\u0cbf","\u0cb5\u0cbf\u0c95\u0cc3\u0ca4\u0cbf","\u0c96\u0cb0","\u0ca8\u0c82\u0ca6\u0ca8","\u0cb5\u0cbf\u0c9c\u0caf","\u0c9c\u0caf","\u0cae\u0ca8\u0ccd\u0cae\u0ca5","\u0ca6\u0cc1\u0cb0\u0ccd\u0cae\u0cc1\u0c96\u0cbf","\u0cb9\u0cc7\u0cb5\u0cbf\u0cb3\u0c82\u0cac\u0cbf","\u0cb5\u0cbf\u0cb3\u0c82\u0cac\u0cbf","\u0cb5\u0cbf\u0c95\u0cbe\u0cb0\u0cbf","\u0cb6\u0cbe\u0cb0\u0ccd\u0cb5\u0cb0\u0cbf","\u0caa\u0ccd\u0cb2\u0cb5","\u0cb6\u0cc1\u0cad\u0c95\u0cc3\u0ca4\u0ccd","\u0cb6\u0ccb\u0cad\u0c95\u0cc3\u0ca4\u0ccd","\u0c95\u0ccd\u0cb0\u0ccb\u0ca7\u0cbf","\u0cb5\u0cbf\u0cb6\u0ccd\u0cb5\u0cbe\u0cb5\u0cb8\u0cc1","\u0caa\u0cb0\u0cbe\u0cad\u0cb5","\u0caa\u0ccd\u0cb2\u0cb5\u0c82\u0c97","\u0c95\u0cc0\u0cb2\u0c95","\u0cb8\u0ccc\u0cae\u0ccd\u0caf","\u0cb8\u0cbe\u0ca7\u0cbe\u0cb0\u0ca3","\u0cb5\u0cbf\u0cb0\u0ccb\u0ca7\u0c95\u0cc3\u0ca4\u0ccd","\u0caa\u0cb0\u0cbf\u0ca7\u0cbe\u0cb5\u0cbf","\u0caa\u0ccd\u0cb0\u0cae\u0cbe\u0ca6\u0cc0\u0c9a","\u0c86\u0ca8\u0c82\u0ca6","\u0cb0\u0cbe\u0c95\u0ccd\u0cb7\u0cb8","\u0c85\u0ca8\u0cb2","\u0caa\u0cbf\u0c82\u0c97\u0cb3","\u0c95\u0cbe\u0cb3\u0caf\u0cc1\u0c95\u0ccd\u0ca4\u0cbf","\u0cb8\u0cbf\u0ca6\u0ccd\u0ca7\u0cbe\u0cb0\u0ccd\u0ca5\u0cbf","\u0cb0\u0ccc\u0ca6\u0ccd\u0cb0\u0cbf","\u0ca6\u0cc1\u0cb0\u0ccd\u0cae\u0ca4\u0cbf","\u0ca6\u0cc1\u0c82\u0ca6\u0cc1\u0cad\u0cbf","\u0cb0\u0cc1\u0ca7\u0cbf\u0cb0\u0ccb\u0ca6\u0ccd\u0c97\u0cbe\u0cb0\u0cbf","\u0cb0\u0c95\u0ccd\u0ca4\u0cbe\u0c95\u0ccd\u0cb7\u0cbf","\u0c95\u0ccd\u0cb0\u0ccb\u0ca7\u0ca8","\u0c85\u0c95\u0ccd\u0cb7\u0caf"],c6)
-i5=s8-78
+i5=s9-78
 i6=null
 if(J.c(f9,9)||J.c(f9,10))i6=!0
 else if(J.c(f9,11)&&e0>=15)i6=!0
@@ -7893,7 +7893,7 @@ j2=e1<J.b7(j0)?J.a4(j0,e1):0
 j3=A.a(["\u0cb5\u0cb8\u0c82\u0ca4 \u0c8b\u0ca4\u0cc1","\u0c97\u0ccd\u0cb0\u0cc0\u0cb7\u0ccd\u0cae \u0c8b\u0ca4\u0cc1","\u0c97\u0ccd\u0cb0\u0cc0\u0cb7\u0ccd\u0cae \u0c8b\u0ca4\u0cc1","\u0cb5\u0cb0\u0ccd\u0cb7\u0cbe \u0c8b\u0ca4\u0cc1","\u0cb5\u0cb0\u0ccd\u0cb7\u0cbe \u0c8b\u0ca4\u0cc1","\u0cb6\u0cb0\u0ca6\u0cc3\u0ca4\u0cc1","\u0cb6\u0cb0\u0ca6\u0cc3\u0ca4\u0cc1","\u0cb9\u0cc7\u0cae\u0c82\u0ca4 \u0c8b\u0ca4\u0cc1","\u0cb9\u0cc7\u0cae\u0c82\u0ca4 \u0c8b\u0ca4\u0cc1","\u0cb6\u0cbf\u0cb6\u0cbf\u0cb0 \u0c8b\u0ca4\u0cc1","\u0cb6\u0cbf\u0cb6\u0cbf\u0cb0 \u0c8b\u0ca4\u0cc1","\u0cb5\u0cb8\u0c82\u0ca4 \u0c8b\u0ca4\u0cc1"],c6)
 j4=J.a4(j3,f9)
 j5=m.cG(864e8)
-j6=A.tQ(A.a9(j5),A.a7(j5),A.aK(j5),s4,s5,s3)
+j6=A.tQ(A.a9(j5),A.a7(j5),A.aK(j5),s5,s6,s4)
 j7=J.a4(j6,0)
 j8=(c0-b9)*24
 j9=(c0-b9)*60
@@ -7902,10 +7902,10 @@ k1=(j7-c0)*60
 k2=new A.a8N()
 k3=k2.$2(j8,j9)
 k4=k2.$2(k0,k1)
-k5=new A.a8O(s3)
-k6=A.ban(n,(e0+1)*12,s0)
-k7=A.bam(n,(e4+1)*6,s0)
-k8=A.bao(n,(e3+1)*13.333333333,s0)
+k5=new A.a8O(s4)
+k6=A.ban(n,(e0+1)*12,s1)
+k7=A.bam(n,(e4+1)*6,s1)
+k8=A.bao(n,(e3+1)*13.333333333,s1)
 c6=B.ux[b8]
 o0=B.ZY[e0]
 o1=B.by[e1]
@@ -7914,25 +7914,26 @@ p8=e5
 q1=B.aC[B.e.q(B.b.aB(d8/30),12)]
 q2=J.b9M(f3)
 q3=B.b.aB(B.b.q(f3,1)*12)
-q4=A.x_(b9,s3)
-q5=A.x_(c0,s3)
-q6=g9
-q7=B.by[f6]
-q8=A.k(f7)
-q9=g1
-r0=h0
-r1=A.k(j1)
-r2=A.k(j2)
-r3=A.x_(k6,s3)
-r4=k5.$2(n,k6)
-r5=A.x_(k7,s3)
-r6=k5.$2(n,k7)
-r7=A.x_(k8,s3)
-r8=k5.$2(n,k8)
-k9=A.bfd(r2+" \u0c98\u0c9f\u0cbf",r0,q6,q1,""+q2+"\u0cb5 "+q3+"\u0ca4\u0cbf",f4,k3,e9,p8,r5,r6,A.x_(e8,s3),k5.$2(n,e8),f2,o1,e1,f0,k4,j4,i8,f1,g0,q9,q4,q5,q7,q8,o0,r3,r4,e0,e6,c6,r1+" \u0c98\u0c9f\u0cbf",o6,r7,r8)
-l0=A.bak(A.b8(s8,s6,s1,0,0,0,0,0),e1,f2)
-r8=J.a4(j,"\u0cb0\u0cb5\u0cbf")
-c6=r8==null?0:r8
+q4=B.b.aB(B.b.q(B.b.q(f3,1)*12,1)*30)
+q5=A.x_(b9,s4)
+q6=A.x_(c0,s4)
+q7=g9
+q8=B.by[f6]
+q9=A.k(f7)
+r0=g1
+r1=h0
+r2=A.k(j1)
+r3=A.k(j2)
+r4=A.x_(k6,s4)
+r5=k5.$2(n,k6)
+r6=A.x_(k7,s4)
+r7=k5.$2(n,k7)
+r8=A.x_(k8,s4)
+r9=k5.$2(n,k8)
+k9=A.bfd(r3+" \u0c98\u0c9f\u0cbf",r1,q7,q1,""+q2+"\u0cb5 "+q3+"\u0ca4\u0cbf "+q4+"\u0ca6\u0cbf",f4,k3,e9,p8,r6,r7,A.x_(e8,s4),k5.$2(n,e8),f2,o1,e1,f0,k4,j4,i8,f1,g0,r0,q5,q6,q8,q9,o0,r4,r5,e0,e6,c6,r2+" \u0c98\u0c9f\u0cbf",o6,r8,r9)
+l0=A.bak(A.b8(s9,s7,s2,0,0,0,0,0),e1,f2)
+r9=J.a4(j,"\u0cb0\u0cb5\u0cbf")
+c6=r9==null?0:r9
 o0=J.a4(j,"\u0c9a\u0c82\u0ca6\u0ccd\u0cb0")
 if(o0==null)o0=0
 o1=J.a4(j,"\u0c95\u0cc1\u0c9c")
@@ -8011,10 +8012,10 @@ p=2
 s=6
 break
 case 4:p=3
-r9=o
-n7=A.ac(r9)
+s0=o
+n7=A.ac(s0)
 A.bR().$1("AstroCalculator error: "+A.k(n7))
-throw r9
+throw s0
 s=6
 break
 case 3:s=2
