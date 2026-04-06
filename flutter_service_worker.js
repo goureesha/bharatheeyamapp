@@ -29,14 +29,14 @@ const RESOURCES = {"version.json": "129888161fca1f0a233551d201b95c94",
 "assets/packages/sweph/assets/ephe/semo_18.se1": "7d67f3203b5277865235529ed26eaf19",
 "assets/packages/sweph/assets/ephe/seasnam.txt": "b81323f1dc15e087893f3ed5d9a7fe37",
 "assets/FontManifest.json": "7b2a36307916a9721811788013e65289",
-"assets/NOTICES": "66543e482d7e99e4fb4ac97d3e373136",
+"assets/NOTICES": "c7fd80d2a0405276c2c91b1a35fd1b4e",
 "assets/AssetManifest.json": "7e84d408abb8b1d5b7f15797cd3225cd",
 "assets/assets/images/logo.png": "8b3be256f8c343bfe505d1de18b50462",
 "assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8cb9b6ce",
 "assets/fonts/MaterialIcons-Regular.otf": "c6f17ac0465146c785bdd595d257d3c7",
 "assets/AssetManifest.bin.json": "40869625df6827315befec75cec0171e",
-"flutter_bootstrap.js": "ace2a0163c23cce72416c09862a9f022",
-"main.dart.js": "40e9679ef427674083c46e1d8e7dbe61"};
+"flutter_bootstrap.js": "617146621b22dba411f16997939c408f",
+"main.dart.js": "6d0e2ebf0a369e7e4d310c805b0e7a65"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
