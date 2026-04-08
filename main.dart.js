@@ -57429,10 +57429,10 @@ $1(a){return B.e.c6(this.a,a)},
 $S:12}
 A.aJO.prototype={
 $0(){var s=this.a,r=this.b.a,q=A.b1(r.h(0,"jyotishi_name"))
-if(q==null)q="\u0cb6\u0ccd\u0cb0\u0cc0 \u0cb0\u0cbe\u0cae\u0c9a\u0c82\u0ca6\u0ccd\u0cb0 \u0c9c\u0ccd\u0caf\u0ccb\u0ca4\u0cbf\u0cb7"
+if(q==null)q=""
 s.ax.saN(q)
 r=A.b1(r.h(0,"jyotishi_phone"))
-if(r==null)r="9480603273"
+if(r==null)r=""
 s.ay.saN(r)},
 $S:0}
 A.aJU.prototype={
