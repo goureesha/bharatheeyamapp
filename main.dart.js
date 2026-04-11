@@ -40972,13 +40972,13 @@ if($.NF==null)return!1
 s=new A.ac(Date.now(),0,!1).d_(0-A.cI(0,0,0,$.h8,0,0).a)
 r=$.NF
 r.toString
-return B.b.aJ(s.f9(r).a,864e8)<3},
+return B.b.aJ(s.f9(r).a,36e8)<72},
 bBk(){var s,r,q
 if($.NF==null)return 0
 s=new A.ac(Date.now(),0,!1).d_(0-A.cI(0,0,0,$.h8,0,0).a)
 r=$.NF
 r.toString
-q=3-B.b.aJ(s.f9(r).a,864e8)
+q=72-B.b.aJ(s.f9(r).a,36e8)
 return q>0?q:0},
 a6o(){if(!$.lp||$.bcN==null)return 0
 var s=B.b.aJ($.bcN.d_(31536e9).f9(new A.ac(Date.now(),0,!1).d_(0-A.cI(0,0,0,$.h8,0,0).a)).a,864e8)
@@ -40990,10 +40990,11 @@ r=$.qW
 r.toString
 q=48-B.b.aJ(s.f9(r).a,36e8)
 return q>0?q:0},
-bl4(){if(!$.lp&&!A.bl3())return"\u0c9a\u0c82\u0ca6\u0cbe\u0ca6\u0cbe\u0cb0\u0cbf\u0c95\u0cc6 \u0c87\u0cb2\u0ccd\u0cb2 (No subscription)"
-if(A.bl3())return"\u0c9f\u0ccd\u0cb0\u0caf\u0cb2\u0ccd \u0cb8\u0c95\u0ccd\u0cb0\u0cbf\u0caf - "+A.bBk()+" \u0ca6\u0cbf\u0ca8 \u0cac\u0cbe\u0c95\u0cbf"
-if($.lp){var s=A.a6o()
-if(s>0)return"\u0caa\u0ccd\u0cb0\u0cc0\u0cae\u0cbf\u0caf\u0c82 \u0cb8\u0c95\u0ccd\u0cb0\u0cbf\u0caf - "+s+" \u0ca6\u0cbf\u0ca8 \u0cac\u0cbe\u0c95\u0cbf"
+bl4(){var s,r
+if(!$.lp&&!A.bl3())return"\u0c9a\u0c82\u0ca6\u0cbe\u0ca6\u0cbe\u0cb0\u0cbf\u0c95\u0cc6 \u0c87\u0cb2\u0ccd\u0cb2 (No subscription)"
+if(A.bl3()){s=""+A.bBk()
+return"\u0c9f\u0ccd\u0cb0\u0caf\u0cb2\u0ccd \u0cb8\u0c95\u0ccd\u0cb0\u0cbf\u0caf - "+s+" \u0c97\u0c82\u0c9f\u0cc6 \u0cac\u0cbe\u0c95\u0cbf ("+s+" hrs left)"}if($.lp){r=A.a6o()
+if(r>0)return"\u0caa\u0ccd\u0cb0\u0cc0\u0cae\u0cbf\u0caf\u0c82 \u0cb8\u0c95\u0ccd\u0cb0\u0cbf\u0caf - "+r+" \u0ca6\u0cbf\u0ca8 \u0cac\u0cbe\u0c95\u0cbf"
 else return"\u0c9a\u0c82\u0ca6\u0cbe\u0ca6\u0cbe\u0cb0\u0cbf\u0c95\u0cc6 \u0cae\u0cc1\u0c97\u0cbf\u0ca6\u0cbf\u0ca6\u0cc6"}return""},
 bl1(){if($.jJ)return"\u0c97\u0ccd\u0cb0\u0cc7\u0cb8\u0ccd \u0cb8\u0c95\u0ccd\u0cb0\u0cbf\u0caf - "+A.bl0()+"h \u0cac\u0cbe\u0c95\u0cbf ("+$.uF+"/10 \u0cac\u0cb3\u0cb8\u0cb2\u0cbe\u0c97\u0cbf\u0ca6\u0cc6)"
 return"\u0c97\u0ccd\u0cb0\u0cc7\u0cb8\u0ccd \u0ca8\u0cbf\u0cb7\u0ccd\u0c95\u0ccd\u0cb0\u0cbf\u0caf ("+$.uF+"/10 \u0cac\u0cb3\u0cb8\u0cb2\u0cbe\u0c97\u0cbf\u0ca6\u0cc6)"},
