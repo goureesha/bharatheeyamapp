@@ -61897,8 +61897,7 @@ for(s=s.b,p=0;p<12;++p)q[p]=B.c.q(s[p]+r,360)
 return q},
 $S:488}
 A.aS8.prototype={
-$1(a){var s=B.aE[B.b.q(B.c.b4(a/30),12)]
-return s.length>=2?B.e.af(s,0,2):s},
+$1(a){return B.aE[B.b.q(B.c.b4(a/30),12)]},
 $S:157}
 A.aS6.prototype={
 $1(a){return A.Gq(a)+" "+A.l(this.a.$1(a))},
