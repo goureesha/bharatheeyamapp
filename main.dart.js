@@ -61900,7 +61900,7 @@ A.aS8.prototype={
 $1(a){return B.aE[B.b.q(B.c.b4(a/30),12)]},
 $S:157}
 A.aS6.prototype={
-$1(a){return A.Gq(a)+" "+A.l(this.a.$1(a))},
+$1(a){return A.Gq(a)+"\n"+A.l(this.a.$1(a))},
 $S:157}
 A.aRZ.prototype={
 $1(a){var s=this.b,r=s[a],q=s[(a+11)%12],p=a+1,o=s[p%12],n=B.c.q(q+B.c.q(r-q+360,360)/2,360),m=B.c.q(r+B.c.q(o-r+360,360)/2,360)
