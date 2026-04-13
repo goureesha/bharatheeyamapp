@@ -35,7 +35,7 @@ const RESOURCES = {"assets/assets/images/logo.png": "8b3be256f8c343bfe505d1de18b
 "canvaskit/skwasm.js": "ac0f73826b925320a1e9b0d3fd7da61c",
 "privacy_policy.html": "10094331e2887570d5e079618ca2fdc8",
 "flutter.js": "4b2350e14c6650ba82871f60906437ea",
-"flutter_bootstrap.js": "edf96f7554659369a4371d7e52a82161",
+"flutter_bootstrap.js": "a61bf8cc2c4f2c498d2b2021e49a2e2a",
 "main.dart.js": "12dfb283046c6cd50882bef020c10ef6",
 "version.json": "24bc4970e5fc08ccf86e820ca1ca438d",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df"};
