@@ -8122,10 +8122,12 @@ r5=J.f(i,d1)
 d7=r5==null?0:r5
 d8=A.am2(d1,d2,d7,c9)
 d9=!1
-if(!J.d(d1,"\u0cb0\u0cb5\u0cbf")&&!J.d(d1,"\u0c9a\u0c82\u0ca6\u0ccd\u0cb0")&&!J.d(d1,"\u0cb0\u0cbe\u0cb9\u0cc1")&&!J.d(d1,"\u0c95\u0cc7\u0ca4\u0cc1")&&!J.d(d1,"\u0cb2\u0c97\u0ccd\u0ca8")&&!J.d(d1,"\u0cae\u0cbe\u0c82\u0ca6\u0cbf")){e0=Math.abs(d2-c9)
+if(!J.d(d1,"\u0cb0\u0cb5\u0cbf")&&!J.d(d1,"\u0cb0\u0cbe\u0cb9\u0cc1")&&!J.d(d1,"\u0c95\u0cc7\u0ca4\u0cc1")&&!J.d(d1,"\u0cb2\u0c97\u0ccd\u0ca8")&&!J.d(d1,"\u0cae\u0cbe\u0c82\u0ca6\u0cbf")){e0=Math.abs(d2-c9)
 if(e0>180)e0=360-e0
 e1=0
-switch(d1){case"\u0c95\u0cc1\u0c9c":e1=17
+switch(d1){case"\u0c9a\u0c82\u0ca6\u0ccd\u0cb0":e1=12
+break
+case"\u0c95\u0cc1\u0c9c":e1=17
 break
 case"\u0cac\u0cc1\u0ca7":e1=11
 break
@@ -8134,7 +8136,7 @@ break
 case"\u0cb6\u0cc1\u0c95\u0ccd\u0cb0":e1=6.6
 break
 case"\u0cb6\u0ca8\u0cbf":e1=13
-break}if(e0<=e1)d9=!0}q4=d3
+break}if(e1>0&&e0<=e1)d9=!0}q4=d3
 r6=d4
 r7=B.aE[d6]
 A.am(J.f(d8,"subDrekD1"))
