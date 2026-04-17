@@ -65589,19 +65589,19 @@ if(r<25)return 10
 return 0}default:if(this.e)return-1
 return B.b.q(B.c.aX(a/30),12)}},
 WH(a){var s=B.c.q(a,30)
-switch(this.d){case 2:return B.c.q(s,15)
-case 3:return B.c.q(s,10)
-case 9:return B.c.q(s,3.33333)
-case 12:return B.c.q(s,2.5)
-case 30:if(B.b.q(B.b.q(B.c.aX(a/30),12),2)===0){if(s<5)return s
-if(s<10)return s-5
-if(s<18)return s-10
-if(s<25)return s-18
-return s-25}else{if(s<5)return s
-if(s<12)return s-5
-if(s<20)return s-12
-if(s<25)return s-20
-return s-25}default:return s}},
+switch(this.d){case 2:return B.c.q(s,15)*2
+case 3:return B.c.q(s,10)*3
+case 9:return B.c.q(s,3.33333)*9.000009000009
+case 12:return B.c.q(s,2.5)*12
+case 30:if(B.b.q(B.b.q(B.c.aX(a/30),12),2)===0){if(s<5)return s*6
+if(s<10)return(s-5)*6
+if(s<18)return(s-10)*3.75
+if(s<25)return(s-18)*4.285714285714286
+return(s-25)*6}else{if(s<5)return s*6
+if(s<12)return(s-5)*4.285714285714286
+if(s<20)return(s-12)*3.75
+if(s<25)return(s-20)*6
+return(s-25)*6}default:return s}},
 J(b7){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,b0,b1,b2,b3,b4,b5=this,b6=null
 if(J.d($.akC().a,"north"))return new A.a2y(b5.c,b5.d,b5.e,!1,b5.r,b5.w,b5.x,b5.y,b5.z,b5.Q,b5.as,b6)
 s=b5.c
@@ -65825,19 +65825,19 @@ if(r<25)return 10
 return 0}default:if(this.e)return-1
 return B.b.q(B.c.aX(a/30),12)}},
 a0E(a){var s=B.c.q(a,30)
-switch(this.d){case 2:return B.c.q(s,15)
-case 3:return B.c.q(s,10)
-case 9:return B.c.q(s,3.33333)
-case 12:return B.c.q(s,2.5)
-case 30:if(B.b.q(B.b.q(B.c.aX(a/30),12),2)===0){if(s<5)return s
-if(s<10)return s-5
-if(s<18)return s-10
-if(s<25)return s-18
-return s-25}else{if(s<5)return s
-if(s<12)return s-5
-if(s<20)return s-12
-if(s<25)return s-20
-return s-25}default:return s}},
+switch(this.d){case 2:return B.c.q(s,15)*2
+case 3:return B.c.q(s,10)*3
+case 9:return B.c.q(s,3.33333)*9.000009000009
+case 12:return B.c.q(s,2.5)*12
+case 30:if(B.b.q(B.b.q(B.c.aX(a/30),12),2)===0){if(s<5)return s*6
+if(s<10)return(s-5)*6
+if(s<18)return(s-10)*3.75
+if(s<25)return(s-18)*4.285714285714286
+return(s-25)*6}else{if(s<5)return s*6
+if(s<12)return(s-5)*4.285714285714286
+if(s<20)return(s-12)*3.75
+if(s<25)return(s-20)*6
+return(s-25)*6}default:return s}},
 J(b6){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,b0=this,b1=null,b2=b0.c,b3=b2.a,b4=b3.h(0,"\u0cb2\u0c97\u0ccd\u0ca8"),b5=b4==null?b1:b4.b
 if(b5==null)b5=0
 s=B.b.q(B.c.aX(b5/30),12)
