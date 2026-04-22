@@ -34,7 +34,7 @@ class _InputScreenState extends State<InputScreen> {
   int _minute        = DateTime.now().minute;
   String _ampm       = DateTime.now().hour < 12 ? 'AM' : 'PM';
   String _ayanamsa   = 'ಲಾಹಿರಿ';
-  String _nodeMode   = 'ನಿಜ ರಾಹು';
+  String _nodeMode   = 'ಮಧ್ಯ ರಾಹು';
   bool _loading      = false;
   bool _geoLoading   = false;
   String _geoStatus  = '';
