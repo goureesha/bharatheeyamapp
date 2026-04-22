@@ -428,19 +428,7 @@ class KundaliChart extends StatelessWidget {
       case ChipType.lagna:  color = const Color(0xFFE53E3E); break;
       case ChipType.sphuta: color = const Color(0xFF805AD5); break;
       default:
-        switch (name) {
-          case 'ರವಿ': color = const Color(0xFFC53030); break;
-          case 'ಚಂದ್ರ': color = const Color(0xFF2C5282); break;
-          case 'ಕುಜ':
-          case 'ಮಂಗಳ': color = const Color(0xFFE53E3E); break;
-          case 'ಬುಧ': color = const Color(0xFF2F855A); break;
-          case 'ಗುರು': color = const Color(0xFFDD6B20); break;
-          case 'ಶುಕ್ರ': color = const Color(0xFFB83280); break;
-          case 'ಶನಿ': color = const Color(0xFF1A202C); break;
-          case 'ರಾಹು': color = const Color(0xFF744210); break;
-          case 'ಕೇತು': color = const Color(0xFF4A5568); break;
-          default: color = const Color(0xFF2B6CB0);
-        }
+        color = const Color(0xFF1A202C); // Uniform dark color for all planets
         break;
     }
 

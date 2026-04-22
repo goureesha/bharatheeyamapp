@@ -620,6 +620,234 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  /// Show form to edit an existing extra person's details
+  void _showEditPersonDialog(String personName) {
+    final idx = _extraPersons.indexWhere((p) => p.name == personName);
+    if (idx == -1) return;
+    final existing = _extraPersons[idx];
+
+    final nameCtrl = TextEditingController(text: existing.name);
+    final placeCtrl = TextEditingController(text: existing.place);
+    final latCtrl = TextEditingController(text: existing.lat.toStringAsFixed(4));
+    final lonCtrl = TextEditingController(text: existing.lon.toStringAsFixed(4));
+    final tzCtrl = TextEditingController(text: '+5.5');
+
+    DateTime dob = existing.dob;
+    int hour = existing.hour;
+    int minute = existing.minute;
+    String ampm = existing.ampm;
+
+    bool geoLoading = false;
+    String geoStatus = '';
+
+    Future<void> performGeocode(String placeName, Function setS) async {
+      if (placeName.trim().isEmpty) return;
+      setS(() { geoLoading = true; geoStatus = ''; });
+      try {
+        final q = Uri.encodeComponent(placeName.trim());
+        final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$q&format=json&limit=1');
+        final resp = await http.get(url, headers: {'User-Agent': 'BharatheeyamApp/1.0'}).timeout(const Duration(seconds: 10));
+        if (resp.statusCode == 200) {
+          final data = jsonDecode(resp.body) as List;
+          if (data.isEmpty) {
+            setS(() => geoStatus = 'ಸ್ಥಳ ಕಂಡುಬಂದಿಲ್ಲ.');
+          } else {
+            final lat = double.parse(data[0]['lat']);
+            final lon = double.parse(data[0]['lon']);
+            final displayName = data[0]['display_name'] as String;
+            final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+            setS(() {
+              placeCtrl.text = placeName.trim();
+              latCtrl.text = lat.toStringAsFixed(4);
+              lonCtrl.text = lon.toStringAsFixed(4);
+              tzCtrl.text = '${autoTz >= 0 ? '+' : ''}$autoTz';
+              geoStatus = '📍 ${data[0]['display_name']} (TZ: ${autoTz >= 0 ? '+' : ''}$autoTz)';
+            });
+          }
+        }
+      } catch (_) {
+        setS(() => geoStatus = 'ಸ್ಥಳ ಸಂಪರ್ಕ ದೋಷ.');
+      }
+      setS(() => geoLoading = false);
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(builder: (ctx2, setS) {
+        return AlertDialog(
+          backgroundColor: kBg,
+          title: Text('ವ್ಯಕ್ತಿ ಬದಲಾಯಿಸಿ', style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(controller: nameCtrl, decoration: InputDecoration(labelText: 'ಹೆಸರು', prefixIcon: Icon(Icons.person_outline))),
+                const SizedBox(height: 14),
+                GestureDetector(
+                  onTap: () async {
+                    final d = await showDatePicker(
+                      context: ctx2, initialDate: dob,
+                      firstDate: DateTime(1800), lastDate: DateTime(2100),
+                      builder: (c, child) => Theme(data: Theme.of(c).copyWith(colorScheme: ColorScheme.light(primary: kPurple2)), child: child!),
+                    );
+                    if (d != null) setS(() => dob = d);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
+                    child: Row(children: [
+                      Icon(Icons.calendar_today, color: kMuted), const SizedBox(width: 10),
+                      Text('ದಿನಾಂಕ: ${dob.day.toString().padLeft(2,'0')}-${dob.month.toString().padLeft(2,'0')}-${dob.year}', style: TextStyle(fontSize: 14, color: kText)),
+                    ]),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                GestureDetector(
+                  onTap: () async {
+                    final picked = await showTimePicker(
+                      context: ctx2,
+                      initialTime: TimeOfDay(
+                        hour: ampm == 'PM' && hour != 12 ? hour + 12 : (ampm == 'AM' && hour == 12 ? 0 : hour),
+                        minute: minute,
+                      ),
+                      builder: (c, child) => Theme(data: Theme.of(c).copyWith(colorScheme: ColorScheme.light(primary: kPurple2)), child: child!),
+                    );
+                    if (picked != null) {
+                      setS(() {
+                        final h24 = picked.hour;
+                        ampm = h24 >= 12 ? 'PM' : 'AM';
+                        hour = h24 % 12 == 0 ? 12 : h24 % 12;
+                        minute = picked.minute;
+                      });
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
+                    child: Row(children: [
+                      Icon(Icons.access_time, color: kMuted), const SizedBox(width: 10),
+                      Text('ಸಮಯ: ${hour.toString().padLeft(2,'0')}:${minute.toString().padLeft(2,'0')} $ampm', style: TextStyle(fontSize: 14, color: kText)),
+                    ]),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Autocomplete<String>(
+                  optionsBuilder: (TextEditingValue textEditingValue) {
+                    if (textEditingValue.text.isEmpty) return offlinePlaces.keys.take(15);
+                    final query = textEditingValue.text.toLowerCase();
+                    return offlinePlaces.keys.where((name) => name.toLowerCase().contains(query));
+                  },
+                  fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
+                    if (placeCtrl.text.isNotEmpty && textEditingController.text.isEmpty) {
+                      textEditingController.text = placeCtrl.text;
+                    }
+                    return TextField(
+                      controller: textEditingController, focusNode: focusNode,
+                      decoration: InputDecoration(
+                        labelText: 'ಊರು ಹುಡುಕಿ', prefixIcon: Icon(Icons.search),
+                        suffixIcon: geoLoading
+                          ? Padding(padding: const EdgeInsets.all(12), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))
+                          : IconButton(icon: Icon(Icons.my_location, color: kTeal), onPressed: () { placeCtrl.text = textEditingController.text; performGeocode(textEditingController.text, setS); }),
+                      ),
+                      onSubmitted: (_) { placeCtrl.text = textEditingController.text; performGeocode(textEditingController.text, setS); },
+                      onChanged: (val) => placeCtrl.text = val,
+                    );
+                  },
+                  onSelected: (String selection) async {
+                    if (offlinePlaces.containsKey(selection)) {
+                      final coords = offlinePlaces[selection]!;
+                      final autoTz = await getTimezoneForPlace(selection, coords[0], coords[1]);
+                      setS(() {
+                        placeCtrl.text = selection;
+                        latCtrl.text = coords[0].toStringAsFixed(4);
+                        lonCtrl.text = coords[1].toStringAsFixed(4);
+                        tzCtrl.text = '${autoTz >= 0 ? '+' : ''}$autoTz';
+                        geoStatus = '📍 $selection (TZ: ${autoTz >= 0 ? '+' : ''}$autoTz)';
+                      });
+                    }
+                  },
+                  optionsViewBuilder: (context, onSelected, options) {
+                    return Align(
+                      alignment: Alignment.topLeft,
+                      child: Material(
+                        elevation: 4.0, borderRadius: BorderRadius.circular(8),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxHeight: 250, maxWidth: MediaQuery.of(context).size.width - 64),
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero, itemCount: options.length, shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              final option = options.elementAt(index);
+                              return ListTile(dense: true, leading: Icon(Icons.location_on, size: 18, color: kPurple2), title: Text(option, style: TextStyle(fontSize: 13)), onTap: () => onSelected(option));
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                if (geoStatus.isNotEmpty) ...[const SizedBox(height: 6), Text(geoStatus, style: TextStyle(fontSize: 12, color: kGreen))],
+                const SizedBox(height: 14),
+                Row(children: [
+                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: 'ಅಕ್ಷಾಂಶ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  const SizedBox(width: 8),
+                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: 'ರೇಖಾಂಶ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  const SizedBox(width: 8),
+                  Expanded(child: TextField(controller: tzCtrl, decoration: const InputDecoration(labelText: 'TZ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                ]),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('ಮುಚ್ಚಿ', style: TextStyle(color: kMuted))),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: kPurple2),
+              onPressed: () async {
+                final name = nameCtrl.text.trim();
+                if (name.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ದಯವಿಟ್ಟು ಹೆಸರನ್ನು ನಮೂದಿಸಿ'), backgroundColor: Colors.red));
+                  return;
+                }
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('⏳ $name ಕುಂಡಲಿ ಮರು ಲೆಕ್ಕಿಸಲಾಗುತ್ತಿದೆ...')));
+                try {
+                  int h24 = hour;
+                  if (ampm == 'PM' && h24 != 12) h24 += 12;
+                  if (ampm == 'AM' && h24 == 12) h24 = 0;
+                  final localHour = h24 + minute / 60.0;
+                  final lat = double.tryParse(latCtrl.text) ?? 14.98;
+                  final lon = double.tryParse(lonCtrl.text) ?? 74.73;
+                  final tz = double.tryParse(tzCtrl.text) ?? 5.5;
+
+                  final result = await AstroCalculator.calculate(
+                    year: dob.year, month: dob.month, day: dob.day,
+                    hourUtcOffset: tz, hour24: localHour,
+                    lat: lat, lon: lon, ayanamsaMode: 'lahiri', trueNode: false,
+                  );
+
+                  if (result == null) {
+                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ಕುಂಡಲಿ ಲೆಕ್ಕ ವಿಫಲ'), backgroundColor: Colors.red));
+                    return;
+                  }
+
+                  if (mounted) {
+                    setState(() {
+                      _extraPersons[idx] = _PersonEntry(name: name, result: result, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, place: placeCtrl.text, notes: existing.notes);
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ $name ಕುಂಡಲಿ ಯಶಸ್ವಿಯಾಗಿ ಬದಲಾಯಿಸಲಾಗಿದೆ'), backgroundColor: Colors.green));
+                  }
+                } catch (e) {
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ದೋಷ: $e'), backgroundColor: Colors.red));
+                }
+              },
+              child: Text('ಮರು ಲೆಕ್ಕಿಸಿ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
   Future<void> _loadJanmaNakshatra() async {
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
@@ -990,11 +1218,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                       Expanded(
                         child: Text(personName, style: TextStyle(fontSize: 15 * textScale, fontWeight: FontWeight.w900, color: isPrimary ? kPurple2 : kTeal)),
                       ),
-                      if (!isPrimary)
+                      if (!isPrimary) ...[
+                        IconButton(
+                          icon: Icon(Icons.edit, size: 18, color: kPurple2),
+                          tooltip: 'ಬದಲಾಯಿಸಿ',
+                          onPressed: () => _showEditPersonDialog(personName),
+                        ),
                         IconButton(
                           icon: Icon(Icons.close, size: 18, color: Colors.redAccent),
                           onPressed: () => setState(() => _extraPersons.removeWhere((p) => p.name == personName)),
                         ),
+                      ],
                     ],
                   ),
                 ),
