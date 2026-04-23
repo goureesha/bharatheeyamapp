@@ -51,12 +51,14 @@ class HomeScreen extends StatelessWidget {
 
     // Tester-only sections (incomplete features)
     final testerSections = [
-      _Section(AppLocale.isHindi ? 'अष्टमंगल' : 'ಅಷ್ಟಮಂಗಲ', 'Ashtamangala', Icons.auto_fix_high, const Color(0xFFE67E22), () {
+      _Section(AppLocale.l('ashtamangala'), 'Ashtamangala', Icons.auto_fix_high, const Color(0xFFE67E22), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const AshtamangalaScreen()));
       }),
     ];
 
-    return Scaffold(
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLocale.langNotifier,
+      builder: (context, _, __) => Scaffold(
       backgroundColor: kBg,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -128,7 +130,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 
   void _showAppointmentDialog(BuildContext context) {

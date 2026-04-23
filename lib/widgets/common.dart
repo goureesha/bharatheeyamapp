@@ -139,6 +139,7 @@ class AppLocale {
       'chart': 'ಕುಂಡಲಿ', 'sphuta': 'ಸ್ಫುಟ', 'bhava': 'ಭಾವ', 'varga': 'ವರ್ಗ',
       'dasha': 'ದಶಾ', 'aroodha': 'ಆರೂಢ', 'ashtakavarga': 'ಅಷ್ಟಕವರ್ಗ',
       'taranukoola': 'ತಾರಾನುಕೂಲ', 'matchMaking': 'ಗುಣ ಮಿಲನ', 'notes': 'ಟಿಪ್ಪಣಿ',
+      'ashtamangala': 'ಅಷ್ಟಮಂಗಲ',
       'sunrise': 'ಸೂರ್ಯೋದಯ', 'sunset': 'ಸೂರ್ಯಾಸ್ತ', 'searchPlace': 'ಊರು ಹುಡುಕಿ',
       'noResults': 'ಯಾವುದೇ ಫಲಿತಾಂಶ ಕಂಡುಬಂದಿಲ್ಲ.', 'deleteConfirm': 'ಅಳಿಸಬೇಕೇ?',
       'deleteMsg': 'ಜಾತಕವನ್ನು ಅಳಿಸಬೇಕೇ?', 'noBtn': 'ಬೇಡ', 'errorLabel': 'ದೋಷ',
