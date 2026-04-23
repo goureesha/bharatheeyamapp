@@ -24,7 +24,7 @@ const RESOURCES = {"assets/assets/images/ganapati.png": "22e33acfbc05962d2d2dcef
 "index.html": "b7df8837a65841ef76449bb0fbf5438c",
 "/": "b7df8837a65841ef76449bb0fbf5438c",
 "main.dart.js": "35a242e08f9b3639a469d06b9fdbec55",
-"flutter_bootstrap.js": "0697d091cf93d3a57b0d883274a0b64e",
+"flutter_bootstrap.js": "abc57bbe2c8f8c30183affbdf8867c11",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df",
 "canvaskit/canvaskit.wasm": "efeeba7dcc952dae57870d4df3111fad",
 "canvaskit/skwasm_st.js.symbols": "c7e7aac7cd8b612defd62b43e3050bdd",
