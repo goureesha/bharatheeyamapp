@@ -33,8 +33,8 @@ class _InputScreenState extends State<InputScreen> {
   int _hour          = DateTime.now().hour % 12 == 0 ? 12 : DateTime.now().hour % 12;
   int _minute        = DateTime.now().minute;
   String _ampm       = DateTime.now().hour < 12 ? 'AM' : 'PM';
-  String _ayanamsa   = 'ಲಾಹಿರಿ';
-  String _nodeMode   = 'ಮಧ್ಯ ರಾಹು';
+  String _ayanamsa   = 'lahiri';
+  String _nodeMode   = 'mean';
   bool _loading      = false;
   bool _geoLoading   = false;
   String _geoStatus  = '';
@@ -330,9 +330,8 @@ class _InputScreenState extends State<InputScreen> {
       if (_ampm == 'AM' && _hour == 12) h24 = 0;
       final localHour = h24 + _minute / 60.0;
 
-      final aynMode = _ayanamsa == 'ರಾಮನ್'
-          ? 'raman' : _ayanamsa == 'ಕೆ.ಪಿ' ? 'kp' : 'lahiri';
-      final trueNode = _nodeMode == 'ನಿಜ ರಾಹು';
+      final aynMode = _ayanamsa;
+      final trueNode = _nodeMode == 'true';
 
       final tzOffset = double.tryParse(_tzCtrl.text) ?? LocationService.tzOffset;
 
@@ -1121,8 +1120,8 @@ class _InputScreenState extends State<InputScreen> {
                     child: DropdownButtonFormField<String>(
                       value: _ayanamsa,
                       decoration: InputDecoration(labelText: AppLocale.l('ayanamsa')),
-                      items: ['ಲಾಹಿರಿ','ರಾಮನ್','ಕೆ.ಪಿ'].map((v) => DropdownMenuItem(
-                        value: v, child: Text(v, style: TextStyle()))).toList(),
+                      items: [{'v':'lahiri','l':'Lahiri'},{'v':'raman','l':'Raman'},{'v':'kp','l':'KP'}].map((m) => DropdownMenuItem(
+                        value: m['v']!, child: Text(m['l']!, style: TextStyle()))).toList(),
                       onChanged: (v) => setState(() => _ayanamsa = v!),
                     ),
                   ),
@@ -1131,8 +1130,8 @@ class _InputScreenState extends State<InputScreen> {
                     child: DropdownButtonFormField<String>(
                       value: _nodeMode,
                       decoration: InputDecoration(labelText: AppLocale.l('nodeType')),
-                      items: ['ನಿಜ ರಾಹು','ಸರಾಸರಿ ರಾಹು'].map((v) => DropdownMenuItem(
-                        value: v, child: Text(v, style: TextStyle()))).toList(),
+                      items: [{'v':'true','l':'True Node'},{'v':'mean','l':'Mean Node'}].map((m) => DropdownMenuItem(
+                        value: m['v']!, child: Text(m['l']!, style: TextStyle()))).toList(),
                       onChanged: (v) => setState(() => _nodeMode = v!),
                     ),
                   ),
