@@ -20,25 +20,35 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
   // Planet filter: null means "All"
   String? _selectedPlanet;
 
-  // Planet names for filter chips
-  static const _planets = [
-    'ಸೂರ್ಯ', 'ಚಂದ್ರ', 'ಮಂಗಳ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ', 'ರಾಹು', 'ಕೇತು',
+  // Planet keys (English, language-independent)
+  static const _planetKeys = [
+    'sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'rahu', 'ketu',
   ];
 
   // Planet emoji icons
   static const _planetIcons = <String, String>{
-    'ಸೂರ್ಯ': '☉', 'ಚಂದ್ರ': '☽', 'ಮಂಗಳ': '♂', 'ಬುಧ': '☿',
-    'ಗುರು': '♃', 'ಶುಕ್ರ': '♀', 'ಶನಿ': '♄', 'ರಾಹು': '☊', 'ಕೇತು': '☋',
+    'sun': '☉', 'moon': '☽', 'mars': '♂', 'mercury': '☿',
+    'jupiter': '♃', 'venus': '♀', 'saturn': '♄', 'rahu': '☊', 'ketu': '☋',
   };
 
   // Planet colors
   static final _planetColors = <String, Color>{
-    'ಸೂರ್ಯ': Color(0xFFFF6B00), 'ಚಂದ್ರ': Color(0xFF4A90D9),
-    'ಮಂಗಳ': Color(0xFFE53935), 'ಬುಧ': Color(0xFF43A047),
-    'ಗುರು': Color(0xFFFFC107), 'ಶುಕ್ರ': Color(0xFFE91E8C),
-    'ಶನಿ': Color(0xFF5C6BC0), 'ರಾಹು': Color(0xFF455A64),
-    'ಕೇತು': Color(0xFF795548),
+    'sun': Color(0xFFFF6B00), 'moon': Color(0xFF4A90D9),
+    'mars': Color(0xFFE53935), 'mercury': Color(0xFF43A047),
+    'jupiter': Color(0xFFFFC107), 'venus': Color(0xFFE91E8C),
+    'saturn': Color(0xFF5C6BC0), 'rahu': Color(0xFF455A64),
+    'ketu': Color(0xFF795548),
   };
+
+  // Get localized planet name from English key
+  static String _planetLabel(String key) {
+    const _keyToLocale = {
+      'sun': 'surya', 'moon': 'chandra', 'mars': 'mars',
+      'mercury': 'mercury', 'jupiter': 'jupiter', 'venus': 'venus',
+      'saturn': 'saturn', 'rahu': 'rahu', 'ketu': 'ketu',
+    };
+    return AppLocale.l(_keyToLocale[key] ?? key);
+  }
 
   @override
   void initState() {
@@ -82,7 +92,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
-        title: Text(AppLocale.isHindi ? 'ग्रह जानकारी' : 'ಗ್ರಹಗಳ ಮಾಹಿತಿ', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(AppLocale.l('planets'), style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: kBg,
         foregroundColor: kPurple1,
         elevation: 0,
@@ -123,7 +133,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
                 Padding(
                   padding: const EdgeInsets.only(right: 6),
                   child: ChoiceChip(
-                    label: Text(AppLocale.isHindi ? 'सभी' : 'ಎಲ್ಲಾ', style: TextStyle(
+                    label: Text(AppLocale.l('all'), style: TextStyle(
                       fontWeight: FontWeight.bold, fontSize: 12,
                       color: _selectedPlanet == null ? Colors.white : kText,
                     )),
@@ -135,13 +145,13 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
                   ),
                 ),
                 // Planet chips
-                ..._planets.map((p) => Padding(
+                ..._planetKeys.map((p) => Padding(
                   padding: const EdgeInsets.only(right: 6),
                   child: ChoiceChip(
                     avatar: _selectedPlanet == p ? null : Text(
                       _planetIcons[p] ?? '', style: const TextStyle(fontSize: 14),
                     ),
-                    label: Text(p, style: TextStyle(
+                    label: Text(_planetLabel(p), style: TextStyle(
                       fontWeight: FontWeight.bold, fontSize: 12,
                       color: _selectedPlanet == p ? Colors.white : kText,
                     )),
@@ -176,7 +186,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _transitData == null
-                    ? const Center(child: Text('ಡೇಟಾ ಲಭ್ಯವಿಲ್ಲ'))
+                    ? Center(child: Text(AppLocale.l('noResults')))
                     : TabBarView(
                         controller: _tabCtrl,
                         children: [
@@ -250,7 +260,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
       itemBuilder: (context, index) {
         final vp = periods[index];
         final startStr = _formatDate(vp.startDate);
-        final endStr = vp.endDate != null ? _formatDate(vp.endDate!) : 'ಮುಂದಿನ ವರ್ಷದವರೆಗೆ';
+        final endStr = vp.endDate != null ? _formatDate(vp.endDate!) : AppLocale.l('continues');
         final pColor = _getPlanetColor(vp.planetName);
         
         return Card(
@@ -285,8 +295,8 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text('ಪ್ರಾರಂಭ: $startStr', style: TextStyle(color: pColor.withValues(alpha: 0.8), fontSize: 13)),
-                      Text('ಅಂತ್ಯ: $endStr', style: TextStyle(color: pColor.withValues(alpha: 0.8), fontSize: 13)),
+                      Text('${AppLocale.l('start')}: $startStr', style: TextStyle(color: pColor.withValues(alpha: 0.8), fontSize: 13)),
+                      Text('${AppLocale.l('end')}: $endStr', style: TextStyle(color: pColor.withValues(alpha: 0.8), fontSize: 13)),
                     ],
                   ),
                 ),
@@ -315,7 +325,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
       itemBuilder: (context, index) {
         final ap = periods[index];
         final startStr = _formatDate(ap.startDate);
-        final endStr = ap.endDate != null ? _formatDate(ap.endDate!) : 'ಮುಂದಿನ ವರ್ಷದವರೆಗೆ';
+        final endStr = ap.endDate != null ? _formatDate(ap.endDate!) : AppLocale.l('continues');
         final pColor = _getPlanetColor(ap.planetName);
         
         return Card(
