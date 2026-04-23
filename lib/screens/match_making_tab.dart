@@ -36,7 +36,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
   void _calculateMatch() {
     if (_bNak == null || _bRashi == null || _gNak == null || _gRashi == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ದಯವಿಟ್ಟು ವಧು ಮತ್ತು ವರರ ಎಲ್ಲಾ ವಿವರಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ')),
+        SnackBar(content: Text(AppLocale.l('selectAllDetails'))),
       );
       return;
     }
@@ -62,7 +62,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
           child: DropdownButtonHideUnderline(
             child: DropdownButton<int>(
               isExpanded: true,
-              hint: Text('ಆಯ್ಕೆಮಾಡಿ', style: TextStyle(fontSize: 14)),
+              hint: Text(AppLocale.l('selectHint'), style: TextStyle(fontSize: 14)),
               value: (allowedIndices.contains(value)) ? value : null,
               items: allowedIndices.map((i) => DropdownMenuItem<int>(
                 value: i,
@@ -85,13 +85,13 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
     String verdict;
     Color verdictColor;
     if (total <= 18) {
-      verdict = 'ಹೊಂದಾಣಿಕೆ ಉತ್ತಮವಾಗಿಲ್ಲ';
+      verdict = AppLocale.l('matchPoor');
       verdictColor = Colors.red.shade700;
     } else if (total <= 25) {
-      verdict = 'ಹೊಂದಾಣಿಕೆ ಮಧ್ಯಮವಾಗಿದೆ';
+      verdict = AppLocale.l('matchMedium');
       verdictColor = Colors.orange.shade700;
     } else {
-      verdict = 'ಹೊಂದಾಣಿಕೆ ತುಂಬಾ ಉತ್ತಮವಾಗಿದೆ';
+      verdict = AppLocale.l('matchGood');
       verdictColor = Colors.green.shade700;
     }
 
@@ -110,7 +110,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('ಅಷ್ಟಕೂಟ ಗುಣ ಮಿಲನ ಫಲಿತಾಂಶ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1), textAlign: TextAlign.center),
+          Text(AppLocale.l('matchResult'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1), textAlign: TextAlign.center),
           const SizedBox(height: 16),
           Table(
             columnWidths: const {
@@ -138,7 +138,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
               TableRow(
                 decoration: BoxDecoration(color: kPurple1.withOpacity(0.05)),
                 children: [
-                  Padding(padding: EdgeInsets.all(12), child: Text('ಒಟ್ಟು ಗುಣ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
+                  Padding(padding: EdgeInsets.all(12), child: Text(AppLocale.l('totalGuna'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
                   Padding(padding: const EdgeInsets.all(12), child: Text(total.toStringAsFixed(1), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: kPurple1))),
                   Padding(padding: EdgeInsets.all(12), child: Text('36', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: kMuted))),
                 ],
@@ -155,7 +155,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
              ),
              child: Column(
                children: [
-                 Text('ಫಲಿತಾಂಶ:', style: TextStyle(fontSize: 14, color: verdictColor, fontWeight: FontWeight.w600)),
+                 Text('${AppLocale.l('result')}:', style: TextStyle(fontSize: 14, color: verdictColor, fontWeight: FontWeight.w600)),
                  const SizedBox(height: 4),
                  Text(
                    verdict, 
@@ -180,7 +180,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SectionTitle('ವಧುವಿನ ವಿವರಗಳು', color: kOrange),
+                SectionTitle(AppLocale.l('brideDetails'), color: kOrange),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -194,7 +194,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
                 const SizedBox(height: 24),
                 Divider(),
                 const SizedBox(height: 8),
-                SectionTitle('ವರನ ವಿವರಗಳು', color: kTeal),
+                SectionTitle(AppLocale.l('groomDetails'), color: kTeal),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -217,7 +217,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
                     ),
-                    child: Text('ಹೊಂದಾಣಿಕೆ ಪರೀಕ್ಷಿಸಿ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    child: Text(AppLocale.l('checkMatch'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
