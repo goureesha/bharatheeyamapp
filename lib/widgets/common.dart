@@ -172,6 +172,8 @@ class AppLocale {
       'matchResult': 'ಅಷ್ಟಕೂಟ ಗುಣ ಮಿಲನ ಫಲಿತಾಂಶ', 'totalGuna': 'ಒಟ್ಟು ಗುಣ', 'result': 'ಫಲಿತಾಂಶ',
       'brideDetails': 'ವಧುವಿನ ವಿವರಗಳು', 'groomDetails': 'ವರನ ವಿವರಗಳು', 'checkMatch': 'ಹೊಂದಾಣಿಕೆ ಪರೀಕ್ಷಿಸಿ',
       'referenceShloka': 'ಆಧಾರ ಶ್ಲೋಕ:', 'rule': 'ನಿಯಮ:', 'source': 'ಆಕರ: ',
+      'themeSettings': 'ಥೀಮ್ ಸೆಟ್ಟಿಂಗ್ಸ್', 'defaultLocation': 'ಡೀಫಾಲ್ಟ್ ಸ್ಥಳ',
+      'locationHint': 'ಪಂಚಾಂಗ ಮತ್ತು ವೈದಿಕ ಗಡಿಯಾರ ಲೆಕ್ಕಾಚಾರಕ್ಕೆ ಬಳಸಲಾಗುತ್ತದೆ',
     },
     'hi': {
       'appName': 'भारतीयम्', 'home': 'होम', 'kundali': 'कुंडली', 'panchanga': 'पंचांग',
@@ -206,6 +208,8 @@ class AppLocale {
       'matchResult': 'अष्टकूट गुण मिलान फल', 'totalGuna': 'कुल गुण', 'result': 'परिणाम',
       'brideDetails': 'वधू के विवरण', 'groomDetails': 'वर के विवरण', 'checkMatch': 'मिलान जाँचें',
       'referenceShloka': 'आधार श्लोक:', 'rule': 'नियम:', 'source': 'स्रोत: ',
+      'themeSettings': 'थीम सेटिंग्स', 'defaultLocation': 'डिफॉल्ट स्थान',
+      'locationHint': 'पंचांग और वैदिक घड़ी गणना के लिए उपयोग',
     },
     'ta': {
       'appName': 'பாரதீயம்', 'home': 'முகப்பு', 'kundali': 'ஜாதகம்', 'panchanga': 'பஞ்சாங்கம்',
@@ -240,6 +244,8 @@ class AppLocale {
       'matchResult': 'அஷ்டகூட குண மிலனம்', 'totalGuna': 'மொத்த குணம்', 'result': 'முடிவு',
       'brideDetails': 'மணப்பெண் விவரங்கள்', 'groomDetails': 'மணமகன் விவரங்கள்', 'checkMatch': 'பொருத்தம் சோதி',
       'referenceShloka': 'ஆதார ஸ்லோகம்:', 'rule': 'விதி:', 'source': 'மூலம்: ',
+      'themeSettings': 'தீம் அமைப்புகள்', 'defaultLocation': 'இயல்பு இடம்',
+      'locationHint': 'பஞ்சாங்கம் மற்றும் வைதிக கடிகாரத்திற்கு பயன்படுத்தப்படும்',
     },
     'te': {
       'appName': 'భారతీయమ్', 'home': 'హోమ్', 'kundali': 'కుండలి', 'panchanga': 'పంచాంగం',
@@ -274,6 +280,8 @@ class AppLocale {
       'matchResult': 'అష్టకూట గుణ మిలనం ఫలితం', 'totalGuna': 'మొత్తం గుణాలు', 'result': 'ఫలితం',
       'brideDetails': 'వధూ వివరాలు', 'groomDetails': 'వరుడు వివరాలు', 'checkMatch': 'పొందిక చూడండి',
       'referenceShloka': 'ఆధార శ్లోకం:', 'rule': 'నియమం:', 'source': 'మూలం: ',
+      'themeSettings': 'థీమ్ సెట్టింగ్స్', 'defaultLocation': 'డీఫాల్ట్ ప్రదేశం',
+      'locationHint': 'పంచాంగ మరియు వైదిక గడియారం లెక్కకు వాడతారు',
     },
     'ml': {
       'appName': 'ഭാരതീയം', 'home': 'ഹോം', 'kundali': 'ജാതകം', 'panchanga': 'പഞ്ചാംഗം',
@@ -308,6 +316,8 @@ class AppLocale {
       'matchResult': 'അഷ്ടകൂട ഗുണ മിലനം ഫലം', 'totalGuna': 'മൊത്തം ഗുണം', 'result': 'ഫലം',
       'brideDetails': 'വധൂ വിവരങ്ങൾ', 'groomDetails': 'വരൻ വിവരങ്ങൾ', 'checkMatch': 'പൊരുത്തം പരിശോധിക്കുക',
       'referenceShloka': 'ആധാര ശ്ലോകം:', 'rule': 'നിയമം:', 'source': 'മൂലം: ',
+      'themeSettings': 'തീം സെറ്റിങ്ങ്സ്', 'defaultLocation': 'ഇയൽപ്പു സ്ഥലം',
+      'locationHint': 'പഞ്ചാംഗ മറ്റും വൈദിക ഘടികാരത്തിനു ഉപയോഗിക്കുന്നു',
     },
   };
 

@@ -142,7 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: kBg,
       appBar: AppBar(
         backgroundColor: kCard,
-        title: Text('ಸೆಟ್ಟಿಂಗ್ಸ್ / Settings',
+        title: Text('${AppLocale.l('settings')} / Settings',
             style: TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.w800)),
         iconTheme: IconThemeData(color: kText),
         elevation: 0,
@@ -157,7 +157,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Theme selection
-                    SectionTitle('ಥೀಮ್ ಸೆಟ್ಟಿಂಗ್ಸ್'),
+                    SectionTitle(AppLocale.l('themeSettings')),
                     const SizedBox(height: 10),
                     ValueListenableBuilder<int>(
                       valueListenable: AppThemes.themeNotifier,
@@ -265,9 +265,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 24),
 
                     // Default Location
-                    SectionTitle('ಡೀಫಾಲ್ಟ್ ಸ್ಥಳ / Default Location'),
+                    SectionTitle(AppLocale.l('defaultLocation')),
                     const SizedBox(height: 6),
-                    Text('ಪಂಚಾಂಗ ಮತ್ತು ವೈದಿಕ ಗಡಿಯಾರ ಲೆಕ್ಕಾಚಾರಕ್ಕೆ ಬಳಸಲಾಗುತ್ತದೆ',
+                    Text(AppLocale.l('locationHint'),
                       style: TextStyle(fontSize: 12, color: kMuted)),
                     const SizedBox(height: 12),
                     Container(
