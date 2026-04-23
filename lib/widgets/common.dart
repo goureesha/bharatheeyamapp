@@ -100,84 +100,108 @@ class ChartStyle {
 }
 
 // ─────────────────────────────────────────────
-// App Language / Locale (Kannada only)
+// App Language / Locale (5 languages)
 // ─────────────────────────────────────────────
 class AppLocale {
   static final ValueNotifier<String> langNotifier = ValueNotifier('kn');
-  static String get current => 'kn';
-  static bool get isHindi => false;
+  static String get current => langNotifier.value;
+  static bool get isHindi => current == 'hi';
 
   static void setLang(String lang) {
-    langNotifier.value = 'kn';
+    if (!['kn', 'hi', 'ta', 'te', 'ml'].contains(lang)) return;
+    langNotifier.value = lang;
+    SharedPreferences.getInstance().then((prefs) => prefs.setString('app_lang', lang));
   }
 
   static Future<void> loadLang() async {
-    langNotifier.value = 'kn';
+    final prefs = await SharedPreferences.getInstance();
+    langNotifier.value = prefs.getString('app_lang') ?? 'kn';
   }
 
-  /// Get localized string by key (Kannada only)
+  /// Get localized string by key — falls back to Kannada then key
   static String l(String key) {
-    return _strings[key] ?? key;
+    final langStrings = _allStrings[current];
+    if (langStrings != null && langStrings.containsKey(key)) return langStrings[key]!;
+    final knFallback = _allStrings['kn'];
+    if (knFallback != null && knFallback.containsKey(key)) return knFallback[key]!;
+    return key;
   }
 
-  static const Map<String, String> _strings = {
-    'appName': '\u0cad\u0cbe\u0cb0\u0ca4\u0cc0\u0caf\u0cae\u0ccd',
-    'home': '\u0cae\u0ca8\u0cc6', 'kundali': '\u0c95\u0cc1\u0c82\u0ca1\u0cb2\u0cbf', 'panchanga': '\u0caa\u0c82\u0c9a\u0cbe\u0c82\u0c97',
-    'planets': '\u0c97\u0ccd\u0cb0\u0cb9\u0c97\u0cb3\u0cc1', 'appointment': '\u0c85\u0caa\u0cbe\u0caf\u0cbf\u0c82\u0c9f\u0ccd\u200c\u0cae\u0cc6\u0c82\u0c9f\u0ccd',
-    'vedicClock': '\u0cb5\u0cc8\u0ca6\u0cbf\u0c95 \u0c97\u0ca1\u0cbf\u0caf\u0cbe\u0cb0', 'settings': '\u0cb8\u0cc6\u0c9f\u0ccd\u0c9f\u0cbf\u0c82\u0c97\u0ccd\u0cb8\u0ccd',
-    'aboutUs': '\u0ca8\u0cae\u0ccd\u0cae \u0cac\u0c97\u0ccd\u0c97\u0cc6 / About Us',
-    'themeSettings': '\u0ca5\u0cc0\u0cae\u0ccd \u0cb8\u0cc6\u0c9f\u0ccd\u0c9f\u0cbf\u0c82\u0c97\u0ccd\u0cb8\u0ccd',
-    'chartStyle': '\u0c95\u0cc1\u0c82\u0ca1\u0cb2\u0cbf \u0cb6\u0cc8\u0cb2\u0cbf / Chart Style',
-    'language': '\u0cad\u0cbe\u0cb7\u0cc6 / Language',
-    'southIndian': '\u0ca6\u0c95\u0ccd\u0cb7\u0cbf\u0ca3 \u0cad\u0cbe\u0cb0\u0ca4', 'northIndian': '\u0c89\u0ca4\u0ccd\u0ca4\u0cb0 \u0cad\u0cbe\u0cb0\u0ca4',
-    'googleAccount': 'Google \u0c96\u0cbe\u0ca4\u0cc6', 'premium': '\u0caa\u0ccd\u0cb0\u0cc0\u0cae\u0cbf\u0caf\u0c82 \u0c9a\u0c82\u0ca6\u0cbe\u0ca6\u0cbe\u0cb0\u0cbf\u0c95\u0cc6',
-    'privacyPolicy': '\u0c97\u0ccc\u0caa\u0ccd\u0caf\u0ca4\u0cbe \u0ca8\u0cc0\u0ca4\u0cbf / Privacy Policy',
-    'name': '\u0cb9\u0cc6\u0cb8\u0cb0\u0cc1', 'dob': '\u0c9c\u0ca8\u0ccd\u0cae \u0ca6\u0cbf\u0ca8\u0cbe\u0c82\u0c95', 'time': '\u0c9c\u0ca8\u0ccd\u0cae \u0cb8\u0cae\u0caf',
-    'place': '\u0c9c\u0ca8\u0ccd\u0cae \u0cb8\u0ccd\u0ca5\u0cb3', 'calculate': '\u0cb2\u0cc6\u0c95\u0ccd\u0c95 \u0cb9\u0cbe\u0c95\u0cbf',
-    'selectDate': '\u0ca6\u0cbf\u0ca8\u0cbe\u0c82\u0c95 \u0c86\u0caf\u0ccd\u0c95\u0cc6', 'selectTime': '\u0cb8\u0cae\u0caf \u0c86\u0caf\u0ccd\u0c95\u0cc6',
-    'chart': '\u0c95\u0cc1\u0c82\u0ca1\u0cb2\u0cbf', 'sphuta': '\u0cb8\u0ccd\u0cab\u0cc1\u0c9f', 'bhava': '\u0cad\u0cbe\u0cb5',
-    'varga': '\u0cb5\u0cb0\u0ccd\u0c97', 'dasha': '\u0ca6\u0cb6\u0cbe', 'aroodha': '\u0c86\u0cb0\u0cc2\u0ca2',
-    'ashtakavarga': '\u0c85\u0cb7\u0ccd\u0c9f\u0c95\u0cb5\u0cb0\u0ccd\u0c97', 'taranukoola': '\u0ca4\u0cbe\u0cb0\u0cbe\u0ca8\u0cc1\u0c95\u0cc2\u0cb2',
-    'matchMaking': '\u0c97\u0cc1\u0ca3 \u0cae\u0cbf\u0cb2\u0ca8', 'notes': '\u0c9f\u0cbf\u0caa\u0ccd\u0caa\u0ca3\u0cbf',
-    'tithi': '\u0ca4\u0cbf\u0ca5\u0cbf', 'nakshatra': '\u0ca8\u0c95\u0ccd\u0cb7\u0ca4\u0ccd\u0cb0', 'yoga': '\u0caf\u0ccb\u0c97',
-    'karana': '\u0c95\u0cb0\u0ca3', 'vara': '\u0cb5\u0cbe\u0cb0',
-    'sunrise': '\u0cb8\u0cc2\u0cb0\u0ccd\u0caf\u0ccb\u0ca6\u0caf', 'sunset': '\u0cb8\u0cc2\u0cb0\u0ccd\u0caf\u0cbe\u0cb8\u0ccd\u0ca4',
-    'rahuKala': '\u0cb0\u0cbe\u0cb9\u0cc1 \u0c95\u0cbe\u0cb2', 'gulikaKala': '\u0c97\u0cc1\u0cb3\u0cbf\u0c95 \u0c95\u0cbe\u0cb2',
-    'yamaghantaKala': '\u0caf\u0cae\u0c98\u0c82\u0c9f \u0c95\u0cbe\u0cb2',
-    'transits': '\u0c97\u0ccd\u0cb0\u0cb9 \u0cb8\u0c82\u0c9a\u0cbe\u0cb0', 'vakri': '\u0cb5\u0c95\u0ccd\u0cb0\u0cbf', 'asta': '\u0c85\u0cb8\u0ccd\u0ca4',
-    'direct': '\u0ca8\u0cc7\u0cb0', 'retrograde': '\u0cb5\u0c95\u0ccd\u0cb0\u0cbf', 'combust': '\u0c85\u0cb8\u0ccd\u0ca4',
-    'yes': '\u0cb9\u0ccc\u0ca6\u0cc1', 'no': '\u0c87\u0cb2\u0ccd\u0cb2', 'notApplicable': '\u0c85\u0ca8\u0ccd\u0cb5\u0caf\u0cbf\u0cb8\u0cc1\u0cb5\u0cc1\u0ca6\u0cbf\u0cb2\u0ccd\u0cb2',
-    'booked': '\u0cac\u0cc1\u0c95\u0ccd \u0c86\u0c97\u0cbf\u0ca6\u0cc6', 'cancelled': '\u0cb0\u0ca6\u0ccd\u0ca6\u0cc1', 'completed': '\u0caa\u0cc2\u0cb0\u0ccd\u0ca3',
-    'addNote': '\u0cb9\u0cca\u0cb8 \u0c9f\u0cbf\u0caa\u0ccd\u0caa\u0ca3\u0cbf \u0cb8\u0cc7\u0cb0\u0cbf\u0cb8\u0cbf...', 'noteHistory': '\u0c9f\u0cbf\u0caa\u0ccd\u0caa\u0ca3\u0cbf \u0c87\u0ca4\u0cbf\u0cb9\u0cbe\u0cb8',
-    'noNotes': '\u0c87\u0ca8\u0ccd\u0ca8\u0cc2 \u0c9f\u0cbf\u0caa\u0ccd\u0caa\u0ca3\u0cbf\u0c97\u0cb3\u0cbf\u0cb2\u0ccd\u0cb2',
-    'share': '\u0cb9\u0c82\u0c9a\u0cbf\u0c95\u0cca\u0cb3\u0ccd\u0cb3\u0cbf', 'delete': '\u0c85\u0cb3\u0cbf\u0cb8\u0cbf',
-    'save': '\u0c89\u0cb3\u0cbf\u0cb8\u0cbf', 'cancel': '\u0cb0\u0ca6\u0ccd\u0ca6\u0cc1', 'confirm': '\u0ca6\u0cc3\u0ca2\u0caa\u0ca1\u0cbf\u0cb8\u0cbf',
-    'clientId': '\u0c97\u0ccd\u0cb0\u0cbe\u0cb9\u0c95 ID', 'phone': '\u0cab\u0ccb\u0ca8\u0ccd',
-    'selectPlace': '\u0cb8\u0ccd\u0ca5\u0cb3 \u0c86\u0caf\u0ccd\u0c95\u0cc6\u0cae\u0cbe\u0ca1\u0cbf',
-    'multiPlacesFound': '\u0c92\u0c82\u0ca6\u0cc7 \u0cb9\u0cc6\u0cb8\u0cb0\u0cbf\u0ca8 \u0cb9\u0cb2\u0cb5\u0cc1 \u0cb8\u0ccd\u0ca5\u0cb3\u0c97\u0cb3\u0cc1 \u0c95\u0c82\u0ca1\u0cc1\u0cac\u0c82\u0ca6\u0cbf\u0cb5\u0cc6:',
-    'placeNotFound': '\u0cb8\u0ccd\u0ca5\u0cb3 \u0c95\u0c82\u0ca1\u0cc1\u0cac\u0c82\u0ca6\u0cbf\u0cb2\u0ccd\u0cb2.',
-    'networkError': '\u0cb8\u0ccd\u0ca5\u0cb3 \u0cb9\u0cc1\u0ca1\u0cc1\u0c95 \u0cb8\u0cbe\u0ca7\u0ccd\u0caf\u0cb5\u0cbf\u0cb2\u0ccd\u0cb2. \u0c87\u0c82\u0c9f\u0cb0\u0ccd\u0ca8\u0cc6\u0c9f\u0ccd \u0cb8\u0c82\u0caa\u0cb0\u0ccd\u0c95/\u0cb8\u0ccd\u0ca5\u0cb3\u0ca6 \u0cb9\u0cc6\u0cb8\u0cb0\u0ca8\u0ccd\u0ca8\u0cc1 \u0caa\u0cb0\u0cc0\u0c95\u0ccd\u0cb7\u0cbf\u0cb8\u0cbf.',
-    'lahiri': '\u0cb2\u0cbe\u0cb9\u0cbf\u0cb0\u0cbf', 'raman': '\u0cb0\u0cbe\u0cae\u0ca8\u0ccd', 'kp': '\u0c95\u0cc6.\u0caa\u0cbf',
-    'trueRahu': '\u0ca8\u0cbf\u0c9c \u0cb0\u0cbe\u0cb9\u0cc1', 'meanRahu': '\u0cae\u0ca7\u0ccd\u0caf\u0cae \u0cb0\u0cbe\u0cb9\u0cc1',
-    'unknown': '\u0c85\u0caa\u0cb0\u0cbf\u0c9a\u0cbf\u0ca4 \u0cb9\u0cc6\u0cb8\u0cb0\u0cc1 (Unknown)',
-    'errorLabel': '\u0ca6\u0ccb\u0cb7',
-    'date': '\u0ca6\u0cbf\u0ca8\u0cbe\u0c82\u0c95', 'timeLabel': '\u0cb8\u0cae\u0caf',
-    'searchPlace': '\u0c8a\u0cb0\u0cc1 \u0cb9\u0cc1\u0ca1\u0cc1\u0c95\u0cbf',
-    'lat': '\u0c85\u0c95\u0ccd\u0cb7\u0cbe\u0c82\u0cb6 (Lat)', 'lon': '\u0cb0\u0cc7\u0c96\u0cbe\u0c82\u0cb6 (Lon)', 'tzOffset': '\u0cb8\u0cae\u0caf \u0cb5\u0cb2\u0caf',
-    'advancedSettings': '\u0c88 \u0c86\u0caf\u0ccd\u0c95\u0cc6\u0c97\u0cb3\u0cc1 \u0cac\u0ca6\u0cb2\u0cbe\u0caf\u0cbf\u0cb8\u0cac\u0cc7\u0ca1\u0cbf',
-    'ayanamsa': '\u0c85\u0caf\u0ca8\u0cbe\u0c82\u0cb6', 'nodeType': '\u0ca8\u0ccb\u0ca1\u0ccd',
-    'openSaved': '\u0ca4\u0cc6\u0cb0\u0cc6\u0caf\u0cbf\u0cb0\u0cbf', 'currentTime': '\u0caa\u0ccd\u0cb0\u0cb8\u0ccd\u0ca4\u0cc1\u0ca4', 'generate': '\u0cb0\u0c9a\u0cbf\u0cb8\u0cbf',
-    'savedKundali': '\u0c89\u0cb3\u0cbf\u0cb8\u0cbf\u0ca6 \u0c95\u0cc1\u0c82\u0ca1\u0cb2\u0cbf (Appointments Merged)',
-    'searchHint': '\u0cb9\u0cc6\u0cb8\u0cb0\u0cc1, \u0cb8\u0ccd\u0ca5\u0cb3, Client ID \u0c85\u0ca5\u0cb5\u0cbe \u0ca6\u0cbf\u0ca8 \u0cb9\u0cc1\u0ca1\u0cc1\u0c95\u0cbf...',
-    'noSavedKundali': '\u0caf\u0cbe\u0cb5\u0cc1\u0ca6\u0cc7 \u0c9c\u0cbe\u0ca4\u0c95 \u0c89\u0cb3\u0cbf\u0cb8\u0cbf\u0cb2\u0ccd\u0cb2.',
-    'noResults': '\u0caf\u0cbe\u0cb5\u0cc1\u0ca6\u0cc7 \u0cab\u0cb2\u0cbf\u0ca4\u0cbe\u0c82\u0cb6 \u0c95\u0c82\u0ca1\u0cc1\u0cac\u0c82\u0ca6\u0cbf\u0cb2\u0ccd\u0cb2.',
-    'deleteConfirm': '\u0c85\u0cb3\u0cbf\u0cb8\u0cac\u0cc7\u0c95\u0cc7?',
-    'deleteMsg': '\u0c9c\u0cbe\u0ca4\u0c95\u0cb5\u0ca8\u0ccd\u0ca8\u0cc1 \u0c85\u0cb3\u0cbf\u0cb8\u0cac\u0cc7\u0c95\u0cc7?',
-    'noBtn': '\u0cac\u0cc7\u0ca1',
-    'kundaliTitle': '\u0c95\u0cc1\u0c82\u0ca1\u0cb2\u0cbf',
-    'webBlockedTitle': '\u0c87\u0c82\u0c9f\u0cb0\u0ccd\u0ca8\u0cc6\u0c9f\u0ccd \u0c85\u0c97\u0ca4\u0ccd\u0caf \u0cb8\u0c82\u0caa\u0cb0\u0ccd\u0c95 \u0c87\u0cb2\u0ccd\u0cb2',
-    'webBlockedMsg': '\u0ca6\u0caf\u0cb5\u0cbf\u0c9f\u0ccd\u0c9f\u0cc1 \u0c87\u0c82\u0c9f\u0cb0\u0ccd\u0ca8\u0cc6\u0c9f\u0ccd\u0ca8\u0cb2\u0ccd\u0cb2\u0cbf \u0cb8\u0c82\u0caa\u0cb0\u0ccd\u0c95 \u0cb9\u0cca\u0c82\u0ca6\u0cbf\u0cb0\u0cbf \u0c88 \u0c85\u0caa\u0ccd\u0cb2\u0cbf\u0c95\u0cc7\u0cb6\u0ca8\u0ccd\u0ca8\u0ca8\u0ccd\u0ca8\u0cc1 \u0cac\u0cb3\u0cb8\u0cb2\u0cc1 \u0c87\u0c82\u0c9f\u0cb0\u0ccd\u0ca8\u0cc6\u0c9f\u0ccd \u0cac\u0cc7\u0c95\u0cc1.',
-    'retryBtn': '\u0caa\u0cc1\u0ca8\u0c83\u0caa\u0ccd\u0cb0\u0caf\u0ca4\u0ccd\u0ca8\u0cbf\u0cb8\u0cbf',
+  static const Map<String, Map<String, String>> _allStrings = {
+    'kn': {
+      'appName': 'ಭಾರತೀಯಮ್', 'home': 'ಮನೆ', 'kundali': 'ಕುಂಡಲಿ', 'panchanga': 'ಪಂಚಾಂಗ',
+      'planets': 'ಗ್ರಹಗಳು', 'appointment': 'ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್', 'vedicClock': 'ವೈದಿಕ ಗಡಿಯಾರ',
+      'settings': 'ಸೆಟ್ಟಿಂಗ್ಸ್', 'aboutUs': 'ನಮ್ಮ ಬಗ್ಗೆ', 'language': 'ಭಾಷೆ / Language',
+      'name': 'ಹೆಸರು', 'dob': 'ಜನ್ಮ ದಿನಾಂಕ', 'time': 'ಜನ್ಮ ಸಮಯ', 'place': 'ಜನ್ಮ ಸ್ಥಳ',
+      'calculate': 'ಲೆಕ್ಕ ಹಾಕಿ', 'selectDate': 'ದಿನಾಂಕ ಆಯ್ಕೆ', 'selectTime': 'ಸಮಯ ಆಯ್ಕೆ',
+      'save': 'ಉಳಿಸಿ', 'delete': 'ಅಳಿಸಿ', 'cancel': 'ರದ್ದು', 'confirm': 'ದೃಢಪಡಿಸಿ',
+      'share': 'ಹಂಚಿಕೊಳ್ಳಿ', 'yes': 'ಹೌದು', 'no': 'ಇಲ್ಲ',
+      'chart': 'ಕುಂಡಲಿ', 'sphuta': 'ಸ್ಫುಟ', 'bhava': 'ಭಾವ', 'varga': 'ವರ್ಗ',
+      'dasha': 'ದಶಾ', 'aroodha': 'ಆರೂಢ', 'ashtakavarga': 'ಅಷ್ಟಕವರ್ಗ',
+      'taranukoola': 'ತಾರಾನುಕೂಲ', 'matchMaking': 'ಗುಣ ಮಿಲನ', 'notes': 'ಟಿಪ್ಪಣಿ',
+      'sunrise': 'ಸೂರ್ಯೋದಯ', 'sunset': 'ಸೂರ್ಯಾಸ್ತ', 'searchPlace': 'ಊರು ಹುಡುಕಿ',
+      'noResults': 'ಯಾವುದೇ ಫಲಿತಾಂಶ ಕಂಡುಬಂದಿಲ್ಲ.', 'deleteConfirm': 'ಅಳಿಸಬೇಕೇ?',
+      'deleteMsg': 'ಜಾತಕವನ್ನು ಅಳಿಸಬೇಕೇ?', 'noBtn': 'ಬೇಡ', 'errorLabel': 'ದೋಷ',
+      'retryBtn': 'ಪುನಃಪ್ರಯತ್ನಿಸಿ', 'placeNotFound': 'ಸ್ಥಳ ಕಂಡುಬಂದಿಲ್ಲ.',
+      'networkError': 'ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಪರೀಕ್ಷಿಸಿ.', 'unknown': 'ಅಪರಿಚಿತ (Unknown)',
+      'savedKundali': 'ಉಳಿಸಿದ ಕುಂಡಲಿ', 'searchHint': 'ಹೆಸರು, ಸ್ಥಳ, ID ಹುಡುಕಿ...',
+      'noSavedKundali': 'ಯಾವುದೇ ಜಾತಕ ಉಳಿಸಿಲ್ಲ.', 'openSaved': 'ತೆರೆಯಿರಿ',
+      'advancedSettings': 'ಈ ಆಯ್ಕೆಗಳು ಬದಲಾಯಿಸಬೇಡಿ', 'webBlockedTitle': 'ಇಂಟರ್ನೆಟ್ ಅಗತ್ಯ',
+      'selectPlace': 'ಸ್ಥಳ ಆಯ್ಕೆಮಾಡಿ', 'multiPlacesFound': 'ಹಲವು ಸ್ಥಳಗಳು ಕಂಡುಬಂದಿವೆ:',
+      'lat': 'ಅಕ್ಷಾಂಶ', 'lon': 'ರೇಖಾಂಶ', 'tzOffset': 'TZ',
+    },
+    'hi': {
+      'appName': 'भारतीयम्', 'home': 'होम', 'kundali': 'कुंडली', 'panchanga': 'पंचांग',
+      'planets': 'ग्रह', 'appointment': 'अपॉइंटमेंट', 'vedicClock': 'वैदिक घड़ी',
+      'settings': 'सेटिंग्स', 'aboutUs': 'हमारे बारे में', 'language': 'भाषा / Language',
+      'name': 'नाम', 'dob': 'जन्म तिथि', 'time': 'जन्म समय', 'place': 'जन्म स्थान',
+      'calculate': 'गणना करें', 'selectDate': 'तिथि चुनें', 'selectTime': 'समय चुनें',
+      'save': 'सहेजें', 'delete': 'हटाएं', 'cancel': 'रद्द', 'share': 'शेयर',
+      'yes': 'हाँ', 'no': 'नहीं', 'chart': 'कुंडली', 'sphuta': 'स्फुट', 'bhava': 'भाव',
+      'dasha': 'दशा', 'aroodha': 'आरूढ़', 'notes': 'टिप्पणी',
+      'sunrise': 'सूर्योदय', 'sunset': 'सूर्यास्त', 'searchPlace': 'स्थान खोजें',
+      'noResults': 'कोई परिणाम नहीं', 'deleteConfirm': 'हटाना है?', 'noBtn': 'नहीं',
+      'errorLabel': 'त्रुटि', 'retryBtn': 'पुनः प्रयास',
+    },
+    'ta': {
+      'appName': 'பாரதீயம்', 'home': 'முகப்பு', 'kundali': 'ஜாதகம்', 'panchanga': 'பஞ்சாங்கம்',
+      'planets': 'கிரகங்கள்', 'appointment': 'சந்திப்பு', 'vedicClock': 'வேத கடிகாரம்',
+      'settings': 'அமைப்புகள்', 'aboutUs': 'எங்களைப் பற்றி', 'language': 'மொழி / Language',
+      'name': 'பெயர்', 'dob': 'பிறந்த தேதி', 'time': 'பிறந்த நேரம்', 'place': 'பிறந்த இடம்',
+      'calculate': 'கணக்கிடு', 'selectDate': 'தேதி தேர்வு', 'selectTime': 'நேரம் தேர்வு',
+      'save': 'சேமி', 'delete': 'நீக்கு', 'cancel': 'ரத்து', 'share': 'பகிர்',
+      'yes': 'ஆம்', 'no': 'இல்லை', 'chart': 'ஜாதகம்', 'sphuta': 'ஸ்புடம்', 'bhava': 'பாவம்',
+      'dasha': 'தசை', 'aroodha': 'ஆரூடம்', 'notes': 'குறிப்பு',
+      'sunrise': 'சூரிய உதயம்', 'sunset': 'சூரிய அஸ்தமனம்', 'searchPlace': 'இடம் தேடு',
+      'noResults': 'முடிவுகள் இல்லை', 'deleteConfirm': 'நீக்கவா?', 'noBtn': 'வேண்டாம்',
+      'errorLabel': 'பிழை', 'retryBtn': 'மீண்டும் முயற்சி',
+    },
+    'te': {
+      'appName': 'భారతీయమ్', 'home': 'హోమ్', 'kundali': 'కుండలి', 'panchanga': 'పంచాంగం',
+      'planets': 'గ్రహాలు', 'appointment': 'అపాయింట్‌మెంట్', 'vedicClock': 'వేద గడియారం',
+      'settings': 'సెట్టింగ్‌లు', 'aboutUs': 'మా గురించి', 'language': 'భాష / Language',
+      'name': 'పేరు', 'dob': 'పుట్టిన తేదీ', 'time': 'పుట్టిన సమయం', 'place': 'పుట్టిన ప్రదేశం',
+      'calculate': 'లెక్కించు', 'selectDate': 'తేదీ ఎంచుకోండి', 'selectTime': 'సమయం ఎంచుకోండి',
+      'save': 'సేవ్', 'delete': 'తొలగించు', 'cancel': 'రద్దు', 'share': 'షేర్',
+      'yes': 'అవును', 'no': 'కాదు', 'chart': 'కుండలి', 'sphuta': 'స్ఫుటం', 'bhava': 'భావం',
+      'dasha': 'దశ', 'aroodha': 'ఆరూఢం', 'notes': 'గమనికలు',
+      'sunrise': 'సూర్యోదయం', 'sunset': 'సూర్యాస్తమయం', 'searchPlace': 'ప్రదేశం వెతుకు',
+      'noResults': 'ఫలితాలు లేవు', 'deleteConfirm': 'తొలగించాలా?', 'noBtn': 'వద్దు',
+      'errorLabel': 'లోపం', 'retryBtn': 'మళ్ళీ ప్రయత్నించు',
+    },
+    'ml': {
+      'appName': 'ഭാരതീയം', 'home': 'ഹോം', 'kundali': 'ജാതകം', 'panchanga': 'പഞ്ചാംഗം',
+      'planets': 'ഗ്രഹങ്ങൾ', 'appointment': 'അപ്പോയിന്റ്‌മെന്റ്', 'vedicClock': 'വേദ ഘടികാരം',
+      'settings': 'ക്രമീകരണം', 'aboutUs': 'ഞങ്ങളെക്കുറിച്ച്', 'language': 'ഭാഷ / Language',
+      'name': 'പേര്', 'dob': 'ജനന തീയതി', 'time': 'ജനന സമയം', 'place': 'ജനന സ്ഥലം',
+      'calculate': 'കണക്കാക്കുക', 'selectDate': 'തീയതി തിരഞ്ഞെടുക്കുക', 'selectTime': 'സമയം തിരഞ്ഞെടുക്കുക',
+      'save': 'സേവ്', 'delete': 'ഇല്ലാതാക്കുക', 'cancel': 'റദ്ദാക്കുക', 'share': 'പങ്കിടുക',
+      'yes': 'അതെ', 'no': 'ഇല്ല', 'chart': 'ജാതകം', 'sphuta': 'സ്ഫുടം', 'bhava': 'ഭാവം',
+      'dasha': 'ദശ', 'aroodha': 'ആരൂഢം', 'notes': 'കുറിപ്പുകൾ',
+      'sunrise': 'സൂര്യോദയം', 'sunset': 'സൂര്യാസ്തമയം', 'searchPlace': 'സ്ഥലം തിരയുക',
+      'noResults': 'ഫലങ്ങൾ ഇല്ല', 'deleteConfirm': 'ഇല്ലാതാക്കണോ?', 'noBtn': 'വേണ്ട',
+      'errorLabel': 'പിശക്', 'retryBtn': 'വീണ്ടും ശ്രമിക്കുക',
+    },
   };
 
   /// Pass-through -- no translation
@@ -186,6 +210,7 @@ class AppLocale {
 
 /// Shorthand global function -- just returns text as-is
 String tr(String text) => text;
+
 
 Color kPurple1 = AppThemes.palettes[0]['purple1']!;
 Color kPurple2 = AppThemes.palettes[0]['purple2']!;
