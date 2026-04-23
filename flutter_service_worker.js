@@ -24,7 +24,7 @@ const RESOURCES = {"assets/assets/images/ganapati.png": "22e33acfbc05962d2d2dcef
 "index.html": "b7df8837a65841ef76449bb0fbf5438c",
 "/": "b7df8837a65841ef76449bb0fbf5438c",
 "main.dart.js": "35a242e08f9b3639a469d06b9fdbec55",
-"flutter_bootstrap.js": "abc57bbe2c8f8c30183affbdf8867c11",
+"flutter_bootstrap.js": "b47c99fc615e58546cd3fcdd087542f9",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df",
 "canvaskit/canvaskit.wasm": "efeeba7dcc952dae57870d4df3111fad",
 "canvaskit/skwasm_st.js.symbols": "c7e7aac7cd8b612defd62b43e3050bdd",
@@ -40,7 +40,7 @@ const RESOURCES = {"assets/assets/images/ganapati.png": "22e33acfbc05962d2d2dcef
 "canvaskit/skwasm.js.symbols": "80806576fa1056b43dd6d0b445b4b6f7",
 "privacy_policy.html": "10094331e2887570d5e079618ca2fdc8",
 "flutter.js": "76f08d47ff9f5715220992f993002504",
-"version.json": "86fb7c7c1b5f534f0bdf94f4e96a832c"};
+"version.json": "62d1a17b35536a3cc49aeca0e026fbd2"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
