@@ -569,13 +569,13 @@ class _InputScreenState extends State<InputScreen> {
                  e.value.date.contains(searchQuery);
         }).toList();
 
-        // Sort ascending by Client ID ("BH-2026-0001", "BH-2026-0002" ...) so they display in exact serial order
+        // Sort descending by Client ID so newest entries appear first
         filteredEntries.sort((a, b) {
           final aId = a.value.clientId ?? '';
           final bId = b.value.clientId ?? '';
           if (aId.isEmpty && bId.isNotEmpty) return 1;
           if (aId.isNotEmpty && bId.isEmpty) return -1;
-          return aId.compareTo(bId); // Ascending serial order
+          return bId.compareTo(aId); // Descending — newest first
         });
 
         return SafeArea(
