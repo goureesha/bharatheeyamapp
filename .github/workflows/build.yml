@@ -57,9 +57,9 @@ jobs:
           flutter build appbundle --release --verbose 2>&1 | tee build_output.txt || true
           # Check if AAB was produced
           if [ ! -f build/app/outputs/bundle/release/app-release.aab ]; then
-            echo "::error::$(grep -i -E 'Error:|error:|FAILURE:|Compilation|Cannot fit|Duplicate class' build_output.txt | head -10 | tr '\n' ' ')"
-            echo "::error::LAST LINES: $(tail -30 build_output.txt | tr '\n' ' ')"
-            tail -100 build_output.txt
+            echo "::error::DART ERRORS: $(grep -E 'lib/.*\.dart.*Error|Compiler message|Target kernel_snapshot failed' build_output.txt | head -10 | tr '\n' ' ')"
+            echo "::error::GRADLE: $(grep -i 'FAILURE' build_output.txt | head -3 | tr '\n' ' ')"
+            echo "::error::LAST50: $(tail -50 build_output.txt | tr '\n' '|||')"
             exit 1
           fi
 
