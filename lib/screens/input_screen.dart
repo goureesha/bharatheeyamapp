@@ -658,7 +658,7 @@ class _InputScreenState extends State<InputScreen> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 2),
                                 child: Text(
-                                  '👥 $totalKundalis ಕುಂಡಲಿ: ${profile.groupMembers.join(', ')}',
+                                  '👥 $totalKundalis ${AppLocale.l('kundaliCount')}: ${profile.groupMembers.join(', ')}',
                                   style: TextStyle(color: kTeal, fontSize: 11, fontWeight: FontWeight.w600),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -746,7 +746,7 @@ class _InputScreenState extends State<InputScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'ಇತ್ತೀಚಿನ ಕುಂಡಲಿಗಳು (${items.length}/100)',
+                        '${AppLocale.l('recentKundalis')} (${items.length}/100)',
                         style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: const Color(0xFF7B2D8E)),
                       ),
                     ),
@@ -757,11 +757,11 @@ class _InputScreenState extends State<InputScreen> {
                             context: ctx,
                             builder: (dCtx) => AlertDialog(
                               backgroundColor: kBg,
-                              title: Text('ಇತಿಹಾಸ ಅಳಿಸಿ', style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
-                              content: Text('ಎಲ್ಲಾ ${items.length} ಇತಿಹಾಸ ನಮೂದುಗಳನ್ನು ಅಳಿಸಬೇಕೇ?', style: TextStyle(color: kMuted)),
+                              title: Text(AppLocale.l('clearHistory'), style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
+                              content: Text('${AppLocale.l('clearHistoryConfirm')}', style: TextStyle(color: kMuted)),
                               actions: [
-                                TextButton(onPressed: () => Navigator.pop(dCtx, false), child: Text('ಬೇಡ', style: TextStyle(color: kMuted))),
-                                TextButton(onPressed: () => Navigator.pop(dCtx, true), child: Text('ಅಳಿಸಿ', style: TextStyle(color: Colors.red))),
+                                TextButton(onPressed: () => Navigator.pop(dCtx, false), child: Text(AppLocale.l('no'), style: TextStyle(color: kMuted))),
+                                TextButton(onPressed: () => Navigator.pop(dCtx, true), child: Text(AppLocale.l('delete'), style: TextStyle(color: Colors.red))),
                               ],
                             ),
                           );
@@ -771,7 +771,7 @@ class _InputScreenState extends State<InputScreen> {
                           }
                         },
                         icon: Icon(Icons.delete_sweep, color: Colors.red.shade400, size: 18),
-                        label: Text('ಅಳಿಸಿ', style: TextStyle(color: Colors.red.shade400, fontSize: 12)),
+                        label: Text(AppLocale.l('delete'), style: TextStyle(color: Colors.red.shade400, fontSize: 12)),
                       ),
                   ],
                 ),
@@ -785,9 +785,9 @@ class _InputScreenState extends State<InputScreen> {
                       children: [
                         Icon(Icons.history_toggle_off, size: 64, color: kMuted.withOpacity(0.3)),
                         const SizedBox(height: 12),
-                        Text('ಇತಿಹಾಸ ಖಾಲಿ', style: TextStyle(fontSize: 16, color: kMuted)),
+                        Text(AppLocale.l('historyEmpty'), style: TextStyle(fontSize: 16, color: kMuted)),
                         const SizedBox(height: 4),
-                        Text('ಕುಂಡಲಿ ರಚಿಸಿದಾಗ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ', style: TextStyle(fontSize: 13, color: kMuted.withOpacity(0.6))),
+                        Text(AppLocale.l('historyHint'), style: TextStyle(fontSize: 13, color: kMuted.withOpacity(0.6))),
                       ],
                     ),
                   ),
@@ -805,13 +805,13 @@ class _InputScreenState extends State<InputScreen> {
                       final diff = DateTime.now().difference(ts);
                       String ago;
                       if (diff.inMinutes < 1) {
-                        ago = 'ಈಗ';
+                        ago = AppLocale.l('now');
                       } else if (diff.inMinutes < 60) {
-                        ago = '${diff.inMinutes}m ಹಿಂದೆ';
+                        ago = '${diff.inMinutes}m ${AppLocale.l('ago')}';
                       } else if (diff.inHours < 24) {
-                        ago = '${diff.inHours}h ಹಿಂದೆ';
+                        ago = '${diff.inHours}h ${AppLocale.l('ago')}';
                       } else {
-                        ago = '${diff.inDays}d ಹಿಂದೆ';
+                        ago = '${diff.inDays}d ${AppLocale.l('ago')}';
                       }
 
                       // Check if already saved
@@ -858,7 +858,7 @@ class _InputScreenState extends State<InputScreen> {
                             if (!isSaved)
                               IconButton(
                                 icon: Icon(Icons.bookmark_add_outlined, color: kTeal, size: 20),
-                                tooltip: 'ಉಳಿಸಿ',
+                                tooltip: AppLocale.l('save'),
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                                 onPressed: () async {
@@ -868,7 +868,7 @@ class _InputScreenState extends State<InputScreen> {
                                   if (mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('\u2705 "${entry.name}" ಉಳಿಸಲಾಗಿದೆ'),
+                                        content: Text('\u2705 "${entry.name}" ${AppLocale.l('saved')}'),
                                         backgroundColor: kGreen,
                                         duration: const Duration(seconds: 2),
                                       ),
@@ -878,7 +878,7 @@ class _InputScreenState extends State<InputScreen> {
                               ),
                             IconButton(
                               icon: Icon(Icons.close, color: Colors.red.shade300, size: 18),
-                              tooltip: 'ಅಳಿಸಿ',
+                              tooltip: AppLocale.l('delete'),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                               onPressed: () async {
