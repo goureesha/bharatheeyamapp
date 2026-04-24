@@ -37,8 +37,8 @@ const RESOURCES = {"assets/assets/images/logo.png": "8b3be256f8c343bfe505d1de18b
 "canvaskit/skwasm_st.js": "d1326ceef381ad382ab492ba5d96f04d",
 "privacy_policy.html": "10094331e2887570d5e079618ca2fdc8",
 "flutter.js": "76f08d47ff9f5715220992f993002504",
-"flutter_bootstrap.js": "33d99e4ec3c9a51c687cb3559968fb6d",
-"main.dart.js": "f47004be2640c51b6bbc8dfe4044c13b",
+"flutter_bootstrap.js": "f7a05ccac849ab796b8078680c78911b",
+"main.dart.js": "786b290954141c158e51d63c4d21ce76",
 "version.json": "7cf7d0efd07df2580f2846747ecb6248",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df"};
 // The application shell files that are downloaded before a service worker can
