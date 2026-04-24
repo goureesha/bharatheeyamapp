@@ -38,6 +38,20 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Patch sweph for 16KB page alignment
+        run: |
+          # Find sweph's native CMakeLists.txt in the pub cache and inject 16KB linker flag
+          SWEPH_CMAKE=$(find $HOME/.pub-cache -path "*/sweph*/native/CMakeLists.txt" 2>/dev/null | head -1)
+          if [ -n "$SWEPH_CMAKE" ]; then
+            echo "" >> "$SWEPH_CMAKE"
+            echo "# 16KB page-size alignment (Android 15+ requirement)" >> "$SWEPH_CMAKE"
+            echo 'target_link_options(sweph PRIVATE "-Wl,-z,max-page-size=16384")' >> "$SWEPH_CMAKE"
+            echo "✅ Patched: $SWEPH_CMAKE"
+            cat "$SWEPH_CMAKE"
+          else
+            echo "⚠️ sweph CMakeLists.txt not found - skipping patch"
+          fi
+
       - name: Build AAB (Play Store)
         run: |
           flutter build appbundle --release --verbose 2>&1 | tee build_output.txt || true
