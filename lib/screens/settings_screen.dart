@@ -136,7 +136,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themes = ['ಸ್ಟ್ಯಾಂಡರ್ಡ್ ಲೈಟ್', 'ಡಾರ್ಕ್ ಮೋಡ್', 'ಸ್ವರ್ಣ', 'ಸಾಗರ', 'ಹಸಿರು'];
+    final themes = [AppLocale.l('themeLight'), AppLocale.l('themeDark'), AppLocale.l('themeGold'), AppLocale.l('themeOcean'), AppLocale.l('themeGreen')];
 
     return Scaffold(
       backgroundColor: kBg,
@@ -184,7 +184,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 24),
 
                     // Chart Style selection
-                    SectionTitle('ಕುಂಡಲಿ ಶೈಲಿ / Chart Style'),
+                    SectionTitle('${AppLocale.l('chartStyle')} / Chart Style'),
                     const SizedBox(height: 10),
                     ValueListenableBuilder<String>(
                       valueListenable: ChartStyle.styleNotifier,
@@ -195,10 +195,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               value: 'south',
                               groupValue: currentStyle,
                               title: Row(children: [
-                                Text('ದಕ್ಷಿಣ ಭಾರತ ', style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
+                                Text('${AppLocale.l('southIndian')} ', style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
                                 Text('(South Indian)', style: TextStyle(color: kMuted, fontSize: 12)),
                               ]),
-                              subtitle: Text('4×4 ಗ್ರಿಡ್ - ರಾಶಿ ಸ್ಥಿರ, ಗ್ರಹಗಳು ಚಲಿಸುವವು', style: TextStyle(fontSize: 11, color: kMuted)),
+                              subtitle: Text(AppLocale.l('southDesc'), style: TextStyle(fontSize: 11, color: kMuted)),
                               activeColor: kPurple2,
                               onChanged: (val) {
                                 if (val != null) ChartStyle.setStyle(val);
@@ -208,10 +208,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               value: 'north',
                               groupValue: currentStyle,
                               title: Row(children: [
-                                Text('ಉತ್ತರ ಭಾರತ ', style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
+                                Text('${AppLocale.l('northIndian')} ', style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
                                 Text('(North Indian)', style: TextStyle(color: kMuted, fontSize: 12)),
                               ]),
-                              subtitle: Text('ವಜ್ರ (Diamond) - ಭಾವ ಸ್ಥಿರ, ರಾಶಿಗಳು ಚಲಿಸುವವು', style: TextStyle(fontSize: 11, color: kMuted)),
+                              subtitle: Text(AppLocale.l('northDesc'), style: TextStyle(fontSize: 11, color: kMuted)),
                               activeColor: kPurple2,
                               onChanged: (val) {
                                 if (val != null) ChartStyle.setStyle(val);
@@ -305,7 +305,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           controller: controller,
                           focusNode: focusNode,
                           decoration: InputDecoration(
-                            labelText: 'ಸ್ಥಳ ಹುಡುಕಿ / Search Location',
+                            labelText: '${AppLocale.l('searchLocation')} / Search Location',
                             prefixIcon: Icon(Icons.search, color: kMuted),
                             suffixIcon: _geoLoading
                                 ? Padding(padding: const EdgeInsets.all(12), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: kPurple2)))
@@ -314,7 +314,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     onPressed: () {
                                       _performGeocode(controller.text);
                                     },
-                                    tooltip: 'ಆನ್‌ಲೈನ್ ಹುಡುಕಿ / Online Search',
+                                    tooltip: '${AppLocale.l('onlineSearch')} / Online Search',
                                   ),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -336,7 +336,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               _geoStatus = '';
                             });
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('ಡೀಫಾಲ್ಟ್ ಸ್ಥಳ: $selection'),
+                              content: Text('${AppLocale.l('defaultLocationSet')}: $selection'),
                               backgroundColor: Colors.green,
                             ));
                           }
@@ -439,7 +439,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               )),
                             ]),
                             const SizedBox(height: 12),
-                            Text('Google ಸಿಂಕ್ ಸಕ್ರಿಯವಾಗಿದೆ', style: TextStyle(fontSize: 13, color: Colors.green)),
+                            Text(AppLocale.l('googleSyncActive'), style: TextStyle(fontSize: 13, color: Colors.green)),
                             const SizedBox(height: 12),
                             OutlinedButton(
                               onPressed: () async {
@@ -451,17 +451,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             const SizedBox(height: 8),
                             OutlinedButton.icon(
                               icon: Icon(Icons.swap_horiz, color: kPurple2, size: 18),
-                              label: Text('ಸಾಧನ ಬದಲಾಯಿಸಿ / Migrate Device', style: TextStyle(color: kPurple2, fontSize: 13)),
+                              label: Text('${AppLocale.l('migrateDevice')} / Migrate Device', style: TextStyle(color: kPurple2, fontSize: 13)),
                               onPressed: () async {
                                 final confirm = await showDialog<bool>(context: context, builder: (ctx) => AlertDialog(
                                   backgroundColor: kCard,
-                                  title: Text('ಸಾಧನ ಬದಲಾಯಿಸಿ?', style: TextStyle(color: kText)),
-                                  content: Text('ಈ ಸಾಧನವನ್ನು ನಿಮ್ಮ ಪ್ರಾಥಮಿಕ ಸಾಧನವಾಗಿ ಹೊಂದಿಸಲಾಗುವುದು. ಬೇರೆ ಸಾಧನದಲ್ಲಿ ಈ ಖಾತೆ ಬ್ಲಾಕ್ ಆಗುತ್ತದೆ.', style: TextStyle(color: kText)),
+                                  title: Text(AppLocale.l('migrateConfirm'), style: TextStyle(color: kText)),
+                                  content: Text(AppLocale.l('migrateMsg'), style: TextStyle(color: kText)),
                                   actions: [
-                                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('ರದ್ದು', style: TextStyle(color: kMuted))),
+                                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppLocale.l('cancel'), style: TextStyle(color: kMuted))),
                                     ElevatedButton(onPressed: () => Navigator.pop(ctx, true),
                                       style: ElevatedButton.styleFrom(backgroundColor: kPurple2),
-                                      child: Text('ಹೌದು, ಬದಲಾಯಿಸಿ')),
+                                      child: Text(AppLocale.l('yesChange'))),
                                   ],
                                 ));
                                 if (confirm == true) {
@@ -471,7 +471,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   }
                                   if (mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                      content: Text(ok ? 'ಸಾಧನ ಯಶಸ್ವಿಯಾಗಿ ಬದಲಾಯಿಸಲಾಗಿದೆ!' : 'ವಿಫಲವಾಗಿದೆ'),
+                                      content: Text(ok ? AppLocale.l('migrateSuccess') : AppLocale.l('failed')),
                                       backgroundColor: ok ? Colors.green : Colors.red));
                                   }
                                 }
@@ -481,7 +481,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Row(children: [
                               Icon(Icons.account_circle, color: kPurple2, size: 28),
                               const SizedBox(width: 12),
-                              Expanded(child: Text('ಕ್ಲೌಡ್ ಬ್ಯಾಕಪ್‌ಗಾಗಿ Google ಗೆ ಸೈನ್ ಇನ್ ಮಾಡಿ',
+                              Expanded(child: Text(AppLocale.l('signInForCloud'),
                                 style: TextStyle(fontSize: 14, color: kText))),
                             ]),
                             const SizedBox(height: 12),
@@ -496,7 +496,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 if (mounted) {
                                   setState(() {});
                                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text(ok ? 'Google Sign In ಯಶಸ್ವಿ!' : 'Sign In ವಿಫಲ'),
+                                    content: Text(ok ? AppLocale.l('signInSuccess') : AppLocale.l('signInFailed')),
                                   ));
                                 }
                               },
@@ -521,7 +521,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
 
                     // Backup & Restore
-                    SectionTitle('ಡೇಟಾ ಬ್ಯಾಕಪ್ ಮತ್ತು ಮರುಸ್ಥಾಪನೆ (Data Backup & Restore)'),
+                    SectionTitle('${AppLocale.l('backupRestore')} (Data Backup & Restore)'),
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -533,7 +533,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text('ನಿಮ್ಮ ಎಲ್ಲಾ ನಿಯತಕಾಲಿಕ ಡೇಟಾವನ್ನು (ಗ್ರಾಹಕರು, ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್\u200cಗಳು) ಬ್ಯಾಕಪ್ ಮಾಡಿ ಮತ್ತು ಹೊಸ ಸಾಧನಕ್ಕೆ ಮರುಸ್ಥಾಪಿಸಿ.',
+                          Text(AppLocale.l('backupDesc'),
                               style: TextStyle(fontSize: 13, color: kMuted)),
                           const SizedBox(height: 16),
                           Row(
@@ -544,12 +544,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     final ok = await BackupService.exportData();
                                     if (mounted && ok) {
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('ಬ್ಯಾಕಪ್ ಫೈಲ್ ಅನ್ನು ಉಳಿಸಲು ಅಪ್ಲಿಕೇಶನ್ ಆಯ್ಕೆಮಾಡಿ.'))
+                                        const SnackBar(content: Text('Choose app to save backup file.'))
                                       );
                                     }
                                   },
                                   icon: const Icon(Icons.upload_file),
-                                  label: const Text('ಬ್ಯಾಕಪ್ ರಫ್ತು ಮಾಡಿ\n(Export)'),
+                                  label: Text('${AppLocale.l('exportBackup')}\n(Export)'),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: kTeal,
                                     foregroundColor: Colors.white,
@@ -565,7 +565,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     if (mounted) {
                                       if (err == null) {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('ಡೇಟಾ ಯಶಸ್ವಿಯಾಗಿ ಮರುಸ್ಥಾಪನೆಯಾಗಿದೆ!'), backgroundColor: Colors.green)
+                                          SnackBar(content: Text(AppLocale.l('restoreSuccess')), backgroundColor: Colors.green)
                                         );
                                       } else {
                                         ScaffoldMessenger.of(context).showSnackBar(
@@ -575,7 +575,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     }
                                   },
                                   icon: Icon(Icons.file_download, color: kPurple2),
-                                  label: Text('ಬ್ಯಾಕಪ್ ಆಮದು ಮಾಡಿ\n(Import)', style: TextStyle(color: kText)),
+                                  label: Text('${AppLocale.l('importBackup')}\n(Import)', style: TextStyle(color: kText)),
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(vertical: 12),
                                     side: BorderSide(color: kBorder),
@@ -585,7 +585,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          Text('ಮಾನವ ಓದಬಲ್ಲ ಸ್ಪ್ರೆಡ್‌ಶೀಟ್‌ಗಳು (Human-readable Spreadsheets & Notes):',
+                          Text('${AppLocale.l('humanReadable')} (Human-readable Spreadsheets & Notes):',
                               style: TextStyle(fontSize: 12, color: kMuted, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
                           ElevatedButton.icon(
@@ -594,17 +594,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               if (mounted) {
                                 if (ok) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('ಸ್ಪ್ರೆಡ್‌ಶೀಟ್ ಮತ್ತು ಟಿಪ್ಪಣಿಗಳನ್ನು ರಫ್ತು ಮಾಡಲಾಗಿದೆ!'), backgroundColor: Colors.green)
+                                    const SnackBar(content: Text('Spreadsheet & Notes exported!'), backgroundColor: Colors.green)
                                   );
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('ರಫ್ತು ವಿಫಲವಾಗಿದೆ (Export failed).'), backgroundColor: Colors.red)
+                                    const SnackBar(content: Text('Export failed.'), backgroundColor: Colors.red)
                                   );
                                 }
                               }
                             },
                             icon: const Icon(Icons.table_view),
-                            label: const Text('ಸ್ಪ್ರೆಡ್‌ಶೀಟ್ ಮತ್ತು ಟಿಪ್ಪಣಿಗಳನ್ನು ರಫ್ತು ಮಾಡಿ\n(Export Spreadsheets & Notes)', textAlign: TextAlign.center),
+                            label: Text('${AppLocale.l('exportSpreadsheet')}\n(Export Spreadsheets & Notes)', textAlign: TextAlign.center),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: kPurple2,
                               foregroundColor: Colors.white,
@@ -620,7 +620,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 24),
 
                     // Google Drive Backup
-                    SectionTitle('Google Drive ಬ್ಯಾಕಪ್ (Cloud Backup)'),
+                    SectionTitle('${AppLocale.l('cloudBackup')} (Cloud Backup)'),
                     const SizedBox(height: 12),
                     _buildDriveBackupSection(),
 
@@ -629,7 +629,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 24),
                     
                     // Purchase Premium
-                    SectionTitle('ಪ್ರೀಮಿಯಂ ಚಂದಾದಾರಿಕೆ'),
+                    SectionTitle(AppLocale.l('premiumSub')),
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.all(16),
