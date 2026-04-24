@@ -93,7 +93,13 @@ jobs:
         run: flutter config --enable-web
 
       - name: Build Web
-        run: flutter build web --release --base-href "/bharatheeyamapp/"
+        run: |
+          flutter build web --release --base-href "/bharatheeyamapp/" 2>&1 | tee web_build.txt || true
+          if [ ! -d build/web ]; then
+            echo "::error::WEB BUILD ERRORS: $(grep -i -E 'Error:|error:' web_build.txt | head -10 | tr '\n' ' ')"
+            tail -50 web_build.txt
+            exit 1
+          fi
 
       - name: Copy docs into web build
         run: |
