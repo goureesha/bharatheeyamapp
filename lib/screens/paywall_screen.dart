@@ -19,7 +19,7 @@ class PaywallScreen extends StatelessWidget {
                 // Logo
                 Image.asset('assets/images/logo.png', width: 90, height: 90),
                 const SizedBox(height: 16),
-                Text('ಭಾರತೀಯಮ್', style: TextStyle(
+                Text(AppLocale.l('appName'), style: TextStyle(
                   fontSize: 28, fontWeight: FontWeight.w900, color: kOrange,
                   letterSpacing: 1.5,
                 )),
@@ -40,7 +40,7 @@ class PaywallScreen extends StatelessWidget {
                   child: Column(children: [
                     Icon(Icons.timer_off, color: Colors.red.shade700, size: 40),
                     const SizedBox(height: 12),
-                    Text('ಉಚಿತ ಪ್ರಯೋಗ ಅವಧಿ ಮುಗಿದಿದೆ',
+                    Text(AppLocale.l('trialExpired'),
                       style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800,
                         color: Colors.red.shade800,
@@ -60,14 +60,14 @@ class PaywallScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('ಚಂದಾದಾರಿಕೆ ಪ್ರಯೋಜನಗಳು', style: TextStyle(
+                      Text(AppLocale.l('subBenefits'), style: TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w800, color: kPurple2)),
                       const SizedBox(height: 14),
-                      _benefit(Icons.auto_awesome, 'ಎಲ್ಲಾ ಕುಂಡಲಿ ವೈಶಿಷ್ಟ್ಯಗಳು'),
-                      _benefit(Icons.calendar_month, 'ಪಂಚಾಂಗ ಮತ್ತು ತಾರಾನುಕೂಲ'),
-                      _benefit(Icons.favorite, 'ಹೊಂದಾಣಿಕೆ / Match Making'),
-                      _benefit(Icons.menu_book, 'ಮಂತ್ರ ಸಂಗ್ರಹ'),
-                      _benefit(Icons.save, 'ನಿಮ್ಮ ಡೇಟಾ ಸುರಕ್ಷಿತ ಬ್ಯಾಕಪ್ (Data Backup)'),
+                      _benefit(Icons.auto_awesome, AppLocale.l('allKundali')),
+                      _benefit(Icons.calendar_month, AppLocale.l('panchangaTara')),
+                      _benefit(Icons.favorite, '${AppLocale.l('matchMakingTitle')} / Match Making'),
+                      _benefit(Icons.menu_book, AppLocale.l('mantraCollection')),
+                      _benefit(Icons.save, AppLocale.l('dataBackup')),
                     ],
                   ),
                 ),
@@ -81,7 +81,7 @@ class PaywallScreen extends StatelessWidget {
                       final success = await SubscriptionService.buySubscription();
                       if (!success && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('ಚಂದಾದಾರಿಕೆ ಪ್ರಕ್ರಿಯೆ ವಿಫಲವಾಗಿದೆ.')),
+                          SnackBar(content: Text(AppLocale.l('subFailed'))),
                         );
                       }
                     },
@@ -91,7 +91,7 @@ class PaywallScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text('₹700 / ವರ್ಷಕ್ಕೆ ಚಂದಾದಾರರಾಗಿ',
+                    child: Text(AppLocale.l('subPrice'),
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
                   ),
                 ),
@@ -103,11 +103,11 @@ class PaywallScreen extends StatelessWidget {
                     await SubscriptionService.restorePurchases();
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('ಹಿಂದಿನ ಖರೀದಿಗಳನ್ನು ಮರುಸ್ಥಾಪಿಸಲಾಗಿದೆ.')),
+                        SnackBar(content: Text(AppLocale.l('restoreDone'))),
                       );
                     }
                   },
-                  child: Text('ಹಿಂದಿನ ಖರೀದಿಯನ್ನು ಮರುಸ್ಥಾಪಿಸಿ (Restore)',
+                  child: Text(AppLocale.l('restorePurchase'),
                     style: TextStyle(color: kPurple2, fontWeight: FontWeight.w600, fontSize: 14)),
                 ),
               ],
