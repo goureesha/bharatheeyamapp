@@ -284,7 +284,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       backgroundColor: kBg,
       appBar: AppBar(
         backgroundColor: kCard,
-        title: Text('ತಾರಾನುಕೂಲ',
+        title: Text(AppLocale.l('taranukoola'),
             style: TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.w800)),
         iconTheme: IconThemeData(color: kText),
         elevation: 0,
@@ -298,7 +298,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('ತಾರಾನುಕೂಲ ಫಲಿತಾಂಶಗಳು', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1)),
+                    Text(AppLocale.l('taraResults'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1)),
                     const SizedBox(height: 16),
                     ToggleButtons(
                       isSelected: [!_isTwoPersonMode, _isTwoPersonMode],
@@ -313,9 +313,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                       fillColor: kPurple1,
                       color: kText,
                       constraints: const BoxConstraints(minHeight: 40, minWidth: 100),
-                      children: const [
-                        Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text('೧ ವ್ಯಕ್ತಿ')),
-                        Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text('೨ ವ್ಯಕ್ತಿಗಳು')),
+                      children: [
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Text(AppLocale.l('onePerson'))),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Text(AppLocale.l('twoPersons'))),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -338,7 +338,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'ಅಶುಭ ನಕ್ಷತ್ರ ಹೊರಗಿಡಿ',
+                              AppLocale.l('excludeBadNak'),
                               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: _excludeNakshatras ? Colors.orange.shade700 : kMuted),
                             ),
                           ),
@@ -375,7 +375,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                     ],
 
                     const SizedBox(height: 16),
-                    Text(_isTwoPersonMode ? 'ವ್ಯಕ್ತಿ 1ರ ಜನ್ಮ ನಕ್ಷತ್ರ:' : 'ನಿಮ್ಮ ಜನ್ಮ ನಕ್ಷತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kText)),
+                    Text(_isTwoPersonMode ? AppLocale.l('person1BirthNak') : AppLocale.l('yourBirthNak'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kText)),
                     const SizedBox(height: 8),
                     Container(
                       decoration: BoxDecoration(
@@ -387,7 +387,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<int>(
                           isExpanded: true,
-                          hint: Text('ಜನ್ಮ ನಕ್ಷತ್ರ ಆಯ್ಕೆಮಾಡಿ'),
+                          hint: Text(AppLocale.l('selectNakHint')),
                           value: _janmaNakshatraIdx1,
                           dropdownColor: kCard,
                           items: List.generate(27, (i) {
@@ -407,7 +407,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                     ),
                     if (_isTwoPersonMode) ...[
                       const SizedBox(height: 16),
-                      Text('ವ್ಯಕ್ತಿ 2ರ ಜನ್ಮ ನಕ್ಷತ್ರ:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kText)),
+                      Text(AppLocale.l('person2BirthNak'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kText)),
                       const SizedBox(height: 8),
                       Container(
                         decoration: BoxDecoration(
@@ -419,7 +419,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<int>(
                             isExpanded: true,
-                            hint: Text('ಜನ್ಮ ನಕ್ಷತ್ರ ಆಯ್ಕೆಮಾಡಿ'),
+                            hint: Text(AppLocale.l('selectNakHint')),
                             value: _janmaNakshatraIdx2,
                             dropdownColor: kCard,
                             items: List.generate(27, (i) {
@@ -510,18 +510,18 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                         Row(mainAxisSize: MainAxisSize.min, children: [
                           Container(width: 12, height: 12, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
                           const SizedBox(width: 4),
-                          Text(_isTwoPersonMode ? 'ಇಬ್ಬರಿಗೂ ಶುಭ' : 'ಶುಭ ದಿನ', style: TextStyle(color: kText, fontSize: 12)),
+                          Text(_isTwoPersonMode ? AppLocale.l('goodBoth') : AppLocale.l('goodDay'), style: TextStyle(color: kText, fontSize: 12)),
                         ]),
                         if (_isTwoPersonMode)
                           Row(mainAxisSize: MainAxisSize.min, children: [
                             Container(width: 12, height: 12, decoration: const BoxDecoration(color: Colors.orange, shape: BoxShape.circle)),
                             const SizedBox(width: 4),
-                            Text('ಒಬ್ಬರಿಗೆ ಮಾತ್ರ ಶುಭ', style: TextStyle(color: kText, fontSize: 12)),
+                            Text(AppLocale.l('goodOnePerson'), style: TextStyle(color: kText, fontSize: 12)),
                           ]),
                         Row(mainAxisSize: MainAxisSize.min, children: [
                           Container(width: 12, height: 12, decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle)),
                           const SizedBox(width: 4),
-                          Text(_isTwoPersonMode ? 'ಇಬ್ಬರಿಗೂ ಅಶುಭ' : 'ಅಶುಭ ದಿನ', style: TextStyle(color: kText, fontSize: 12)),
+                          Text(_isTwoPersonMode ? AppLocale.l('badBoth') : AppLocale.l('badDay'), style: TextStyle(color: kText, fontSize: 12)),
                         ]),
                       ],
                     ),
@@ -546,10 +546,10 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                                 decoration: BoxDecoration(color: bgColor, border: Border.all(color: borderColor, width: 2), borderRadius: BorderRadius.circular(12)),
                                 child: Column(
                                   children: [
-                                    Text('ಆಯ್ಕೆಮಾಡಿದ ದಿನದ ನಕ್ಷತ್ರ: ${knNak[dinaIdx]}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
+                                    Text('${AppLocale.l('selectedDayNak')}: ${knNak[dinaIdx]}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
                                     if (isExcluded) ...[  
                                       const SizedBox(height: 4),
-                                      Text('⚠️ ಹೊರಗಿಡಲಾದ ನಕ್ಷತ್ರ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.orange.shade700)),
+                                      Text('⚠️ ${AppLocale.l('excludedNak')}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.orange.shade700)),
                                     ],
                                     const SizedBox(height: 8),
                                     Text(_taras[tara1], style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: textColor), textAlign: TextAlign.center),
@@ -569,20 +569,20 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                                 decoration: BoxDecoration(color: bgColor, border: Border.all(color: borderColor, width: 2), borderRadius: BorderRadius.circular(12)),
                                 child: Column(
                                   children: [
-                                    Text('ಆಯ್ಕೆಮಾಡಿದ ದಿನದ ನಕ್ಷತ್ರ: ${knNak[dinaIdx]}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
+                                    Text('${AppLocale.l('selectedDayNak')}: ${knNak[dinaIdx]}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
                                     const SizedBox(height: 12),
                                     Row(
                                       children: [
                                         Expanded(child: Column(
                                           children: [
-                                            Text('ವ್ಯಕ್ತಿ 1', style: TextStyle(fontWeight: FontWeight.w600, color: textColor)),
+                                            Text(AppLocale.l('person1'), style: TextStyle(fontWeight: FontWeight.w600, color: textColor)),
                                             Text(_taras[tara1], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isGood1 ? Colors.green.shade700 : Colors.red.shade700)),
                                           ]
                                         )),
                                         Container(width: 1, height: 40, color: borderColor),
                                         Expanded(child: Column(
                                           children: [
-                                            Text('ವ್ಯಕ್ತಿ 2', style: TextStyle(fontWeight: FontWeight.w600, color: textColor)),
+                                            Text(AppLocale.l('person2'), style: TextStyle(fontWeight: FontWeight.w600, color: textColor)),
                                             Text(_taras[tara2], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isGood2 ? Colors.green.shade700 : Colors.red.shade700)),
                                           ]
                                         )),
@@ -599,7 +599,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                          padding: const EdgeInsets.all(16),
                          alignment: Alignment.center,
                          decoration: BoxDecoration(color: kBorder.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(8)),
-                         child: Text('ಫಲಿತಾಂಶವನ್ನು ನೋಡಲು ಎರಡೂ ನಕ್ಷತ್ರಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ.', style: TextStyle(color: kMuted))
+                         child: Text(AppLocale.l('selectBothNak'), style: TextStyle(color: kMuted))
                        )
                     ],
 
@@ -607,7 +607,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                     Theme(
                       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                       child: ExpansionTile(
-                        title: Text('ತಾರಾನುಕೂಲ ಚಾರ್ಟ್', style: TextStyle(fontWeight: FontWeight.bold, color: kPurple2)),
+                        title: Text(AppLocale.l('taraChart'), style: TextStyle(fontWeight: FontWeight.bold, color: kPurple2)),
                         initiallyExpanded: _showTaraCharts,
                         onExpansionChanged: (val) => setState(() => _showTaraCharts = val),
                         backgroundColor: kCard,
@@ -621,9 +621,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 if (_janmaNakshatraIdx1 != null)
-                                  _buildTaraChart(_janmaNakshatraIdx1!, _isTwoPersonMode ? 'ವ್ಯಕ್ತಿ 1ರ ತಾರಾನುಕೂಲ ಚಾರ್ಟ್' : 'ನಿಮ್ಮ ತಾರಾನುಕೂಲ ಚಾರ್ಟ್'),
+                                  _buildTaraChart(_janmaNakshatraIdx1!, _isTwoPersonMode ? AppLocale.l('person1TaraChart') : AppLocale.l('yourTaraChart')),
                                 if (_isTwoPersonMode && _janmaNakshatraIdx2 != null)
-                                  _buildTaraChart(_janmaNakshatraIdx2!, 'ವ್ಯಕ್ತಿ 2ರ ತಾರಾನುಕೂಲ ಚಾರ್ಟ್'),
+                                  _buildTaraChart(_janmaNakshatraIdx2!, AppLocale.l('person2TaraChart')),
                               ],
                             ),
                           ),
@@ -634,7 +634,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                     if (_isLoadingPanchang)
                        const Padding(padding: EdgeInsets.all(32), child: Center(child: CircularProgressIndicator()))
                     else if (_selectedDayResult != null) ...[
-                      Text('ದಿನದ ಪಂಚಾಂಗ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1)),
+                      Text(AppLocale.l('dayPanchanga'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1)),
                       const SizedBox(height: 12),
                       Builder(builder: (context) {
                         final r = _selectedDayResult!;
@@ -705,7 +705,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       children: [
         const SizedBox(height: 20),
         // ── Event Selector ──
-        Text('ಮುಹೂರ್ತ ನಿಯಮಗಳು', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1)),
+        Text(AppLocale.l('muhurtaRules'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1)),
         const SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
@@ -894,7 +894,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     final moonHouse = ((moonRashi - janmaRashi + 12) % 12) + 1;
     final chandraBala = const [3, 6, 10, 11].contains(moonHouse);
 
-    final label = _isTwoPersonMode ? '👤 ವ್ಯಕ್ತಿ $personNum ಬಲಗಳು' : '👤 ನಿಮ್ಮ ಬಲಗಳು';
+    final label = _isTwoPersonMode ? '👤 ${AppLocale.l('person1')} $personNum ${AppLocale.l('personBalas')}' : '👤 ${AppLocale.l('yourBalas')}';
 
     return Container(
       padding: const EdgeInsets.all(12),
