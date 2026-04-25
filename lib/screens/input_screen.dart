@@ -484,7 +484,7 @@ class _InputScreenState extends State<InputScreen> {
                 const SizedBox(height: 24),
                 Text(AppLocale.l('webBlockedTitle'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.red), textAlign: TextAlign.center),
                 const SizedBox(height: 16),
-                Text('ನಿಮ್ಮ ಚಂದಾದಾರಿಕೆಯನ್ನು ಪರಿಶೀಲಿಸಲು ದಯವಿಟ್ಟು ೪೮ ಗಂಟೆಗಳಿಗೊಮ್ಮೆ ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಕಲ್ಪಿಸಿ.', 
+                Text(AppLocale.l('checkInternet'), 
                     style: TextStyle(fontSize: 16, height: 1.5), textAlign: TextAlign.center),
                 const SizedBox(height: 32),
                 ElevatedButton.icon(

@@ -197,7 +197,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: kBg,
-        title: Text('ವ್ಯಕ್ತಿ ಸೇರಿಸಿ', style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
+        title: Text(AppLocale.l('addPerson'), style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -206,8 +206,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                 backgroundColor: kTeal.withOpacity(0.15),
                 child: Icon(Icons.add, color: kTeal),
               ),
-              title: Text('ಹೊಸ ವ್ಯಕ್ತಿ ಸೇರಿಸಿ', style: TextStyle(color: kTeal, fontWeight: FontWeight.w800)),
-              subtitle: Text('ಹೊಸ ಜಾತಕ ವಿವರ ನಮೂದಿಸಿ', style: TextStyle(color: kMuted, fontSize: 12)),
+              title: Text(AppLocale.l('addNewPerson'), style: TextStyle(color: kTeal, fontWeight: FontWeight.w800)),
+              subtitle: Text(AppLocale.l('newPersonHint'), style: TextStyle(color: kMuted, fontSize: 12)),
               onTap: () {
                 Navigator.pop(ctx);
                 _showNewPersonForm();
@@ -219,8 +219,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                 backgroundColor: kPurple2.withOpacity(0.15),
                 child: Icon(Icons.folder_open, color: kPurple2),
               ),
-              title: Text('ಉಳಿಸಿದ ಜಾತಕದಿಂದ ಸೇರಿಸಿ', style: TextStyle(color: kPurple2, fontWeight: FontWeight.w800)),
-              subtitle: Text('ಸೇವ್ ಮಾಡಲಾದ / ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಲಿಸ್ಟ್', style: TextStyle(color: kMuted, fontSize: 12)),
+              title: Text(AppLocale.l('addFromSaved'), style: TextStyle(color: kPurple2, fontWeight: FontWeight.w800)),
+              subtitle: Text(AppLocale.l('savedListHint'), style: TextStyle(color: kMuted, fontSize: 12)),
               onTap: () {
                 Navigator.pop(ctx);
                 _showSavedProfilesListDialog();
@@ -229,7 +229,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('ಮುಚ್ಚಿ', style: TextStyle(color: kMuted))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocale.l('close'), style: TextStyle(color: kMuted))),
         ],
       ),
     );
@@ -295,7 +295,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: kBg,
-        title: Text('ಉಳಿಸಿದ ಜಾತಕ ಆಯ್ಕೆಮಾಡಿ', style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
+        title: Text(AppLocale.l('selectSavedProfile'), style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
         content: SizedBox(
           width: double.maxFinite,
           child: otherProfiles.isEmpty
@@ -321,7 +321,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('ಹಿಂದೆ', style: TextStyle(color: kMuted))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocale.l('back'), style: TextStyle(color: kMuted))),
         ],
       ),
     );
@@ -331,7 +331,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   void _addSavedProfile(BuildContext ctx, Profile p) async {
     Navigator.pop(ctx);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('⏳ ${p.name} ${'ಕುಂಡಲಿ ಲೆಕ್ಕಿಸಲಾಗುತ್ತಿದೆ...'}')),
+      SnackBar(content: Text('⏳ ${p.name} ${AppLocale.l('calcInProgress')}')),
     );
     try {
       final dateParts = p.date.split('-');
@@ -346,7 +346,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         lat: p.lat, lon: p.lon, ayanamsaMode: 'lahiri', trueNode: true,
       );
       if (result == null) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ${'ಕುಂಡಲಿ ಲೆಕ್ಕ ವಿಫಲ'}'), backgroundColor: Colors.red));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ${AppLocale.l('calcFailed')}'), backgroundColor: Colors.red));
         return;
       }
       if (mounted) {
@@ -385,7 +385,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         if (resp.statusCode == 200) {
           final data = jsonDecode(resp.body) as List;
           if (data.isEmpty) {
-            setS(() => geoStatus = 'ಸ್ಥಳ ಕಂಡುಬಂದಿಲ್ಲ.');
+            setS(() => geoStatus = AppLocale.l('placeNotFoundDash'));
           } else {
             final lat = double.parse(data[0]['lat']);
             final lon = double.parse(data[0]['lon']);
@@ -401,7 +401,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           }
         }
       } catch (_) {
-        setS(() => geoStatus = 'ಸ್ಥಳ ಸಂಪರ್ಕ ದೋಷ. ನೇರವಾಗಿ ಅಕ್ಷಾಂಶ/ರೇಖಾಂಶ ನಮೂದಿಸಿ.');
+        setS(() => geoStatus = AppLocale.l('placeError'));
       }
       setS(() => geoLoading = false);
     }
@@ -411,13 +411,13 @@ class _DashboardScreenState extends State<DashboardScreen>
       builder: (ctx) => StatefulBuilder(builder: (ctx2, setS) {
         return AlertDialog(
           backgroundColor: kBg,
-          title: Text('ಹೊಸ ವ್ಯಕ್ತಿ', style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
+          title: Text(AppLocale.l('newPerson'), style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(controller: nameCtrl, decoration: InputDecoration(labelText: 'ಹೆಸರು', prefixIcon: Icon(Icons.person_outline))),
+                TextField(controller: nameCtrl, decoration: InputDecoration(labelText: AppLocale.l('nameLabel'), prefixIcon: Icon(Icons.person_outline))),
                 const SizedBox(height: 14),
 
                 // Date picker
@@ -438,7 +438,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     child: Row(children: [
                       Icon(Icons.calendar_today, color: kMuted),
                       const SizedBox(width: 10),
-                      Text('${'ದಿನಾಂಕ'}: ${dob.day.toString().padLeft(2,'0')}-${dob.month.toString().padLeft(2,'0')}-${dob.year}', style: TextStyle(fontSize: 14, color: kText)),
+                      Text('${AppLocale.l('dateLabel')}: ${dob.day.toString().padLeft(2,'0')}-${dob.month.toString().padLeft(2,'0')}-${dob.year}', style: TextStyle(fontSize: 14, color: kText)),
                     ]),
                   ),
                 ),
@@ -470,7 +470,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     child: Row(children: [
                       Icon(Icons.access_time, color: kMuted),
                       const SizedBox(width: 10),
-                      Text('${'ಸಮಯ'}: ${hour.toString().padLeft(2,'0')}:${minute.toString().padLeft(2,'0')} $ampm', style: TextStyle(fontSize: 14, color: kText)),
+                      Text('${AppLocale.l('timeLabel')}: ${hour.toString().padLeft(2,'0')}:${minute.toString().padLeft(2,'0')} $ampm', style: TextStyle(fontSize: 14, color: kText)),
                     ]),
                   ),
                 ),
@@ -494,7 +494,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       controller: textEditingController,
                       focusNode: focusNode,
                       decoration: InputDecoration(
-                        labelText: 'ಊರು ಹುಡುಕಿ',
+                        labelText: AppLocale.l('searchPlace'),
                         prefixIcon: Icon(Icons.search),
                         suffixIcon: geoLoading
                           ? Padding(padding: const EdgeInsets.all(12), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))
@@ -562,9 +562,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                 const SizedBox(height: 14),
 
                 Row(children: [
-                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: 'ಅಕ್ಷಾಂಶ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: AppLocale.l('latLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
-                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: 'ರೇಖಾಂಶ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: AppLocale.l('lonLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
                   Expanded(child: TextField(controller: tzCtrl, decoration: const InputDecoration(labelText: 'TZ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                 ]),
@@ -572,17 +572,17 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('ಮುಚ್ಚಿ', style: TextStyle(color: kMuted))),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocale.l('close'), style: TextStyle(color: kMuted))),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: kPurple2),
               onPressed: () async {
                 final name = nameCtrl.text.trim();
                 if (name.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ದಯವಿಟ್ಟು ಹೆಸರನ್ನು ನಮೂದಿಸಿ'), backgroundColor: Colors.red));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocale.l('enterName')), backgroundColor: Colors.red));
                   return;
                 }
                 Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('⏳ $name ${'ಕುಂಡಲಿ ಲೆಕ್ಕಿಸಲಾಗುತ್ತಿದೆ...'}')));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('⏳ $name ${AppLocale.l('calcInProgress')}')));
                 try {
                   int h24 = hour;
                   if (ampm == 'PM' && h24 != 12) h24 += 12;
@@ -599,7 +599,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   );
                   
                   if (result == null) {
-                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ${'ಕುಂಡಲಿ ಲೆಕ್ಕ ವಿಫಲ'}'), backgroundColor: Colors.red));
+                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ${AppLocale.l('calcFailed')}'), backgroundColor: Colors.red));
                     return;
                   }
                   
@@ -634,13 +634,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                     setState(() {
                       _extraPersons.add(_PersonEntry(name: name, result: result, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, place: placeCtrl.text));
                     });
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ $name ${'ಕುಂಡಲಿ ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ ಮತ್ತು ಉಳಿಸಲಾಗಿದೆ'}'), backgroundColor: Colors.green));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ $name ${AppLocale.l('calcSuccess')}'), backgroundColor: Colors.green));
                   }
                 } catch (e) {
-                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ${'ದೋಷ'}: $e'), backgroundColor: Colors.red));
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ${AppLocale.l('errorLabel')}: $e'), backgroundColor: Colors.red));
                 }
               },
-              child: Text('ಲೆಕ್ಕಿಸಿ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+              child: Text(AppLocale.l('calculate'), style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
             ),
           ],
         );
@@ -694,7 +694,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           }
         }
       } catch (_) {
-        setS(() => geoStatus = 'ಸ್ಥಳ ಸಂಪರ್ಕ ದೋಷ.');
+        setS(() => geoStatus = AppLocale.l('placeError'));
       }
       setS(() => geoLoading = false);
     }
@@ -704,13 +704,13 @@ class _DashboardScreenState extends State<DashboardScreen>
       builder: (ctx) => StatefulBuilder(builder: (ctx2, setS) {
         return AlertDialog(
           backgroundColor: kBg,
-          title: Text('ವ್ಯಕ್ತಿ ಬದಲಾಯಿಸಿ', style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
+          title: Text(AppLocale.l('editPerson'), style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(controller: nameCtrl, decoration: InputDecoration(labelText: 'ಹೆಸರು', prefixIcon: Icon(Icons.person_outline))),
+                TextField(controller: nameCtrl, decoration: InputDecoration(labelText: AppLocale.l('nameLabel'), prefixIcon: Icon(Icons.person_outline))),
                 const SizedBox(height: 14),
                 GestureDetector(
                   onTap: () async {
@@ -726,7 +726,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
                     child: Row(children: [
                       Icon(Icons.calendar_today, color: kMuted), const SizedBox(width: 10),
-                      Text('ದಿನಾಂಕ: ${dob.day.toString().padLeft(2,'0')}-${dob.month.toString().padLeft(2,'0')}-${dob.year}', style: TextStyle(fontSize: 14, color: kText)),
+                      Text('${AppLocale.l('dateLabel')}: ${dob.day.toString().padLeft(2,'0')}-${dob.month.toString().padLeft(2,'0')}-${dob.year}', style: TextStyle(fontSize: 14, color: kText)),
                     ]),
                   ),
                 ),
@@ -755,7 +755,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
                     child: Row(children: [
                       Icon(Icons.access_time, color: kMuted), const SizedBox(width: 10),
-                      Text('ಸಮಯ: ${hour.toString().padLeft(2,'0')}:${minute.toString().padLeft(2,'0')} $ampm', style: TextStyle(fontSize: 14, color: kText)),
+                      Text('${AppLocale.l('timeLabel')}: ${hour.toString().padLeft(2,'0')}:${minute.toString().padLeft(2,'0')} $ampm', style: TextStyle(fontSize: 14, color: kText)),
                     ]),
                   ),
                 ),
@@ -773,7 +773,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     return TextField(
                       controller: textEditingController, focusNode: focusNode,
                       decoration: InputDecoration(
-                        labelText: 'ಊರು ಹುಡುಕಿ', prefixIcon: Icon(Icons.search),
+                        labelText: AppLocale.l('searchPlace'), prefixIcon: Icon(Icons.search),
                         suffixIcon: geoLoading
                           ? Padding(padding: const EdgeInsets.all(12), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))
                           : IconButton(icon: Icon(Icons.my_location, color: kTeal), onPressed: () { placeCtrl.text = textEditingController.text; performGeocode(textEditingController.text, setS); }),
@@ -817,9 +817,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                 if (geoStatus.isNotEmpty) ...[const SizedBox(height: 6), Text(geoStatus, style: TextStyle(fontSize: 12, color: kGreen))],
                 const SizedBox(height: 14),
                 Row(children: [
-                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: 'ಅಕ್ಷಾಂಶ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: AppLocale.l('latLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
-                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: 'ರೇಖಾಂಶ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: AppLocale.l('lonLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
                   Expanded(child: TextField(controller: tzCtrl, decoration: const InputDecoration(labelText: 'TZ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                 ]),
@@ -827,17 +827,17 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('ಮುಚ್ಚಿ', style: TextStyle(color: kMuted))),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocale.l('close'), style: TextStyle(color: kMuted))),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: kPurple2),
               onPressed: () async {
                 final name = nameCtrl.text.trim();
                 if (name.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ದಯವಿಟ್ಟು ಹೆಸರನ್ನು ನಮೂದಿಸಿ'), backgroundColor: Colors.red));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocale.l('enterName')), backgroundColor: Colors.red));
                   return;
                 }
                 Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('⏳ $name ಕುಂಡಲಿ ಮರು ಲೆಕ್ಕಿಸಲಾಗುತ್ತಿದೆ...')));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('⏳ $name ${AppLocale.l('calcInProgress')}')));
                 try {
                   int h24 = hour;
                   if (ampm == 'PM' && h24 != 12) h24 += 12;
@@ -854,7 +854,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   );
 
                   if (result == null) {
-                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ಕುಂಡಲಿ ಲೆಕ್ಕ ವಿಫಲ'), backgroundColor: Colors.red));
+                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ${AppLocale.l('calcFailed')}'), backgroundColor: Colors.red));
                     return;
                   }
 
@@ -862,13 +862,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                     setState(() {
                       _extraPersons[idx] = _PersonEntry(name: name, result: result, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, place: placeCtrl.text, notes: existing.notes);
                     });
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ $name ಕುಂಡಲಿ ಯಶಸ್ವಿಯಾಗಿ ಬದಲಾಯಿಸಲಾಗಿದೆ'), backgroundColor: Colors.green));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ $name ${AppLocale.l('calcSuccess')}'), backgroundColor: Colors.green));
                   }
                 } catch (e) {
-                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ದೋಷ: $e'), backgroundColor: Colors.red));
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ${AppLocale.l('errorLabel')}: $e'), backgroundColor: Colors.red));
                 }
               },
-              child: Text('ಮರು ಲೆಕ್ಕಿಸಿ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+              child: Text(AppLocale.l('calculate'), style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
             ),
           ],
         );
@@ -1057,7 +1057,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               onPressed: () async {
                 final name = nameCtrl.text.trim();
                 if (name.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ದಯವಿಟ್ಟು ಹೆಸರನ್ನು ನಮೂದಿಸಿ'), backgroundColor: Colors.red));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocale.l('enterName')), backgroundColor: Colors.red));
                   return;
                 }
                 Navigator.pop(ctx);
