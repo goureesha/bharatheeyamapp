@@ -129,6 +129,23 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   bool _syncing = false;
 
+  /// Translate dasha balance suffixes (ವ=years, ತಿ=months, ದಿ=days)
+  String _trDashaBalance(String bal) {
+    if (AppLocale.current == 'kn') return bal;
+    const suffixes = {
+      'hi': {'ವ': 'व', 'ತಿ': 'म', 'ದಿ': 'दि'},
+      'ta': {'ವ': 'வ', 'ತಿ': 'மா', 'ದಿ': 'நா'},
+      'te': {'ವ': 'సం', 'ತಿ': 'నె', 'ದಿ': 'రో'},
+      'ml': {'ವ': 'വ', 'ತಿ': 'മാ', 'ದಿ': 'ദി'},
+    };
+    final map = suffixes[AppLocale.current];
+    if (map == null) return bal;
+    var result = bal;
+    for (final entry in map.entries) {
+      result = result.replaceAll(entry.key, entry.value);
+    }
+    return result;
+  }
 
 
 
@@ -1631,7 +1648,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       final ri = (deg / 30).floor() % 12;
                       final nakIdx = (deg / 13.333333).floor() % 27;
                       final pada = ((deg % 13.333333) / 3.333333).floor() + 1;
-                      return _tableRow([tr(sp), appRashi[ri], formatDeg(deg), '${appNak[nakIdx]}-$pada'],
+                      return _tableRow([trAll(sp), appRashi[ri], formatDeg(deg), '${appNak[nakIdx]}-$pada'],
                         bold0: true);
                     }),
                   ],
@@ -1864,7 +1881,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           final ri = (deg / 30).floor() % 12;
                           final nakIdx = (deg / 13.333333).floor() % 27;
                           final pada = ((deg % 13.333333) / 3.333333).floor() + 1;
-                          return _tableRow([sp, appRashi[ri], formatDeg(deg), '${appNak[nakIdx]}-$pada'],
+                          return _tableRow([trAll(sp), appRashi[ri], formatDeg(deg), '${appNak[nakIdx]}-$pada'],
                             bold0: true);
                         }),
                       ],
@@ -2013,7 +2030,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
               AppCard(
                 child: Text(
-                  '${AppLocale.l('dashaLord')}: ${pan.dashaLord}  ${AppLocale.l('dashaBalance')}: ${pan.dashaBalance}',
+                  '${AppLocale.l('dashaLord')}: ${trAll(pan.dashaLord)}  ${AppLocale.l('dashaBalance')}: ${_trDashaBalance(pan.dashaBalance)}',
                   style: TextStyle(color: kOrange, fontWeight: FontWeight.w900, fontSize: 14),
                 ),
               ),
@@ -3083,7 +3100,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                               ),
                             ),
                             const SizedBox(height: 6),
-                            Text(t.nameKn, style: TextStyle(
+                            Text(AppLocale.current == 'kn' ? t.nameKn : t.nameEn, style: TextStyle(
                               fontSize: 11, fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
                               color: isSelected ? t.primaryLight : kText,
                             )),
@@ -3171,7 +3188,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     icon: const Icon(Icons.print),
-                    label: Text('${AppLocale.l('pdfPrint')} — ${selectedTheme.nameKn}', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                    label: Text('${AppLocale.l('pdfPrint')} — ${AppLocale.current == 'kn' ? selectedTheme.nameKn : selectedTheme.nameEn}', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
                     onPressed: () async {
                       final dateStr = '${widget.dob.day.toString().padLeft(2,'0')}-${widget.dob.month.toString().padLeft(2,'0')}-${widget.dob.year}';
                       final timeStr = '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}';
@@ -3189,7 +3206,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       );
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('⏳ ${selectedTheme.nameKn} ${AppLocale.l('pdfCreating')}'))
+                        SnackBar(content: Text('⏳ ${AppLocale.current == 'kn' ? selectedTheme.nameKn : selectedTheme.nameEn} ${AppLocale.l('pdfCreating')}'))
                       );
 
                       try {
