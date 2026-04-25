@@ -150,7 +150,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
             return MaterialApp(
               navigatorKey: navigatorKey,
               key: ValueKey('theme_${themeIndex}_bound_$isBound'),
-              title: 'ಭಾರತೀಯಮ್',
+              title: AppLocale.l('appName'),
               debugShowCheckedModeBanner: false,
               locale: const Locale('en', 'IN'),
               supportedLocales: const [
@@ -297,11 +297,11 @@ class _SideloadBlockedScreen extends StatelessWidget {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Icon(Icons.block, size: 80, color: Colors.red[400]),
           const SizedBox(height: 24),
-          Text('ಅನಧಿಕೃತ ಅನುಸ್ಥಾಪನೆ', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kText)),
+          Text(AppLocale.l('unauthorizedInstall'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kText)),
           const SizedBox(height: 8),
           Text('Unauthorized Installation', style: TextStyle(fontSize: 16, color: kMuted)),
           const SizedBox(height: 24),
-          Text('ಈ ಅಪ್ಲಿಕೇಶನ್ Google Play Store ನಿಂದ ಮಾತ್ರ ಡೌನ್‌ಲೋಡ್ ಮಾಡಬೇಕು.',
+          Text(AppLocale.l('downloadFromPlayStore'),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 15, color: kText, height: 1.5)),
           const SizedBox(height: 8),
@@ -311,7 +311,7 @@ class _SideloadBlockedScreen extends StatelessWidget {
           const SizedBox(height: 32),
           ElevatedButton.icon(
             icon: const Icon(Icons.shop, color: Colors.white),
-            label: const Text('Play Store ಗೆ ಹೋಗಿ'),
+            label: Text(AppLocale.l('goToPlayStore')),
             style: ElevatedButton.styleFrom(backgroundColor: kPurple2, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14)),
             onPressed: () {
               // Open Play Store listing
@@ -343,7 +343,7 @@ class _DeviceMismatchScreenState extends State<_DeviceMismatchScreen> {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Icon(Icons.devices, size: 80, color: Colors.orange[400]),
           const SizedBox(height: 24),
-          Text('ಬೇರೆ ಸಾಧನದಲ್ಲಿ ಸಕ್ರಿಯ', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kText)),
+          Text(AppLocale.l('activeOnOtherDevice'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kText)),
           const SizedBox(height: 8),
           Text('Active on Another Device', style: TextStyle(fontSize: 16, color: kMuted)),
           const SizedBox(height: 24),
@@ -356,7 +356,7 @@ class _DeviceMismatchScreenState extends State<_DeviceMismatchScreen> {
           else
             ElevatedButton.icon(
               icon: const Icon(Icons.swap_horiz, color: Colors.white),
-              label: const Text('ಸಾಧನ ಬದಲಾಯಿಸಿ / Migrate Device'),
+              label: Text(AppLocale.l('migrateDevice')),
               style: ElevatedButton.styleFrom(backgroundColor: kPurple2, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14)),
               onPressed: () async {
                 setState(() => _migrating = true);
@@ -368,7 +368,7 @@ class _DeviceMismatchScreenState extends State<_DeviceMismatchScreen> {
                   setState(() => _migrating = false);
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ Google ಸೈನ್ ಇನ್ ಮಾಡಿ.'), backgroundColor: Colors.red));
+                      SnackBar(content: Text(AppLocale.l('migrateFailed')), backgroundColor: Colors.red));
                   }
                 }
               },
@@ -380,7 +380,7 @@ class _DeviceMismatchScreenState extends State<_DeviceMismatchScreen> {
               // After sign-out, no email = binding is N/A → use notifier to rebuild
               deviceBindingNotifier.value = true;
             },
-            child: Text('ಬೇರೆ ಖಾತೆಯಿಂದ ಲಾಗಿನ್ / Sign in with different account',
+            child: Text(AppLocale.l('signInDifferent'),
               style: TextStyle(color: kMuted, fontSize: 13)),
           ),
         ]),
@@ -408,7 +408,7 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Icon(Icons.wifi_off_rounded, size: 80, color: Colors.orange[400]),
           const SizedBox(height: 24),
-          Text('ಇಂಟರ್ನೆಟ್ ಅಗತ್ಯವಿದೆ', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kText)),
+          Text(AppLocale.l('internetRequired'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kText)),
           const SizedBox(height: 8),
           Text('Internet Connection Required', style: TextStyle(fontSize: 16, color: kMuted)),
           const SizedBox(height: 24),
@@ -445,7 +445,7 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
           else
             ElevatedButton.icon(
               icon: const Icon(Icons.refresh, color: Colors.white),
-              label: const Text('ಪರಿಶೀಲಿಸಿ / Verify Now'),
+              label: Text(AppLocale.l('verifyNow')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: kPurple2,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -469,7 +469,7 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
                     setState(() => _checking = false);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.'),
+                        content: Text(AppLocale.l('internetFailed')),
                         backgroundColor: Colors.red,
                       ),
                     );
