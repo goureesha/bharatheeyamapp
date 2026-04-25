@@ -301,7 +301,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           child: otherProfiles.isEmpty
               ? Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text('ಬೇರೆ ಪ್ರೊಫೈಲ್‌ಗಳಿಲ್ಲ', textAlign: TextAlign.center, style: TextStyle(color: kMuted)),
+                  child: Text(AppLocale.l('noOtherProfiles'), textAlign: TextAlign.center, style: TextStyle(color: kMuted)),
                 )
               : ListView.builder(
                   shrinkWrap: true,
@@ -678,7 +678,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         if (resp.statusCode == 200) {
           final data = jsonDecode(resp.body) as List;
           if (data.isEmpty) {
-            setS(() => geoStatus = 'ಸ್ಥಳ ಕಂಡುಬಂದಿಲ್ಲ.');
+            setS(() => geoStatus = AppLocale.l('placeNotFoundDash'));
           } else {
             final lat = double.parse(data[0]['lat']);
             final lon = double.parse(data[0]['lon']);
@@ -902,7 +902,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         if (resp.statusCode == 200) {
           final data = jsonDecode(resp.body) as List;
           if (data.isEmpty) {
-            setS(() => geoStatus = 'ಸ್ಥಳ ಕಂಡುಬಂದಿಲ್ಲ.');
+            setS(() => geoStatus = AppLocale.l('placeNotFoundDash'));
           } else {
             final lat = double.parse(data[0]['lat']);
             final lon = double.parse(data[0]['lon']);
@@ -918,7 +918,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           }
         }
       } catch (_) {
-        setS(() => geoStatus = 'ಸ್ಥಳ ಸಂಪರ್ಕ ದೋಷ.');
+        setS(() => geoStatus = AppLocale.l('placeError'));
       }
       setS(() => geoLoading = false);
     }
@@ -928,13 +928,13 @@ class _DashboardScreenState extends State<DashboardScreen>
       builder: (ctx) => StatefulBuilder(builder: (ctx2, setS) {
         return AlertDialog(
           backgroundColor: kBg,
-          title: Text('ಮುಖ್ಯ ವ್ಯಕ್ತಿ ಬದಲಾಯಿಸಿ', style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
+          title: Text(AppLocale.l('editPerson'), style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(controller: nameCtrl, decoration: InputDecoration(labelText: 'ಹೆಸರು', prefixIcon: Icon(Icons.person_outline))),
+                TextField(controller: nameCtrl, decoration: InputDecoration(labelText: AppLocale.l('nameLabel'), prefixIcon: Icon(Icons.person_outline))),
                 const SizedBox(height: 14),
                 GestureDetector(
                   onTap: () async {
@@ -950,7 +950,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
                     child: Row(children: [
                       Icon(Icons.calendar_today, color: kMuted), const SizedBox(width: 10),
-                      Text('ದಿನಾಂಕ: ${dob.day.toString().padLeft(2,'0')}-${dob.month.toString().padLeft(2,'0')}-${dob.year}', style: TextStyle(fontSize: 14, color: kText)),
+                      Text('${AppLocale.l('dateLabel')}: ${dob.day.toString().padLeft(2,'0')}-${dob.month.toString().padLeft(2,'0')}-${dob.year}', style: TextStyle(fontSize: 14, color: kText)),
                     ]),
                   ),
                 ),
@@ -979,7 +979,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
                     child: Row(children: [
                       Icon(Icons.access_time, color: kMuted), const SizedBox(width: 10),
-                      Text('ಸಮಯ: ${hour.toString().padLeft(2,'0')}:${minute.toString().padLeft(2,'0')} $ampm', style: TextStyle(fontSize: 14, color: kText)),
+                      Text('${AppLocale.l('timeLabel')}: ${hour.toString().padLeft(2,'0')}:${minute.toString().padLeft(2,'0')} $ampm', style: TextStyle(fontSize: 14, color: kText)),
                     ]),
                   ),
                 ),
@@ -997,7 +997,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     return TextField(
                       controller: textEditingController, focusNode: focusNode,
                       decoration: InputDecoration(
-                        labelText: 'ಊರು ಹುಡುಕಿ', prefixIcon: Icon(Icons.search),
+                        labelText: AppLocale.l('searchPlace'), prefixIcon: Icon(Icons.search),
                         suffixIcon: geoLoading
                           ? Padding(padding: const EdgeInsets.all(12), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))
                           : IconButton(icon: Icon(Icons.my_location, color: kTeal), onPressed: () { placeCtrl.text = textEditingController.text; performGeocode(textEditingController.text, setS); }),
@@ -1041,9 +1041,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                 if (geoStatus.isNotEmpty) ...[const SizedBox(height: 6), Text(geoStatus, style: TextStyle(fontSize: 12, color: kGreen))],
                 const SizedBox(height: 14),
                 Row(children: [
-                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: 'ಅಕ್ಷಾಂಶ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: AppLocale.l('latLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
-                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: 'ರೇಖಾಂಶ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: AppLocale.l('lonLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
                   Expanded(child: TextField(controller: tzCtrl, decoration: const InputDecoration(labelText: 'TZ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                 ]),
@@ -1051,7 +1051,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('ಮುಚ್ಚಿ', style: TextStyle(color: kMuted))),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocale.l('close'), style: TextStyle(color: kMuted))),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: kPurple2),
               onPressed: () async {
@@ -1061,7 +1061,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   return;
                 }
                 Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('⏳ $name ಕುಂಡಲಿ ಮರು ಲೆಕ್ಕಿಸಲಾಗುತ್ತಿದೆ...')));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('⏳ $name ${AppLocale.l('recalculating')}')));
                 try {
                   int h24 = hour;
                   if (ampm == 'PM' && h24 != 12) h24 += 12;
@@ -1078,7 +1078,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   );
 
                   if (result == null) {
-                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ಕುಂಡಲಿ ಲೆಕ್ಕ ವಿಫಲ'), backgroundColor: Colors.red));
+                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ${AppLocale.l('calcFailed')}'), backgroundColor: Colors.red));
                     return;
                   }
 
@@ -1094,13 +1094,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                       _primaryLon = lon;
                       _primaryPlace = placeCtrl.text;
                     });
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ $name ಕುಂಡಲಿ ಯಶಸ್ವಿಯಾಗಿ ಬದಲಾಯಿಸಲಾಗಿದೆ'), backgroundColor: Colors.green));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ $name ${AppLocale.l('calcSuccess')}'), backgroundColor: Colors.green));
                   }
                 } catch (e) {
-                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ದೋಷ: $e'), backgroundColor: Colors.red));
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ${AppLocale.l('errorLabel')}: $e'), backgroundColor: Colors.red));
                 }
               },
-              child: Text('ಮರು ಲೆಕ್ಕಿಸಿ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+              child: Text(AppLocale.l('recalcBtn'), style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
             ),
           ],
         );
@@ -1176,35 +1176,35 @@ class _DashboardScreenState extends State<DashboardScreen>
       buf.write('\uFEFF');
 
       // Personal Info
-      buf.writeln('${'ಜಾತಕ ವಿವರ'},,');
-      buf.writeln('${'ಹೆಸರು'},$name,');
-      buf.writeln('${'ಸ್ಥಳ'},${widget.place},');
-      buf.writeln('${'ದಿನಾಂಕ'},$dateStr,');
-      buf.writeln('${'ಸಮಯ'},$timeStr,');
-      buf.writeln('${'ಅಕ್ಷಾಂಶ'},${widget.lat},');
-      buf.writeln('${'ರೇಖಾಂಶ'},${widget.lon},');
+      buf.writeln('${AppLocale.l('jatakaVivar')},,');
+      buf.writeln('${AppLocale.l('nameLabel')},$name,');
+      buf.writeln('${AppLocale.l('placeLabel')},${widget.place},');
+      buf.writeln('${AppLocale.l('dateLabel')},$dateStr,');
+      buf.writeln('${AppLocale.l('timeLabel')},$timeStr,');
+      buf.writeln('${AppLocale.l('latLabel')},${widget.lat},');
+      buf.writeln('${AppLocale.l('lonLabel')},${widget.lon},');
       buf.writeln(',');
 
       // Panchanga
-      buf.writeln('${'ಪಂಚಾಂಗ'},,');
-      buf.writeln('${'ಸಂವತ್ಸರ'},${pan.samvatsara},');
-      buf.writeln('${'ವಾರ'},${pan.vara},');
-      buf.writeln('${'ತಿಥಿ'},${pan.tithi},');
-      buf.writeln('${'ನಕ್ಷತ್ರ'},${pan.nakshatra},');
-      buf.writeln('${'ಯೋಗ'},${pan.yoga},');
-      buf.writeln('${'ಕರಣ'},${pan.karana},');
-      buf.writeln('${'ಚಂದ್ರ ರಾಶಿ'},${pan.chandraRashi},');
-      buf.writeln('${'ಚಂದ್ರ ಮಾಸ'},${pan.chandraMasa},');
-      buf.writeln('${'ಸೌರ ಮಾಸ'},${pan.souraMasa},');
-      buf.writeln('${'ಸೂರ್ಯೋದಯ'},${pan.sunrise},');
-      buf.writeln('${'ಸೂರ್ಯಾಸ್ತ'},${pan.sunset},');
-      buf.writeln('${'ದಶಾ ನಾಥ'},${pan.dashaLord},');
-      buf.writeln('${'ದಶಾ ಉಳಿಕೆ'},${pan.dashaBalance},');
+      buf.writeln('${AppLocale.l('pHeading')},,');
+      buf.writeln('${AppLocale.l('samvatsara')},${pan.samvatsara},');
+      buf.writeln('${AppLocale.l('varaLabel')},${pan.vara},');
+      buf.writeln('${AppLocale.l('tithiLabel')},${pan.tithi},');
+      buf.writeln('${AppLocale.l('nakshatraShort')},${pan.nakshatra},');
+      buf.writeln('${AppLocale.l('yogaLabel')},${pan.yoga},');
+      buf.writeln('${AppLocale.l('karanaLabel')},${pan.karana},');
+      buf.writeln('${AppLocale.l('chandraRashiLabel')},${pan.chandraRashi},');
+      buf.writeln('${AppLocale.l('chandraMasa')},${pan.chandraMasa},');
+      buf.writeln('${AppLocale.l('souraMasa')},${pan.souraMasa},');
+      buf.writeln('${AppLocale.l('sunrise')},${pan.sunrise},');
+      buf.writeln('${AppLocale.l('sunset')},${pan.sunset},');
+      buf.writeln('${AppLocale.l('dashaLord')},${pan.dashaLord},');
+      buf.writeln('${AppLocale.l('dashaBalanceLabel')},${pan.dashaBalance},');
       buf.writeln(',');
 
       // Graha Sphuta
-      buf.writeln('${'ಗ್ರಹ ಸ್ಫುಟ'},,,');
-      buf.writeln('${'ಗ್ರಹ'},${'ರಾಶಿ'},${'ಸ್ಫುಟ'},${'ನಕ್ಷತ್ರ'} - ${'ಪಾದ'}');
+      buf.writeln('${AppLocale.l('grahaSphuta')},,,');
+      buf.writeln('${AppLocale.l('hGraha')},${AppLocale.l('hRashi')},${AppLocale.l('hSphuta')},${AppLocale.l('hNakPada')}');
       for (final p in planetOrder) {
         final info = r.planets[p];
         if (info == null) continue;
@@ -1214,8 +1214,8 @@ class _DashboardScreenState extends State<DashboardScreen>
       buf.writeln(',');
 
       // Upagraha Sphuta
-      buf.writeln('${'ಉಪಗ್ರಹ ಸ್ಫುಟ'},,,');
-      buf.writeln('${'ಉಪಗ್ರಹ'},${'ರಾಶಿ'},${'ಅಂಶ'},${'ನಕ್ಷತ್ರ'}');
+      buf.writeln('${AppLocale.l('upagrahaTitle')},,,');
+      buf.writeln('${AppLocale.l('hUpagraha')},${AppLocale.l('hRashi')},${AppLocale.l('hDegree')},${AppLocale.l('hNakshatraCol')}');
       for (final sp in sphutas16Order) {
         final deg = r.advSphutas[sp];
         if (deg == null) continue;
@@ -1229,7 +1229,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       if (kIsWeb) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('ವೆಬ್‌ನಲ್ಲಿ ಹಂಚಿಕೊಳ್ಳಲು ಸಾಧ್ಯವಿಲ್ಲ.')));
+            SnackBar(content: Text(AppLocale.l('webShareError'))));
         }
         return;
       }
@@ -1238,12 +1238,12 @@ class _DashboardScreenState extends State<DashboardScreen>
       await ExportService.shareCSV(
         csvContent: buf.toString(),
         fileName: fileName,
-        shareText: '$name ${'ಜಾತಕ'} - $dateStr',
+        shareText: '$name ${AppLocale.l('kundaliLabel')} - $dateStr',
       );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${'ದೋಷ'}: $e'), backgroundColor: Colors.red));
+          SnackBar(content: Text('${AppLocale.l('errorLabel')}: $e'), backgroundColor: Colors.red));
       }
     }
   }
@@ -1279,7 +1279,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   Row(children: [
                     IconButton(
                       icon: Icon(Icons.person_add, color: kPurple2),
-                      tooltip: 'ವ್ಯಕ್ತಿ ಸೇರಿಸಿ',
+                      tooltip: AppLocale.l('addPerson'),
                       onPressed: _showAddPersonDialog,
                     ),
 
@@ -1362,7 +1362,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             if (!mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('✅ ಜಾತಕವನ್ನು ಉಳಿಸಲಾಗಿದೆ! ($totalCount ಕುಂಡಲಿ)\nClient ID: ${resolvedCId ?? ''}'),
+                                content: Text('✅ ${AppLocale.l('savedSuccess')} ($totalCount ಕುಂಡಲಿ)\nClient ID: ${resolvedCId ?? ''}'),
                                 backgroundColor: Colors.green,
                                 duration: const Duration(seconds: 4),
                               )
@@ -1472,7 +1472,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                       IconButton(
                         icon: Icon(Icons.edit, size: 18, color: kPurple2),
-                        tooltip: 'ಬದಲಾಯಿಸಿ',
+                        tooltip: AppLocale.l('editTooltip'),
                         onPressed: () => isPrimary ? _showEditPrimaryDialog() : _showEditPersonDialog(personName),
                       ),
                       if (!isPrimary)
@@ -1543,7 +1543,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             child: OutlinedButton.icon(
               onPressed: _showAddPersonDialog,
               icon: Icon(Icons.person_add, color: kPurple2),
-              label: Text('ವ್ಯಕ್ತಿ ಸೇರಿಸಿ', style: TextStyle(color: kPurple2, fontWeight: FontWeight.w800)),
+              label: Text(AppLocale.l('addPerson'), style: TextStyle(color: kPurple2, fontWeight: FontWeight.w800)),
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: kPurple2),
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -1665,11 +1665,11 @@ class _DashboardScreenState extends State<DashboardScreen>
         setState(() {
           _prastutaResult = result;
         });
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ಪ್ರಸ್ತುತ-ಕಾಲದ ಚಕ್ರವನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಿದೆ.'))); // Current-time chart loaded
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocale.l('loadingPrastuta')))); // Current-time chart loaded
       }
     } catch (e) {
       if (mounted) Navigator.pop(context);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ದೋಷ: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${AppLocale.l('errorLabel')}: $e')));
     }
   }
 
@@ -1729,10 +1729,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SectionTitle('ಆರೂಢ ಚಕ್ರ'),
+                      SectionTitle(AppLocale.l('aroodhaChakra')),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.access_time, size: 16),
-                        label: Text('ಪ್ರಸ್ತುತ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        label: Text(AppLocale.l('prastuta'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: kTeal,
                           foregroundColor: Colors.white,
@@ -2281,7 +2281,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: _bhavaPlanet == null ? kTeal : kBorder),
                   ),
-                  child: Text('ಲಗ್ನ', style: TextStyle(
+                  child: Text(AppLocale.l('lagna'), style: TextStyle(
                     fontSize: 13,
                     fontWeight: _bhavaPlanet == null ? FontWeight.w900 : FontWeight.w600,
                     color: _bhavaPlanet == null ? Colors.white : kText,
@@ -2692,18 +2692,18 @@ class _DashboardScreenState extends State<DashboardScreen>
       final clientId = widget.extraInfo['clientId'] ?? '';
       final buf = StringBuffer();
       buf.writeln('═══════════════════════════');
-      buf.writeln('   ✨ ${'ಭಾರತೀಯಮ್'} ✨');
+      buf.writeln('   ✨ ${AppLocale.l('appName')} ✨');
       buf.writeln('═══════════════════════════\n');
-      if (clientId.isNotEmpty) buf.writeln('🪪 ${'ಐಡಿ'}: $clientId');
-      buf.writeln('👤 ${'ಹೆಸರು'}: $name');
-      buf.writeln('📅 ${'ಜನ್ಮ ದಿನಾಂಕ'}: $dobStr');
-      buf.writeln('🕰️ ${'ಜನ್ಮ ಸಮಯ'}: $timeStr');
-      buf.writeln('📍 ${'ಜನ್ಮ ಸ್ಥಳ'}: $birthPlace\n');
+      if (clientId.isNotEmpty) buf.writeln('🪪 ${AppLocale.l('idLabel')}: $clientId');
+      buf.writeln('👤 ${AppLocale.l('nameLabel')}: $name');
+      buf.writeln('📅 ${AppLocale.l('birthDate')}: $dobStr');
+      buf.writeln('🕰️ ${AppLocale.l('birthTime')}: $timeStr');
+      buf.writeln('📍 ${AppLocale.l('birthPlace')}: $birthPlace\n');
       buf.writeln('───────────────────────────');
-      buf.writeln('   📝 ${'ಟಿಪ್ಪಣಿಗಳು'}');
+      buf.writeln('   📝 ${AppLocale.l('notesLabel')}');
       buf.writeln('───────────────────────────\n');
       if (entries.isEmpty) {
-        buf.writeln('ಯಾವುದೇ ಟಿಪ್ಪಣಿಗಳಿಲ್ಲ');
+        buf.writeln(AppLocale.l('noNotes'));
       } else {
         for (int i = 0; i < entries.length; i++) {
           buf.writeln('🕐 ${entries[i]['date']}\n   ${entries[i]['text']}');
@@ -2713,7 +2713,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       buf.writeln('\n═══════════════════════════');
       final text = buf.toString();
       Clipboard.setData(ClipboardData(text: text));
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ಕ್ಲಿಪ್‌ಬೋರ್ಡ್‌ಗೆ ನಕಲಿಸಲಾಗಿದೆ! ✅')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${AppLocale.l('copiedToClipboard')} ✅')));
       final encoded = Uri.encodeComponent(text);
       launchUrl(Uri.parse('https://wa.me/?text=$encoded'), mode: LaunchMode.externalApplication);
     }
@@ -2727,7 +2727,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: kBorder)),
         collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: kBorder)),
         title: Text(name, style: TextStyle(fontWeight: FontWeight.w900, color: kTeal)),
-        subtitle: Text(isPrimary ? 'ಮುಖ್ಯ ವ್ಯಕ್ತಿ ಟಿಪ್ಪಣಿಗಳು' : 'ಗುಂಪು ಸದಸ್ಯರ ಟಿಪ್ಪಣಿಗಳು', style: TextStyle(fontSize: 12, color: kMuted)),
+        subtitle: Text(isPrimary ? AppLocale.l('primaryPersonNotes') : AppLocale.l('groupMemberNotes'), style: TextStyle(fontSize: 12, color: kMuted)),
         childrenPadding: const EdgeInsets.all(12),
         children: [
           Row(
@@ -2736,7 +2736,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 child: ElevatedButton.icon(
                   onPressed: shareNotes,
                   icon: Icon(Icons.share, size: 18),
-                  label: Text('ಹಂಚಿಕೊಳ್ಳಿ', style: TextStyle(fontSize: 13)),
+                  label: Text(AppLocale.l('shareLabel'), style: TextStyle(fontSize: 13)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
@@ -2756,18 +2756,18 @@ class _DashboardScreenState extends State<DashboardScreen>
                     final clientId = widget.extraInfo['clientId'] ?? '';
                     final buf = StringBuffer();
                     buf.writeln('═══════════════════════════');
-                    buf.writeln('   ✨ ${'ಭಾರತೀಯಮ್'} ✨');
+                    buf.writeln('   ✨ ${AppLocale.l('appName')} ✨');
                     buf.writeln('═══════════════════════════\n');
-                    if (clientId.isNotEmpty) buf.writeln('🪪 ${'ಐಡಿ'}: $clientId');
-                    buf.writeln('👤 ${'ಹೆಸರು'}: $name');
-                    buf.writeln('📅 ${'ಜನ್ಮ ದಿನಾಂಕ'}: $dobStr');
-                    buf.writeln('🕰️ ${'ಜನ್ಮ ಸಮಯ'}: $timeStr');
-                    buf.writeln('📍 ${'ಜನ್ಮ ಸ್ಥಳ'}: $birthPlace\n');
+                    if (clientId.isNotEmpty) buf.writeln('🪪 ${AppLocale.l('idLabel')}: $clientId');
+                    buf.writeln('👤 ${AppLocale.l('nameLabel')}: $name');
+                    buf.writeln('📅 ${AppLocale.l('birthDate')}: $dobStr');
+                    buf.writeln('🕰️ ${AppLocale.l('birthTime')}: $timeStr');
+                    buf.writeln('📍 ${AppLocale.l('birthPlace')}: $birthPlace\n');
                     buf.writeln('───────────────────────────');
-                    buf.writeln('   📝 ${'ಟಿಪ್ಪಣಿಗಳು'}');
+                    buf.writeln('   📝 ${AppLocale.l('notesLabel')}');
                     buf.writeln('───────────────────────────\n');
                     if (entries.isEmpty) {
-                      buf.writeln('ಯಾವುದೇ ಟಿಪ್ಪಣಿಗಳಿಲ್ಲ');
+                      buf.writeln(AppLocale.l('noNotes'));
                     } else {
                       for (int i = 0; i < entries.length; i++) {
                         buf.writeln('🕐 ${entries[i]['date']}\n   ${entries[i]['text']}');
@@ -2778,7 +2778,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     _showPrintPreview(buf.toString());
                   },
                   icon: Icon(Icons.print, size: 18),
-                  label: Text('ಪ್ರಿಂಟ್', style: TextStyle(fontSize: 13)),
+                  label: Text(AppLocale.l('printLabel'), style: TextStyle(fontSize: 13)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPurple2, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
@@ -2796,7 +2796,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   maxLines: 8,
                   minLines: 3,
                   decoration: InputDecoration(
-                    hintText: 'ಹೊಸ ಟಿಪ್ಪಣಿ ಸೇರಿಸಿ...',
+                    hintText: AppLocale.l('addNoteHint'),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kBorder)),
                     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kBorder)),
                     fillColor: kBg, filled: true, contentPadding: const EdgeInsets.all(12),
@@ -2822,7 +2822,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ctrl.clear();
                     _saveIndividualNote(name, isPrimary, entry, updatedNotes);
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ ${'ಟಿಪ್ಪಣಿ ಉಳಿಸಲಾಗಿದೆ'}'), backgroundColor: Colors.green));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ ${AppLocale.l('noteSaved')}'), backgroundColor: Colors.green));
                 },
                 child: Container(
                   padding: const EdgeInsets.all(14),
@@ -2834,7 +2834,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 14),
           if (entries.isEmpty)
-            Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: 20), child: Text('ಇನ್ನೂ ಟಿಪ್ಪಣಿಗಳಿಲ್ಲ', style: TextStyle(color: kMuted))))
+            Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: 20), child: Text(AppLocale.l('noNotes')', style: TextStyle(color: kMuted))))
           else
             ...entries.asMap().entries.map((en) {
               final i = en.key;
@@ -2919,7 +2919,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         title: Row(children: [
           Icon(Icons.print, color: kPurple2),
           const SizedBox(width: 8),
-          Text('ಪ್ರಿಂಟ್ ಪ್ರಿವ್ಯೂ', style: TextStyle(color: kText)),
+          Text(AppLocale.l('printPreview'), style: TextStyle(color: kText)),
         ]),
         content: SizedBox(
           width: double.maxFinite,
@@ -2941,18 +2941,18 @@ class _DashboardScreenState extends State<DashboardScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('ಮುಚ್ಚಿ', style: TextStyle(color: kMuted)),
+            child: Text(AppLocale.l('close'), style: TextStyle(color: kMuted)),
           ),
           ElevatedButton.icon(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: text));
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('ನಕಲಿಸಲಾಗಿದೆ — ಯಾವುದೇ ಟೆಕ್ಸ್ಟ್ ಎಡಿಟರ್‌ನಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ ಪ್ರಿಂಟ್ ಮಾಡಿ ✅')),
+                SnackBar(content: Text(AppLocale.l('copiedMsg'))),
               );
             },
             icon: const Icon(Icons.copy, size: 18),
-            label: Text('${'ನಕಲಿಸಿ'} & ${'ಪ್ರಿಂಟ್'}'),
+            label: Text(AppLocale.l('copyAndPrint')),
             style: ElevatedButton.styleFrom(backgroundColor: kTeal, foregroundColor: Colors.white),
           ),
         ],
@@ -2972,7 +2972,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       if (match != null) {
         entries.add({'date': match.group(1)!, 'text': match.group(2)!.trim()});
       } else {
-        entries.add({'date': 'ಹಳೆಯ ಟಿಪ್ಪಣಿ', 'text': trimmed});
+        entries.add({'date': AppLocale.l('oldNote'), 'text': trimmed});
       }
     }
     return entries;
@@ -3009,11 +3009,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                   children: [
                     Icon(Icons.palette, color: kPurple2),
                     const SizedBox(width: 8),
-                    Text('PDF ಥೀಮ್ ಆಯ್ಕೆ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kText)),
+                    Text(AppLocale.l('pdfThemeSelect'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kText)),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text('ಪತ್ರಿಕೆಯ ವಿನ್ಯಾಸ ಮತ್ತು ಬಣ್ಣ ಬದಲಾಯಿಸಿ', style: TextStyle(fontSize: 12, color: kMuted)),
+                Text(AppLocale.l('pdfThemeDesc'), style: TextStyle(fontSize: 12, color: kMuted)),
                 const SizedBox(height: 12),
                 GridView.count(
                   crossAxisCount: 3,
@@ -3129,47 +3129,47 @@ class _DashboardScreenState extends State<DashboardScreen>
                   children: [
                     Icon(Icons.picture_as_pdf, color: selectedTheme.primaryLight),
                     const SizedBox(width: 8),
-                    Text('ಜನ್ಮ ಪತ್ರಿಕೆ ರಚಿಸಿ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kText)),
+                    Text(AppLocale.l('createPatrike'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kText)),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'ಸಾಂಪ್ರದಾಯಿಕ ಶೈಲಿಯ ಜನ್ಮ ಪತ್ರಿಕೆಯನ್ನು PDF ರೂಪದಲ್ಲಿ ಪ್ರಿಂಟ್ ಮಾಡಲು ಈ ಕೆಳಗಿನ ವಿವರಗಳನ್ನು ತುಂಬಿ.',
+                  AppLocale.l('patrikeDesc'),
                   style: TextStyle(fontSize: 12, color: kMuted),
                 ),
                 const SizedBox(height: 16),
 
                 // Family Details
-                Text('ಕುಟುಂಬದ ವಿವರ', style: TextStyle(fontWeight: FontWeight.w800, color: kTeal)),
+                Text(AppLocale.l('familyDetails'), style: TextStyle(fontWeight: FontWeight.w800, color: kTeal)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _fatherNameCtrl,
-                  decoration: InputDecoration(labelText: 'ತಂದೆಯ ಹೆಸರು', prefixIcon: Icon(Icons.person_outline, size: 18), isDense: true),
+                  decoration: InputDecoration(labelText: AppLocale.l('fatherName'), prefixIcon: Icon(Icons.person_outline, size: 18), isDense: true),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: _motherNameCtrl,
-                  decoration: InputDecoration(labelText: 'ತಾಯಿಯ ಹೆಸರು', prefixIcon: Icon(Icons.person_3_outlined, size: 18), isDense: true),
+                  decoration: InputDecoration(labelText: AppLocale.l('motherName'), prefixIcon: Icon(Icons.person_3_outlined, size: 18), isDense: true),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: _gotraCtrl,
-                  decoration: InputDecoration(labelText: 'ಗೋತ್ರ', prefixIcon: Icon(Icons.hub_outlined, size: 18), isDense: true),
+                  decoration: InputDecoration(labelText: AppLocale.l('gotraLabel'), prefixIcon: Icon(Icons.hub_outlined, size: 18), isDense: true),
                 ),
                 const SizedBox(height: 20),
 
                 // Jyotishi Details
-                Text('ಜ್ಯೋತಿಷಿಗಳ ವಿವರ (ಪ್ರಿಂಟ್ ಮಾಡಲು)', style: TextStyle(fontWeight: FontWeight.w800, color: kTeal)),
+                Text(AppLocale.l('jyotishiSection'), style: TextStyle(fontWeight: FontWeight.w800, color: kTeal)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _jyotishiNameCtrl,
-                  decoration: InputDecoration(labelText: 'ಜ್ಯೋತಿಷಿಗಳ ಹೆಸರು / ಸಂಸ್ಥೆ', prefixIcon: Icon(Icons.storefront, size: 18), isDense: true),
+                  decoration: InputDecoration(labelText: AppLocale.l('jyotishiName'), prefixIcon: Icon(Icons.storefront, size: 18), isDense: true),
                   onChanged: (_) => _saveJyotishiDetails(),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: _jyotishiPhoneCtrl,
-                  decoration: InputDecoration(labelText: 'ಸಂಪರ್ಕ ಸಂಖ್ಯೆ', prefixIcon: Icon(Icons.phone, size: 18), isDense: true),
+                  decoration: InputDecoration(labelText: AppLocale.l('jyotishiPhone'), prefixIcon: Icon(Icons.phone, size: 18), isDense: true),
                   keyboardType: TextInputType.phone,
                   onChanged: (_) => _saveJyotishiDetails(),
                 ),
@@ -3186,7 +3186,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     icon: const Icon(Icons.print),
-                    label: Text('PDF ಪ್ರಿಂಟ್ ಮಾಡಿ — ${selectedTheme.nameKn}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                    label: Text('${AppLocale.l('pdfPrint')} — ${selectedTheme.nameKn}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
                     onPressed: () async {
                       final dateStr = '${widget.dob.day.toString().padLeft(2,'0')}-${widget.dob.month.toString().padLeft(2,'0')}-${widget.dob.year}';
                       final timeStr = '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}';
@@ -3204,14 +3204,14 @@ class _DashboardScreenState extends State<DashboardScreen>
                       );
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('⏳ ${selectedTheme.nameKn} ಥೀಮ್‌ನಲ್ಲಿ PDF ಸೃಷ್ಟಿಸಲಾಗುತ್ತಿದೆ...'))
+                        SnackBar(content: Text('⏳ ${selectedTheme.nameKn} ${AppLocale.l('pdfCreating')}'))
                       );
 
                       try {
                         await JanmaPatrikeService.generateAndPrint(ud, widget.result, theme: selectedTheme);
                       } catch (e) {
                          ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('❌ ${'ದೋಷ'}: $e'), backgroundColor: Colors.red)
+                          SnackBar(content: Text('❌ ${AppLocale.l('errorLabel')}: $e'), backgroundColor: Colors.red)
                         );
                       }
                     },
