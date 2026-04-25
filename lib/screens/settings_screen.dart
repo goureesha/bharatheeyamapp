@@ -1014,13 +1014,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: GoogleAuthService.isSignedIn ? () async {
                     // Show loading
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(AppLocale.l('backingUpDrive'))), duration: Duration(seconds: 2)),
+                      SnackBar(content: Text(AppLocale.l('backingUpDrive')), duration: Duration(seconds: 2)),
                     );
                     final result = await DriveBackupService.uploadBackup();
                     if (mounted) {
                       if (result == 'success') {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text(AppLocale.l('driveBackupSuccess')),
                             backgroundColor: Colors.green,
                           ),
@@ -1075,14 +1075,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(AppLocale.l('restoringDrive'))), duration: Duration(seconds: 2)),
+                        SnackBar(content: Text(AppLocale.l('restoringDrive')), duration: Duration(seconds: 2)),
                       );
                     }
                     final err = await DriveBackupService.downloadAndRestore();
                     if (mounted) {
                       if (err == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text(AppLocale.l('driveRestoreSuccess')),
                             backgroundColor: Colors.green,
                           ),
