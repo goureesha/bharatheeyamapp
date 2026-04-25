@@ -314,8 +314,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                       color: kText,
                       constraints: const BoxConstraints(minHeight: 40, minWidth: 100),
                       children: [
-                        Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Text(AppLocale.l('onePerson'))),
-                        Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Text(AppLocale.l('twoPersons'))),
+                        Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text(AppLocale.l('onePerson'))),
+                        Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text(AppLocale.l('twoPersons'))),
                       ],
                     ),
                     const SizedBox(height: 12),

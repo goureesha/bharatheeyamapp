@@ -562,9 +562,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                 const SizedBox(height: 14),
 
                 Row(children: [
-                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: AppLocale.l('latLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: AppLocale.l('latLabel'), isDense: true), keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
-                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: AppLocale.l('lonLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: AppLocale.l('lonLabel'), isDense: true), keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
                   Expanded(child: TextField(controller: tzCtrl, decoration: const InputDecoration(labelText: 'TZ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                 ]),
@@ -817,9 +817,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                 if (geoStatus.isNotEmpty) ...[const SizedBox(height: 6), Text(geoStatus, style: TextStyle(fontSize: 12, color: kGreen))],
                 const SizedBox(height: 14),
                 Row(children: [
-                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: AppLocale.l('latLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: AppLocale.l('latLabel'), isDense: true), keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
-                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: AppLocale.l('lonLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: AppLocale.l('lonLabel'), isDense: true), keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
                   Expanded(child: TextField(controller: tzCtrl, decoration: const InputDecoration(labelText: 'TZ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                 ]),
@@ -1041,9 +1041,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                 if (geoStatus.isNotEmpty) ...[const SizedBox(height: 6), Text(geoStatus, style: TextStyle(fontSize: 12, color: kGreen))],
                 const SizedBox(height: 14),
                 Row(children: [
-                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: AppLocale.l('latLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: latCtrl, decoration: InputDecoration(labelText: AppLocale.l('latLabel'), isDense: true), keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
-                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: AppLocale.l('lonLabel'), isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
+                  Expanded(child: TextField(controller: lonCtrl, decoration: InputDecoration(labelText: AppLocale.l('lonLabel'), isDense: true), keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true))),
                   const SizedBox(width: 8),
                   Expanded(child: TextField(controller: tzCtrl, decoration: const InputDecoration(labelText: 'TZ', isDense: true), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true))),
                 ]),
@@ -2834,7 +2834,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 14),
           if (entries.isEmpty)
-            Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: 20), child: Text(AppLocale.l('noNotes')', style: TextStyle(color: kMuted))))
+            Center(child: Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Text(AppLocale.l('noNotes'), style: TextStyle(color: kMuted))))
           else
             ...entries.asMap().entries.map((en) {
               final i = en.key;
@@ -3186,7 +3186,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     icon: const Icon(Icons.print),
-                    label: Text('${AppLocale.l('pdfPrint')} — ${selectedTheme.nameKn}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                    label: Text('${AppLocale.l('pdfPrint')} — ${selectedTheme.nameKn}', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
                     onPressed: () async {
                       final dateStr = '${widget.dob.day.toString().padLeft(2,'0')}-${widget.dob.month.toString().padLeft(2,'0')}-${widget.dob.year}';
                       final timeStr = '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}';

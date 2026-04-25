@@ -30,14 +30,14 @@ class HomeScreen extends StatelessWidget {
       _Section(AppLocale.l('taranukoola'), 'Taranukoola', Icons.stars_rounded, kGreen, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const TaranukoolaScreen()));
       }),
-      _Section(AppLocale.l('matchMaking'), 'Match Making', Icons.favorite, const Color(0xFFE53E3E), () {
+      _Section(AppLocale.l('matchMaking'), 'Match Making', Icons.favorite, Color(0xFFE53E3E), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const MatchMakingScreen()));
       }),
-      _Section(AppLocale.l('planets'), 'Planets', Icons.blur_circular, const Color(0xFFc0392b), () {
+      _Section(AppLocale.l('planets'), 'Planets', Icons.blur_circular, Color(0xFFc0392b), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const PlanetsScreen()));
       }),
 
-      _Section(AppLocale.l('vedicClock'), 'Vedic Clock', Icons.watch_later_rounded, const Color(0xFF5B2C6F), () {
+      _Section(AppLocale.l('vedicClock'), 'Vedic Clock', Icons.watch_later_rounded, Color(0xFF5B2C6F), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const VedicClockScreen()));
       }),
       _Section(AppLocale.l('appointment'), 'Appointments', Icons.event_note, kTeal, () {
@@ -51,7 +51,7 @@ class HomeScreen extends StatelessWidget {
 
     // Tester-only sections (incomplete features)
     final testerSections = [
-      _Section(AppLocale.l('ashtamangala'), 'Ashtamangala', Icons.auto_fix_high, const Color(0xFFE67E22), () {
+      _Section(AppLocale.l('ashtamangala'), 'Ashtamangala', Icons.auto_fix_high, Color(0xFFE67E22), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const AshtamangalaScreen()));
       }),
     ];

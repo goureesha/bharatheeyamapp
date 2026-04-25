@@ -75,7 +75,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
               onPressed: () => _generateKundali(familyMode: true),
               backgroundColor: kTeal,
               icon: const Icon(Icons.auto_awesome, color: Colors.white),
-              label: Text('${AppLocale.l('create')} (${_selectedMembers.length})', style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
+              label: Text('${AppLocale.l('create')} (${_selectedMembers.length})', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
             )
           else if (!_familyMode && _members.isNotEmpty)
             const SizedBox.shrink(),

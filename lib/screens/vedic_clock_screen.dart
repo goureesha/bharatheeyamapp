@@ -317,9 +317,9 @@ class _GhatiClockPainter extends CustomPainter {
 
     // === LEGEND ===
     final legendY = cy + R * 0.42;
-    _txt(canvas, '● ' + AppLocale.l('ghati'), cx - R * 0.22, legendY, const Color(0xFFE53E3E), R * 0.038, true);
-    _txt(canvas, '● ' + AppLocale.l('vighati'), cx, legendY, const Color(0xFF2B6CB0), R * 0.038, true);
-    _txt(canvas, '● ' + AppLocale.l('anuVighati'), cx + R * 0.25, legendY, const Color(0xFF38A169), R * 0.038, true);
+    _txt(canvas, '● ' + AppLocale.l('ghati'), cx - R * 0.22, legendY, Color(0xFFE53E3E), R * 0.038, true);
+    _txt(canvas, '● ' + AppLocale.l('vighati'), cx, legendY, Color(0xFF2B6CB0), R * 0.038, true);
+    _txt(canvas, '● ' + AppLocale.l('anuVighati'), cx + R * 0.25, legendY, Color(0xFF38A169), R * 0.038, true);
   }
 
   void _drawHand(Canvas canvas, double cx, double cy, double angle, double length, double width, Color color, double tailLen) {

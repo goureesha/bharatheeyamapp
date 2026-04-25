@@ -1066,7 +1066,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, true),
-                            child: Text(AppLocale.l('restore'), style: TextStyle(color: const Color(0xFF4285F4), fontWeight: FontWeight.w700)),
+                            child: Text(AppLocale.l('restore'), style: TextStyle(color: Color(0xFF4285F4), fontWeight: FontWeight.w700)),
                           ),
                         ],
                       ),
