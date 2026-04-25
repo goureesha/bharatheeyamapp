@@ -1674,7 +1674,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _buildAroodhaTab() {
-    String _selAro = 'ಆರೂಢ';
+    String _selAro = AppLocale.l('aroodha');
     int _selRashiIdx = 0;
     return StatefulBuilder(builder: (ctx, setS) {
       final activeResult = _prastutaResult ?? widget.result;
@@ -1700,22 +1700,14 @@ class _DashboardScreenState extends State<DashboardScreen>
       String getRashiLord(String rashiNameKn) {
         int idx = knRashi.indexOf(rashiNameKn);
         if (idx < 0) return rashiNameKn;
-        final isHi = AppLocale.isHindi;
-        switch (idx) {
-          case 0: return isHi ? 'मं' : 'ಕು';
-          case 1: return isHi ? 'शु' : 'ಶು';
-          case 2: return isHi ? 'बु' : 'ಬು';
-          case 3: return isHi ? 'चं' : 'ಚ';
-          case 4: return isHi ? 'सू' : 'ರ';
-          case 5: return isHi ? 'बु' : 'ಬು';
-          case 6: return isHi ? 'शु' : 'ಶು';
-          case 7: return isHi ? 'मं' : 'ಕು';
-          case 8: return isHi ? 'गु' : 'ಗು';
-          case 9: return isHi ? 'श' : 'ಶ';
-          case 10: return isHi ? 'श' : 'ಶ';
-          case 11: return isHi ? 'गु' : 'ಗು';
-        }
-        return '';
+        final lordAbbr = const <String, List<String>>{
+          'kn': ['ಕು','ಶು','ಬು','ಚ','ರ','ಬು','ಶು','ಕು','ಗು','ಶ','ಶ','ಗು'],
+          'hi': ['मं','शु','बु','चं','सू','बु','शु','मं','गु','श','श','गु'],
+          'ta': ['செ','சு','பு','சந்','சூ','பு','சு','செ','கு','ச','ச','கு'],
+          'te': ['కు','శు','బు','చం','ర','బు','శు','కు','గు','శ','శ','గు'],
+          'ml': ['കു','ശു','ബു','ചം','ര','ബു','ശു','കു','ഗു','ശ','ശ','ഗു'],
+        };
+        return (lordAbbr[AppLocale.current] ?? lordAbbr['kn']!)[idx];
       }
 
       return SingleChildScrollView(
@@ -2432,22 +2424,14 @@ class _DashboardScreenState extends State<DashboardScreen>
       int idx = knRashi.indexOf(rashiNameKn);
       if (idx < 0) return rashiNameKn; 
       
-      final isHi = AppLocale.isHindi;
-      switch (idx) {
-        case 0: return isHi ? 'मं' : 'ಕು'; 
-        case 1: return isHi ? 'शु' : 'ಶು'; 
-        case 2: return isHi ? 'बु' : 'ಬು'; 
-        case 3: return isHi ? 'चं' : 'ಚ'; 
-        case 4: return isHi ? 'सू' : 'ರ'; 
-        case 5: return isHi ? 'बु' : 'ಬು'; 
-        case 6: return isHi ? 'शु' : 'ಶು'; 
-        case 7: return isHi ? 'मं' : 'ಕು'; 
-        case 8: return isHi ? 'गु' : 'ಗು'; 
-        case 9: return isHi ? 'श' : 'ಶ'; 
-        case 10: return isHi ? 'श' : 'ಶ'; 
-        case 11: return isHi ? 'गु' : 'ಗು'; 
-      }
-      return '';
+      final lordAbbr = const <String, List<String>>{
+        'kn': ['ಕು','ಶು','ಬು','ಚ','ರ','ಬು','ಶು','ಕು','ಗು','ಶ','ಶ','ಗು'],
+        'hi': ['मं','शु','बु','चं','सू','बु','शु','मं','गु','श','श','गु'],
+        'ta': ['செ','சு','பு','சந்','சூ','பு','சு','செ','கு','ச','ச','கு'],
+        'te': ['కు','శు','బు','చం','ర','బు','శు','కు','గు','శ','శ','గు'],
+        'ml': ['കു','ശു','ബു','ചം','ര','ബു','ശു','കു','ഗു','ശ','ശ','ഗു'],
+      };
+      return (lordAbbr[AppLocale.current] ?? lordAbbr['kn']!)[idx];
     }
 
     return SingleChildScrollView(
