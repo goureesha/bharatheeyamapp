@@ -141,6 +141,9 @@ class AppLocale {
       'taranukoola': 'ತಾರಾನುಕೂಲ', 'matchMaking': 'ಗುಣ ಮಿಲನ', 'notes': 'ಟಿಪ್ಪಣಿ',
       'ashtamangala': 'ಅಷ್ಟಮಂಗಲ',
       'sunrise': 'ಸೂರ್ಯೋದಯ', 'sunset': 'ಸೂರ್ಯಾಸ್ತ', 'searchPlace': 'ಊರು ಹುಡುಕಿ',
+      'shadbalNoData': 'ಷಡ್ಬಲ ಡೇಟಾ ಲಭ್ಯವಿಲ್ಲ', 'shadbala': 'ಷಡ್ಬಲ', 'shadbalDesc': 'ಗ್ರಹಗಳ ಆರು ಬಗೆಯ ಬಲಗಳನ್ನು ರೂಪಗಳಲ್ಲಿ (Rupas) ನೀಡಲಾಗಿದೆ. ಪ್ರತಿ ಗ್ರಹಕ್ಕೂ ನಿರ್ದಿಷ್ಟ ಕನಿಷ್ಠ ಬಲ (Shadbala Pinda) ಅಗತ್ಯ.', 'graha': 'ಗ್ರಹ', 'sthana': 'ಸ್ಥಾನ', 'dik': 'ದಿಕ್', 'kaala': 'ಕಾಲ', 'cheshta': 'ಚೇಷ್ಟಾ', 'naisargika': 'ನೈಸರ್ಗಿಕ', 'drik': 'ದೃಕ್', 'ottu': 'ಒಟ್ಟು', 'arhate': 'ಅರ್ಹತೆ', 'phalitamsha': 'ಫಲಿತಾಂಶ', 'balashali': 'ಬಲಶಾಲಿ', 'durbala': 'ದುರ್ಬಲ', 'sarvashtaka': 'ಸರ್ವಾಷ್ಟಕ', 'sarvashtakaVarga': 'ಸರ್ವಾಷ್ಟಕ ವರ್ಗ', 'binduVitarane': 'ಬಿಂದು ವಿತರಣೆ', 'grahaBinuSaramsha': 'ಗ್ರಹ ಬಿಂದು ಸಾರಾಂಶ', 'grahaSampurnaVivara': 'ಗ್ರಹದ ಸಂಪೂರ್ಣ ವಿವರ', 'mulaVivara': 'ಮೂಲ ವಿವರ', 'sphuta': 'ಸ್ಫುಟ', 'gati': 'ಗತಿ', 'asta': 'ಅಸ್ತ', 'houdu': 'ಹೌದು', 'illa': 'ಇಲ್ಲ', 'anvayisadu': 'ಅನ್ವಯಿಸದು', 'vargagalu': 'ವರ್ಗಗಳು', 'rashi': 'ರಾಶಿ', 'hora': 'ಹೋರಾ', 'drekkana': 'ದ್ರೇಕ್ಕಾಣ', 'navamsha': 'ನವಾಂಶ', 'dvadashamsha': 'ದ್ವಾದಶಾಂಶ', 'trimshamsha': 'ತ್ರಿಂಶಾಂಶ', 'upaVibhagagalu': 'ಉಪ-ವಿಭಾಗಗಳು', 'rashiDrekkana': 'ರಾಶಿ ದ್ರೇಕ್ಕಾಣ', 'navamshaDrekkana': 'ನವಾಂಶ ದ್ರೇಕ್ಕಾಣ', 'dvadashamshaDrekkana': 'ದ್ವಾದಶಾಂಶ ದ್ರೇಕ್ಕಾಣ', 'navaNavamsha': 'ನವ-ನವಾಂಶ', 'koota': 'ಕೂಟ', 'padeGuna': 'ಪಡೆದ
+ಗುಣ', 'garishThaGuna': 'ಗರಿಷ್ಠ
+ಗುಣ', 'varna': '೧. ವರ್ಣ', 'vashya': '೨. ವಶ್ಯ', 'tara': '೩. ತಾರಾ', 'yoni': '೪. ಯೋನಿ', 'grahaMaitri': '೫. ಗ್ರಹ ಮೈತ್ರಿ', 'gana': '೬. ಗಣ', 'bhakoot': '೭. ಭಕ್ಕೂಟ (ರಾಶಿ)', 'naadi': '೮. ನಾಡಿ', 'nakshatra': 'ನಕ್ಷತ್ರ', 'noTransits': 'ಯಾವುದೇ ಸಂಚಾರಗಳಿಲ್ಲ', 'noRetro': 'ಯಾವುದೇ ಗ್ರಹ ವಕ್ರಿಯಾಗಿಲ್ಲ', 'noCombust': 'ಯಾವುದೇ ಗ್ರಹ ಅಸ್ತವಾಗಿಲ್ಲ', 'start': 'ಪ್ರಾರಂಭ', 'end': 'ಅಂತ್ಯ',
       'noResults': 'ಯಾವುದೇ ಫಲಿತಾಂಶ ಕಂಡುಬಂದಿಲ್ಲ.', 'deleteConfirm': 'ಅಳಿಸಬೇಕೇ?',
       'deleteMsg': 'ಜಾತಕವನ್ನು ಅಳಿಸಬೇಕೇ?', 'noBtn': 'ಬೇಡ', 'errorLabel': 'ದೋಷ',
       'retryBtn': 'ಪುನಃಪ್ರಯತ್ನಿಸಿ', 'placeNotFound': 'ಸ್ಥಳ ಕಂಡುಬಂದಿಲ್ಲ.',
@@ -300,6 +303,9 @@ class AppLocale {
       'yes': 'हाँ', 'no': 'नहीं', 'chart': 'कुंडली', 'sphuta': 'स्फुट', 'bhava': 'भाव',
       'dasha': 'दशा', 'aroodha': 'आरूढ़', 'notes': 'टिप्पणी',
       'sunrise': 'सूर्योदय', 'sunset': 'सूर्यास्त', 'searchPlace': 'स्थान खोजें',
+      'shadbalNoData': 'षड्बल डेटा उपलब्ध नहीं', 'shadbala': 'षड्बल', 'shadbalDesc': 'ग्रहों की छह प्रकार की शक्तियों को रूपों (Rupas) में दिया गया है। प्रत्येक ग्रह के लिए न्यूनतम बल आवश्यक।', 'graha': 'ग्रह', 'sthana': 'स्थान', 'dik': 'दिक्', 'kaala': 'काल', 'cheshta': 'चेष्टा', 'naisargika': 'नैसर्गिक', 'drik': 'दृक्', 'ottu': 'कुल', 'arhate': 'योग्यता', 'phalitamsha': 'परिणाम', 'balashali': 'बलवान', 'durbala': 'दुर्बल', 'sarvashtaka': 'सर्वाष्टक', 'sarvashtakaVarga': 'सर्वाष्टक वर्ग', 'binduVitarane': 'बिंदु वितरण', 'grahaBinuSaramsha': 'ग्रह बिंदु सारांश', 'grahaSampurnaVivara': 'ग्रह का संपूर्ण विवरण', 'mulaVivara': 'मूल विवरण', 'sphuta': 'स्फुट', 'gati': 'गति', 'asta': 'अस्त', 'houdu': 'हाँ', 'illa': 'नहीं', 'anvayisadu': 'लागू नहीं', 'vargagalu': 'वर्ग', 'rashi': 'राशि', 'hora': 'होरा', 'drekkana': 'द्रेक्काण', 'navamsha': 'नवांश', 'dvadashamsha': 'द्वादशांश', 'trimshamsha': 'त्रिंशांश', 'upaVibhagagalu': 'उप-विभाग', 'rashiDrekkana': 'राशि द्रेक्काण', 'navamshaDrekkana': 'नवांश द्रेक्काण', 'dvadashamshaDrekkana': 'द्वादशांश द्रेक्काण', 'navaNavamsha': 'नव-नवांश', 'koota': 'कूट', 'padeGuna': 'प्राप्त
+गुण', 'garishThaGuna': 'अधिकतम
+गुण', 'varna': '१. वर्ण', 'vashya': '२. वश्य', 'tara': '३. तारा', 'yoni': '४. योनि', 'grahaMaitri': '५. ग्रह मैत्री', 'gana': '६. गण', 'bhakoot': '७. भकूट (राशि)', 'naadi': '८. नाडी', 'nakshatra': 'नक्षत्र', 'noTransits': 'कोई संचार नहीं', 'noRetro': 'कोई ग्रह वक्री नहीं', 'noCombust': 'कोई ग्रह अस्त नहीं', 'start': 'प्रारंभ', 'end': 'अंत',
       'noResults': 'कोई परिणाम नहीं', 'deleteConfirm': 'हटाना है?', 'noBtn': 'नहीं',
       'errorLabel': 'त्रुटि', 'retryBtn': 'पुनः प्रयास',
       'tithi': 'तिथि', 'vara': 'वार', 'nakshatra': 'नक्षत्र', 'yoga': 'योग', 'karana': 'करण',
@@ -451,6 +457,9 @@ class AppLocale {
       'yes': 'ஆம்', 'no': 'இல்லை', 'chart': 'ஜாதகம்', 'sphuta': 'ஸ்புடம்', 'bhava': 'பாவம்',
       'dasha': 'தசை', 'aroodha': 'ஆரூடம்', 'notes': 'குறிப்பு',
       'sunrise': 'சூரிய உதயம்', 'sunset': 'சூரிய அஸ்தமனம்', 'searchPlace': 'இடம் தேடு',
+      'shadbalNoData': 'ஷட்பல தரவு கிடைக்கவில்லை', 'shadbala': 'ஷட்பலம்', 'shadbalDesc': 'கிரகங்களின் ஆறு வகை பலங்கள் ரூபாக்களில் கொடுக்கப்பட்டுள்ளன.', 'graha': 'கிரகம்', 'sthana': 'ஸ்தானம்', 'dik': 'திக்', 'kaala': 'காலம்', 'cheshta': 'சேஷ்டா', 'naisargika': 'நைசர்கிக', 'drik': 'திருக்', 'ottu': 'மொத்தம்', 'arhate': 'தகுதி', 'phalitamsha': 'பலன்', 'balashali': 'பலமுள்ள', 'durbala': 'பலமற்ற', 'sarvashtaka': 'சர்வாஷ்டகம்', 'sarvashtakaVarga': 'சர்வாஷ்டக வர்கம்', 'binduVitarane': 'பிந்து விநியோகம்', 'grahaBinuSaramsha': 'கிரக பிந்து சுருக்கம்', 'grahaSampurnaVivara': 'கிரகத்தின் முழு விவரம்', 'mulaVivara': 'அடிப்படை விவரம்', 'sphuta': 'ஸ்புடம்', 'gati': 'கதி', 'asta': 'அஸ்தம்', 'houdu': 'ஆம்', 'illa': 'இல்லை', 'anvayisadu': 'பொருந்தாது', 'vargagalu': 'வர்கங்கள்', 'rashi': 'ராசி', 'hora': 'ஹோரா', 'drekkana': 'திரேக்காணம்', 'navamsha': 'நவாம்சம்', 'dvadashamsha': 'துவாதசாம்சம்', 'trimshamsha': 'திரிம்சாம்சம்', 'upaVibhagagalu': 'உப-பிரிவுகள்', 'rashiDrekkana': 'ராசி திரேக்காணம்', 'navamshaDrekkana': 'நவாம்ச திரேக்காணம்', 'dvadashamshaDrekkana': 'துவாதசாம்ச திரேக்காணம்', 'navaNavamsha': 'நவ-நவாம்சம்', 'koota': 'கூட்டம்', 'padeGuna': 'பெற்ற
+குணம்', 'garishThaGuna': 'அதிகபட்ச
+குணம்', 'varna': '1. வர்ணம்', 'vashya': '2. வச்யம்', 'tara': '3. தாரா', 'yoni': '4. யோனி', 'grahaMaitri': '5. கிரக மைத்ரி', 'gana': '6. கணம்', 'bhakoot': '7. பகூட் (ராசி)', 'naadi': '8. நாடி', 'nakshatra': 'நட்சத்திரம்', 'noTransits': 'எந்த சஞ்சாரமும் இல்லை', 'noRetro': 'எந்த கிரகமும் வக்ரம் இல்லை', 'noCombust': 'எந்த கிரகமும் அஸ்தமாகவில்லை', 'start': 'தொடக்கம்', 'end': 'முடிவு',
       'noResults': 'முடிவுகள் இல்லை', 'deleteConfirm': 'நீக்கவா?', 'noBtn': 'வேண்டாம்',
       'errorLabel': 'பிழை', 'retryBtn': 'மீண்டும் முயற்சி',
       'tithi': 'திதி', 'vara': 'வாரம்', 'nakshatra': 'நட்சத்திரம்', 'yoga': 'யோகம்', 'karana': 'கரணம்',
@@ -602,6 +611,9 @@ class AppLocale {
       'yes': 'అవును', 'no': 'కాదు', 'chart': 'కుండలి', 'sphuta': 'స్ఫుటం', 'bhava': 'భావం',
       'dasha': 'దశ', 'aroodha': 'ఆరూఢం', 'notes': 'గమనికలు',
       'sunrise': 'సూర్యోదయం', 'sunset': 'సూర్యాస్తమయం', 'searchPlace': 'ప్రదేశం వెతుకు',
+      'shadbalNoData': 'షడ్బల డేటా అందుబాటులో లేదు', 'shadbala': 'షడ్బలం', 'shadbalDesc': 'గ్రహాల ఆరు రకాల బలాలు రూపాలలో ఇవ్వబడ్డాయి.', 'graha': 'గ్రహం', 'sthana': 'స్థానం', 'dik': 'దిక్', 'kaala': 'కాలం', 'cheshta': 'చేష్ట', 'naisargika': 'నైసర్గిక', 'drik': 'దృక్', 'ottu': 'మొత్తం', 'arhate': 'అర్హత', 'phalitamsha': 'ఫలితం', 'balashali': 'బలవంతుడు', 'durbala': 'దుర్బలుడు', 'sarvashtaka': 'సర్వాష్టకం', 'sarvashtakaVarga': 'సర్వాష్టక వర్గం', 'binduVitarane': 'బిందు పంపిణీ', 'grahaBinuSaramsha': 'గ్రహ బిందు సారాంశం', 'grahaSampurnaVivara': 'గ్రహం పూర్తి వివరాలు', 'mulaVivara': 'మూల వివరాలు', 'sphuta': 'స్ఫుటం', 'gati': 'గతి', 'asta': 'అస్తం', 'houdu': 'అవును', 'illa': 'లేదు', 'anvayisadu': 'వర్తించదు', 'vargagalu': 'వర్గాలు', 'rashi': 'రాశి', 'hora': 'హోరా', 'drekkana': 'ద్రేక్కాణం', 'navamsha': 'నవాంశం', 'dvadashamsha': 'ద్వాదశాంశం', 'trimshamsha': 'త్రింశాంశం', 'upaVibhagagalu': 'ఉప-విభాగాలు', 'rashiDrekkana': 'రాశి ద్రేక్కాణం', 'navamshaDrekkana': 'నవాంశ ద్రేక్కాణం', 'dvadashamshaDrekkana': 'ద్వాదశాంశ ద్రేక్కాణం', 'navaNavamsha': 'నవ-నవాంశం', 'koota': 'కూటం', 'padeGuna': 'పొందిన
+గుణం', 'garishThaGuna': 'గరిష్ఠ
+గుణం', 'varna': '1. వర్ణం', 'vashya': '2. వశ్యం', 'tara': '3. తారా', 'yoni': '4. యోని', 'grahaMaitri': '5. గ్రహ మైత్రి', 'gana': '6. గణం', 'bhakoot': '7. భకూట్ (రాశి)', 'naadi': '8. నాడి', 'nakshatra': 'నక్షత్రం', 'noTransits': 'ఏ సంచారాలు లేవు', 'noRetro': 'ఏ గ్రహం వక్రి కాదు', 'noCombust': 'ఏ గ్రహం అస్తం కాదు', 'start': 'ప్రారంభం', 'end': 'అంతం',
       'noResults': 'ఫలితాలు లేవు', 'deleteConfirm': 'తొలగించాలా?', 'noBtn': 'వద్దు',
       'errorLabel': 'లోపం', 'retryBtn': 'మళ్ళీ ప్రయత్నించు',
       'tithi': 'తిథి', 'vara': 'వారం', 'nakshatra': 'నక్షత్రం', 'yoga': 'యోగం', 'karana': 'కరణం',
@@ -753,6 +765,9 @@ class AppLocale {
       'yes': 'അതെ', 'no': 'ഇല്ല', 'chart': 'ജാതകം', 'sphuta': 'സ്ഫുടം', 'bhava': 'ഭാവം',
       'dasha': 'ദശ', 'aroodha': 'ആരൂഢം', 'notes': 'കുറിപ്പുകൾ',
       'sunrise': 'സൂര്യോദയം', 'sunset': 'സൂര്യാസ്തമയം', 'searchPlace': 'സ്ഥലം തിരയുക',
+      'shadbalNoData': 'ഷഡ്ബല ഡാറ്റ ലഭ്യമല്ല', 'shadbala': 'ഷഡ്ബലം', 'shadbalDesc': 'ഗ്രഹങ്ങളുടെ ആറ് തരം ബലങ്ങൾ രൂപങ്ങളിൽ നൽകിയിരിക്കുന്നു.', 'graha': 'ഗ്രഹം', 'sthana': 'സ്ഥാനം', 'dik': 'ദിക്ക്', 'kaala': 'കാലം', 'cheshta': 'ചേഷ്ട', 'naisargika': 'നൈസർഗിക', 'drik': 'ദൃക്ക്', 'ottu': 'ആകെ', 'arhate': 'യോഗ്യത', 'phalitamsha': 'ഫലം', 'balashali': 'ബലവാൻ', 'durbala': 'ദുർബലൻ', 'sarvashtaka': 'സർവാഷ്ടകം', 'sarvashtakaVarga': 'സർവാഷ്ടക വർഗം', 'binduVitarane': 'ബിന്ദു വിതരണം', 'grahaBinuSaramsha': 'ഗ്രഹ ബിന്ദു സാരാംശം', 'grahaSampurnaVivara': 'ഗ്രഹത്തിന്റെ പൂർണ വിവരം', 'mulaVivara': 'അടിസ്ഥാന വിവരം', 'sphuta': 'സ്ഫുടം', 'gati': 'ഗതി', 'asta': 'അസ്തം', 'houdu': 'അതെ', 'illa': 'ഇല്ല', 'anvayisadu': 'ബാധകമല്ല', 'vargagalu': 'വർഗങ്ങൾ', 'rashi': 'രാശി', 'hora': 'ഹോര', 'drekkana': 'ദ്രേക്കാണം', 'navamsha': 'നവാംശം', 'dvadashamsha': 'ദ്വാദശാംശം', 'trimshamsha': 'ത്രിംശാംശം', 'upaVibhagagalu': 'ഉപ-വിഭാഗങ്ങൾ', 'rashiDrekkana': 'രാശി ദ്രേക്കാണം', 'navamshaDrekkana': 'നവാംശ ദ്രേക്കാണം', 'dvadashamshaDrekkana': 'ദ്വാദശാംശ ദ്രേക്കാണം', 'navaNavamsha': 'നവ-നവാംശം', 'koota': 'കൂടം', 'padeGuna': 'ലഭിച്ച
+ഗുണം', 'garishThaGuna': 'പരമാവധി
+ഗുണം', 'varna': '1. വർണം', 'vashya': '2. വശ്യം', 'tara': '3. താരാ', 'yoni': '4. യോനി', 'grahaMaitri': '5. ഗ്രഹ മൈത്രി', 'gana': '6. ഗണം', 'bhakoot': '7. ഭകൂട്ട് (രാശി)', 'naadi': '8. നാഡി', 'nakshatra': 'നക്ഷത്രം', 'noTransits': 'ഒരു സഞ്ചാരവും ഇല്ല', 'noRetro': 'ഒരു ഗ്രഹവും വക്രിയല്ല', 'noCombust': 'ഒരു ഗ്രഹവും അസ്തമായിട്ടില്ല', 'start': 'ആരംഭം', 'end': 'അവസാനം',
       'noResults': 'ഫലങ്ങൾ ഇല്ല', 'deleteConfirm': 'ഇല്ലാതാക്കണോ?', 'noBtn': 'വേണ്ട',
       'errorLabel': 'പിശക്', 'retryBtn': 'വീണ്ടും ശ്രമിക്കുക',
       'tithi': 'തിഥി', 'vara': 'വാരം', 'nakshatra': 'നക്ഷത്രം', 'yoga': 'യോഗം', 'karana': 'കരണം',
@@ -896,12 +911,23 @@ class AppLocale {
     },
   };
 
-  /// Pass-through -- no translation
-  static String tr(String text) => text;
+  /// Translate Kannada text → current language using reverse lookup
+  static String tr(String text) {
+    if (current == 'kn') return text;
+    // Reverse lookup: find the key whose 'kn' value == text
+    final knMap = _allStrings['kn'];
+    if (knMap == null) return text;
+    for (final entry in knMap.entries) {
+      if (entry.value == text) {
+        return l(entry.key);
+      }
+    }
+    return text; // no match — return original
+  }
 }
 
-/// Shorthand global function -- just returns text as-is
-String tr(String text) => text;
+/// Shorthand global function
+String tr(String text) => AppLocale.tr(text);
 
 
 Color kPurple1 = AppThemes.palettes[0]['purple1']!;

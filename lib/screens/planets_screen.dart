@@ -209,7 +209,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
     }
     if (transits.isEmpty) {
       return Center(child: Text(
-        _selectedPlanet != null ? '$_selectedPlanet' : (AppLocale.isHindi ? 'कोई संचार नहीं' : 'ಯಾವುದೇ ಸಂಚಾರಗಳಿಲ್ಲ'),
+        _selectedPlanet != null ? '$_selectedPlanet' : AppLocale.l('noTransits'),
         style: TextStyle(color: kMuted),
       ));
     }
@@ -250,7 +250,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
     }
     if (periods.isEmpty) {
       return Center(child: Text(
-        _selectedPlanet != null ? '$_selectedPlanet' : (AppLocale.isHindi ? 'कोई ग्रह वक्री नहीं' : 'ಯಾವುದೇ ಗ್ರಹ ವಕ್ರಿಯಾಗಿಲ್ಲ'),
+        _selectedPlanet != null ? '$_selectedPlanet' : AppLocale.l('noRetro'),
         style: TextStyle(color: kMuted),
       ));
     }
@@ -315,7 +315,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
     }
     if (periods.isEmpty) {
       return Center(child: Text(
-        _selectedPlanet != null ? '$_selectedPlanet' : (AppLocale.isHindi ? 'कोई ग्रह अस्त नहीं' : 'ಯಾವುದೇ ಗ್ರಹ ಅಸ್ತವಾಗಿಲ್ಲ'),
+        _selectedPlanet != null ? '$_selectedPlanet' : AppLocale.l('noCombust'),
         style: TextStyle(color: kMuted),
       ));
     }
@@ -360,8 +360,8 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text('ಪ್ರಾರಂಭ: $startStr', style: TextStyle(color: pColor.withValues(alpha: 0.8), fontSize: 13)),
-                      Text('ಅಂತ್ಯ: $endStr', style: TextStyle(color: pColor.withValues(alpha: 0.8), fontSize: 13)),
+                      Text('${AppLocale.l('start')}: $startStr', style: TextStyle(color: pColor.withValues(alpha: 0.8), fontSize: 13)),
+                      Text('${AppLocale.l('end')}: $endStr', style: TextStyle(color: pColor.withValues(alpha: 0.8), fontSize: 13)),
                     ],
                   ),
                 ),

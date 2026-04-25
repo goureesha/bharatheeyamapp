@@ -122,19 +122,19 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
               TableRow(
                 decoration: BoxDecoration(color: kPurple2.withOpacity(0.12), borderRadius: const BorderRadius.vertical(top: Radius.circular(8))),
                 children: const [
-                  Padding(padding: EdgeInsets.all(12), child: Text('ಕೂಟ', style: TextStyle(fontWeight: FontWeight.bold))),
-                  Padding(padding: EdgeInsets.all(12), child: Text('ಪಡೆದ\nಗುಣ', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
-                  Padding(padding: EdgeInsets.all(12), child: Text('ಗರಿಷ್ಠ\nಗುಣ', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                  Padding(padding: EdgeInsets.all(12), child: Text(AppLocale.l('koota'), style: TextStyle(fontWeight: FontWeight.bold))),
+                  Padding(padding: EdgeInsets.all(12), child: Text(AppLocale.l('padeGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                  Padding(padding: EdgeInsets.all(12), child: Text(AppLocale.l('garishThaGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
                 ],
               ),
-              row('೧. ವರ್ಣ', _result!['varna'], 1),
-              row('೨. ವಶ್ಯ', _result!['vashya'], 2),
-              row('೩. ತಾರಾ', _result!['tara'], 3),
-              row('೪. ಯೋನಿ', _result!['yoni'], 4),
-              row('೫. ಗ್ರಹ ಮೈತ್ರಿ', _result!['graha'], 5),
-              row('೬. ಗಣ', _result!['gana'], 6),
-              row('೭. ಭಕ್ಕೂಟ (ರಾಶಿ)', _result!['bhakoot'], 7),
-              row('೮. ನಾಡಿ', _result!['nadi'], 8),
+              row(AppLocale.l('varna'), _result!['varna'], 1),
+              row(AppLocale.l('vashya'), _result!['vashya'], 2),
+              row(AppLocale.l('tara'), _result!['tara'], 3),
+              row(AppLocale.l('yoni'), _result!['yoni'], 4),
+              row(AppLocale.l('grahaMaitri'), _result!['graha'], 5),
+              row(AppLocale.l('gana'), _result!['gana'], 6),
+              row(AppLocale.l('bhakoot'), _result!['bhakoot'], 7),
+              row(AppLocale.l('naadi'), _result!['nadi'], 8),
               TableRow(
                 decoration: BoxDecoration(color: kPurple1.withOpacity(0.05)),
                 children: [
@@ -188,7 +188,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
                        setState(() { _bRashi = v; if (v != null && !_rashiNakMap[v]!.contains(_bNak)) _bNak = null; });
                     })),
                     const SizedBox(width: 16),
-                    Expanded(child: _buildDropdown('ನಕ್ಷತ್ರ', _bNak, knNak, _bRashi != null ? _rashiNakMap[_bRashi]! : List.generate(27, (i) => i), (v) => setState(() => _bNak = v))),
+                    Expanded(child: _buildDropdown(AppLocale.l('nakshatra'), _bNak, knNak, _bRashi != null ? _rashiNakMap[_bRashi]! : List.generate(27, (i) => i), (v) => setState(() => _bNak = v))),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -202,7 +202,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
                        setState(() { _gRashi = v; if (v != null && !_rashiNakMap[v]!.contains(_gNak)) _gNak = null; });
                     })),
                     const SizedBox(width: 16),
-                    Expanded(child: _buildDropdown('ನಕ್ಷತ್ರ', _gNak, knNak, _gRashi != null ? _rashiNakMap[_gRashi]! : List.generate(27, (i) => i), (v) => setState(() => _gNak = v))),
+                    Expanded(child: _buildDropdown(AppLocale.l('nakshatra'), _gNak, knNak, _gRashi != null ? _rashiNakMap[_gRashi]! : List.generate(27, (i) => i), (v) => setState(() => _gNak = v))),
                   ],
                 ),
                 const SizedBox(height: 32),
