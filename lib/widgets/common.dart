@@ -297,6 +297,22 @@ class AppLocale {
       'noOtherProfiles': 'ಬೇರೆ ಪ್ರೊಫೈಲ್‌ಗಳಿಲ್ಲ', 'placeNotFoundDash': 'ಸ್ಥಳ ಕಂಡುಬಂದಿಲ್ಲ.',
       'placeError': 'ಸ್ಥಳ ಸಂಪರ್ಕ ದೋಷ.', 'dateLabel': 'ದಿನಾಂಕ', 'timeLabel': 'ಸಮಯ',
       'searchPlace': 'ಊರು ಹುಡುಕಿ',
+      // Rashi
+      'rashi0': 'ಮೇಷ', 'rashi1': 'ವೃಷಭ', 'rashi2': 'ಮಿಥುನ', 'rashi3': 'ಕರ್ಕ', 'rashi4': 'ಸಿಂಹ', 'rashi5': 'ಕನ್ಯಾ', 'rashi6': 'ತುಲಾ', 'rashi7': 'ವೃಶ್ಚಿಕ', 'rashi8': 'ಧನು', 'rashi9': 'ಮಕರ', 'rashi10': 'ಕುಂಭ', 'rashi11': 'ಮೀನ',
+      // Nakshatra
+      'nak0': 'ಅಶ್ವಿನಿ', 'nak1': 'ಭರಣಿ', 'nak2': 'ಕೃತ್ತಿಕಾ', 'nak3': 'ರೋಹಿಣಿ', 'nak4': 'ಮೃಗಶಿರಾ', 'nak5': 'ಆರ್ದ್ರಾ', 'nak6': 'ಪುನರ್ವಸು', 'nak7': 'ಪುಷ್ಯ', 'nak8': 'ಆಶ್ಲೇಷಾ', 'nak9': 'ಮಘಾ', 'nak10': 'ಪೂರ್ವ ಫಲ್ಗುಣಿ', 'nak11': 'ಉತ್ತರ ಫಲ್ಗುಣಿ', 'nak12': 'ಹಸ್ತ', 'nak13': 'ಚಿತ್ರಾ', 'nak14': 'ಸ್ವಾತಿ', 'nak15': 'ವಿಶಾಖ', 'nak16': 'ಅನುರಾಧಾ', 'nak17': 'ಜ್ಯೇಷ್ಠಾ', 'nak18': 'ಮೂಲಾ', 'nak19': 'ಪೂರ್ವಾಷಾಢ', 'nak20': 'ಉತ್ತರಾಷಾಢ', 'nak21': 'ಶ್ರವಣ', 'nak22': 'ಧನಿಷ್ಠಾ', 'nak23': 'ಶತಭಿಷಾ', 'nak24': 'ಪೂರ್ವಾಭಾದ್ರ', 'nak25': 'ಉತ್ತರಾಭಾದ್ರ', 'nak26': 'ರೇವತಿ',
+      // Upagraha
+      'upa0': 'ಧೂಮ', 'upa1': 'ವ್ಯತೀಪಾತ', 'upa2': 'ಪರಿವೇಷ', 'upa3': 'ಇಂದ್ರಚಾಪ', 'upa4': 'ಉಪಕೇತು', 'upa5': 'ಭೃಗು ಬಿ.', 'upa6': 'ಬೀಜ', 'upa7': 'ಕ್ಷೇತ್ರ', 'upa8': 'ಯೋಗಿ', 'upa9': 'ತ್ರಿಸ್ಫುಟ', 'upa10': 'ಚತುಃಸ್ಫುಟ', 'upa11': 'ಪಂಚಸ್ಫುಟ', 'upa12': 'ಪ್ರಾಣ', 'upa13': 'ದೇಹ', 'upa14': 'ಮೃತ್ಯು', 'upa15': 'ಸೂಕ್ಷ್ಮ ತ್ರಿ.',
+      // Planet names
+      'planetRavi': 'ರವಿ', 'planetChandra': 'ಚಂದ್ರ', 'planetKuja': 'ಕುಜ', 'planetBudha': 'ಬುಧ', 'planetGuru': 'ಗುರು', 'planetShukra': 'ಶುಕ್ರ', 'planetShani': 'ಶನಿ', 'planetRahu': 'ರಾಹು', 'planetKetu': 'ಕೇತು', 'planetLagna': 'ಲಗ್ನ', 'planetMandi': 'ಮಾಂದಿ', 'planetSurya': 'ಸೂರ್ಯ', 'planetMangala': 'ಮಂಗಳ',
+      // Gati
+      'gatiNera': 'ನೇರ', 'gatiVakri': 'ವಕ್ರಿ', 'gatiNA': 'ಅನ್ವಯಿಸುವುದಿಲ್ಲ',
+      // Karana
+      'kar0': 'ಬವ', 'kar1': 'ಬಾಲವ', 'kar2': 'ಕೌಲವ', 'kar3': 'ತೈತಿಲ', 'kar4': 'ಗರ', 'kar5': 'ವಣಿಜ', 'kar6': 'ಭದ್ರಾ (ವಿಷ್ಟಿ)', 'kar7': 'ಕಿಂಸ್ತುಘ್ನ', 'kar8': 'ಶಕುನಿ', 'kar9': 'ಚತುಷ್ಪಾದ', 'kar10': 'ನಾಗ',
+      // Chandra Masa
+      'nija': 'ನಿಜ', 'adhika': 'ಅಧಿಕ', 'cm0': 'ವೈಶಾಖ', 'cm1': 'ಜ್ಯೇಷ್ಠ', 'cm2': 'ಆಷಾಢ', 'cm3': 'ಶ್ರಾವಣ', 'cm4': 'ಭಾದ್ರಪದ', 'cm5': 'ಆಶ್ವಿನ', 'cm6': 'ಕಾರ್ತೀಕ', 'cm7': 'ಮಾರ್ಗಶಿರ', 'cm8': 'ಪುಷ್ಯ', 'cm9': 'ಮಾಘ', 'cm10': 'ಫಾಲ್ಗುಣ', 'cm11': 'ಚೈತ್ರ',
+      // Ayana/Shaka
+      'uttarayana': 'ಉತ್ತರಾಯಣ', 'dakshinayana': 'ದಕ್ಷಿಣಾಯನ', 'shakaLabel': 'ಶಕ',
     },
     'hi': {
 
@@ -954,28 +970,19 @@ class AppLocale {
 /// Shorthand global function
 String tr(String text) => AppLocale.tr(text);
 
-/// Comprehensive translator: checks arrays (rashi/nak/vara/tithi/yoga) + tr() + word-by-word
+/// Comprehensive translator: checks tr() + word-by-word fallback for compound strings
 String trAll(String knText) {
   if (AppLocale.current == 'kn') return knText;
-  int idx;
-  idx = knRashi.indexOf(knText); if (idx >= 0) return appRashi[idx];
-  idx = knNak.indexOf(knText);   if (idx >= 0) return appNak[idx];
-  idx = knVara.indexOf(knText);  if (idx >= 0) return appVara[idx];
-  idx = knTithi.indexOf(knText); if (idx >= 0) return appTithi[idx];
-  idx = knYoga.indexOf(knText);  if (idx >= 0) return appYoga[idx];
+  // Direct tr() lookup first
   final exact = tr(knText);
   if (exact != knText) return exact;
-  // Word-by-word for compound strings
+  // Word-by-word for compound strings (e.g. "ನಿಜ ವೈಶಾಖ", "ವರಾಭವ (ಶಕ 1948)")
   final words = knText.split(' ');
   if (words.length > 1) {
     return words.map((w) {
       if (RegExp(r'^[\d()°\x27".\-:]+$').hasMatch(w)) return w;
       final t = tr(w);
-      if (t != w) return t;
-      int i;
-      i = knRashi.indexOf(w); if (i >= 0) return appRashi[i];
-      i = knNak.indexOf(w);   if (i >= 0) return appNak[i];
-      return w;
+      return t;
     }).join(' ');
   }
   return knText;
