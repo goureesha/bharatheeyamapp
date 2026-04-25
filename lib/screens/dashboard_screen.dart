@@ -1422,22 +1422,14 @@ class _DashboardScreenState extends State<DashboardScreen>
   // TAB 1: KUNDALI (All vargas stacked vertically)
   // ─────────────────────────────────────────────
   Widget _buildKundaliTab() {
-    final charts = AppLocale.isHindi ? [
-      {'label': 'राशि कुण्डली', 'varga': 1, 'isBhava': false},
-      {'label': 'नवांश कुण्डली', 'varga': 9, 'isBhava': false},
-      {'label': 'भाव कुण्डली', 'varga': 1, 'isBhava': true},
-      {'label': 'होरा कुण्डली', 'varga': 2, 'isBhava': false},
-      {'label': 'द्रेष्काण कुण्डली', 'varga': 3, 'isBhava': false},
-      {'label': 'द्वादशांश कुण्डली', 'varga': 12, 'isBhava': false},
-      {'label': 'त्रिंशांश कुण्डली', 'varga': 30, 'isBhava': false},
-    ] : [
-      {'label': 'ರಾಶಿ ಕುಂಡಲಿ', 'varga': 1, 'isBhava': false},
-      {'label': 'ನವಾಂಶ ಕುಂಡಲಿ', 'varga': 9, 'isBhava': false},
-      {'label': 'ಭಾವ ಕುಂಡಲಿ', 'varga': 1, 'isBhava': true},
-      {'label': 'ಹೋರಾ ಕುಂಡಲಿ', 'varga': 2, 'isBhava': false},
-      {'label': 'ದ್ರೇಕ್ಕಾಣ ಕುಂಡಲಿ', 'varga': 3, 'isBhava': false},
-      {'label': 'ದ್ವಾದಶಾಂಶ ಕುಂಡಲಿ', 'varga': 12, 'isBhava': false},
-      {'label': 'ತ್ರಿಂಶಾಂಶ ಕುಂಡಲಿ', 'varga': 30, 'isBhava': false},
+    final charts = [
+      {'label': AppLocale.l('rashiKundali'), 'varga': 1, 'isBhava': false},
+      {'label': AppLocale.l('navamshaKundali'), 'varga': 9, 'isBhava': false},
+      {'label': AppLocale.l('bhavaKundali'), 'varga': 1, 'isBhava': true},
+      {'label': AppLocale.l('horaKundali'), 'varga': 2, 'isBhava': false},
+      {'label': AppLocale.l('drekkanaKundali'), 'varga': 3, 'isBhava': false},
+      {'label': AppLocale.l('dvadashamsha'), 'varga': 12, 'isBhava': false},
+      {'label': AppLocale.l('trimshamsha'), 'varga': 30, 'isBhava': false},
     ];
 
     // All persons: primary + extras
@@ -1602,13 +1594,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                   child: Text(personName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kTeal)),
                 ),
               // Graha Sphuta added back per user request
-              Text(AppLocale.isHindi ? 'ग्रह स्फुट' : 'ಗ್ರಹ ಸ್ಫುಟ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: kPurple2)),
+              Text(AppLocale.l('grahaSphuta'), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: kPurple2)),
               const SizedBox(height: 8),
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
-                    _tableHeader(AppLocale.isHindi ? ['ग्रह', 'राशि', 'स्फुट', 'नक्षत्र - पाद'] : ['ಗ್ರಹ', 'ರಾಶಿ', 'ಸ್ಫುಟ', 'ನಕ್ಷತ್ರ - ಪಾದ']),
+                    _tableHeader([AppLocale.l('hGraha'), AppLocale.l('hRashi'), AppLocale.l('hSphuta'), AppLocale.l('hNakPada')]),
                     ...planetOrder.map((p) {
                       final info = personResult.planets[p];
                       if (info == null) return const SizedBox.shrink();
@@ -1625,13 +1617,13 @@ class _DashboardScreenState extends State<DashboardScreen>
               ),
               const SizedBox(height: 24),
 
-              Text(AppLocale.isHindi ? 'उपग्रह स्फुट' : 'ಉಪಗ್ರಹ ಸ್ಫುಟ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: kPurple2)),
+              Text(AppLocale.l('upagrahaTitle'), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: kPurple2)),
               const SizedBox(height: 8),
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
-                    _tableHeader(AppLocale.isHindi ? ['उपग्रह', 'राशि', 'अंश', 'नक्षत्र'] : ['ಉಪಗ್ರಹ', 'ರಾಶಿ', 'ಅಂಶ', 'ನಕ್ಷತ್ರ']),
+                    _tableHeader([AppLocale.l('hUpagraha'), AppLocale.l('hRashi'), AppLocale.l('hDegree'), AppLocale.l('hNakshatraCol')]),
                     ...sphutas16Order.map((sp) {
                       final deg = personResult.advSphutas[sp];
                       if (deg == null) return const SizedBox.shrink();
@@ -1688,22 +1680,14 @@ class _DashboardScreenState extends State<DashboardScreen>
       final activeResult = _prastutaResult ?? widget.result;
 
       // Varga charts for horizontal scrolling
-      final charts = AppLocale.isHindi ? [
-        {'label': 'राशि कुण्डली', 'varga': 1, 'isBhava': false},
-        {'label': 'नवांश कुण्डली', 'varga': 9, 'isBhava': false},
-        {'label': 'भाव कुण्डली', 'varga': 1, 'isBhava': true},
-        {'label': 'होरा कुण्डली', 'varga': 2, 'isBhava': false},
-        {'label': 'द्रेष्काण कुण्डली', 'varga': 3, 'isBhava': false},
-        {'label': 'द्वादशांश कुण्डली', 'varga': 12, 'isBhava': false},
-        {'label': 'त्रिंशांश कुण्डली', 'varga': 30, 'isBhava': false},
-      ] : [
-        {'label': 'ರಾಶಿ ಕುಂಡಲಿ', 'varga': 1, 'isBhava': false},
-        {'label': 'ನವಾಂಶ ಕುಂಡಲಿ', 'varga': 9, 'isBhava': false},
-        {'label': 'ಭಾವ ಕುಂಡಲಿ', 'varga': 1, 'isBhava': true},
-        {'label': 'ಹೋರಾ ಕುಂಡಲಿ', 'varga': 2, 'isBhava': false},
-        {'label': 'ದ್ರೇಕ್ಕಾಣ ಕುಂಡಲಿ', 'varga': 3, 'isBhava': false},
-        {'label': 'ದ್ವಾದಶಾಂಶ ಕುಂಡಲಿ', 'varga': 12, 'isBhava': false},
-        {'label': 'ತ್ರಿಂಶಾಂಶ ಕುಂಡಲಿ', 'varga': 30, 'isBhava': false},
+      final charts = [
+        {'label': AppLocale.l('rashiKundali'), 'varga': 1, 'isBhava': false},
+        {'label': AppLocale.l('navamshaKundali'), 'varga': 9, 'isBhava': false},
+        {'label': AppLocale.l('bhavaKundali'), 'varga': 1, 'isBhava': true},
+        {'label': AppLocale.l('horaKundali'), 'varga': 2, 'isBhava': false},
+        {'label': AppLocale.l('drekkanaKundali'), 'varga': 3, 'isBhava': false},
+        {'label': AppLocale.l('dvadashamsha'), 'varga': 12, 'isBhava': false},
+        {'label': AppLocale.l('trimshamsha'), 'varga': 30, 'isBhava': false},
       ];
 
       final screenWidth = MediaQuery.of(context).size.width;
@@ -1763,7 +1747,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         value: _selAro,
-                        items: (AppLocale.isHindi ? ['आरूढ़','उदय','लग्नांश','छत्र','स्पृष्टांग','चन्द्र','ताम्बूल'] : ['ಆರೂಢ','ಉದಯ','ಲಗ್ನಾಂಶ','ಛತ್ರ','ಸ್ಪೃಷ್ಟಾಂಗ','ಚಂದ್ರ','ತಾಂಬೂಲ'])
+                        items: List.generate(7, (i) => AppLocale.l('aroType$i'))
                           .map((a) => DropdownMenuItem(value: a, child: Text(a, style: TextStyle()))).toList(),
                         onChanged: (v) => setS(() => _selAro = v!),
                         decoration: InputDecoration(labelText: AppLocale.l('aroodhaLabel')),
@@ -1874,13 +1858,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                   const SizedBox(height: 16),
 
                   // Upagraha Sputa
-                  Text(AppLocale.isHindi ? 'उपग्रह स्फुट' : 'ಉಪಗ್ರಹ ಸ್ಫುಟ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: kPurple2)),
+                  Text(AppLocale.l('upagrahaTitle'), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: kPurple2)),
                   const SizedBox(height: 8),
                   AppCard(
                     padding: EdgeInsets.zero,
                     child: Column(
                       children: [
-                        _tableHeader(AppLocale.isHindi ? ['उपग्रह', 'राशि', 'अंश', 'नक्षत्र'] : ['ಉಪಗ್ರಹ', 'ರಾಶಿ', 'ಅಂಶ', 'ನಕ್ಷತ್ರ']),
+                        _tableHeader([AppLocale.l('hUpagraha'), AppLocale.l('hRashi'), AppLocale.l('hDegree'), AppLocale.l('hNakshatraCol')]),
                         ...sphutas16Order.map((sp) {
                           final deg = activeResult.advSphutas[sp];
                           if (deg == null) return const SizedBox.shrink();
@@ -2204,7 +2188,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
               ),
               const SizedBox(height: 16),
-              Text(AppLocale.isHindi ? 'षड्वर्ग' : 'ಷಡ್ವರ್ಗ (Shadvarga)', style: TextStyle(
+              Text(AppLocale.l('shadvargaTitle'), style: TextStyle(
                 fontWeight: FontWeight.w800, fontSize: 15,
                 color: kPurple2)),
               const SizedBox(height: 12),
@@ -2436,13 +2420,13 @@ class _DashboardScreenState extends State<DashboardScreen>
       ..._extraPersons.map((p) => {'name': p.name, 'result': p.result}),
     ];
 
-    final hGraha = AppLocale.isHindi ? 'ग्रह' : 'ಗ್ರಹ';
-    final hD3 = AppLocale.isHindi ? 'द्रे' : 'ದ್ರೇ';
-    final hD2 = AppLocale.isHindi ? 'हो' : 'ಹೋ';
-    final hD9 = AppLocale.isHindi ? 'न' : 'ನ';
-    final hD30 = AppLocale.isHindi ? 'त्रिं' : 'ತ್ರಿಂ';
-    final hD12 = AppLocale.isHindi ? 'द्वा' : 'ದ್ವಾ';
-    final hKshetra = AppLocale.isHindi ? 'क्षे' : 'ಕ್ಷೇ';
+    final hGraha = AppLocale.l('hGraha');
+    final hD3 = AppLocale.l('hD3');
+    final hD2 = AppLocale.l('hD2');
+    final hD9 = AppLocale.l('hD9');
+    final hD30 = AppLocale.l('hD30');
+    final hD12 = AppLocale.l('hD12');
+    final hKshetra = AppLocale.l('hKshetra');
 
     String getRashiLord(String rashiNameKn) {
       int idx = knRashi.indexOf(rashiNameKn);
@@ -2496,7 +2480,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   children: [
                     Icon(Icons.grid_view_rounded, size: 18, color: kPurple2),
                     const SizedBox(width: 8),
-                    Text(AppLocale.isHindi ? 'षड्वर्ग' : 'ಷಡ್ವರ್ಗ', style: TextStyle(
+                    Text(AppLocale.l('shadvarga'), style: TextStyle(
                       fontWeight: FontWeight.w900, fontSize: 16, color: kPurple2,
                     )),
                   ],
