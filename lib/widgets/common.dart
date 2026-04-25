@@ -127,7 +127,7 @@ class AppLocale {
     return key;
   }
 
-  static const Map<String, Map<String, String>> _allStrings = {
+  static final Map<String, Map<String, String>> _allStrings = {
     'kn': {
       'appName': 'ಭಾರತೀಯಮ್', 'home': 'ಮನೆ', 'kundali': 'ಕುಂಡಲಿ', 'panchanga': 'ಪಂಚಾಂಗ',
       'planets': 'ಗ್ರಹಗಳು', 'appointment': 'ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್', 'vedicClock': 'ವೈದಿಕ ಗಡಿಯಾರ',
