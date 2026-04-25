@@ -345,7 +345,7 @@ class KundaliChart extends StatelessWidget {
 
   Widget _centerBox() {
     String label = centerLabel ?? AppLocale.l('appName');
-    if (AppLocale.isHindi && centerLabel != null) {
+    if (AppLocale.current != 'kn' && centerLabel != null) {
       // Auto-translate each line of the center label
       label = label.split('\n').map((line) => tr(line)).join('\n');
     }
@@ -422,6 +422,58 @@ class KundaliChart extends StatelessWidget {
     'ಮಾಂದಿ': 'मां',
   };
 
+  static const _shortNamesTa = <String, String>{
+    'ರವಿ': 'சூ', 'ಸೂರ್ಯ': 'சூ',
+    'ಚಂದ್ರ': 'சந்',
+    'ಕುಜ': 'செ', 'ಮಂಗಳ': 'செ',
+    'ಬುಧ': 'பு',
+    'ಗುರು': 'கு',
+    'ಶುಕ್ರ': 'சு',
+    'ಶನಿ': 'ச',
+    'ರಾಹು': 'ரா',
+    'ಕೇತು': 'கே',
+    'ಲಗ್ನ': 'ல',
+    'ಮಾಂದಿ': 'மா',
+  };
+
+  static const _shortNamesTe = <String, String>{
+    'ರವಿ': 'ర', 'ಸೂರ್ಯ': 'సూ',
+    'ಚಂದ್ರ': 'చం',
+    'ಕುಜ': 'కు', 'ಮಂಗಳ': 'మం',
+    'ಬುಧ': 'బు',
+    'ಗುರು': 'గు',
+    'ಶುಕ್ರ': 'శు',
+    'ಶನಿ': 'శ',
+    'ರಾಹು': 'రా',
+    'ಕೇತು': 'కే',
+    'ಲಗ್ನ': 'ల',
+    'ಮಾಂದಿ': 'మా',
+  };
+
+  static const _shortNamesMl = <String, String>{
+    'ರವಿ': 'ര', 'ಸೂರ್ಯ': 'സൂ',
+    'ಚಂದ್ರ': 'ചം',
+    'ಕುಜ': 'കു', 'ಮಂಗಳ': 'മം',
+    'ಬುಧ': 'ബു',
+    'ಗುರು': 'ഗു',
+    'ಶುಕ್ರ': 'ശു',
+    'ಶನಿ': 'ശ',
+    'ರಾಹು': 'രാ',
+    'ಕೇತು': 'കേ',
+    'ಲಗ್ನ': 'ല',
+    'ಮಾಂದಿ': 'മാ',
+  };
+
+  static Map<String, String> get _shortNames {
+    switch (AppLocale.current) {
+      case 'hi': return _shortNamesHi;
+      case 'ta': return _shortNamesTa;
+      case 'te': return _shortNamesTe;
+      case 'ml': return _shortNamesMl;
+      default: return _shortNamesKn;
+    }
+  }
+
   Widget _planetChip(String name, {PlanetInfo? info, required ChipType type, double? displayDeg}) {
     Color color;
     switch (type) {
@@ -433,7 +485,7 @@ class KundaliChart extends StatelessWidget {
     }
 
     // Build display text
-    final map = AppLocale.isHindi ? _shortNamesHi : _shortNamesKn;
+    final map = _shortNames;
     final shortName = map[name] ?? name;
     String displayText = shortName;
     bool isCombust = false;
