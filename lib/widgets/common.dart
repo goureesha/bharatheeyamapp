@@ -954,6 +954,33 @@ class AppLocale {
 /// Shorthand global function
 String tr(String text) => AppLocale.tr(text);
 
+/// Comprehensive translator: checks arrays (rashi/nak/vara/tithi/yoga) + tr() + word-by-word
+String trAll(String knText) {
+  if (AppLocale.current == 'kn') return knText;
+  int idx;
+  idx = knRashi.indexOf(knText); if (idx >= 0) return appRashi[idx];
+  idx = knNak.indexOf(knText);   if (idx >= 0) return appNak[idx];
+  idx = knVara.indexOf(knText);  if (idx >= 0) return appVara[idx];
+  idx = knTithi.indexOf(knText); if (idx >= 0) return appTithi[idx];
+  idx = knYoga.indexOf(knText);  if (idx >= 0) return appYoga[idx];
+  final exact = tr(knText);
+  if (exact != knText) return exact;
+  // Word-by-word for compound strings
+  final words = knText.split(' ');
+  if (words.length > 1) {
+    return words.map((w) {
+      if (RegExp(r'^[\d()°\x27".\-:]+$').hasMatch(w)) return w;
+      final t = tr(w);
+      if (t != w) return t;
+      int i;
+      i = knRashi.indexOf(w); if (i >= 0) return appRashi[i];
+      i = knNak.indexOf(w);   if (i >= 0) return appNak[i];
+      return w;
+    }).join(' ');
+  }
+  return knText;
+}
+
 
 Color kPurple1 = AppThemes.palettes[0]['purple1']!;
 Color kPurple2 = AppThemes.palettes[0]['purple2']!;

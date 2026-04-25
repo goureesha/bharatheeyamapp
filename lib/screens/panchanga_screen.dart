@@ -390,11 +390,11 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
                       padding: EdgeInsets.zero,
                       child: Column(children: [
                         _sectionHeader(Icons.auto_awesome, AppLocale.l('panchanga') + ' / Five Limbs', kPurple2),
-                        _tableRow([AppLocale.l('tithi'), _formatEnd(tr(_panchang!.tithi), _panchang!.tithiEndTime, _panchang!.tithiEndsNextDay)]),
-                        _tableRow([AppLocale.l('vara'), tr(_panchang!.vara)]),
-                        _tableRow([AppLocale.l('chandraNak'), _formatEnd('${tr(_panchang!.nakshatra)} - ${AppLocale.l('pada')} ${_chandraPada()}', _panchang!.nakEndTime, _panchang!.nakEndsNextDay)]),
-                        _tableRow([AppLocale.l('yoga'), _formatEnd(tr(_panchang!.yoga), _panchang!.yogaEndTime, _panchang!.yogaEndsNextDay)]),
-                        _tableRow([AppLocale.l('karana'), _formatEnd(tr(_panchang!.karana), _panchang!.karanaEndTime, _panchang!.karanaEndsNextDay)]),
+                        _tableRow([AppLocale.l('tithi'), _formatEnd(trAll(_panchang!.tithi), _panchang!.tithiEndTime, _panchang!.tithiEndsNextDay)]),
+                        _tableRow([AppLocale.l('vara'), trAll(_panchang!.vara)]),
+                        _tableRow([AppLocale.l('chandraNak'), _formatEnd('${trAll(_panchang!.nakshatra)} - ${AppLocale.l('pada')} ${_chandraPada()}', _panchang!.nakEndTime, _panchang!.nakEndsNextDay)]),
+                        _tableRow([AppLocale.l('yoga'), _formatEnd(trAll(_panchang!.yoga), _panchang!.yogaEndTime, _panchang!.yogaEndsNextDay)]),
+                        _tableRow([AppLocale.l('karana'), _formatEnd(trAll(_panchang!.karana), _panchang!.karanaEndTime, _panchang!.karanaEndsNextDay)]),
                       ]),
                     ),
 
@@ -405,8 +405,8 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
                         _sectionHeader(Icons.wb_sunny, AppLocale.l('surya') + ' / Sun', kOrange),
                         _tableRow([AppLocale.l('sunrise'), _panchang!.sunrise]),
                         _tableRow([AppLocale.l('sunset'), _panchang!.sunset]),
-                        _tableRow([AppLocale.l('suryaNak'), '${tr(_panchang!.suryaNakshatra)} - ${AppLocale.l('pada')} ${_panchang!.suryaPada}']),
-                        _tableRow([AppLocale.l('souraMasa'), tr(_panchang!.souraMasa)]),
+                        _tableRow([AppLocale.l('suryaNak'), '${trAll(_panchang!.suryaNakshatra)} - ${AppLocale.l('pada')} ${_panchang!.suryaPada}']),
+                        _tableRow([AppLocale.l('souraMasa'), trAll(_panchang!.souraMasa)]),
                         _tableRow([AppLocale.l('souraMasaGataDina'), _panchang!.souraMasaGataDina]),
                       ]),
                     ),
@@ -416,8 +416,8 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
                       padding: EdgeInsets.zero,
                       child: Column(children: [
                         _sectionHeader(Icons.nightlight_round, AppLocale.l('chandra') + ' / Moon', kTeal),
-                        _tableRow([AppLocale.l('chandraRashi'), tr(_panchang!.chandraRashi)]),
-                        _tableRow([AppLocale.l('chandraMasa'), tr(_panchang!.chandraMasa)]),
+                        _tableRow([AppLocale.l('chandraRashi'), trAll(_panchang!.chandraRashi)]),
+                        _tableRow([AppLocale.l('chandraMasa'), trAll(_panchang!.chandraMasa)]),
 
                         _tableRow([AppLocale.l('paramaGhati'), _panchang!.paramaGhati]),
                       ]),
@@ -428,9 +428,9 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
                       padding: EdgeInsets.zero,
                       child: Column(children: [
                         _sectionHeader(Icons.access_time, AppLocale.l('kala') + ' / Time', kPurple1),
-                        _tableRow([AppLocale.l('samvatsara'), tr(_panchang!.samvatsara)]),
-                        _tableRow([AppLocale.l('ayana'), tr(_panchang!.ayana)]),
-                        _tableRow([AppLocale.l('rutu'), tr(_panchang!.rutu)]),
+                        _tableRow([AppLocale.l('samvatsara'), trAll(_panchang!.samvatsara)]),
+                        _tableRow([AppLocale.l('ayana'), trAll(_panchang!.ayana)]),
+                        _tableRow([AppLocale.l('rutu'), trAll(_panchang!.rutu)]),
                         _tableRow([AppLocale.l('divamana'), _panchang!.divamana]),
                         _tableRow([AppLocale.l('ratrimana'), _panchang!.ratrimana]),
 
@@ -640,7 +640,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
     if (hasAmritaSiddhi) {
       final varas = [tr('ಭಾನುವಾರ'), tr('ಸೋಮವಾರ'), tr('ಮಂಗಳವಾರ'), tr('ಬುಧವಾರ'), tr('ಗುರುವಾರ'), tr('ಶುಕ್ರವಾರ'), tr('ಶನಿವಾರ')];
       final varaName = varas[_weekday];
-      final nakName = tr(_panchang!.nakshatra.split(' ')[0]); // Get exact nakshatra name without extra text
+      final nakName = trAll(_panchang!.nakshatra.split(' ')[0]); // Get exact nakshatra name without extra text
       timings.add({
         'name': tr('ಅಮೃತ ಸಿದ್ಧಿ ಯೋಗ'), 'nameEn': 'Amrita Siddhi Yoga',
         'start': _minutesToTimeStr(sr % (24*60)), 'end': _minutesToTimeStr(ss % (24*60)),
