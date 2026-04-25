@@ -46,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (resp.statusCode == 200) {
         final data = jsonDecode(resp.body) as List;
         if (data.isEmpty) {
-          setState(() => _geoStatus = 'ಸ್ಥಳ ಕಂಡುಬಂದಿಲ್ಲ.');
+          setState(() => _geoStatus = AppLocale.l('placeNotFoundDash'));
         } else if (data.length == 1) {
           // Only one result — auto-select
           await _applyGeoResult(data[0], placeName.trim());
@@ -57,7 +57,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             context: context,
             builder: (ctx) => AlertDialog(
               backgroundColor: kCard,
-              title: Text('ಸ್ಥಳ ಆಯ್ಕೆಮಾಡಿ / Select Location',
+              title: Text('${AppLocale.l('selectLocation')} / Select Location',
                   style: TextStyle(color: kText, fontWeight: FontWeight.w900, fontSize: 16)),
               content: SizedBox(
                 width: double.maxFinite,
@@ -93,7 +93,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: Text('ರದ್ದು / Cancel', style: TextStyle(color: kMuted)),
+                  child: Text('${AppLocale.l('cancel')} / Cancel', style: TextStyle(color: kMuted)),
                 ),
               ],
             ),
@@ -104,7 +104,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         }
       }
     } catch (_) {
-      setState(() => _geoStatus = 'ಸ್ಥಳ ಸಂಪರ್ಕ ದೋಷ. ನೇರವಾಗಿ ಅಕ್ಷಾಂಶ/ರೇಖಾಂಶ ನಮೂದಿಸಿ.');
+      setState(() => _geoStatus = AppLocale.l('placeError'));
     }
     setState(() => _geoLoading = false);
   }
@@ -122,7 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _geoStatus = '📍 $displayName (TZ: ${autoTz >= 0 ? '+' : ''}$autoTz)';
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('ಡೀಫಾಲ್ಟ್ ಸ್ಥಳ: $placeName'),
+        content: Text('${AppLocale.l('defaultLocationSet')}: $placeName'),
         backgroundColor: Colors.green,
       ));
     }
@@ -372,7 +372,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     if (_geoStatus.isNotEmpty) ...[
                       const SizedBox(height: 6),
-                      Text(_geoStatus, style: TextStyle(fontSize: 12, color: _geoStatus.contains('ದೋಷ') || _geoStatus.contains('ಇಲ್ಲ') ? Colors.redAccent : Colors.green)),
+                      Text(_geoStatus, style: TextStyle(fontSize: 12, color: _geoStatus.contains(AppLocale.l('errorLabel')) || _geoStatus.contains(AppLocale.l('placeNotFoundDash')) ? Colors.redAccent : Colors.green)),
                     ],
                     const SizedBox(height: 12),
                     TextField(
@@ -652,8 +652,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                Expanded(
                                  child: Text(
                                    SubscriptionService.hasSubscription 
-                                      ? 'ನೀವು ಪ್ರೀಮಿಯಂ ಸದಸ್ಯರು! (Premium Active)' 
-                                      : 'ಪ್ರೀಮಿಯಂ ಲಭ್ಯತೆ ಪಡೆಯಿರಿ',
+                                      ? '${AppLocale.l('premiumActive')} (Premium Active)' 
+                                      : AppLocale.l('getPremium'),
                                    style: TextStyle(
                                      fontSize: SubscriptionService.hasSubscription ? 16 : 18, 
                                      fontWeight: FontWeight.bold,
@@ -695,7 +695,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                      ),
                                    ),
                                    const SizedBox(height: 4),
-                                   Text('${SubscriptionService.subscriptionDaysRemaining} / 365 ದಿನ ಬಾಕಿ',
+                                   Text('${SubscriptionService.subscriptionDaysRemaining} / 365 ${AppLocale.l('daysRemaining')}',
                                      style: TextStyle(fontSize: 11, color: kMuted)),
                                  ],
                                  const SizedBox(height: 10),
@@ -733,7 +733,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                            if (!SubscriptionService.hasSubscription) ...[
                              const SizedBox(height: 12),
                              Text(
-                               'ವರ್ಷಕ್ಕೆ ಕೇವಲ ₹೭೦೦ ಪಾವತಿಸಿ ಮತ್ತು ಎಲ್ಲಾ ಕುಂಡಲಿ ಹಾಗೂ ಪಂಚಾಂಗ ವೈಶಿಷ್ಟ್ಯಗಳನ್ನು ಬಳಸಿ.',
+                               AppLocale.l('premiumDesc'),
                                style: TextStyle(fontSize: 14, color: kText, height: 1.4),
                              ),
                              const SizedBox(height: 20),
@@ -742,7 +742,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                  final success = await SubscriptionService.buySubscription();
                                  if (!success && mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('ಚಂದಾದಾರಿಕೆ ಪ್ರಕ್ರಿಯೆ ವಿಫಲವಾಗಿದೆ ಅಥವಾ ನೀವು ವೆಬ್ ಬಳಸುತ್ತಿದ್ದೀರಿ.'))
+                                      SnackBar(content: Text(AppLocale.l('subFailed')))
                                     );
                                  }
                                },
@@ -752,7 +752,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                  padding: const EdgeInsets.symmetric(vertical: 14),
                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                ),
-                               child: const Text('₹700 / ವರ್ಷಕ್ಕೆ ಚಂದಾದಾರರಾಗಿ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                               child: Text(AppLocale.l('subscribeBtn'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                              ),
                              const SizedBox(height: 12),
                              TextButton(
@@ -761,11 +761,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   if (mounted) {
                                     setState(() {});
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('ಹಿಂದಿನ ಖರೀದಿಗಳನ್ನು ಮರುಸ್ಥಾಪಿಸಲಾಗಿದೆ.'))
+                                        SnackBar(content: Text(AppLocale.l('purchasesRestored')))
                                     );
                                   }
                                },
-                               child: Text('ಹಿಂದಿನ ಖರೀದಿಯನ್ನು ಮರುಸ್ಥಾಪಿಸಿ (Restore)', style: TextStyle(color: kPurple2, fontWeight: FontWeight.w600)),
+                               child: Text('${AppLocale.l('restorePurchases')} (Restore)', style: TextStyle(color: kPurple2, fontWeight: FontWeight.w600)),
                              )
                            ]
                         ],
@@ -777,7 +777,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 24),
 
                     // Clock / NTP Status
-                    SectionTitle('ಸಮಯ ಪರಿಶೀಲನೆ / Clock Verification'),
+                    SectionTitle('${AppLocale.l('clockVerification')} / Clock Verification'),
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -952,7 +952,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: kMuted)),
                       const SizedBox(width: 8),
-                      Text('ಬ್ಯಾಕಪ್ ಮಾಹಿತಿ ಪಡೆಯಲಾಗುತ್ತಿದೆ...', style: TextStyle(fontSize: 12, color: kMuted)),
+                      Text(AppLocale.l('fetchingBackup'), style: TextStyle(fontSize: 12, color: kMuted)),
                     ],
                   ),
                 );
@@ -974,7 +974,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'ಕೊನೆಯ ಬ್ಯಾಕಪ್: ${info['lastBackup']}  (${info['size']})',
+                          '${AppLocale.l('lastBackup')}: ${info['lastBackup']}  (${info['size']})',
                           style: TextStyle(fontSize: 12, color: Colors.green.shade700, fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -995,7 +995,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'ಇನ್ನೂ ಯಾವುದೇ ಬ್ಯಾಕಪ್ ಇಲ್ಲ (No backup yet)',
+                          '${AppLocale.l('noBackupYet')} (No backup yet)',
                           style: TextStyle(fontSize: 12, color: Colors.blue.shade700),
                         ),
                       ),
@@ -1014,14 +1014,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: GoogleAuthService.isSignedIn ? () async {
                     // Show loading
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('☁️ Google Drive ಗೆ ಬ್ಯಾಕಪ್ ಮಾಡಲಾಗುತ್ತಿದೆ...'), duration: Duration(seconds: 2)),
+                      SnackBar(content: Text(AppLocale.l('backingUpDrive'))), duration: Duration(seconds: 2)),
                     );
                     final result = await DriveBackupService.uploadBackup();
                     if (mounted) {
                       if (result == 'success') {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('✅ Google Drive ಗೆ ಬ್ಯಾಕಪ್ ಯಶಸ್ವಿ!'),
+                            content: Text(AppLocale.l('driveBackupSuccess')),
                             backgroundColor: Colors.green,
                           ),
                         );
@@ -1034,7 +1034,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     }
                   } : null,
                   icon: const Icon(Icons.cloud_upload),
-                  label: const Text('Drive ಗೆ\nಬ್ಯಾಕಪ್', textAlign: TextAlign.center),
+                  label: Text(AppLocale.l('backupToDrive'), textAlign: TextAlign.center),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4285F4),
                     foregroundColor: Colors.white,
@@ -1052,21 +1052,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       context: context,
                       builder: (ctx) => AlertDialog(
                         backgroundColor: kCard,
-                        title: Text('Drive ಬ್ಯಾಕಪ್ ಮರುಸ್ಥಾಪನೆ', style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
+                        title: Text(AppLocale.l('driveRestoreTitle'), style: TextStyle(color: kText, fontWeight: FontWeight.w900)),
                         content: Text(
-                          'Google Drive ನಿಂದ ಡೇಟಾ ಮರುಸ್ಥಾಪಿಸುವುದರಿಂದ ಪ್ರಸ್ತುತ ಡೇಟಾ ಬದಲಾಗುತ್ತದೆ.\n\n'
-                          'ಮುಂದುವರಿಸಬೇಕೇ?\n\n'
+                          AppLocale.l('driveRestoreWarn') + '\n\n'
+                          '${AppLocale.l('continueQ')}\n\n'
                           '(Restoring will overwrite current data. Continue?)',
                           style: TextStyle(color: kMuted, height: 1.5),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, false),
-                            child: Text('ಬೇಡ', style: TextStyle(color: kMuted)),
+                            child: Text(AppLocale.l('no'), style: TextStyle(color: kMuted)),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, true),
-                            child: Text('ಮರುಸ್ಥಾಪಿಸಿ', style: TextStyle(color: const Color(0xFF4285F4), fontWeight: FontWeight.w700)),
+                            child: Text(AppLocale.l('restore'), style: TextStyle(color: const Color(0xFF4285F4), fontWeight: FontWeight.w700)),
                           ),
                         ],
                       ),
@@ -1075,7 +1075,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('☁️ Google Drive ನಿಂದ ಮರುಸ್ಥಾಪಿಸಲಾಗುತ್ತಿದೆ...'), duration: Duration(seconds: 2)),
+                        SnackBar(content: Text(AppLocale.l('restoringDrive'))), duration: Duration(seconds: 2)),
                       );
                     }
                     final err = await DriveBackupService.downloadAndRestore();
@@ -1083,7 +1083,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       if (err == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('✅ Google Drive ನಿಂದ ಡೇಟಾ ಯಶಸ್ವಿಯಾಗಿ ಮರುಸ್ಥಾಪಿಸಲಾಗಿದೆ!'),
+                            content: Text(AppLocale.l('driveRestoreSuccess')),
                             backgroundColor: Colors.green,
                           ),
                         );
@@ -1095,7 +1095,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     }
                   } : null,
                   icon: Icon(Icons.cloud_download, color: GoogleAuthService.isSignedIn ? const Color(0xFF4285F4) : Colors.grey),
-                  label: Text('Drive ನಿಂದ\nಮರುಸ್ಥಾಪಿಸಿ', textAlign: TextAlign.center, style: TextStyle(color: kText)),
+                  label: Text(AppLocale.l('restoreFromDrive'), textAlign: TextAlign.center, style: TextStyle(color: kText)),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     side: BorderSide(color: GoogleAuthService.isSignedIn ? const Color(0xFF4285F4) : Colors.grey.shade300),
