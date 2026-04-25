@@ -129,6 +129,8 @@ class AppLocale {
 
   static final Map<String, Map<String, String>> _allStrings = {
     'kn': {
+
+      'planetRavi': 'ರವಿ', 'planetChandra': 'ಚಂದ್ರ', 'planetKuja': 'ಕುಜ', 'planetBudha': 'ಬುಧ', 'planetGuru': 'ಗುರು', 'planetShukra': 'ಶುಕ್ರ', 'planetShani': 'ಶನಿ', 'planetRahu': 'ರಾಹು', 'planetKetu': 'ಕೇತು', 'planetLagna': 'ಲಗ್ನ', 'planetMandi': 'ಮಾಂದಿ', 'planetSurya': 'ಸೂರ್ಯ', 'planetMangala': 'ಮಂಗಳ', 'nak0': 'ಅಶ್ವಿನಿ', 'nak1': 'ಭರಣಿ', 'nak2': 'ಕೃತಿಕಾ', 'nak3': 'ರೋಹಿಣಿ', 'nak4': 'ಮೃಗಶಿರ', 'nak5': 'ಆರಿದ್ರಾ', 'nak6': 'ಪುನರ್ವಸು', 'nak7': 'ಪುಷ್ಯ', 'nak8': 'ಆಶ್ಲೇಷ', 'nak9': 'ಮಘ', 'nak10': 'ಪೂರ್ವ ಫಾಲ್ಗುಣಿ', 'nak11': 'ಉತ್ತರ ಫಾಲ್ಗುಣಿ', 'nak12': 'ಹಸ್ತ', 'nak13': 'ಚಿತ್ತಾ', 'nak14': 'ಸ್ವಾತಿ', 'nak15': 'ವಿಶಾಖ', 'nak16': 'ಅನುರಾಧ', 'nak17': 'ಜ್ಯೇಷ್ಠ', 'nak18': 'ಮೂಲ', 'nak19': 'ಪೂರ್ವಾಷಾಢ', 'nak20': 'ಉತ್ತರಾಷಾಢ', 'nak21': 'ಶ್ರವಣ', 'nak22': 'ಧನಿಷ್ಠ', 'nak23': 'ಶತಭಿಷ', 'nak24': 'ಪೂರ್ವಾಭಾದ್ರ', 'nak25': 'ಉತ್ತರಾಭಾದ್ರ', 'nak26': 'ರೇವತಿ', 
       'appName': 'ಭಾರತೀಯಮ್', 'home': 'ಮನೆ', 'kundali': 'ಕುಂಡಲಿ', 'panchanga': 'ಪಂಚಾಂಗ',
       'planets': 'ಗ್ರಹಗಳು', 'appointment': 'ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್', 'vedicClock': 'ವೈದಿಕ ಗಡಿಯಾರ',
       'settings': 'ಸೆಟ್ಟಿಂಗ್ಸ್', 'aboutUs': 'ನಮ್ಮ ಬಗ್ಗೆ', 'language': 'ಭಾಷೆ / Language',
@@ -293,6 +295,8 @@ class AppLocale {
       'searchPlace': 'ಊರು ಹುಡುಕಿ',
     },
     'hi': {
+
+      'planetRavi': 'सूर्य', 'planetChandra': 'चन्द्र', 'planetKuja': 'मंगल', 'planetBudha': 'बुध', 'planetGuru': 'गुरु', 'planetShukra': 'शुक्र', 'planetShani': 'शनि', 'planetRahu': 'राहु', 'planetKetu': 'केतु', 'planetLagna': 'लग्न', 'planetMandi': 'मांदि', 'planetSurya': 'सूर्य', 'planetMangala': 'मंगल', 'nak0': 'अश्विनी', 'nak1': 'भरणी', 'nak2': 'कृत्तिका', 'nak3': 'रोहिणी', 'nak4': 'मृगशिरा', 'nak5': 'आर्द्रा', 'nak6': 'पुनर्वसु', 'nak7': 'पुष्य', 'nak8': 'आश्लेषा', 'nak9': 'मघा', 'nak10': 'पूर्व फाल्गुनी', 'nak11': 'उत्तर फाल्गुनी', 'nak12': 'हस्त', 'nak13': 'चित्रा', 'nak14': 'स्वाति', 'nak15': 'विशाखा', 'nak16': 'अनुराधा', 'nak17': 'ज्येष्ठा', 'nak18': 'मूल', 'nak19': 'पूर्वाषाढ़ा', 'nak20': 'उत्तराषाढ़ा', 'nak21': 'श्रवण', 'nak22': 'धनिष्ठा', 'nak23': 'शतभिषा', 'nak24': 'पूर्वाभाद्रपद', 'nak25': 'उत्तराभाद्रपद', 'nak26': 'रेवती', 
       'appName': 'भारतीयम्', 'home': 'होम', 'kundali': 'कुंडली', 'panchanga': 'पंचांग',
       'planets': 'ग्रह', 'appointment': 'अपॉइंटमेंट', 'vedicClock': 'वैदिक घड़ी',
       'settings': 'सेटिंग्स', 'aboutUs': 'हमारे बारे में', 'language': 'भाषा / Language',
@@ -446,6 +450,8 @@ class AppLocale {
       'searchPlace': 'स्थान खोजें',
     },
     'ta': {
+
+      'planetRavi': 'சூரியன்', 'planetChandra': 'சந்திரன்', 'planetKuja': 'செவ்வாய்', 'planetBudha': 'புதன்', 'planetGuru': 'குரு', 'planetShukra': 'சுக்கிரன்', 'planetShani': 'சனி', 'planetRahu': 'ராகு', 'planetKetu': 'கேது', 'planetLagna': 'லக்னம்', 'planetMandi': 'மாந்தி', 'planetSurya': 'சூரியன்', 'planetMangala': 'செவ்வாய்', 'nak0': 'அசுவினி', 'nak1': 'பரணி', 'nak2': 'கிருத்திகை', 'nak3': 'ரோகிணி', 'nak4': 'மிருகசீரிஷம்', 'nak5': 'திருவாதிரை', 'nak6': 'புனர்பூசம்', 'nak7': 'பூசம்', 'nak8': 'ஆயில்யம்', 'nak9': 'மகம்', 'nak10': 'பூரம்', 'nak11': 'உத்திரம்', 'nak12': 'ஹஸ்தம்', 'nak13': 'சித்திரை', 'nak14': 'சுவாதி', 'nak15': 'விசாகம்', 'nak16': 'அனுஷம்', 'nak17': 'கேட்டை', 'nak18': 'மூலம்', 'nak19': 'பூராடம்', 'nak20': 'உத்திராடம்', 'nak21': 'திருவோணம்', 'nak22': 'அவிட்டம்', 'nak23': 'சதயம்', 'nak24': 'பூரட்டாதி', 'nak25': 'உத்திரட்டாதி', 'nak26': 'ரேவதி', 
       'appName': 'பாரதீயம்', 'home': 'முகப்பு', 'kundali': 'ஜாதகம்', 'panchanga': 'பஞ்சாங்கம்',
       'planets': 'கிரகங்கள்', 'appointment': 'சந்திப்பு', 'vedicClock': 'வேத கடிகாரம்',
       'settings': 'அமைப்புகள்', 'aboutUs': 'எங்களைப் பற்றி', 'language': 'மொழி / Language',
@@ -599,6 +605,8 @@ class AppLocale {
       'searchPlace': 'ஊர் தேடு',
     },
     'te': {
+
+      'planetRavi': 'సూర్యుడు', 'planetChandra': 'చంద్రుడు', 'planetKuja': 'కుజ', 'planetBudha': 'బుధ', 'planetGuru': 'గురు', 'planetShukra': 'శుక్ర', 'planetShani': 'శని', 'planetRahu': 'రాహు', 'planetKetu': 'కేతు', 'planetLagna': 'లగ్నం', 'planetMandi': 'మాంది', 'planetSurya': 'సూర్యుడు', 'planetMangala': 'కుజ', 'nak0': 'అశ్విని', 'nak1': 'భరణి', 'nak2': 'కృత్తిక', 'nak3': 'రోహిణి', 'nak4': 'మృగశిర', 'nak5': 'ఆర్ద్ర', 'nak6': 'పునర్వసు', 'nak7': 'పుష్యమి', 'nak8': 'ఆశ్లేష', 'nak9': 'మఘ', 'nak10': 'పూర్వ ఫల్గుణి', 'nak11': 'ఉత్తర ఫల్గుణి', 'nak12': 'హస్త', 'nak13': 'చిత్త', 'nak14': 'స్వాతి', 'nak15': 'విశాఖ', 'nak16': 'అనురాధ', 'nak17': 'జ్యేష్ఠ', 'nak18': 'మూల', 'nak19': 'పూర్వాషాఢ', 'nak20': 'ఉత్తరాషాఢ', 'nak21': 'శ్రవణం', 'nak22': 'ధనిష్ఠ', 'nak23': 'శతభిషం', 'nak24': 'పూర్వాభాద్ర', 'nak25': 'ఉత్తరాభాద్ర', 'nak26': 'రేవతి', 
       'appName': 'భారతీయమ్', 'home': 'హోమ్', 'kundali': 'కుండలి', 'panchanga': 'పంచాంగం',
       'planets': 'గ్రహాలు', 'appointment': 'అపాయింట్‌మెంట్', 'vedicClock': 'వేద గడియారం',
       'settings': 'సెట్టింగ్‌లు', 'aboutUs': 'మా గురించి', 'language': 'భాష / Language',
@@ -752,6 +760,8 @@ class AppLocale {
       'searchPlace': 'ఊరు వెతుకు',
     },
     'ml': {
+
+      'planetRavi': 'സൂര്യൻ', 'planetChandra': 'ചന്ദ്രൻ', 'planetKuja': 'ചൊവ്വ', 'planetBudha': 'ബുധൻ', 'planetGuru': 'ഗുരു', 'planetShukra': 'ശുക്രൻ', 'planetShani': 'ശനി', 'planetRahu': 'രാഹു', 'planetKetu': 'കേതു', 'planetLagna': 'ലഗ്നം', 'planetMandi': 'മാന്ദി', 'planetSurya': 'സൂര്യൻ', 'planetMangala': 'ചൊവ്വ', 'nak0': 'അശ്വതി', 'nak1': 'ഭരണി', 'nak2': 'കാർത്തിക', 'nak3': 'രോഹിണി', 'nak4': 'മകയിരം', 'nak5': 'തിരുവാതിര', 'nak6': 'പുണർതം', 'nak7': 'പൂയം', 'nak8': 'ആയില്യം', 'nak9': 'മകം', 'nak10': 'പൂരം', 'nak11': 'ഉത്രം', 'nak12': 'അത്തം', 'nak13': 'ചിത്തിര', 'nak14': 'ചോതി', 'nak15': 'വിശാഖം', 'nak16': 'അനിഴം', 'nak17': 'തൃക്കേട്ട', 'nak18': 'മൂലം', 'nak19': 'പൂരാടം', 'nak20': 'ഉത്രാടം', 'nak21': 'തിരുവോണം', 'nak22': 'അവിട്ടം', 'nak23': 'ചതയം', 'nak24': 'പൂരുരുട്ടാതി', 'nak25': 'ഉത്രട്ടാതി', 'nak26': 'രേവതി', 
       'appName': 'ഭാരതീയം', 'home': 'ഹോം', 'kundali': 'ജാതകം', 'panchanga': 'പഞ്ചാംഗം',
       'planets': 'ഗ്രഹങ്ങൾ', 'appointment': 'അപ്പോയിന്റ്‌മെന്റ്', 'vedicClock': 'വേദ ഘടികാരം',
       'settings': 'ക്രമീകരണം', 'aboutUs': 'ഞങ്ങളെക്കുറിച്ച്', 'language': 'ഭാഷ / Language',

@@ -130,6 +130,13 @@ class _DashboardScreenState extends State<DashboardScreen>
   bool _syncing = false;
 
 
+  /// Translate a Kannada nakshatra name to the current language
+  String _localNak(String knName) {
+    final idx = knNak.indexOf(knName);
+    if (idx >= 0) return appNak[idx];
+    return tr(knName);
+  }
+
 
   static List<String> get _tabs {
     switch (AppLocale.current) {
@@ -1209,7 +1216,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         final info = r.planets[p];
         if (info == null) continue;
         final ri = (info.longitude / 30).floor() % 12;
-        buf.writeln('${appPlanetNames[p] ?? p},${appRashi[ri]},${formatDeg(info.longitude)},${info.nakshatra} - ${info.pada}');
+        buf.writeln('${tr(p)},${appRashi[ri]},${formatDeg(info.longitude)},${_localNak(info.nakshatra)} - ${info.pada}');
       }
       buf.writeln(',');
 
@@ -1606,10 +1613,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                       if (info == null) return const SizedBox.shrink();
                       final ri = (info.longitude / 30).floor() % 12;
                       return _tableRow([
-                        appPlanetNames[p] ?? p,
+                        tr(p),
                         appRashi[ri],
                         formatDeg(info.longitude),
-                        '${info.nakshatra} - ${info.pada}'
+                        '${_localNak(info.nakshatra)} - ${info.pada}'
                       ], bold0: true);
                     }),
                   ],
@@ -1838,10 +1845,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                           if (info == null) return const SizedBox.shrink();
                           final ri = (info.longitude / 30).floor() % 12;
                           return _tableRow([
-                            appPlanetNames[p] ?? p,
+                            tr(p),
                             appRashi[ri],
                             formatDeg(info.longitude),
-                            '${info.nakshatra} - ${info.pada}'
+                            '${_localNak(info.nakshatra)} - ${info.pada}'
                           ], bold0: true);
                         }),
                       ],
@@ -1954,7 +1961,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                               final pInfo = activeResult.planets[pNameKey];
                               if (pInfo == null) return const TableRow(children: [SizedBox(), SizedBox(), SizedBox(), SizedBox(), SizedBox(), SizedBox(), SizedBox()]);
                               final details = AstroCalculator.getPlanetDetail(pNameKey, pInfo.longitude, pInfo.speed, activeResult.planets['ರವಿ']?.longitude ?? 0.0);
-                              final displayName = appPlanetNames[pNameKey] ?? pNameKey;
+                              final displayName = tr(pNameKey);
                               final isEvenRow = rowIdx++ % 2 == 0;
                               return TableRow(
                                 decoration: BoxDecoration(
@@ -2291,7 +2298,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: isSelected ? kTeal : kBorder),
                     ),
-                    child: Text(appPlanetNames[p] ?? p, style: TextStyle(
+                    child: Text(tr(p), style: TextStyle(
                       fontSize: 13,
                       fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
                       color: isSelected ? Colors.white : kText,
@@ -2521,7 +2528,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         if (pInfo == null) return const TableRow(children: [SizedBox(), SizedBox(), SizedBox(), SizedBox(), SizedBox(), SizedBox(), SizedBox()]);
                         
                         final details = AstroCalculator.getPlanetDetail(pNameKey, pInfo.longitude, pInfo.speed, r.planets['ರವಿ']?.longitude ?? 0.0);
-                        final displayName = appPlanetNames[pNameKey] ?? pNameKey;
+                        final displayName = tr(pNameKey);
                         final isEvenRow = rowIdx++ % 2 == 0;
 
                         return TableRow(
