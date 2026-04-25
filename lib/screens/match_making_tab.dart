@@ -121,7 +121,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
             children: [
               TableRow(
                 decoration: BoxDecoration(color: kPurple2.withOpacity(0.12), borderRadius: const BorderRadius.vertical(top: Radius.circular(8))),
-                children: const [
+                children: [
                   Padding(padding: EdgeInsets.all(12), child: Text(AppLocale.l('koota'), style: TextStyle(fontWeight: FontWeight.bold))),
                   Padding(padding: EdgeInsets.all(12), child: Text(AppLocale.l('padeGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
                   Padding(padding: EdgeInsets.all(12), child: Text(AppLocale.l('garishThaGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
