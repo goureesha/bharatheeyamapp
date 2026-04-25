@@ -130,11 +130,35 @@ class _DashboardScreenState extends State<DashboardScreen>
   bool _syncing = false;
 
 
-  /// Translate a Kannada nakshatra name to the current language
-  String _localNak(String knName) {
-    final idx = knNak.indexOf(knName);
-    if (idx >= 0) return appNak[idx];
-    return tr(knName);
+  /// Translate ANY Kannada engine string to the current language.
+  /// Checks all known arrays, then tr(), then word-by-word fallback.
+  String _trAll(String knText) {
+    if (AppLocale.current == 'kn') return knText;
+    int idx;
+    idx = knRashi.indexOf(knText); if (idx >= 0) return appRashi[idx];
+    idx = knNak.indexOf(knText);   if (idx >= 0) return appNak[idx];
+    idx = knVara.indexOf(knText);  if (idx >= 0) return appVara[idx];
+    idx = knTithi.indexOf(knText); if (idx >= 0) return appTithi[idx];
+    idx = knYoga.indexOf(knText);  if (idx >= 0) return appYoga[idx];
+    // Check tr() for exact match first
+    final exact = tr(knText);
+    if (exact != knText) return exact;
+    // Word-by-word translation for compound strings (e.g. "ನಿಜ ವೈಶಾಖ", "ವರಾಭವ (ಶಕ 1948)")
+    final words = knText.split(' ');
+    if (words.length > 1) {
+      return words.map((w) {
+        // Skip numbers and punctuation
+        if (RegExp(r'^[\d()°\x27".\-:]+$').hasMatch(w)) return w;
+        final t = tr(w);
+        if (t != w) return t;
+        // Check arrays for individual words too
+        int i;
+        i = knRashi.indexOf(w); if (i >= 0) return appRashi[i];
+        i = knNak.indexOf(w);   if (i >= 0) return appNak[i];
+        return w;
+      }).join(' ');
+    }
+    return knText;
   }
 
 
@@ -1216,7 +1240,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         final info = r.planets[p];
         if (info == null) continue;
         final ri = (info.longitude / 30).floor() % 12;
-        buf.writeln('${tr(p)},${appRashi[ri]},${formatDeg(info.longitude)},${_localNak(info.nakshatra)} - ${info.pada}');
+        buf.writeln('${tr(p)},${appRashi[ri]},${formatDeg(info.longitude)},${_trAll(info.nakshatra)} - ${info.pada}');
       }
       buf.writeln(',');
 
@@ -1616,7 +1640,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         tr(p),
                         appRashi[ri],
                         formatDeg(info.longitude),
-                        '${_localNak(info.nakshatra)} - ${info.pada}'
+                        '${_trAll(info.nakshatra)} - ${info.pada}'
                       ], bold0: true);
                     }),
                   ],
@@ -1848,7 +1872,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             tr(p),
                             appRashi[ri],
                             formatDeg(info.longitude),
-                            '${_localNak(info.nakshatra)} - ${info.pada}'
+                            '${_trAll(info.nakshatra)} - ${info.pada}'
                           ], bold0: true);
                         }),
                       ],
@@ -2070,16 +2094,16 @@ class _DashboardScreenState extends State<DashboardScreen>
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(children: [
-                  _tableRow([AppLocale.l('samvatsara'), tr(pan.samvatsara)]),
-                  _tableRow([AppLocale.l('varaLabel'), tr(pan.vara)]),
-                  _tableRow([AppLocale.l('tithiLabel'), tr(pan.tithi)]),
-                  _tableRow([AppLocale.l('chandraNakshatra'), () { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${_localNak(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p'; }()]),
-                  _tableRow([AppLocale.l('yogaLabel'), tr(pan.yoga)]),
-                  _tableRow([AppLocale.l('karanaLabel'), tr(pan.karana)]),
-                  _tableRow([AppLocale.l('chandraRashiLabel'), tr(pan.chandraRashi)]),
-                  _tableRow([AppLocale.l('chandraMasa'), tr(pan.chandraMasa)]),
-                  _tableRow([AppLocale.l('suryaNakshatraLabel'), '${_localNak(pan.suryaNakshatra)} - ${AppLocale.l('padaLabel')} ${pan.suryaPada}']),
-                  _tableRow([AppLocale.l('souraMasa'), tr(pan.souraMasa)]),
+                  _tableRow([AppLocale.l('samvatsara'), _trAll(pan.samvatsara)]),
+                  _tableRow([AppLocale.l('varaLabel'), _trAll(pan.vara)]),
+                  _tableRow([AppLocale.l('tithiLabel'), _trAll(pan.tithi)]),
+                  _tableRow([AppLocale.l('chandraNakshatra'), () { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${_trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p'; }()]),
+                  _tableRow([AppLocale.l('yogaLabel'), _trAll(pan.yoga)]),
+                  _tableRow([AppLocale.l('karanaLabel'), _trAll(pan.karana)]),
+                  _tableRow([AppLocale.l('chandraRashiLabel'), _trAll(pan.chandraRashi)]),
+                  _tableRow([AppLocale.l('chandraMasa'), _trAll(pan.chandraMasa)]),
+                  _tableRow([AppLocale.l('suryaNakshatraLabel'), '${_trAll(pan.suryaNakshatra)} - ${AppLocale.l('padaLabel')} ${pan.suryaPada}']),
+                  _tableRow([AppLocale.l('souraMasa'), _trAll(pan.souraMasa)]),
                   _tableRow([AppLocale.l('souraMasaGataDina'), pan.souraMasaGataDina]),
                   _tableRow([AppLocale.l('sunrise'), pan.sunrise]),
                   _tableRow([AppLocale.l('sunset'), pan.sunset]),
