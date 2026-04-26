@@ -10,7 +10,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
       backgroundColor: kBg,
       appBar: AppBar(
         backgroundColor: kCard,
-        title: Text('ಗೌಪ್ಯತಾ ನೀತಿ / Privacy Policy',
+        title: Text(AppLocale.l('privacyLink'),
             style: TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.w800)),
         iconTheme: IconThemeData(color: kText),
         elevation: 0,

@@ -826,7 +826,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           if (TrustedTimeService.isClockTampered) ...[
                             const SizedBox(height: 8),
                             Text(
-                              'ನಿಮ್ಮ ಫೋನ್ ಗಡಿಯಾರ ಬದಲಾಗಿದೆ. ಸರಿಯಾದ ಸಮಯಕ್ಕೆ ಹೊಂದಿಸಿ.',
+                              AppLocale.l('clockTampered'),
                               style: TextStyle(fontSize: 12, color: Colors.red.shade800),
                             ),
                             Text(
@@ -859,7 +859,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // About Us
                     ListTile(
                       leading: Icon(Icons.info_outline, color: kPurple2),
-                      title: Text('ನಮ್ಮ ಬಗ್ಗೆ / About Us',
+                      title: Text(AppLocale.l('aboutUsLink'),
                           style: TextStyle(color: kText, fontSize: 14)),
                       trailing: Icon(Icons.chevron_right, color: kMuted),
                       onTap: () => Navigator.push(
@@ -871,7 +871,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Privacy Policy
                     ListTile(
                       leading: Icon(Icons.shield_outlined, color: kPurple2),
-                      title: Text('ಗೌಪ್ಯತಾ ನೀತಿ / Privacy Policy',
+                      title: Text(AppLocale.l('privacyLink'),
                           style: TextStyle(color: kText, fontSize: 14)),
                       trailing: Icon(Icons.chevron_right, color: kMuted),
                       onTap: () => Navigator.push(
@@ -909,7 +909,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'ನಿಮ್ಮ ಡೇಟಾವನ್ನು Google Drive ನಲ್ಲಿ ಸುರಕ್ಷಿತವಾಗಿ ಬ್ಯಾಕಪ್ ಮಾಡಿ.\nYour data is stored securely in your own Google Drive.',
+                  AppLocale.l('driveBackupDesc'),
                   style: TextStyle(fontSize: 12, color: kMuted, height: 1.4),
                 ),
               ),

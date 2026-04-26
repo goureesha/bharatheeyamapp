@@ -1380,7 +1380,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             if (!mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('✅ ${AppLocale.l('savedSuccess')} ($totalCount ಕುಂಡಲಿ)\nClient ID: ${resolvedCId ?? ''}'),
+                                content: Text('✅ ${AppLocale.l('savedSuccess')} ($totalCount ${AppLocale.l('kundaliCount')})\nClient ID: ${resolvedCId ?? ''}'),
                                 backgroundColor: Colors.green,
                                 duration: const Duration(seconds: 4),
                               )

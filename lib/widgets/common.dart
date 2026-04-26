@@ -264,7 +264,10 @@ class AppLocale {
       'shareViaWA': 'WhatsApp ನಲ್ಲಿ ಹಂಚಿಕೊಳ್ಳಿ', 'bookingLink': 'ಬುಕಿಂಗ್ ಲಿಂಕ್ ಹಂಚಿಕೊಳ್ಳಿ', 'endTimeLabel': 'ಅಂತ್ಯ ಸಮಯ',
       'month0': 'ಜನವರಿ', 'month1': 'ಫೆಬ್ರವರಿ', 'month2': 'ಮಾರ್ಚ್', 'month3': 'ಏಪ್ರಿಲ್', 'month4': 'ಮೇ', 'month5': 'ಜೂನ್', 'month6': 'ಜುಲೈ', 'month7': 'ಆಗಸ್ಟ್', 'month8': 'ಸೆಪ್ಟೆಂಬರ್', 'month9': 'ಅಕ್ಟೋಬರ್', 'month10': 'ನವೆಂಬರ್', 'month11': 'ಡಿಸೆಂಬರ್',
       'dayMon': 'ಸೋಮ', 'dayTue': 'ಮಂಗಳ', 'dayWed': 'ಬುಧ', 'dayThu': 'ಗುರು', 'dayFri': 'ಶುಕ್ರ', 'daySat': 'ಶನಿ', 'daySun': 'ರವಿ',
-      'phonePrefix': 'ಫೋನ್',
+      'phonePrefix': 'ಫೋನ್', 'kundaliCount': 'ಕುಂಡಲಿ',
+      'clockTampered': 'ನಿಮ್ಮ ಫೋನ್ ಗಡಿಯಾರ ಬದಲಾಗಿದೆ. ಸರಿಯಾದ ಸಮಯಕ್ಕೆ ಹೊಂದಿಸಿ.',
+      'aboutUsLink': 'ನಮ್ಮ ಬಗ್ಗೆ / About Us', 'privacyLink': 'ಗೌಪ್ಯತಾ ನೀತಿ / Privacy Policy',
+      'driveBackupDesc': 'ನಿಮ್ಮ ಡೇಟಾವನ್ನು Google Drive ನಲ್ಲಿ ಸುರಕ್ಷಿತವಾಗಿ ಬ್ಯಾಕಪ್ ಮಾಡಿ.\nYour data is stored securely in your own Google Drive.',
       'aroType0': 'ಆರೂಢ', 'aroType1': 'ಉದಯ', 'aroType2': 'ಲಗ್ನಾಂಶ', 'aroType3': 'ಛತ್ರ',
       'aroType4': 'ಸ್ಪೃಷ್ಟಾಂಗ', 'aroType5': 'ಚಂದ್ರ', 'aroType6': 'ತಾಂಬೂಲ',
       'shadvarga': 'ಷಡ್ವರ್ಗ', 'bhavaKaksha': 'ಭಾವ ಕಕ್ಷೆ ಗ್ರಹ ವಿಶ್ಲೇಷಣೆ',
@@ -559,7 +562,10 @@ class AppLocale {
       'shareViaWA': 'WhatsApp पर शेयर करें', 'bookingLink': 'बुकिंग लिंक शेयर करें', 'endTimeLabel': 'समाप्ति समय',
       'month0': 'जनवरी', 'month1': 'फरवरी', 'month2': 'मार्च', 'month3': 'अप्रैल', 'month4': 'मई', 'month5': 'जून', 'month6': 'जुलाई', 'month7': 'अगस्त', 'month8': 'सितंबर', 'month9': 'अक्टूबर', 'month10': 'नवंबर', 'month11': 'दिसंबर',
       'dayMon': 'सोम', 'dayTue': 'मंगल', 'dayWed': 'बुध', 'dayThu': 'गुरु', 'dayFri': 'शुक्र', 'daySat': 'शनि', 'daySun': 'रवि',
-      'phonePrefix': 'फ़ोन',
+      'phonePrefix': 'फ़ोन', 'kundaliCount': 'कुंडली',
+      'clockTampered': 'आपकी फ़ोन की घड़ी बदली गई है. सही समय पर सेट करें.',
+      'aboutUsLink': 'हमारे बारे में / About Us', 'privacyLink': 'गोपनीयता नीति / Privacy Policy',
+      'driveBackupDesc': 'अपना डेटा Google Drive में सुरक्षित बैकअप करें.\nYour data is stored securely in your own Google Drive.',
     },
     'ta': {
 
@@ -754,7 +760,10 @@ class AppLocale {
       'shareViaWA': 'WhatsApp-ல் பகிர்', 'bookingLink': 'முன்பதிவு இணைப்பு பகிர்', 'endTimeLabel': 'முடிவு நேரம்',
       'month0': 'ஜனவரி', 'month1': 'பிப்ரவரி', 'month2': 'மார்ச்', 'month3': 'ஏப்ரல்', 'month4': 'மே', 'month5': 'ஜூன்', 'month6': 'ஜூலை', 'month7': 'ஆகஸ்ட்', 'month8': 'செப்டம்பர்', 'month9': 'அக்டோபர்', 'month10': 'நவம்பர்', 'month11': 'டிசம்பர்',
       'dayMon': 'திங்', 'dayTue': 'செவ்', 'dayWed': 'புத', 'dayThu': 'வியா', 'dayFri': 'வெள்', 'daySat': 'சனி', 'daySun': 'ஞாயி',
-      'phonePrefix': 'தொலைபேசி',
+      'phonePrefix': 'தொலைபேசி', 'kundaliCount': 'ஜாதகம்',
+      'clockTampered': 'னிங்கள் போன் கடிகாரம் மாற்றப்பட்டுள்ளது. சரியான நேரத்திற்கு அமைக்கவும்.',
+      'aboutUsLink': 'எங்களை பற்றி / About Us', 'privacyLink': 'தனியுரிமைக் கொள்கை / Privacy Policy',
+      'driveBackupDesc': 'னிங்கள் தரவை Google Drive-ல் பாதுகாப்பாக சேமிக்கவும்.\nYour data is stored securely in your own Google Drive.',
     },
     'te': {
 
@@ -949,7 +958,10 @@ class AppLocale {
       'shareViaWA': 'WhatsApp లో షేర్ చేయి', 'bookingLink': 'బుకింగ్ లింక్ షేర్ చేయి', 'endTimeLabel': 'ముగింపు సమయం',
       'month0': 'జనవరి', 'month1': 'ఫిబ్రవరి', 'month2': 'మార్చి', 'month3': 'ఏప్రిల్', 'month4': 'మే', 'month5': 'జూన్', 'month6': 'జూలై', 'month7': 'ఆగస్ట్', 'month8': 'సెప్టెంబర్', 'month9': 'అక్టోబర్', 'month10': 'నవంబర్', 'month11': 'డిసెంబర్',
       'dayMon': 'సోమ', 'dayTue': 'మంగళ', 'dayWed': 'బుధ', 'dayThu': 'గురు', 'dayFri': 'శుక్ర', 'daySat': 'శని', 'daySun': 'రవి',
-      'phonePrefix': 'ఫోన్',
+      'phonePrefix': 'ఫోన్', 'kundaliCount': 'కుండలి',
+      'clockTampered': 'మీ ఫోన్ గడియారం మారింది. సరిఅయిన సమయానికి సెట్ చేయండి.',
+      'aboutUsLink': 'మా గురించి / About Us', 'privacyLink': 'గోప్యతా విధానం / Privacy Policy',
+      'driveBackupDesc': 'మీ డేటాను Google Driveలో సురక్షితంగా బ్యాకప్ చేయండి.\nYour data is stored securely in your own Google Drive.',
     },
     'ml': {
 
@@ -1144,7 +1156,10 @@ class AppLocale {
       'shareViaWA': 'WhatsApp-ൽ പങ്കിടുക', 'bookingLink': 'ബുക്കിംഗ് ലിങ്ക് പങ്കിടുക', 'endTimeLabel': 'അവസാന സമയം',
       'month0': 'ജനുവരി', 'month1': 'ഫെബ്രുവരി', 'month2': 'മാർച്ച്', 'month3': 'ഏപ്രിൽ', 'month4': 'മേയ്', 'month5': 'ജൂൺ', 'month6': 'ജൂലൈ', 'month7': 'ഓഗസ്റ്റ്', 'month8': 'സെപ്റ്റംബർ', 'month9': 'ഒക്ടോബർ', 'month10': 'നവംബർ', 'month11': 'ഡിസംബർ',
       'dayMon': 'തിങ്', 'dayTue': 'ചൊവ്', 'dayWed': 'ബുധ', 'dayThu': 'വ്യാഴ', 'dayFri': 'വെള്ളി', 'daySat': 'ശനി', 'daySun': 'ഞായർ',
-      'phonePrefix': 'ഫോൺ',
+      'phonePrefix': 'ഫോൺ', 'kundaliCount': 'ജാതകം',
+      'clockTampered': 'നിങ്ങളുടെ ഫോൺ ക്ലോക്ക് മാറിയിരിക്കുന്നു. സ്വയംചാലക സമയത്തിലേക്ക് സെറ്റ് ചെയ്യുക.',
+      'aboutUsLink': 'ഞങ്ങളെ കുറിച്ച് / About Us', 'privacyLink': 'സ്വകാര്യതാ നയം / Privacy Policy',
+      'driveBackupDesc': 'നിങ്ങളുടെ ഡേറ്റ Google Drive-ല്‍ സുരക്ഷിതമായി ബാക്കപ്പ് ചെയ്യുക.\nYour data is stored securely in your own Google Drive.',
     },
   };
 

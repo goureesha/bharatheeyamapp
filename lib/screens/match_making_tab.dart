@@ -184,7 +184,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Expanded(child: _buildDropdown('ರಾಶಿ', _bRashi, knRashi, List.generate(12, (i) => i), (v) {
+                    Expanded(child: _buildDropdown(AppLocale.l('rashiLabel'), _bRashi, knRashi, List.generate(12, (i) => i), (v) {
                        setState(() { _bRashi = v; if (v != null && !_rashiNakMap[v]!.contains(_bNak)) _bNak = null; });
                     })),
                     const SizedBox(width: 16),
@@ -198,7 +198,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Expanded(child: _buildDropdown('ರಾಶಿ', _gRashi, knRashi, List.generate(12, (i) => i), (v) {
+                    Expanded(child: _buildDropdown(AppLocale.l('rashiLabel'), _gRashi, knRashi, List.generate(12, (i) => i), (v) {
                        setState(() { _gRashi = v; if (v != null && !_rashiNakMap[v]!.contains(_gNak)) _gNak = null; });
                     })),
                     const SizedBox(width: 16),
