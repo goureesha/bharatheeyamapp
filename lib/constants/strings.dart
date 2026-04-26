@@ -387,3 +387,85 @@ List<String> get appPlanetOrder {
   }
 }
 
+// ─── DISPLAY-LAYER TRANSLATION ───
+// Translates Kannada engine output → user's language.
+// Engine stays untouched; only the UI sees localized text.
+
+String? _cachedTranslateLang;
+Map<String, String> _knToLocaleMap = {};
+
+/// Translate a Kannada engine string to the current app locale.
+/// Returns the original string if no mapping found (safe passthrough).
+String translateKn(String knValue) {
+  if (AppLocale.current == 'kn') return knValue;
+  _buildTranslateMapIfNeeded();
+  return _knToLocaleMap[knValue] ?? knValue;
+}
+
+void _buildTranslateMapIfNeeded() {
+  if (_cachedTranslateLang == AppLocale.current) return;
+  _cachedTranslateLang = AppLocale.current;
+  _knToLocaleMap = {};
+
+  final map = _knToLocaleMap;
+
+  // Rashi (12)
+  for (int i = 0; i < knRashi.length; i++) {
+    map[knRashi[i]] = appRashi[i];
+  }
+  // Vara (7)
+  for (int i = 0; i < knVara.length; i++) {
+    map[knVara[i]] = appVara[i];
+  }
+  // Tithi (30)
+  for (int i = 0; i < knTithi.length; i++) {
+    map[knTithi[i]] = appTithi[i];
+  }
+  // Nakshatra (27)
+  for (int i = 0; i < knNak.length; i++) {
+    map[knNak[i]] = appNak[i];
+  }
+  // Yoga (27)
+  for (int i = 0; i < knYoga.length; i++) {
+    map[knYoga[i]] = appYoga[i];
+  }
+  // Dasha Lords (9)
+  for (int i = 0; i < dashaLords.length; i++) {
+    map[dashaLords[i]] = appDashaLords[i];
+  }
+  // Planet names
+  final localePlanets = appPlanetNames;
+  for (final entry in planetNames.entries) {
+    final knName = entry.value;
+    final localeName = localePlanets[entry.key];
+    if (localeName != null) map[knName] = localeName;
+  }
+  // Sphutas (16)
+  final localeSphutas = appSphutas16Order;
+  for (int i = 0; i < sphutas16Order.length && i < localeSphutas.length; i++) {
+    map[sphutas16Order[i]] = localeSphutas[i];
+  }
+  // Planet order
+  final localePlanetOrder = appPlanetOrder;
+  for (int i = 0; i < planetOrder.length && i < localePlanetOrder.length; i++) {
+    map[planetOrder[i]] = localePlanetOrder[i];
+  }
+  // Karana (kar0..kar10 via AppLocale.l)
+  for (int i = 0; i <= 10; i++) {
+    final knVal = AppLocale.l_kn('kar$i');
+    final locVal = AppLocale.l('kar$i');
+    if (knVal != 'kar$i' && locVal != 'kar$i') map[knVal] = locVal;
+  }
+  // Chandra Masa (cm0..cm11)
+  for (int i = 0; i <= 11; i++) {
+    final knVal = AppLocale.l_kn('cm$i');
+    final locVal = AppLocale.l('cm$i');
+    if (knVal != 'cm$i' && locVal != 'cm$i') map[knVal] = locVal;
+  }
+  // Samvatsara (sam0..sam59)
+  for (int i = 0; i < 60; i++) {
+    final knVal = AppLocale.l_kn('sam$i');
+    final locVal = AppLocale.l('sam$i');
+    if (knVal != 'sam$i' && locVal != 'sam$i') map[knVal] = locVal;
+  }
+}

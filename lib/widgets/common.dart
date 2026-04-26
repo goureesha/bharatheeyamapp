@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../constants/strings.dart';
 // ─────────────────────────────────────────────
 // Shared app-wide decorators / constants
 // ─────────────────────────────────────────────
@@ -124,6 +125,13 @@ class AppLocale {
     if (langStrings != null && langStrings.containsKey(key)) return langStrings[key]!;
     final knFallback = _allStrings['kn'];
     if (knFallback != null && knFallback.containsKey(key)) return knFallback[key]!;
+    return key;
+  }
+
+  /// Get the Kannada value for a key (used by translateKn for reverse lookup)
+  static String l_kn(String key) {
+    final kn = _allStrings['kn'];
+    if (kn != null && kn.containsKey(key)) return kn[key]!;
     return key;
   }
 
@@ -1405,19 +1413,24 @@ class AppLocale {
 /// Shorthand global function
 String tr(String text) => AppLocale.tr(text);
 
-/// Comprehensive translator: checks tr() + word-by-word fallback for compound strings
+/// Comprehensive translator: checks tr() + translateKn() + word-by-word fallback
 String trAll(String knText) {
   if (AppLocale.current == 'kn') return knText;
-  // Direct tr() lookup first
+  // Direct tr() lookup first (common.dart keys)
   final exact = tr(knText);
   if (exact != knText) return exact;
+  // Try translateKn() for array-based data (rashi, tithi, nakshatra, etc.)
+  final arrayMatch = translateKn(knText);
+  if (arrayMatch != knText) return arrayMatch;
   // Word-by-word for compound strings (e.g. "ನಿಜ ವೈಶಾಖ", "ವರಾಭವ (ಶಕ 1948)")
   final words = knText.split(' ');
   if (words.length > 1) {
     return words.map((w) {
       if (RegExp(r'^[\d()°\x27".\-:]+$').hasMatch(w)) return w;
+      // Try tr() first, then translateKn()
       final t = tr(w);
-      return t;
+      if (t != w) return t;
+      return translateKn(w);
     }).join(' ');
   }
   return knText;
