@@ -321,6 +321,20 @@ class AppLocale {
       'muh0': 'ರುದ್ರ', 'muh1': 'ಅಹಿ', 'muh2': 'ಮಿತ್ರ', 'muh3': 'ಪಿತ್ರು', 'muh4': 'ವಸು', 'muh5': 'ವಾರಾಹ', 'muh6': 'ವಿಶ್ವೇದೇವ', 'muh7': 'ವಿಧಿ', 'muh8': 'ಸತ್ಮುಖಿ', 'muh9': 'ಪುರುಹೂತ', 'muh10': 'ವಾಹಿನಿ', 'muh11': 'ನಕ್ತನಕರ', 'muh12': 'ವರುಣ', 'muh13': 'ಅರ್ಯಮ', 'muh14': 'ಭಗ',
       // Muhurta nature / day label
       'dayMuhurta': 'ಹಗಲಿನ ಮುಹೂರ್ತ', 'dayMuhurtaDesc': 'ದಿನವನ್ನು 15 ಸಮಭಾಗಗಳಾಗಿ ವಿಂಗಡಿಸಿದೆ', 'shubha': 'ಶುಭ', 'ashubha': 'ಅಶುಭ', 'madhyama': 'ಮಧ್ಯಮ',
+      // Tara names (9 taras)
+      'tara0': 'ಜನ್ಮ ತಾರೆ (ಅಶುಭ)', 'tara1': 'ಸಂಪತ್ ತಾರೆ (ಶುಭ)', 'tara2': 'ವಿಪತ್ ತಾರೆ (ಅಶುಭ)', 'tara3': 'ಕ್ಷೇಮ ತಾರೆ (ಶುಭ)', 'tara4': 'ಪ್ರತ್ಯಕ್ ತಾರೆ (ಅಶುಭ)', 'tara5': 'ಸಾಧಕ ತಾರೆ (ಶುಭ)', 'tara6': 'ವಧ ತಾರೆ (ಅಶುಭ)', 'tara7': 'ಮಿತ್ರ ತಾರೆ (ಶುಭ)', 'tara8': 'ಪರಮ ಮಿತ್ರ ತಾರೆ (ಅತ್ಯುತ್ತಮ)',
+      // Panchanga table labels
+      'samvatsaraLabel': 'ಸಂವತ್ಸರ', 'varaLabel': 'ವಾರ', 'tithiLabel': 'ತಿಥಿ', 'chandraNakLabel': 'ಚಂದ್ರ ನಕ್ಷತ್ರ', 'yogaLabel': 'ಯೋಗ', 'karanaLabel': 'ಕರಣ', 'chandraRashiLabel': 'ಚಂದ್ರ ರಾಶಿ', 'chandraMasaLabel': 'ಚಂದ್ರ ಮಾಸ', 'suryaNakLabel': 'ಸೂರ್ಯ ನಕ್ಷತ್ರ', 'souraMasaLabel': 'ಸೌರ ಮಾಸ', 'sunriseLabel': 'ಸೂರ್ಯೋದಯ', 'sunsetLabel': 'ಸೂರ್ಯಾಸ್ತ', 'padaLabel': 'ಪಾದ', 'endLabel': 'ಅಂತ್ಯ', 'nextDayLabel': 'ಮುಂದಿನ ದಿನ',
+      // Weekday abbreviations (Mon-Sun)
+      'wdMon': 'ಸೋಮ', 'wdTue': 'ಮಂಗಳ', 'wdWed': 'ಬುಧ', 'wdThu': 'ಗುರು', 'wdFri': 'ಶುಕ್ರ', 'wdSat': 'ಶನಿ', 'wdSun': 'ರವಿ',
+      // Shuddhi / Muhurta rules
+      'lagnaLabel': 'ಲಗ್ನ', 'saptama': 'ಸಪ್ತಮ', 'ashtama': 'ಅಷ್ಟಮ', 'dashama': 'ದಶಮ', 'chandraSaptama': 'ಚಂದ್ರ ಸಪ್ತಮ', 'chandraSaptamaShort': 'ಚಂದ್ರಸಪ್ತಮ',
+      'allTithi': 'ಎಲ್ಲಾ ತಿಥಿಗಳು', 'allNak': 'ಎಲ್ಲಾ ನಕ್ಷತ್ರಗಳು', 'allVara': 'ಎಲ್ಲಾ ವಾರಗಳು', 'shuklaOnly': 'ಶುಕ್ಲ ಪಕ್ಷ ಮಾತ್ರ', 'rulesTitle': 'ಮುಹೂರ್ತದ ನಿಯಮಗಳು', 'rTithi': '📋 ತಿಥಿಗಳು: ', 'rNak': '📋 ನಕ್ಷತ್ರಗಳು: ', 'rVara': '📋 ವಾರಗಳು: ', 'rLagna': '📋 ಲಗ್ನಗಳು: ', 'rShuddhi': '📋 ಲಗ್ನಶು ಪರೀಕ್ಷೆ: ', 'anyLagna': 'ಯಾವುದಾ (ಲಗ್ನಶು ನೋಡಿ)',
+      'panchaShuddhi': 'ಪಂಚಾಂಗ ಶುದ್ಧಿ', 'shukla': 'ಶುಕ್ಲ', 'krishna': 'ಕೃಷ್ಣ', 'paksha': 'ಪಕ್ಷ',
+      'taraBala': 'ತಾರಾ ಬಲ', 'chandraBala': 'ಚಂದ್ರ ಬಲ', 'anukoola': 'ಅನುಕೂಲ', 'pratikoola': 'ಪ್ರತಿಕೂಲ',
+      'dayMuhurtaTimings': 'ಈ ದಿನ ಹಗಲು ಮುಹೂರ್ತಗಳು', 'nightMuhurtaTimings': 'ಈ ದಿನ ರಾತ್ರಿಯ ಮುಹೂರ್ತಗಳು',
+      'dayLagnaLabel': 'ಈ ಹಗಲು ಲಗ್ನ ಶುದ್ಧಿ', 'nightLagnaLabel': 'ಈ ರಾತ್ರಿ ಲಗ್ನ ಶುದ್ಧಿ',
+      'needShuddhi': 'ಅಗತ್ಯ', 'shuddhaLabel': 'ಶುದ್ಧ', 'guruAnukoola': 'ಗುರು ✅', 'guruPratikoola': 'ಗುರು ❌', 'guruvaarVichar': 'ಗುರುವಾರ ವಿಚಾರ', 'la': 'ಲ', 'saptamaShort': '೭ ಸಪ್ತಮ', 'ashtamaShort': '೮ ಅಷ್ಟಮ', 'dashamaShort': '೧೦ ದಶಮ',
     },
     'hi': {
 
@@ -488,6 +502,16 @@ class AppLocale {
       'muh0': 'रुद्र', 'muh1': 'अहि', 'muh2': 'मित्र', 'muh3': 'पितृ', 'muh4': 'वसु', 'muh5': 'वाराह', 'muh6': 'विश्वेदेव', 'muh7': 'विधि', 'muh8': 'सत्मुखी', 'muh9': 'पुरुहूत', 'muh10': 'वाहिनी', 'muh11': 'नक्तनकर', 'muh12': 'वरुण', 'muh13': 'अर्यम', 'muh14': 'भग',
       // Muhurta nature / day label
       'dayMuhurta': 'दिन के मुहूर्त', 'dayMuhurtaDesc': 'दिन को 15 समान भागों में विभाजित', 'shubha': 'शुभ', 'ashubha': 'अशुभ', 'madhyama': 'मध्यम',
+      'tara0': 'जन्म तारा (अशुभ)', 'tara1': 'सम्पत् तारा (शुभ)', 'tara2': 'विपत् तारा (अशुभ)', 'tara3': 'क्षेम तारा (शुभ)', 'tara4': 'प्रत्यक् तारा (अशुभ)', 'tara5': 'साधक तारा (शुभ)', 'tara6': 'वध तारा (अशुभ)', 'tara7': 'मित्र तारा (शुभ)', 'tara8': 'परम मित्र तारा (उत्तम)',
+      'samvatsaraLabel': 'संवत्सर', 'varaLabel': 'वार', 'tithiLabel': 'तिथि', 'chandraNakLabel': 'चन्द्र नक्षत्र', 'yogaLabel': 'योग', 'karanaLabel': 'करण', 'chandraRashiLabel': 'चन्द्र राशि', 'chandraMasaLabel': 'चन्द्र मास', 'suryaNakLabel': 'सूर्य नक्षत्र', 'souraMasaLabel': 'सौर मास', 'sunriseLabel': 'सूर्योदय', 'sunsetLabel': 'सूर्यास्त', 'padaLabel': 'पाद', 'endLabel': 'अंत', 'nextDayLabel': 'अगले दिन',
+      'wdMon': 'सोम', 'wdTue': 'मंगल', 'wdWed': 'बुध', 'wdThu': 'गुरु', 'wdFri': 'शुक्र', 'wdSat': 'शनि', 'wdSun': 'रवि',
+      'lagnaLabel': 'लग्न', 'saptama': 'सप्तम', 'ashtama': 'अष्टम', 'dashama': 'दशम', 'chandraSaptama': 'चन्द्र सप्तम', 'chandraSaptamaShort': 'चन्द्रसप्तम',
+      'allTithi': 'सभी तिथियाँ', 'allNak': 'सभी नक्षत्र', 'allVara': 'सभी वार', 'shuklaOnly': 'शुक्ल पक्ष ही', 'rulesTitle': 'मुहूर्त नियम', 'rTithi': '📋 तिथियाँ: ', 'rNak': '📋 नक्षत्र: ', 'rVara': '📋 वार: ', 'rLagna': '📋 लग्न: ', 'rShuddhi': '📋 लग्नशुद्धि: ', 'anyLagna': 'कोई भी (लग्नशुद्धि देखें)',
+      'panchaShuddhi': 'पंचांग शुद्धि', 'shukla': 'शुक्ल', 'krishna': 'कृष्ण', 'paksha': 'पक्ष',
+      'taraBala': 'तारा बल', 'chandraBala': 'चन्द्र बल', 'anukoola': 'अनुकूल', 'pratikoola': 'प्रतिकूल',
+      'dayMuhurtaTimings': 'आज के दिन मुहूर्त', 'nightMuhurtaTimings': 'आज के रात मुहूर्त',
+      'dayLagnaLabel': 'दिन लग्न शुद्धि', 'nightLagnaLabel': 'रात लग्न शुद्धि',
+      'needShuddhi': 'आवश्यक', 'shuddhaLabel': 'शुद्ध', 'guruAnukoola': 'गुरु ✅', 'guruPratikoola': 'गुरु ❌', 'guruvaarVichar': 'गुरुवार विचार', 'la': 'ल', 'saptamaShort': '७ सप्तम', 'ashtamaShort': '८ अष्टम', 'dashamaShort': '१० दशम',
     },
     'ta': {
 
@@ -651,6 +675,16 @@ class AppLocale {
       'horaSurya': 'சூரியன்', 'horaShukra': 'சுக்கிரன்', 'horaBudha': 'புதன்', 'horaChandra': 'சந்திரன்', 'horaShani': 'சனி', 'horaGuru': 'குரு', 'horaMangala': 'செவ்வாய்',
       'muh0': 'ருத்ரம்', 'muh1': 'அஹி', 'muh2': 'மித்ரம்', 'muh3': 'பிதிரு', 'muh4': 'வசு', 'muh5': 'வராஹம்', 'muh6': 'விஸ்வேதேவம்', 'muh7': 'விதி', 'muh8': 'சத்முகி', 'muh9': 'புருஹூதம்', 'muh10': 'வாஹினி', 'muh11': 'நக்தநகரம்', 'muh12': 'வருணம்', 'muh13': 'அர்யமம்', 'muh14': 'பகம்',
       'dayMuhurta': 'பகல் முஹூர்த்தம்', 'dayMuhurtaDesc': 'நாளை 15 சம பாகங்களாக பிரிக்கப்பட்டது', 'shubha': 'சுபம்', 'ashubha': 'அசுபம்', 'madhyama': 'மத்யமம்',
+      'tara0': 'ஜன்ம தாரை (அசுபம்)', 'tara1': 'சம்பத் தாரை (சுபம்)', 'tara2': 'விபத் தாரை (அசுபம்)', 'tara3': 'க்ஷேம தாரை (சுபம்)', 'tara4': 'பிரத்யக் தாரை (அசுபம்)', 'tara5': 'சாதக தாரை (சுபம்)', 'tara6': 'வத தாரை (அசுபம்)', 'tara7': 'மித்ர தாரை (சுபம்)', 'tara8': 'பரம மித்ர தாரை (சிறந்தது)',
+      'samvatsaraLabel': 'சம்வத்சரம்', 'varaLabel': 'வாரம்', 'tithiLabel': 'திதி', 'chandraNakLabel': 'சந்திர நக்ஷத்ரம்', 'yogaLabel': 'யோகம்', 'karanaLabel': 'கரணம்', 'chandraRashiLabel': 'சந்திர ராசி', 'chandraMasaLabel': 'சந்திர மாசம்', 'suryaNakLabel': 'சூரிய நக்ஷத்ரம்', 'souraMasaLabel': 'சௌர மாசம்', 'sunriseLabel': 'சூரியோதயம்', 'sunsetLabel': 'சூரியாஸ்தமனம்', 'padaLabel': 'பாதம்', 'endLabel': 'முடிவு', 'nextDayLabel': 'அடுத்த நாள்',
+      'wdMon': 'திங்', 'wdTue': 'செவ்', 'wdWed': 'புத', 'wdThu': 'வியா', 'wdFri': 'வெள்', 'wdSat': 'சனி', 'wdSun': 'ஞாயி',
+      'lagnaLabel': 'லக்னம்', 'saptama': 'சப்தமம்', 'ashtama': 'அஷ்டமம்', 'dashama': 'தசமம்', 'chandraSaptama': 'சந்திர சப்தமம்', 'chandraSaptamaShort': 'சந்திரசப்தமம்',
+      'allTithi': 'அனைத்து திதிகள்', 'allNak': 'அனைத்து நக்ஷத்ரங்கள்', 'allVara': 'அனைத்து வாரங்கள்', 'shuklaOnly': 'சுக்ல பக்ஷம் மட்டும்', 'rulesTitle': 'முஹூர்த்த விதிகள்', 'rTithi': '📋 திதிகள்: ', 'rNak': '📋 நக்ஷத்ரங்கள்: ', 'rVara': '📋 வாரங்கள்: ', 'rLagna': '📋 லக்னங்கள்: ', 'rShuddhi': '📋 லக்னசுத்தி: ', 'anyLagna': 'எதுவும் (லக்னசுத்தி பார்க்கவும்)',
+      'panchaShuddhi': 'பஞ்சாங்க சுத்தி', 'shukla': 'சுக்ல', 'krishna': 'கிருஷ்ண', 'paksha': 'பக்ஷம்',
+      'taraBala': 'தாரா பலம்', 'chandraBala': 'சந்திர பலம்', 'anukoola': 'அனுகூலம்', 'pratikoola': 'பிரதிகூலம்',
+      'dayMuhurtaTimings': 'இன்றைய பகல் முஹூர்த்தங்கள்', 'nightMuhurtaTimings': 'இன்றைய இரவு முஹூர்த்தங்கள்',
+      'dayLagnaLabel': 'பகல் லக்ன சுத்தி', 'nightLagnaLabel': 'இரவு லக்ன சுத்தி',
+      'needShuddhi': 'தேவை', 'shuddhaLabel': 'சுத்தம்', 'guruAnukoola': 'குரு ✅', 'guruPratikoola': 'குரு ❌', 'guruvaarVichar': 'குருவார விசாரம்', 'la': 'ல', 'saptamaShort': '௭ சப்தமம்', 'ashtamaShort': '௮ அஷ்டமம்', 'dashamaShort': '௧௦ தசமம்',
     },
     'te': {
 
@@ -814,6 +848,16 @@ class AppLocale {
       'horaSurya': 'సూర్యుడు', 'horaShukra': 'శుక్ర', 'horaBudha': 'బుధ', 'horaChandra': 'చంద్రుడు', 'horaShani': 'శని', 'horaGuru': 'గురు', 'horaMangala': 'కుజ',
       'muh0': 'రుద్రం', 'muh1': 'అహి', 'muh2': 'మిత్రం', 'muh3': 'పితృ', 'muh4': 'వసు', 'muh5': 'వరాహం', 'muh6': 'విశ్వేదేవం', 'muh7': 'విధి', 'muh8': 'సత్ముఖి', 'muh9': 'పురుహూతం', 'muh10': 'వాహిని', 'muh11': 'నక్తనకరం', 'muh12': 'వరుణం', 'muh13': 'అర్యమం', 'muh14': 'భగం',
       'dayMuhurta': 'పగటి ముహూర్తం', 'dayMuhurtaDesc': 'రోజును 15 సమ భాగాలుగా విభజించారు', 'shubha': 'శుభం', 'ashubha': 'అశుభం', 'madhyama': 'మధ్యమం',
+      'tara0': 'జన్మ తార (అశుభం)', 'tara1': 'సంపత్ తార (శుభం)', 'tara2': 'విపత్ తార (అశుభం)', 'tara3': 'క్షేమ తార (శుభం)', 'tara4': 'ప్రత్యక్ తార (అశుభం)', 'tara5': 'సాధక తార (శుభం)', 'tara6': 'వధ తార (అశుభం)', 'tara7': 'మిత్ర తార (శుభం)', 'tara8': 'పరమ మిత్ర తార (ఉత్తమం)',
+      'samvatsaraLabel': 'సంవత్సరం', 'varaLabel': 'వారం', 'tithiLabel': 'తిథి', 'chandraNakLabel': 'చంద్ర నక్షత్రం', 'yogaLabel': 'యోగం', 'karanaLabel': 'కరణం', 'chandraRashiLabel': 'చంద్ర రాశి', 'chandraMasaLabel': 'చంద్ర మాసం', 'suryaNakLabel': 'సూర్య నక్షత్రం', 'souraMasaLabel': 'సౌర మాసం', 'sunriseLabel': 'సూర్యోదయం', 'sunsetLabel': 'సూర్యాస్తమయం', 'padaLabel': 'పాదం', 'endLabel': 'ముగింపు', 'nextDayLabel': 'మరుసటి రోజు',
+      'wdMon': 'సోమ', 'wdTue': 'మంగళ', 'wdWed': 'బుధ', 'wdThu': 'గురు', 'wdFri': 'శుక్ర', 'wdSat': 'శని', 'wdSun': 'ఆది',
+      'lagnaLabel': 'లగ్నం', 'saptama': 'సప్తమం', 'ashtama': 'అష్టమం', 'dashama': 'దశమం', 'chandraSaptama': 'చంద్ర సప్తమం', 'chandraSaptamaShort': 'చంద్రసప్తమం',
+      'allTithi': 'అన్ని తిథులు', 'allNak': 'అన్ని నక్షత్రాలు', 'allVara': 'అన్ని వారాలు', 'shuklaOnly': 'శుక్ల పక్షం మాత్రమే', 'rulesTitle': 'ముహూర్తం నియమాలు', 'rTithi': '📋 తిథులు: ', 'rNak': '📋 నక్షత్రాలు: ', 'rVara': '📋 వారాలు: ', 'rLagna': '📋 లగ్నాలు: ', 'rShuddhi': '📋 లగ్నశుద్ధి: ', 'anyLagna': 'ఏదైనా (లగ్నశుద్ధి చూడండి)',
+      'panchaShuddhi': 'పంచాంగ శుద్ధి', 'shukla': 'శుక్ల', 'krishna': 'కృష్ణ', 'paksha': 'పక్షం',
+      'taraBala': 'తారా బలం', 'chandraBala': 'చంద్ర బలం', 'anukoola': 'అనుకూలం', 'pratikoola': 'ప్రతికూలం',
+      'dayMuhurtaTimings': 'ఈ రోజు పగటి ముహూర్తాలు', 'nightMuhurtaTimings': 'ఈ రోజు రాత్రి ముహూర్తాలు',
+      'dayLagnaLabel': 'పగటి లగ్న శుద్ధి', 'nightLagnaLabel': 'రాత్రి లగ్న శుద్ధి',
+      'needShuddhi': 'అవసరం', 'shuddhaLabel': 'శుద్ధం', 'guruAnukoola': 'గురు ✅', 'guruPratikoola': 'గురు ❌', 'guruvaarVichar': 'గురువార విచారం', 'la': 'ల', 'saptamaShort': '7 సప్తమం', 'ashtamaShort': '8 అష్టమం', 'dashamaShort': '10 దశమం',
     },
     'ml': {
 
@@ -977,6 +1021,16 @@ class AppLocale {
       'horaSurya': 'സൂര്യൻ', 'horaShukra': 'ശുക്രൻ', 'horaBudha': 'ബുധൻ', 'horaChandra': 'ചന്ദ്രൻ', 'horaShani': 'ശനി', 'horaGuru': 'ഗുരു', 'horaMangala': 'ചൊവ്വ',
       'muh0': 'രുദ്രം', 'muh1': 'അഹി', 'muh2': 'മിത്രം', 'muh3': 'പിതൃ', 'muh4': 'വസു', 'muh5': 'വരാഹം', 'muh6': 'വിശ്വേദേവം', 'muh7': 'വിധി', 'muh8': 'സത്മുഖി', 'muh9': 'പുരുഹൂതം', 'muh10': 'വാഹിനി', 'muh11': 'നക്തനകരം', 'muh12': 'വരുണം', 'muh13': 'അര്യമം', 'muh14': 'ഭഗം',
       'dayMuhurta': 'പകൽ മുഹൂർത്തം', 'dayMuhurtaDesc': 'ദിവസത്തെ 15 സമഭാഗങ്ങളായി വിഭജിച്ചു', 'shubha': 'ശുഭം', 'ashubha': 'അശുഭം', 'madhyama': 'മധ്യമം',
+      'tara0': 'ജന്മ താരം (അശുഭം)', 'tara1': 'സമ്പത്ത് താരം (ശുഭം)', 'tara2': 'വിപത്ത് താരം (അശുഭം)', 'tara3': 'ക്ഷേമ താരം (ശുഭം)', 'tara4': 'പ്രത്യക് താരം (അശുഭം)', 'tara5': 'സാധക താരം (ശുഭം)', 'tara6': 'വധ താരം (അശുഭം)', 'tara7': 'മിത്ര താരം (ശുഭം)', 'tara8': 'പരമ മിത്ര താരം (ഉത്തമം)',
+      'samvatsaraLabel': 'സംവത്സരം', 'varaLabel': 'വാരം', 'tithiLabel': 'തിഥി', 'chandraNakLabel': 'ചന്ദ്ര നക്ഷത്രം', 'yogaLabel': 'യോഗം', 'karanaLabel': 'കരണം', 'chandraRashiLabel': 'ചന്ദ്ര രാശി', 'chandraMasaLabel': 'ചന്ദ്ര മാസം', 'suryaNakLabel': 'സൂര്യ നക്ഷത്രം', 'souraMasaLabel': 'സൗര മാസം', 'sunriseLabel': 'സൂര്യോദയം', 'sunsetLabel': 'സൂര്യാസ്തമയം', 'padaLabel': 'പാദം', 'endLabel': 'അവസാനം', 'nextDayLabel': 'അടുത്ത ദിവസം',
+      'wdMon': 'തിങ്ക', 'wdTue': 'ചൊവ്വ', 'wdWed': 'ബുധ', 'wdThu': 'വ്യാഴ', 'wdFri': 'വെള്ളി', 'wdSat': 'ശനി', 'wdSun': 'ഞായർ',
+      'lagnaLabel': 'ലഗ്നം', 'saptama': 'സപ്തമം', 'ashtama': 'അഷ്ടമം', 'dashama': 'ദശമം', 'chandraSaptama': 'ചന്ദ്ര സപ്തമം', 'chandraSaptamaShort': 'ചന്ദ്രസപ്തമം',
+      'allTithi': 'എല്ലാ തിഥികൾ', 'allNak': 'എല്ലാ നക്ഷത്രങ്ങൾ', 'allVara': 'എല്ലാ വാരങ്ങൾ', 'shuklaOnly': 'ശുക്ല പക്ഷം മാത്രം', 'rulesTitle': 'മുഹൂർത്ത നിയമങ്ങൾ', 'rTithi': '📋 തിഥികൾ: ', 'rNak': '📋 നക്ഷത്രങ്ങൾ: ', 'rVara': '📋 വാരങ്ങൾ: ', 'rLagna': '📋 ലഗ്നങ്ങൾ: ', 'rShuddhi': '📋 ലഗ്നശുദ്ധി: ', 'anyLagna': 'ഏതെങ്കിലും (ലഗ്നശുദ്ധി കാണുക)',
+      'panchaShuddhi': 'പഞ്ചാംഗ ശുദ്ധി', 'shukla': 'ശുക്ല', 'krishna': 'കൃഷ്ണ', 'paksha': 'പക്ഷം',
+      'taraBala': 'താരാ ബലം', 'chandraBala': 'ചന്ദ്ര ബലം', 'anukoola': 'അനുകൂലം', 'pratikoola': 'പ്രതികൂലം',
+      'dayMuhurtaTimings': 'ഇന്നത്തെ പകൽ മുഹൂർത്തങ്ങൾ', 'nightMuhurtaTimings': 'ഇന്നത്തെ രാത്രി മുഹൂർത്തങ്ങൾ',
+      'dayLagnaLabel': 'പകൽ ലഗ്ന ശുദ്ധി', 'nightLagnaLabel': 'രാത്രി ലഗ്ന ശുദ്ധി',
+      'needShuddhi': 'ആവശ്യം', 'shuddhaLabel': 'ശുദ്ധം', 'guruAnukoola': 'ഗുരു ✅', 'guruPratikoola': 'ഗുരു ❌', 'guruvaarVichar': 'ഗുരുവാര വിചാരം', 'la': 'ല', 'saptamaShort': '7 സപ്തമം', 'ashtamaShort': '8 അഷ്ടമം', 'dashamaShort': '10 ദശമം',
     },
   };
 

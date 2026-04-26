@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:sweph/sweph.dart';
@@ -30,17 +30,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
   bool _showTaraCharts = false;
   MuhurtaEvent _selectedMuhurtaEvent = MuhurtaEvent.vivaha;
 
-  final _taras = [
-    'ಜನ್ಮ ತಾರೆ (ಅಶುಭ)',
-    'ಸಂಪತ್ ತಾರೆ (ಶುಭ)',
-    'ವಿಪತ್ ತಾರೆ (ಅಶುಭ)',
-    'ಕ್ಷೇಮ ತಾರೆ (ಶುಭ)',
-    'ಪ್ರತ್ಯಕ್ ತಾರೆ (ಅಶುಭ)',
-    'ಸಾಧಕ ತಾರೆ (ಶುಭ)',
-    'ವಧ ತಾರೆ (ಅಶುಭ)',
-    'ಮಿತ್ರ ತಾರೆ (ಶುಭ)',
-    'ಪರಮ ಮಿತ್ರ ತಾರೆ (ಅತ್ಯುತ್ತಮ)',
-  ];
+  List<String> get _taras => List.generate(9, (i) => AppLocale.l('tara$i'));
 
   @override
   void initState() {
@@ -223,7 +213,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
 
   String _formatEnd(String base, String endTime, bool nextDay) {
     if (endTime.isEmpty) return base;
-    return '$base (ಅಂತ್ಯ: $endTime${nextDay ? ' ಮುಂದಿನ ದಿನ' : ''})';
+    return '$base (${AppLocale.l('endLabel')}: $endTime${nextDay ? ' ${AppLocale.l('nextDayLabel')}' : ''})';
   }
 
   Widget _buildTaraChart(int janmaIdx, String title) {
@@ -253,7 +243,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
               int n1 = (janmaIdx + i) % 27;
               int n2 = (janmaIdx + i + 9) % 27;
               int n3 = (janmaIdx + i + 18) % 27;
-              String nakshatras = '${knNak[n1]}, ${knNak[n2]}, ${knNak[n3]}';
+              String nakshatras = '${trAll(knNak[n1])}, ${trAll(knNak[n2])}, ${trAll(knNak[n3])}';
 
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -369,7 +359,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.red.withOpacity(0.3)),
                           ),
-                          child: Text(knNak[idx], style: TextStyle(fontSize: 11, color: Colors.red.shade700, fontWeight: FontWeight.w600)),
+                          child: Text(trAll(knNak[idx]), style: TextStyle(fontSize: 11, color: Colors.red.shade700, fontWeight: FontWeight.w600)),
                         )).toList(),
                       ),
                     ],
@@ -393,7 +383,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                           items: List.generate(27, (i) {
                             return DropdownMenuItem<int>(
                               value: i,
-                              child: Text(knNak[i], style: TextStyle(fontSize: 16, color: kText)),
+                              child: Text(trAll(knNak[i]), style: TextStyle(fontSize: 16, color: kText)),
                             );
                           }),
                           onChanged: (val) {
@@ -425,7 +415,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                             items: List.generate(27, (i) {
                               return DropdownMenuItem<int>(
                                 value: i,
-                                child: Text(knNak[i], style: TextStyle(fontSize: 16, color: kText)),
+                                child: Text(trAll(knNak[i]), style: TextStyle(fontSize: 16, color: kText)),
                               );
                             }),
                             onChanged: (val) {
@@ -464,7 +454,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                         calendarBuilders: CalendarBuilders(
                           markerBuilder: (context, date, events) => _buildMarker(date, events),
                           dowBuilder: (context, day) {
-                            const days = ['ಸೋಮ', 'ಮಂಗಳ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ', 'ರವಿ'];
+                            final days = [AppLocale.l('wdMon'), AppLocale.l('wdTue'), AppLocale.l('wdWed'), AppLocale.l('wdThu'), AppLocale.l('wdFri'), AppLocale.l('wdSat'), AppLocale.l('wdSun')];
                             return Center(
                               child: Text(
                                 days[day.weekday - 1],
@@ -473,7 +463,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                             );
                           },
                           headerTitleBuilder: (context, day) {
-                            const months = ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ', 'ಮಾರ್ಚ್', 'ಏಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 'ಜುಲೈ', 'ಆಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್'];
+                            final months = [AppLocale.l('jan'), AppLocale.l('feb'), AppLocale.l('mar'), AppLocale.l('apr'), AppLocale.l('may'), AppLocale.l('jun'), AppLocale.l('jul'), AppLocale.l('aug'), AppLocale.l('sep'), AppLocale.l('oct'), AppLocale.l('nov'), AppLocale.l('dec')];
                             return Text(
                               '${months[day.month - 1]} ${day.year}',
                               style: TextStyle(color: kText, fontWeight: FontWeight.bold, fontSize: 16),
@@ -656,18 +646,18 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                                   textAlign: TextAlign.center,
                                 ),
                               ),
-                              _tableRow(['ಸಂವತ್ಸರ', pan.samvatsara]),
-                              _tableRow(['ವಾರ', pan.vara]),
-                              _tableRow(['ತಿಥಿ', _formatEnd(pan.tithi, pan.tithiEndTime, pan.tithiEndsNextDay)]),
-                              _tableRow(['ಚಂದ್ರ ನಕ್ಷತ್ರ', _formatEnd(() { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${pan.nakshatra} - ${'ಪಾದ'} $p'; }(), pan.nakEndTime, pan.nakEndsNextDay)]),
-                              _tableRow(['ಯೋಗ', _formatEnd(pan.yoga, pan.yogaEndTime, pan.yogaEndsNextDay)]),
-                              _tableRow(['ಕರಣ', _formatEnd(pan.karana, pan.karanaEndTime, pan.karanaEndsNextDay)]),
-                              _tableRow(['ಚಂದ್ರ ರಾಶಿ', pan.chandraRashi]),
-                              _tableRow(['ಚಂದ್ರ ಮಾಸ', pan.chandraMasa]),
-                              _tableRow(['ಸೂರ್ಯ ನಕ್ಷತ್ರ', '${pan.suryaNakshatra} - ${'ಪಾದ'} ${pan.suryaPada}']),
-                              _tableRow(['ಸೌರ ಮಾಸ', pan.souraMasa]),
-                              _tableRow(['ಸೂರ್ಯೋದಯ', pan.sunrise]),
-                              _tableRow(['ಸೂರ್ಯಾಸ್ತ', pan.sunset]),
+                              _tableRow([AppLocale.l('samvatsaraLabel'), trAll(pan.samvatsara)]),
+                              _tableRow([AppLocale.l('varaLabel'), trAll(pan.vara)]),
+                              _tableRow([AppLocale.l('tithiLabel'), _formatEnd(trAll(pan.tithi), pan.tithiEndTime, pan.tithiEndsNextDay)]),
+                              _tableRow([AppLocale.l('chandraNakLabel'), _formatEnd(() { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p'; }(), pan.nakEndTime, pan.nakEndsNextDay)]),
+                              _tableRow([AppLocale.l('yogaLabel'), _formatEnd(trAll(pan.yoga), pan.yogaEndTime, pan.yogaEndsNextDay)]),
+                              _tableRow([AppLocale.l('karanaLabel'), _formatEnd(trAll(pan.karana), pan.karanaEndTime, pan.karanaEndsNextDay)]),
+                              _tableRow([AppLocale.l('chandraRashiLabel'), trAll(pan.chandraRashi)]),
+                              _tableRow([AppLocale.l('chandraMasaLabel'), trAll(pan.chandraMasa)]),
+                              _tableRow([AppLocale.l('suryaNakLabel'), '${trAll(pan.suryaNakshatra)} - ${AppLocale.l('padaLabel')} ${pan.suryaPada}']),
+                              _tableRow([AppLocale.l('souraMasaLabel'), trAll(pan.souraMasa)]),
+                              _tableRow([AppLocale.l('sunriseLabel'), pan.sunrise]),
+                              _tableRow([AppLocale.l('sunsetLabel'), pan.sunset]),
                             ],
                           ),
                         );
@@ -772,24 +762,24 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
   // ── Event Rules Card ──
   Widget _buildEventRulesCard(MuhurtaEventRules rules) {
     String tithiText = rules.allowedTithis == null
-        ? 'ಎಲ್ಲಾ ತಿಥಿಗಳು'
-        : rules.allowedTithis!.map((i) => knTithi[i]).join(', ');
-    if (rules.requireShukla) tithiText = 'ಶುಕ್ಲ ಪಕ್ಷ ಮಾತ್ರ: $tithiText';
+        ? AppLocale.l('allTithi')
+        : rules.allowedTithis!.map((i) => trAll(knTithi[i])).join(', ');
+    if (rules.requireShukla) tithiText = '${AppLocale.l('shuklaOnly')}: $tithiText';
 
     String nakText = rules.allowedNakshatras == null
-        ? 'ಎಲ್ಲಾ ನಕ್ಷತ್ರಗಳು'
-        : rules.allowedNakshatras!.map((i) => knNak[i].split(' ')[0]).join(', ');
+        ? AppLocale.l('allNak')
+        : rules.allowedNakshatras!.map((i) => trAll(knNak[i].split(' ')[0])).join(', ');
     String varaText = rules.allowedVaras == null
-        ? 'ಎಲ್ಲಾ ವಾರಗಳು'
-        : rules.allowedVaras!.map((i) => knVara[i].replaceAll('ವಾರ', '')).join(', ');
+        ? AppLocale.l('allVara')
+        : rules.allowedVaras!.map((i) => trAll(knVara[i])).join(', ');
 
     final shuddhis = rules.requiredShuddhis.map((s) {
       switch (s) {
-        case ShuddhiType.lagna: return 'ಲಗ್ನ';
-        case ShuddhiType.saptama: return 'ಸಪ್ತಮ';
-        case ShuddhiType.ashtama: return 'ಅಷ್ಟಮ';
-        case ShuddhiType.dashama: return 'ದಶಮ';
-        case ShuddhiType.chandraSaptama: return 'ಚಂದ್ರ ಸಪ್ತಮ';
+        case ShuddhiType.lagna: return AppLocale.l('lagnaLabel');
+        case ShuddhiType.saptama: return AppLocale.l('saptama');
+        case ShuddhiType.ashtama: return AppLocale.l('ashtama');
+        case ShuddhiType.dashama: return AppLocale.l('dashama');
+        case ShuddhiType.chandraSaptama: return AppLocale.l('chandraSaptama');
       }
     }).join(' + ');
 
@@ -798,17 +788,17 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('ಶಾಸ್ತ್ರೋಕ್ತ ನಿಯಮಗಳು', style: TextStyle(fontWeight: FontWeight.w800, color: kPurple1, fontSize: 13)),
+          Text(AppLocale.l('rulesTitle'), style: TextStyle(fontWeight: FontWeight.w800, color: kPurple1, fontSize: 13)),
           const SizedBox(height: 8),
-          _ruleRow('• ತಿಥಿಗಳು: ', tithiText),
+          _ruleRow(AppLocale.l('rTithi'), tithiText),
           const SizedBox(height: 4),
-          _ruleRow('• ನಕ್ಷತ್ರಗಳು: ', nakText),
+          _ruleRow(AppLocale.l('rNak'), nakText),
           const SizedBox(height: 4),
-          _ruleRow('• ವಾರಗಳು: ', varaText),
+          _ruleRow(AppLocale.l('rVara'), varaText),
           const SizedBox(height: 4),
-          _ruleRow('• ಲಗ್ನಗಳು: ', rules.allowedLagnas == null ? 'ಸಾಮಾನ್ಯ (ಶುದ್ಧಿ ಆಧಾರಿತ)' : rules.allowedLagnas!.map((i) => knRashi[i]).join(', ')),
+          _ruleRow(AppLocale.l('rLagna'), rules.allowedLagnas == null ? AppLocale.l('anyLagna') : rules.allowedLagnas!.map((i) => trAll(knRashi[i])).join(', ')),
           const SizedBox(height: 4),
-          _ruleRow('• ಕಡ್ಡಾಯ ಶುದ್ಧಿ: ', shuddhis, valueColor: kPurple1, valueBold: true),
+          _ruleRow(AppLocale.l('rShuddhi'), shuddhis, valueColor: kPurple1, valueBold: true),
         ],
       ),
     );
@@ -838,12 +828,12 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     final pakshaOk = !rules.requireShukla || (tIdx >= 0 && tIdx <= 14);
 
     final checks = [
-      {'label': 'ತಿಥಿ', 'value': pan.tithi, 'ok': tithiOk},
-      {'label': 'ನಕ್ಷತ್ರ', 'value': pan.nakshatra, 'ok': nakOk},
-      {'label': 'ವಾರ', 'value': pan.vara, 'ok': varaOk},
-      {'label': 'ಕರಣ', 'value': pan.karana, 'ok': karanaOk},
+      {'label': AppLocale.l('tithiLabel'), 'value': trAll(pan.tithi), 'ok': tithiOk},
+      {'label': AppLocale.l('nakshatra'), 'value': trAll(pan.nakshatra), 'ok': nakOk},
+      {'label': AppLocale.l('varaLabel'), 'value': trAll(pan.vara), 'ok': varaOk},
+      {'label': AppLocale.l('karanaLabel'), 'value': trAll(pan.karana), 'ok': karanaOk},
       if (rules.requireShukla)
-        {'label': 'ಪಕ್ಷ', 'value': tIdx <= 14 ? 'ಶುಕ್ಲ' : 'ಕೃಷ್ಣ', 'ok': pakshaOk},
+        {'label': AppLocale.l('paksha'), 'value': tIdx <= 14 ? AppLocale.l('shukla') : AppLocale.l('krishna'), 'ok': pakshaOk},
     ];
 
     return Container(
@@ -860,7 +850,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
             color: kPurple1.withOpacity(0.08),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
           ),
-          child: Text('ಪಂಚಾಂಗ ಶುದ್ಧಿ', style: TextStyle(fontWeight: FontWeight.w800, color: kPurple1, fontSize: 14)),
+          child: Text(AppLocale.l('panchaShuddhi'), style: TextStyle(fontWeight: FontWeight.w800, color: kPurple1, fontSize: 14)),
         ),
         ...checks.map((c) => Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -906,8 +896,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label, style: TextStyle(fontWeight: FontWeight.w800, color: kPurple1, fontSize: 13)),
         const SizedBox(height: 8),
-        _balaChipRow('ತಾರಾ ಬಲ', taraName, isGoodTara),
-        _balaChipRow('ಚಂದ್ರ ಬಲ', chandraBala ? 'ಅನುಕೂಲ' : 'ಪ್ರತಿಕೂಲ', chandraBala),
+        _balaChipRow(AppLocale.l('taraBala'), taraName, isGoodTara),
+        _balaChipRow(AppLocale.l('chandraBala'), chandraBala ? AppLocale.l('anukoola') : AppLocale.l('pratikoola'), chandraBala),
       ]),
     );
   }
@@ -984,7 +974,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     final names = isDay ? _dayMuhurtaNames : _nightMuhurtaNames;
     final natures = isDay ? _dayMuhurtaNature : _nightMuhurtaNature;
     final Color headerColor = isDay ? const Color(0xFF8E44AD) : const Color(0xFF2C3E50);
-    final String headerText = isDay ? '☀️ ೧೫ ಹಗಲಿನ ಮುಹೂರ್ತ' : '🌙 ೧೫ ರಾತ್ರಿಯ ಮುಹೂರ್ತ';
+    final String headerText = isDay ? '☀️ ${AppLocale.l('dayMuhurtaTimings')}' : '🌙 ${AppLocale.l('nightMuhurtaTimings')}';
 
     double duration;
     double startMin;
@@ -1194,15 +1184,15 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     if (windows == null || windows.isEmpty) return const SizedBox();
 
     final Color headerColor = isDay ? const Color(0xFF2E86AB) : const Color(0xFF2C3E50);
-    final String headerText = isDay ? '🏠 ಹಗಲಿನ ಲಗ್ನ ಶುದ್ಧಿ' : '🌙 ರಾತ್ರಿಯ ಲಗ್ನ ಶುದ್ಧಿ';
+    final String headerText = isDay ? '🏠 ${AppLocale.l('dayLagnaLabel')}' : '🌙 ${AppLocale.l('nightLagnaLabel')}';
 
     final req = rules.requiredShuddhis;
     final parts = <String>[];
-    if (req.contains(ShuddhiType.lagna)) parts.add('ಲಗ್ನ');
-    if (req.contains(ShuddhiType.saptama)) parts.add('ಸಪ್ತಮ');
-    if (req.contains(ShuddhiType.ashtama)) parts.add('ಅಷ್ಟಮ');
-    if (req.contains(ShuddhiType.dashama)) parts.add('ದಶಮ');
-    if (req.contains(ShuddhiType.chandraSaptama)) parts.add('ಚಂದ್ರಸಪ್ತಮ');
+    if (req.contains(ShuddhiType.lagna)) parts.add(AppLocale.l('lagnaLabel'));
+    if (req.contains(ShuddhiType.saptama)) parts.add(AppLocale.l('saptama'));
+    if (req.contains(ShuddhiType.ashtama)) parts.add(AppLocale.l('ashtama'));
+    if (req.contains(ShuddhiType.dashama)) parts.add(AppLocale.l('dashama'));
+    if (req.contains(ShuddhiType.chandraSaptama)) parts.add(AppLocale.l('chandraSaptamaShort'));
 
     return Container(
       decoration: BoxDecoration(
@@ -1221,7 +1211,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(headerText, style: TextStyle(fontWeight: FontWeight.w800, color: headerColor, fontSize: 14)),
             const SizedBox(height: 4),
-            Text('ಅಗತ್ಯ: ${parts.join(' + ')} ಶುದ್ಧಿ + ಗುರು ಅನುಕೂಲ',
+            Text('${AppLocale.l('needShuddhi')}: ${parts.join(' + ')} ${AppLocale.l('shuddhaLabel')} + ${AppLocale.l('guruAnukoola').split(' ')[0]} ${AppLocale.l('anukoola')}',
                 style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w500)),
           ]),
         ),
@@ -1270,17 +1260,17 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
               ]),
               const SizedBox(height: 4),
               Wrap(spacing: 6, runSpacing: 4, children: [
-                _shuddhiChip('ಲಗ್ನ', lw.lagnaShuddhi, lw.lagnaGrahas,
+                _shuddhiChip(AppLocale.l('lagnaLabel'), lw.lagnaShuddhi, lw.lagnaGrahas,
                     required: lw.requiredShuddhis.contains(ShuddhiType.lagna)),
-                _shuddhiChip('೭ ಸಪ್ತಮ', lw.saptamaShuddhi, lw.saptamaGrahas,
+                _shuddhiChip(AppLocale.l('saptamaShort'), lw.saptamaShuddhi, lw.saptamaGrahas,
                     required: lw.requiredShuddhis.contains(ShuddhiType.saptama)),
-                _shuddhiChip('೮ ಅಷ್ಟಮ', lw.ashtamaShuddhi, lw.ashtamaGrahas,
+                _shuddhiChip(AppLocale.l('ashtamaShort'), lw.ashtamaShuddhi, lw.ashtamaGrahas,
                     required: lw.requiredShuddhis.contains(ShuddhiType.ashtama)),
                 if (lw.requiredShuddhis.contains(ShuddhiType.dashama) || lw.dashamaGrahas.isNotEmpty)
-                  _shuddhiChip('೧೦ ದಶಮ', lw.dashamaShuddhi, lw.dashamaGrahas,
+                  _shuddhiChip(AppLocale.l('dashamaShort'), lw.dashamaShuddhi, lw.dashamaGrahas,
                       required: lw.requiredShuddhis.contains(ShuddhiType.dashama)),
                 if (lw.requiredShuddhis.contains(ShuddhiType.chandraSaptama) || lw.chandraSaptamaGrahas.isNotEmpty)
-                  _shuddhiChip('ಚಂದ್ರ-೭', lw.chandraSaptamaShuddhi, lw.chandraSaptamaGrahas,
+                  _shuddhiChip(AppLocale.l('chandraSaptamaShort'), lw.chandraSaptamaShuddhi, lw.chandraSaptamaGrahas,
                       required: lw.requiredShuddhis.contains(ShuddhiType.chandraSaptama)),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -1290,7 +1280,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                     border: Border.all(color: lw.guruAnukoola ? Colors.amber.shade600 : Colors.grey.shade300, width: 0.5),
                   ),
                   child: Text(
-                    lw.guruAnukoola ? 'ಗುರು ✓ (${lw.guruFromLagna})' : 'ಗುರು ✗ (${lw.guruFromLagna})',
+                    lw.guruAnukoola ? '${AppLocale.l('guruAnukoola').split(' ')[0]} ✓ (${lw.guruFromLagna})' : '${AppLocale.l('guruPratikoola').split(' ')[0]} ✗ (${lw.guruFromLagna})',
                     style: TextStyle(fontSize: 10, color: lw.guruAnukoola ? Colors.amber.shade800 : kMuted, fontWeight: FontWeight.w700),
                   ),
                 ),
@@ -1298,7 +1288,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
-                    child: Text('ನಿಷಿದ್ಧ ಲಗ್ನ', style: TextStyle(fontSize: 10, color: Colors.red.shade700, fontWeight: FontWeight.w700)),
+                    child: Text('${AppLocale.l('guruvaarVichar')}', style: TextStyle(fontSize: 10, color: Colors.red.shade700, fontWeight: FontWeight.w700)),
                   ),
               ]),
             ]),
