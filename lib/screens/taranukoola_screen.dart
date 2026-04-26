@@ -713,7 +713,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                 final info = muhurtaEventNames[e]!;
                 return DropdownMenuItem(
                   value: e,
-                  child: Text('${info.kannadaName} (${info.englishName})',
+                  child: Text('${AppLocale.l(info.localeKey)} (${info.englishName})',
                       style: TextStyle(fontSize: 13, color: kText)),
                 );
               }).toList(),
