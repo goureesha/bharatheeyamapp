@@ -565,10 +565,10 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
     final abhijitStart = midday - muhurtaDur / 2.0;
     final abhijitEnd = midday + muhurtaDur / 2.0;
     timings.add({
-      'name': tr('ಅಭಿಜಿತ್ ಮುಹೂರ್ತ'), 'nameEn': 'Abhijit Muhurta',
+      'name': AppLocale.l('abhijit'), 'nameEn': 'Abhijit Muhurta',
       'start': _minutesToTimeStr(abhijitStart), 'end': _minutesToTimeStr(abhijitEnd),
       'icon': Icons.star, 'color': Colors.green,
-      'desc': tr('ಅತ್ಯಂತ ಶುಭ — ') + 'Most auspicious (midday ± ½ muhurta)',
+      'desc': AppLocale.l('abhijitDesc') + 'Most auspicious (midday ± ½ muhurta)',
     });
 
     // ═══ Durmuhurta — fixed offsets from sunrise per weekday ═══
@@ -595,11 +595,11 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
       final dStart = sr + offset;
       final dEnd = dStart + dur;
       timings.add({
-        'name': weekdayDurs.length > 1 ? '${tr('ದುರ್ಮುಹೂರ್ತ')} ${i + 1}' : tr('ದುರ್ಮುಹೂರ್ತ'),
+        'name': weekdayDurs.length > 1 ? '${AppLocale.l('durmuhurta')} ${i + 1}' : AppLocale.l('durmuhurta'),
         'nameEn': weekdayDurs.length > 1 ? 'Durmuhurta ${i + 1}' : 'Durmuhurta',
         'start': _minutesToTimeStr(dStart % (24 * 60)), 'end': _minutesToTimeStr(dEnd % (24 * 60)),
         'icon': Icons.dangerous, 'color': Colors.red,
-        'desc': tr('ಅಶುಭ ಸಮಯ — ') + 'Inauspicious (${dur.toInt()} min)',
+        'desc': AppLocale.l('durmuhurtaDesc') + 'Inauspicious (${dur.toInt()} min)',
       });
     }
 
@@ -616,11 +616,11 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
     final varjyaStartMins = sr + (varjyaStartGhati * 24.0);
     final varjyaEndMins = varjyaStartMins + (4 * 24.0); // 4 ghatis = 96 min
     timings.add({
-      'name': tr('ವರ್ಜ್ಯ (ತ್ಯಾಜ್ಯ)'), 'nameEn': 'Varjyam (Tyajya)',
+      'name': AppLocale.l('varjya'), 'nameEn': 'Varjyam (Tyajya)',
       'start': _minutesToTimeStr(varjyaStartMins % (24 * 60)),
       'end': _minutesToTimeStr(varjyaEndMins % (24 * 60)),
       'icon': Icons.block, 'color': Colors.orange,
-      'desc': tr('ವರ್ಜ್ಯ ಕಾಲ — ') + 'Avoid (nakshatra ghati: $varjyaStartGhati-${varjyaStartGhati + 4})',
+      'desc': AppLocale.l('varjyaDesc') + 'Avoid (nakshatra ghati: $varjyaStartGhati-${varjyaStartGhati + 4})',
     });
 
     // ═══ Amrita Siddhi Yoga ═══
@@ -638,14 +638,14 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
     }
 
     if (hasAmritaSiddhi) {
-      final varas = [tr('ಭಾನುವಾರ'), tr('ಸೋಮವಾರ'), tr('ಮಂಗಳವಾರ'), tr('ಬುಧವಾರ'), tr('ಗುರುವಾರ'), tr('ಶುಕ್ರವಾರ'), tr('ಶನಿವಾರ')];
+      final varas = [trAll(knVara[0]), trAll(knVara[1]), trAll(knVara[2]), trAll(knVara[3]), trAll(knVara[4]), trAll(knVara[5]), trAll(knVara[6])];
       final varaName = varas[_weekday];
-      final nakName = trAll(_panchang!.nakshatra.split(' ')[0]); // Get exact nakshatra name without extra text
+      final nakName = trAll(_panchang!.nakshatra.split(' ')[0]);
       timings.add({
-        'name': tr('ಅಮೃತ ಸಿದ್ಧಿ ಯೋಗ'), 'nameEn': 'Amrita Siddhi Yoga',
+        'name': AppLocale.l('amritaSiddhi'), 'nameEn': 'Amrita Siddhi Yoga',
         'start': _minutesToTimeStr(sr % (24*60)), 'end': _minutesToTimeStr(ss % (24*60)),
         'icon': Icons.diamond, 'color': Colors.green,
-        'desc': '$varaName + $nakName ನಕ್ಷತ್ರ ವಿಶೇಷ ಸಂಯೋಜನೆ ಅತ್ಯಂತ ಶುಭ',
+        'desc': '$varaName + $nakName ${AppLocale.l('amritaSiddhiDesc')}',
       });
     }
 
@@ -654,11 +654,11 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
         Row(children: [
           Icon(Icons.access_alarm, color: kOrange, size: 22),
           const SizedBox(width: 8),
-          Text(tr('ಮುಹೂರ್ತ ಸಮಯ') + ' / Muhurta Timings', style: TextStyle(
+          Text(AppLocale.l('muhurtaTimings') + ' / Muhurta Timings', style: TextStyle(
             fontWeight: FontWeight.w900, fontSize: 14, color: kOrange)),
         ]),
         const SizedBox(height: 6),
-        Text(tr('ಅಭಿಜಿತ್, ದುರ್ಮುಹೂರ್ತ ಮತ್ತು ವರ್ಜ್ಯ ಕಾಲ'), style: TextStyle(color: kMuted, fontSize: 11)),
+        Text(AppLocale.l('muhurtaTimingsDesc'), style: TextStyle(color: kMuted, fontSize: 11)),
         const SizedBox(height: 10),
         ...timings.map((t) {
           final color = t['color'] as Color;
@@ -700,7 +700,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
         Row(children: [
           Icon(Icons.warning_amber_rounded, color: Colors.red, size: 22),
           const SizedBox(width: 8),
-          Text(tr('ಅಶುಭ ಕಾಲ') + ' / Inauspicious Periods', style: TextStyle(
+          Text(AppLocale.l('ashubhaKala') + ' / Inauspicious Periods', style: TextStyle(
             fontWeight: FontWeight.w900, fontSize: 14, color: Colors.red)),
         ]),
         const SizedBox(height: 12),
@@ -740,7 +740,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
           Icon(isDay ? Icons.wb_sunny : Icons.nightlight_round,
             color: isDay ? kOrange : kPurple2, size: 22),
           const SizedBox(width: 8),
-          Text(isDay ? tr('ಹಗಲಿನ ಚೌಘಡಿಯಾ') + ' / Day Chougadiya' : tr('ರಾತ್ರಿ ಚೌಘಡಿಯಾ') + ' / Night Chougadiya',
+          Text(isDay ? AppLocale.l('dayChougadiya') + ' / Day Chougadiya' : AppLocale.l('nightChougadiya') + ' / Night Chougadiya',
             style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: isDay ? kOrange : kPurple2)),
         ]),
         const SizedBox(height: 10),
@@ -783,7 +783,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
           Icon(isDay ? Icons.access_time : Icons.access_time_filled,
             color: isDay ? kTeal : kPurple1, size: 22),
           const SizedBox(width: 8),
-          Text(isDay ? tr('ಹಗಲಿನ ಹೋರಾ') + ' / Day Hora' : tr('ರಾತ್ರಿ ಹೋರಾ') + ' / Night Hora',
+          Text(isDay ? AppLocale.l('dayHora') + ' / Day Hora' : AppLocale.l('nightHora') + ' / Night Hora',
             style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: isDay ? kTeal : kPurple1)),
         ]),
         const SizedBox(height: 10),
@@ -832,7 +832,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
 
   String _formatEnd(String base, String endTime, bool nextDay) {
     if (endTime.isEmpty) return base;
-    return '$base (${tr('ಅಂತ್ಯ')}: $endTime${nextDay ? tr(' ಮುಂದಿನ ದಿನ') : ''})';
+    return '$base (${AppLocale.l('endLabel')}: $endTime${nextDay ? ' ${AppLocale.l('nextDayLabel')}' : ''})';
   }
 
   int _chandraPada() {

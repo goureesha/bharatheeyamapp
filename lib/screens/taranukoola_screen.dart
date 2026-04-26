@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:sweph/sweph.dart';
@@ -916,20 +916,16 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
   }
 
   // ── Muhurta Timings (Day / Night) ──
-  static const List<String> _dayMuhurtaNames = [
-    'ರುದ್ರ', 'ಅಹಿ (ಸರ್ಪ)', 'ಮಿತ್ರ', 'ಪಿತೃ', 'ವಸು',
-    'ವಾರಾಹ', 'ವಿಶ್ವೇದೇವ', 'ಅಭಿಜಿತ್ (ವಿಧಿ)', 'ಸತಮುಖೀ', 'ಪುರುಹೂತ',
-    'ವಾಹಿನಿ', 'ನಕ್ತನಕರಾ', 'ವರುಣ', 'ಅರ್ಯಮ', 'ಭಗ',
+  static List<String> get _dayMuhurtaNames => [
+    for (int i = 0; i < 15; i++) AppLocale.l('muh$i'),
   ];
   static const List<bool?> _dayMuhurtaNature = [
     false, false, true, false, true,
     true, true, true, true, true,
     false, false, true, null, false,
   ];
-  static const List<String> _nightMuhurtaNames = [
-    'ಗಿರೀಶ', 'ಅಜಿಪಾದ', 'ಅಹಿರ್ಬುಧ್ನ', 'ಪೂಷಾ', 'ಅಶ್ವಿನೀ',
-    'ಯಮ', 'ಅಗ್ನಿ', 'ವಿಧಾತೃ', 'ಚಂಡ', 'ಅದಿತಿ',
-    'ಜೀವ', 'ವಿಷ್ಣು', 'ದ್ಯುಮದ್ಗದ್ಯುತಿ', 'ತ್ವಷ್ಟೃ', 'ವಾಯು',
+  static List<String> get _nightMuhurtaNames => [
+    for (int i = 0; i < 15; i++) AppLocale.l('nmuh$i'),
   ];
   static const List<bool?> _nightMuhurtaNature = [
     false, false, false, true, true,

@@ -239,6 +239,13 @@ class AppLocale {
       'udayadiGhati': 'ಉದಯಾದಿ ಘಟಿ',
       'gataGhati': 'ಗತ ಘಟಿ', 'sheshaGhati': 'ಶೇಷ ಘಟಿ', 'lagna': 'ಲಗ್ನ',
       'placeLabel': 'ಸ್ಥಳ', 'dashaLord': 'ದಶಾ ನಾಥ', 'dashaBalance': 'ಶೇಷ',
+      'needShuddhi': 'ಅಗತ್ಯ', 'shuddhaLabel': 'ಶುದ್ಧ', 'guruAnukoola': 'ಗುರು ✅', 'guruPratikoola': 'ಗುರು ❌', 'guruvaarVichar': 'ಗುರುವಾರ ವಿಚಾರ', 'la': 'ಲ', 'saptamaShort': '೭ ಸಪ್ತಮ', 'ashtamaShort': '೮ ಅಷ್ಟಮ', 'dashamaShort': '೧೦ ದಶಮ',
+      // Night Muhurta names
+      'nmuh0': 'ಗಿರೀಶ', 'nmuh1': 'ಅಜಿಪಾದ', 'nmuh2': 'ಅಹಿರ್ಬುಧ್ನ', 'nmuh3': 'ಪೂಷಾ', 'nmuh4': 'ಅಶ್ವಿನೀ', 'nmuh5': 'ಯಮ', 'nmuh6': 'ಅಗ್ನಿ', 'nmuh7': 'ವಿಧಾತೃ', 'nmuh8': 'ಚಂಡ', 'nmuh9': 'ಅದಿತಿ', 'nmuh10': 'ಜೀವ', 'nmuh11': 'ವಿಷ್ಣು', 'nmuh12': 'ದ್ಯುಮದಗದ್ಯುತಿ', 'nmuh13': 'ತ್ವಷ್ಟೃ', 'nmuh14': 'ವಾಯು',
+      // Panchanga timing labels
+      'abhijit': 'ಅಭಿಜಿತ್ ಮುಹೂರ್ತ', 'abhijitDesc': 'ಅತ್ಯಂತ ಶುಭ — ', 'durmuhurta': 'ದುರ್ಮುಹೂರ್ತ', 'durmuhurtaDesc': 'ಅಶುಭ ಸಮಯ — ', 'varjya': 'ವರ್ಜ್ಯ (ತ್ಯಾಜ್ಯ)', 'varjyaDesc': 'ವರ್ಜ್ಯ ಕಾಲ — ', 'amritaSiddhi': 'ಅಮೃತ ಸಿದ್ದಿ ಯೋಗ', 'amritaSiddhiDesc': 'ನಕ್ಷತ್ರ ವಿಶೇಷ ಸಂಯೋಜನೆ ಅತ್ಯಂತ ಶುಭ',
+      'muhurtaTimings': 'ಮುಹೂರ್ತ ಸಮಯ', 'muhurtaTimingsDesc': 'ಅಭಿಜಿತ್, ದುರ್ಮುಹೂರ್ತ ಮತ್ತು ವರ್ಜ್ಯ ಕಾಲ', 'ashubhaKala': 'ಅಶುಭ ಕಾಲ',
+      'dayChougadiya': 'ಹಗಲಿನ ಚೌಘಡಿಯಾ', 'nightChougadiya': 'ರಾತ್ರಿ ಚೌಘಡಿಯಾ', 'dayHora': 'ಹಗಲಿನ ಹೋರಾ', 'nightHora': 'ರಾತ್ರಿ ಹೋರಾ',
       'aroType0': 'ಆರೂಢ', 'aroType1': 'ಉದಯ', 'aroType2': 'ಲಗ್ನಾಂಶ', 'aroType3': 'ಛತ್ರ',
       'aroType4': 'ಸ್ಪೃಷ್ಟಾಂಗ', 'aroType5': 'ಚಂದ್ರ', 'aroType6': 'ತಾಂಬೂಲ',
       'shadvarga': 'ಷಡ್ವರ್ಗ', 'bhavaKaksha': 'ಭಾವ ಕಕ್ಷೆ ಗ್ರಹ ವಿಶ್ಲೇಷಣೆ',
@@ -512,6 +519,10 @@ class AppLocale {
       'dayMuhurtaTimings': 'आज के दिन मुहूर्त', 'nightMuhurtaTimings': 'आज के रात मुहूर्त',
       'dayLagnaLabel': 'दिन लग्न शुद्धि', 'nightLagnaLabel': 'रात लग्न शुद्धि',
       'needShuddhi': 'आवश्यक', 'shuddhaLabel': 'शुद्ध', 'guruAnukoola': 'गुरु ✅', 'guruPratikoola': 'गुरु ❌', 'guruvaarVichar': 'गुरुवार विचार', 'la': 'ल', 'saptamaShort': '७ सप्तम', 'ashtamaShort': '८ अष्टम', 'dashamaShort': '१० दशम',
+      'nmuh0': 'गिरीश', 'nmuh1': 'अजिपाद', 'nmuh2': 'अहिर्बुध्न्य', 'nmuh3': 'पूषा', 'nmuh4': 'अश्विनी', 'nmuh5': 'यम', 'nmuh6': 'अग्नि', 'nmuh7': 'विधातृ', 'nmuh8': 'चण्ड', 'nmuh9': 'अदिति', 'nmuh10': 'जीव', 'nmuh11': 'विष्णु', 'nmuh12': 'द्युमद्गद्युति', 'nmuh13': 'त्वष्टृ', 'nmuh14': 'वायु',
+      'abhijit': 'अभिजित मुहूर्त', 'abhijitDesc': 'अत्यंत शुभ — ', 'durmuhurta': 'दुर्मुहूर्त', 'durmuhurtaDesc': 'अशुभ समय — ', 'varjya': 'वर्ज्य (त्याज्य)', 'varjyaDesc': 'वर्ज्य काल — ', 'amritaSiddhi': 'अमृत सिद्धि योग', 'amritaSiddhiDesc': 'नक्षत्र विशेष संयोजन अत्यंत शुभ',
+      'muhurtaTimings': 'मुहूर्त समय', 'muhurtaTimingsDesc': 'अभिजित, दुर्मुहूर्त और वर्ज्य काल', 'ashubhaKala': 'अशुभ काल',
+      'dayChougadiya': 'दिन चौघड़िया', 'nightChougadiya': 'रात चौघड़िया', 'dayHora': 'दिन होरा', 'nightHora': 'रात होरा',
     },
     'ta': {
 
@@ -685,6 +696,10 @@ class AppLocale {
       'dayMuhurtaTimings': 'இன்றைய பகல் முஹூர்த்தங்கள்', 'nightMuhurtaTimings': 'இன்றைய இரவு முஹூர்த்தங்கள்',
       'dayLagnaLabel': 'பகல் லக்ன சுத்தி', 'nightLagnaLabel': 'இரவு லக்ன சுத்தி',
       'needShuddhi': 'தேவை', 'shuddhaLabel': 'சுத்தம்', 'guruAnukoola': 'குரு ✅', 'guruPratikoola': 'குரு ❌', 'guruvaarVichar': 'குருவார விசாரம்', 'la': 'ல', 'saptamaShort': '௭ சப்தமம்', 'ashtamaShort': '௮ அஷ்டமம்', 'dashamaShort': '௧௦ தசமம்',
+      'nmuh0': 'கிரீசன்', 'nmuh1': 'அஜிபாதன்', 'nmuh2': 'அஹிர்புத்னியன்', 'nmuh3': 'பூஷா', 'nmuh4': 'அஸ்வினி', 'nmuh5': 'யமன்', 'nmuh6': 'அக்னி', 'nmuh7': 'விதாத்ரு', 'nmuh8': 'சண்டன்', 'nmuh9': 'அதிதி', 'nmuh10': 'ஜீவன்', 'nmuh11': 'விஷ்ணு', 'nmuh12': 'த்யுமத்கத்யுதி', 'nmuh13': 'த்வஷ்ட்ரு', 'nmuh14': 'வாயு',
+      'abhijit': 'அபிஜித் முஹூர்த்தம்', 'abhijitDesc': 'மிகவும் சுபம் — ', 'durmuhurta': 'துர்முஹூர்த்தம்', 'durmuhurtaDesc': 'அசுப நேரம் — ', 'varjya': 'வர்ஜ்யம் (த்யாஜ்யம்)', 'varjyaDesc': 'வர்ஜ்ய காலம் — ', 'amritaSiddhi': 'அம்ருத சித்தி யோகம்', 'amritaSiddhiDesc': 'நட்சத்திர விசேஷ இணைப்பு மிகவும் சுபம்',
+      'muhurtaTimings': 'முஹூர்த்த நேரம்', 'muhurtaTimingsDesc': 'அபிஜித், துர்முஹூர்த்தம் மற்றும் வர்ஜ்ய காலம்', 'ashubhaKala': 'அசுப காலம்',
+      'dayChougadiya': 'பகல் சௌகடியா', 'nightChougadiya': 'இரவு சௌகடியா', 'dayHora': 'பகல் ஹோரா', 'nightHora': 'இரவு ஹோரா',
     },
     'te': {
 
@@ -858,6 +873,10 @@ class AppLocale {
       'dayMuhurtaTimings': 'ఈ రోజు పగటి ముహూర్తాలు', 'nightMuhurtaTimings': 'ఈ రోజు రాత్రి ముహూర్తాలు',
       'dayLagnaLabel': 'పగటి లగ్న శుద్ధి', 'nightLagnaLabel': 'రాత్రి లగ్న శుద్ధి',
       'needShuddhi': 'అవసరం', 'shuddhaLabel': 'శుద్ధం', 'guruAnukoola': 'గురు ✅', 'guruPratikoola': 'గురు ❌', 'guruvaarVichar': 'గురువార విచారం', 'la': 'ల', 'saptamaShort': '7 సప్తమం', 'ashtamaShort': '8 అష్టమం', 'dashamaShort': '10 దశమం',
+      'nmuh0': 'గిరీశుడు', 'nmuh1': 'అజిపాదుడు', 'nmuh2': 'అహిర్బుధ్న్యుడు', 'nmuh3': 'పూషా', 'nmuh4': 'అశ్వినీ', 'nmuh5': 'యముడు', 'nmuh6': 'అగ్ని', 'nmuh7': 'విధాత', 'nmuh8': 'చండుడు', 'nmuh9': 'అదితి', 'nmuh10': 'జీవుడు', 'nmuh11': 'విష్ణువు', 'nmuh12': 'ద్యుమద్గద్యుతి', 'nmuh13': 'త్వష్ట', 'nmuh14': 'వాయువు',
+      'abhijit': 'అభిజిత్ ముహూర్తం', 'abhijitDesc': 'అత్యంత శుభం — ', 'durmuhurta': 'దుర్ముహూర్తం', 'durmuhurtaDesc': 'అశుభ సమయం — ', 'varjya': 'వర్జ్యం (త్యాజ్యం)', 'varjyaDesc': 'వర్జ్య కాలం — ', 'amritaSiddhi': 'అమృత సిద్ధి యోగం', 'amritaSiddhiDesc': 'నక్షత్ర విశేష సంయోజనం అత్యంత శుభం',
+      'muhurtaTimings': 'ముహూర్త సమయం', 'muhurtaTimingsDesc': 'అభిజిత్, దుర్ముహూర్తం మరియు వర్జ్య కాలం', 'ashubhaKala': 'అశుభ కాలం',
+      'dayChougadiya': 'పగటి చౌఘడియా', 'nightChougadiya': 'రాత్రి చౌఘడియా', 'dayHora': 'పగటి హోరా', 'nightHora': 'రాత్రి హోరా',
     },
     'ml': {
 
@@ -1031,6 +1050,10 @@ class AppLocale {
       'dayMuhurtaTimings': 'ഇന്നത്തെ പകൽ മുഹൂർത്തങ്ങൾ', 'nightMuhurtaTimings': 'ഇന്നത്തെ രാത്രി മുഹൂർത്തങ്ങൾ',
       'dayLagnaLabel': 'പകൽ ലഗ്ന ശുദ്ധി', 'nightLagnaLabel': 'രാത്രി ലഗ്ന ശുദ്ധി',
       'needShuddhi': 'ആവശ്യം', 'shuddhaLabel': 'ശുദ്ധം', 'guruAnukoola': 'ഗുരു ✅', 'guruPratikoola': 'ഗുരു ❌', 'guruvaarVichar': 'ഗുരുവാര വിചാരം', 'la': 'ല', 'saptamaShort': '7 സപ്തമം', 'ashtamaShort': '8 അഷ്ടമം', 'dashamaShort': '10 ദശമം',
+      'nmuh0': 'ഗിരീശൻ', 'nmuh1': 'അജിപാദൻ', 'nmuh2': 'അഹിർബുധ്ന്യൻ', 'nmuh3': 'പൂഷാവ്', 'nmuh4': 'അശ്വിനി', 'nmuh5': 'യമൻ', 'nmuh6': 'അഗ്നി', 'nmuh7': 'വിധാതാവ്', 'nmuh8': 'ചണ്ഡൻ', 'nmuh9': 'അദിതി', 'nmuh10': 'ജീവൻ', 'nmuh11': 'വിഷ്ണു', 'nmuh12': 'ദ്യുമദ്ഗദ്യുതി', 'nmuh13': 'ത്വഷ്ടാവ്', 'nmuh14': 'വായു',
+      'abhijit': 'അഭിജിത് മുഹൂർത്തം', 'abhijitDesc': 'അത്യന്തം ശുഭം — ', 'durmuhurta': 'ദുർമുഹൂർത്തം', 'durmuhurtaDesc': 'അശുഭ സമയം — ', 'varjya': 'വർജ്യം (ത്യാജ്യം)', 'varjyaDesc': 'വർജ്യ കാലം — ', 'amritaSiddhi': 'അമൃത സിദ്ധി യോഗം', 'amritaSiddhiDesc': 'നക്ഷത്ര വിശേഷ സംയോജനം അത്യന്തം ശുഭം',
+      'muhurtaTimings': 'മുഹൂർത്ത സമയം', 'muhurtaTimingsDesc': 'അഭിജിത്, ദുർമുഹൂർത്തം, വർജ്യ കാലം', 'ashubhaKala': 'അശുഭ കാലം',
+      'dayChougadiya': 'പകൽ ചൗഘഡിയ', 'nightChougadiya': 'രാത്രി ചൗഘഡിയ', 'dayHora': 'പകൽ ഹോര', 'nightHora': 'രാത്രി ഹോര',
     },
   };
 
