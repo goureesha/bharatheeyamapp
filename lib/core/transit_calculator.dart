@@ -68,15 +68,15 @@ class TransitCalculator {
     final baseSunLng = basePos['Sun']![0];
     
     final planetsToCheck = {
-      'Sun': 'ಸೂರ್ಯ', 
-      'Moon': 'ಚಂದ್ರ',
-      'Mars': 'ಮಂಗಳ', 
-      'Mercury': 'ಬುಧ', 
-      'Jupiter': 'ಗುರು', 
-      'Venus': 'ಶುಕ್ರ', 
-      'Saturn': 'ಶನಿ',
-      'Rahu': 'ರಾಹು', 
-      'Ketu': 'ಕೇತು'
+      'Sun': 'sun', 
+      'Moon': 'moon',
+      'Mars': 'mars', 
+      'Mercury': 'mercury', 
+      'Jupiter': 'jupiter', 
+      'Venus': 'venus', 
+      'Saturn': 'saturn',
+      'Rahu': 'rahu', 
+      'Ketu': 'ketu'
     };
     
     // Initialize base state
@@ -144,7 +144,7 @@ class TransitCalculator {
              transits.add(TransitEvent(
                 date: currentDate,
                 planetName: knName,
-                description: '$prevName ರಾಶಿಯಿಂದ $nextName ರಾಶಿಗೆ ಪ್ರವೇಶ',
+                description: '${prevRashi[p]} -> $rIdx',
                 fromRashi: prevName,
                 toRashi: nextName,
              ));

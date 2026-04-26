@@ -234,8 +234,8 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
                 style: TextStyle(color: pColor, fontWeight: FontWeight.bold, fontSize: 18),
               ),
             ),
-            title: Text(ev.planetName, style: TextStyle(fontWeight: FontWeight.bold, color: kText)),
-            subtitle: Text(ev.description, style: TextStyle(color: kMuted)),
+            title: Text(_planetLabel(ev.planetName), style: TextStyle(fontWeight: FontWeight.bold, color: kText)),
+            subtitle: Text('${trAll(ev.fromRashi)} → ${trAll(ev.toRashi)}', style: TextStyle(color: kMuted)),
             trailing: Text(_formatDate(ev.date), style: TextStyle(color: kText, fontWeight: FontWeight.w600, fontSize: 12)),
           ),
         );
@@ -289,7 +289,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
                     children: [
                       Row(
                         children: [
-                           Text(vp.planetName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: pColor)),
+                           Text(_planetLabel(vp.planetName), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: pColor)),
                            const SizedBox(width: 8),
                            Icon(Icons.turn_left, size: 16, color: pColor),
                         ],
@@ -354,7 +354,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
                     children: [
                       Row(
                         children: [
-                           Text(ap.planetName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: pColor)),
+                           Text(_planetLabel(ap.planetName), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: pColor)),
                            const SizedBox(width: 8),
                            Icon(Icons.brightness_low, size: 16, color: pColor),
                         ],
