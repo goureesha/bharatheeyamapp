@@ -184,11 +184,11 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Expanded(child: _buildDropdown(AppLocale.l('rashiLabel'), _bRashi, knRashi, List.generate(12, (i) => i), (v) {
+                    Expanded(child: _buildDropdown(AppLocale.l('rashiLabel'), _bRashi, appRashi, List.generate(12, (i) => i), (v) {
                        setState(() { _bRashi = v; if (v != null && !_rashiNakMap[v]!.contains(_bNak)) _bNak = null; });
                     })),
                     const SizedBox(width: 16),
-                    Expanded(child: _buildDropdown(AppLocale.l('nakshatra'), _bNak, knNak, _bRashi != null ? _rashiNakMap[_bRashi]! : List.generate(27, (i) => i), (v) => setState(() => _bNak = v))),
+                    Expanded(child: _buildDropdown(AppLocale.l('nakshatra'), _bNak, appNak, _bRashi != null ? _rashiNakMap[_bRashi]! : List.generate(27, (i) => i), (v) => setState(() => _bNak = v))),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -198,11 +198,11 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Expanded(child: _buildDropdown(AppLocale.l('rashiLabel'), _gRashi, knRashi, List.generate(12, (i) => i), (v) {
+                    Expanded(child: _buildDropdown(AppLocale.l('rashiLabel'), _gRashi, appRashi, List.generate(12, (i) => i), (v) {
                        setState(() { _gRashi = v; if (v != null && !_rashiNakMap[v]!.contains(_gNak)) _gNak = null; });
                     })),
                     const SizedBox(width: 16),
-                    Expanded(child: _buildDropdown(AppLocale.l('nakshatra'), _gNak, knNak, _gRashi != null ? _rashiNakMap[_gRashi]! : List.generate(27, (i) => i), (v) => setState(() => _gNak = v))),
+                    Expanded(child: _buildDropdown(AppLocale.l('nakshatra'), _gNak, appNak, _gRashi != null ? _rashiNakMap[_gRashi]! : List.generate(27, (i) => i), (v) => setState(() => _gNak = v))),
                   ],
                 ),
                 const SizedBox(height: 32),
