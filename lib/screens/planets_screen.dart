@@ -209,7 +209,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
     }
     if (transits.isEmpty) {
       return Center(child: Text(
-        _selectedPlanet != null ? '$_selectedPlanet' : AppLocale.l('noTransits'),
+        _selectedPlanet != null ? '${_planetLabel(_selectedPlanet!)} — ${AppLocale.l('noTransits')}' : AppLocale.l('noTransits'),
         style: TextStyle(color: kMuted),
       ));
     }
@@ -250,7 +250,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
     }
     if (periods.isEmpty) {
       return Center(child: Text(
-        _selectedPlanet != null ? '$_selectedPlanet' : AppLocale.l('noRetro'),
+        _selectedPlanet != null ? '${_planetLabel(_selectedPlanet!)} — ${AppLocale.l('noRetro')}' : AppLocale.l('noRetro'),
         style: TextStyle(color: kMuted),
       ));
     }
@@ -315,7 +315,7 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
     }
     if (periods.isEmpty) {
       return Center(child: Text(
-        _selectedPlanet != null ? '$_selectedPlanet' : AppLocale.l('noCombust'),
+        _selectedPlanet != null ? '${_planetLabel(_selectedPlanet!)} — ${AppLocale.l('noCombust')}' : AppLocale.l('noCombust'),
         style: TextStyle(color: kMuted),
       ));
     }
