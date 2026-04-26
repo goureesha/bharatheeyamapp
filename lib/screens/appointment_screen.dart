@@ -151,7 +151,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
     await _syncInBackground();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ ಸಿಂಕ್ ಪೂರ್ಣವಾಗಿದೆ!'), duration: Duration(seconds: 2)),
+        SnackBar(content: Text(AppLocale.l('syncDone')), duration: const Duration(seconds: 2)),
       );
     }
   }
@@ -170,7 +170,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
-        title: const Text('ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್‌ಗಳು', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(AppLocale.l('apptTitle'), style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: kBg,
         foregroundColor: kText,
         elevation: 0,
@@ -181,12 +181,12 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
             icon: _isSyncing
                 ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: kTeal))
                 : Icon(Icons.sync, color: kTeal),
-            tooltip: 'ಸಿಂಕ್ ಮಾಡಿ',
+            tooltip: AppLocale.l('syncBtn'),
             onPressed: _isSyncing ? null : () => _syncData(),
           ),
           IconButton(
             icon: Icon(Icons.share, color: kTeal),
-            tooltip: 'ಕ್ಯಾಲೆಂಡರ್ ಹಂಚಿಕೊಳ್ಳಿ',
+            tooltip: AppLocale.l('shareCalendar'),
             onPressed: () => _showShareConfigDialog(),
           ),
         ],
@@ -196,9 +196,9 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
           labelColor: kTeal,
           unselectedLabelColor: kMuted,
           labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
-          tabs: const [
-            Tab(icon: Icon(Icons.calendar_today, size: 18), text: 'ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್'),
-            Tab(icon: Icon(Icons.people, size: 18), text: 'ಗ್ರಾಹಕರು'),
+          tabs: [
+            Tab(icon: const Icon(Icons.calendar_today, size: 18), text: AppLocale.l('apptTab')),
+            Tab(icon: const Icon(Icons.people, size: 18), text: AppLocale.l('clientsTab')),
           ],
         ),
       ),
@@ -239,7 +239,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                                 children: [
                                   Icon(Icons.event_available, size: 60, color: kMuted.withOpacity(0.3)),
                                   const SizedBox(height: 12),
-                                  Text('ಯಾವುದೇ ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್ ಇಲ್ಲ', style: TextStyle(color: kMuted, fontSize: 15)),
+                                  Text(AppLocale.l('noAppt'), style: TextStyle(color: kMuted, fontSize: 15)),
                                 ],
                               ),
                             )
@@ -262,7 +262,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
               backgroundColor: kTeal,
               foregroundColor: Colors.white,
               icon: const Icon(Icons.add),
-              label: const Text('ಹೊಸ ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್', style: TextStyle(fontWeight: FontWeight.bold)),
+              label: Text(AppLocale.l('newAppt'), style: const TextStyle(fontWeight: FontWeight.bold)),
             )
           : null,
     );
@@ -318,7 +318,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                 const Spacer(),
                 IconButton(
                   icon: Icon(Icons.add, color: kTeal, size: 22),
-                  tooltip: 'ಹೊಸ ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್',
+                  tooltip: AppLocale.l('newAppt'),
                   onPressed: () => _showAddAppointmentDialog(),
                 ),
                 GestureDetector(
@@ -466,9 +466,9 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
           children: [
             Icon(Icons.login, size: 60, color: kMuted),
             const SizedBox(height: 16),
-            Text('Google ಸೈನ್ ಇನ್ ಅಗತ್ಯವಿದೆ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kText)),
+            Text(AppLocale.l('googleSignInNeeded'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kText)),
             const SizedBox(height: 8),
-            Text('ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್ ನಿರ್ವಹಣೆಗಾಗಿ Settings ನಲ್ಲಿ Google ಸೈನ್ ಇನ್ ಮಾಡಿ.',
+            Text(AppLocale.l('googleSignInDesc'),
               textAlign: TextAlign.center, style: TextStyle(color: kMuted, fontSize: 14)),
           ],
         ),
@@ -489,7 +489,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
           child: TextField(
             onChanged: (v) => setState(() => _clientSearch = v),
             decoration: InputDecoration(
-              hintText: 'ಹೆಸರು, ಫೋನ್ ಅಥವಾ ID ಹುಡುಕಿ...',
+              hintText: AppLocale.l('searchHint'),
               prefixIcon: Icon(Icons.search, color: kMuted),
               isDense: true,
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -818,20 +818,20 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
               Row(
                 children: [
                   // WhatsApp confirmation
-                  _actionBtn(Icons.message, 'ಸಂದೇಶ', Colors.green, () => _sendWhatsApp(appt, isReminder: false)),
+                  _actionBtn(Icons.message, AppLocale.l('msgBtn'), Colors.green, () => _sendWhatsApp(appt, isReminder: false)),
                   const SizedBox(width: 8),
                   // WhatsApp reminder
-                  _actionBtn(Icons.notifications_active, 'ಜ್ಞಾಪನೆ', kOrange, () => _sendWhatsApp(appt, isReminder: true)),
+                  _actionBtn(Icons.notifications_active, AppLocale.l('reminderBtn'), kOrange, () => _sendWhatsApp(appt, isReminder: true)),
                   const Spacer(),
                   if (!isCompleted) ...[
                     // Mark completed
-                    _actionBtn(Icons.check, 'ಮುಗಿದಿದೆ', Colors.green, () async {
+                    _actionBtn(Icons.check, AppLocale.l('doneBtn'), Colors.green, () async {
                       final ok = await AppointmentService.updateStatus(appt, 'completed');
                       if (ok && mounted) setState(() {});
                     }),
                     const SizedBox(width: 8),
                     // Cancel
-                    _actionBtn(Icons.close, 'ರದ್ದು', Colors.red, () async {
+                    _actionBtn(Icons.close, AppLocale.l('cancelBtn'), Colors.red, () async {
                       final ok = await AppointmentService.updateStatus(appt, 'cancelled');
                       if (ok && mounted) setState(() {});
                     }),
@@ -895,14 +895,14 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                     child: Container(width: 40, height: 4, decoration: BoxDecoration(color: kMuted.withOpacity(0.3), borderRadius: BorderRadius.circular(2))),
                   ),
                   const SizedBox(height: 16),
-                  Text('ಹೊಸ ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: kText)),
+                  Text(AppLocale.l('newAppt'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: kText)),
                   const SizedBox(height: 20),
 
                   // Client Name
                   TextField(
                     controller: nameCtrl,
                     decoration: InputDecoration(
-                      labelText: 'ಗ್ರಾಹಕರ ಹೆಸರು *',
+                      labelText: AppLocale.l('clientNameLabel'),
                       prefixIcon: Icon(Icons.person, color: kTeal),
                     ),
                     style: TextStyle(color: kText),
@@ -914,7 +914,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                     controller: phoneCtrl,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
-                      labelText: 'ಫೋನ್ ಸಂಖ್ಯೆ',
+                      labelText: AppLocale.l('phoneNumberLabel'),
                       prefixIcon: Icon(Icons.phone, color: kTeal),
                     ),
                     style: TextStyle(color: kText),
@@ -945,10 +945,10 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                   const SizedBox(height: 12),
 
                   // Available time slots
-                  Text('ಲಭ್ಯ ಸಮಯ:', style: TextStyle(fontWeight: FontWeight.bold, color: kText)),
+                  Text(AppLocale.l('availableTime'), style: TextStyle(fontWeight: FontWeight.bold, color: kText)),
                   const SizedBox(height: 8),
                   if (availableSlots.isEmpty)
-                    Text('ಈ ದಿನ ಯಾವುದೇ ಸ್ಲಾಟ್ ಲಭ್ಯವಿಲ್ಲ', style: TextStyle(color: kMuted))
+                    Text(AppLocale.l('noSlots'), style: TextStyle(color: kMuted))
                   else
                     Wrap(
                       spacing: 8,
@@ -975,7 +975,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                     controller: notesCtrl,
                     maxLines: 2,
                     decoration: InputDecoration(
-                      labelText: 'ಟಿಪ್ಪಣಿಗಳು (ಐಚ್ಛಿಕ)',
+                      labelText: AppLocale.l('notesOptional'),
                       prefixIcon: Icon(Icons.note, color: kTeal),
                     ),
                     style: TextStyle(color: kText),
@@ -987,7 +987,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.check),
-                      label: const Text('ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್ ಬುಕ್ ಮಾಡಿ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                      label: Text(AppLocale.l('bookAppt'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: kTeal,
                         foregroundColor: Colors.white,
@@ -1026,7 +1026,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                                 setState(() => _isLoading = false);
                                 if (ok) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('✅ ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್ ಬುಕ್ ಆಗಿದೆ!'), backgroundColor: Colors.green),
+                                    SnackBar(content: Text(AppLocale.l('apptBooked')), backgroundColor: Colors.green),
                                   );
 
                                   // Sync to Google Calendar
@@ -1035,11 +1035,11 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                                     title: nameCtrl.text,
                                     start: startDt,
                                     end: startDt.add(Duration(minutes: daySlot.slotMinutes)),
-                                    description: 'ಫೋನ್: ${phoneCtrl.text}\n${notesCtrl.text}'.trim(),
+                                    description: '${AppLocale.l('phonePrefix')}: ${phoneCtrl.text}\n${notesCtrl.text}'.trim(),
                                   );
                                   if (mounted && calOk) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('📅 Google Calendar ಗೆ ಸೇರಿಸಲಾಗಿದೆ'), backgroundColor: Colors.blueGrey),
+                                      SnackBar(content: Text(AppLocale.l('addedToGCal')), backgroundColor: Colors.blueGrey),
                                     );
                                   }
 
@@ -1054,7 +1054,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                                   ));
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('❌ ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್ ವಿಫಲ'), backgroundColor: Colors.red),
+                                    SnackBar(content: Text(AppLocale.l('apptFailed')), backgroundColor: Colors.red),
                                   );
                                 }
                               }
@@ -1197,7 +1197,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                   const SizedBox(height: 16),
 
                   // PHONE NUMBER FOR WHATSAPP REQUESTS
-                  Text('ನಿಮ್ಮ WhatsApp ಸಂಖ್ಯೆ', style: TextStyle(color: kMuted, fontSize: 13, fontWeight: FontWeight.w600)),
+                  Text(AppLocale.l('whatsappNumber'), style: TextStyle(color: kMuted, fontSize: 13, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 6),
                   TextField(
                     controller: phoneCtrl,
@@ -1225,7 +1225,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text('ಗ್ರಾಹಕರ ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್ ವಿನಂತಿ WhatsApp ಮೂಲಕ ಬರುತ್ತದೆ', style: TextStyle(color: kMuted, fontSize: 11)),
+                  Text(AppLocale.l('whatsappDesc'), style: TextStyle(color: kMuted, fontSize: 11)),
 
                   const SizedBox(height: 24),
 
@@ -1234,7 +1234,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.share),
-                      label: const Text('WhatsApp \u0ca8\u0cb2\u0ccd\u0cb2\u0cbf \u0cb9\u0c82\u0c9a\u0cbf\u0c95\u0cca\u0cb3\u0ccd\u0cb3\u0cbf', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
+                      label: Text(AppLocale.l('shareViaWA'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF25D366),
                         foregroundColor: Colors.white,
@@ -1261,7 +1261,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       icon: Icon(Icons.link, color: kTeal),
-                      label: Text('ಬುಕಿಂಗ್ ಲಿಂಕ್ ಹಂಚಿಕೊಳ್ಳಿ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: kTeal)),
+                      label: Text(AppLocale.l('bookingLink'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: kTeal)),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: kTeal),
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -1321,8 +1321,8 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
   // ─── Helpers ───────────────────────────────────────────
 
   String _formatDate(DateTime d) {
-    const months = ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ', 'ಮಾರ್ಚ್', 'ಏಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 'ಜುಲೈ', 'ಆಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್'];
-    const days = ['ಸೋಮ', 'ಮಂಗಳ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ', 'ರವಿ'];
+    final months = [AppLocale.l('month0'), AppLocale.l('month1'), AppLocale.l('month2'), AppLocale.l('month3'), AppLocale.l('month4'), AppLocale.l('month5'), AppLocale.l('month6'), AppLocale.l('month7'), AppLocale.l('month8'), AppLocale.l('month9'), AppLocale.l('month10'), AppLocale.l('month11')];
+    final days = [AppLocale.l('dayMon'), AppLocale.l('dayTue'), AppLocale.l('dayWed'), AppLocale.l('dayThu'), AppLocale.l('dayFri'), AppLocale.l('daySat'), AppLocale.l('daySun')];
     return '${days[d.weekday - 1]}, ${d.day} ${months[d.month - 1]}';
   }
 
