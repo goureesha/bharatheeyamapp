@@ -4,6 +4,7 @@ import 'package:sweph/sweph.dart';
 import '../constants/strings.dart';
 import 'ephemeris.dart';
 import 'shadbala.dart';
+import '../widgets/common.dart';
 
 // ============================================================
 // KUNDALI RESULT DATA MODELS
@@ -758,9 +759,9 @@ class AstroCalculator {
         chandraMasaRaw = masaName;
         
         if (!hasSankranti) {
-          chandraMasa = 'ಅಧಿಕ $masaName';
+          chandraMasa = '${AppLocale.l('adhikaPrefix')} $masaName';
         } else {
-          chandraMasa = 'ನಿಜ $masaName';
+          chandraMasa = '${AppLocale.l('nijaPrefix')} $masaName';
         }
       } catch (_) {
         chandraMasa = knChandraMasa[sunRashiIdx];
@@ -804,28 +805,28 @@ class AstroCalculator {
       
       if (beforeUgadi) shakaYear -= 1;
       final samvatsaraIdx = ((shakaYear + 11) % 60);
-      final samvatsara = '${knSamvatsara[samvatsaraIdx]} (ಶಕ $shakaYear)';
+      final samvatsara = '${knSamvatsara[samvatsaraIdx]} (${AppLocale.l('shakaPrefix')} $shakaYear)';
 
       // === End Times, Divamana, Ratrimana, Rutu ===
       // Rutu — Vedic seasons based on Sun's rashi (solar month pairs)
       // Mesha(0)=Vasanta, Vrishabha(1)=Grishma, Mithuna(2)=Grishma, Kataka(3)=Varsha,
       // Simha(4)=Varsha, Kanya(5)=Sharad, Tula(6)=Sharad, Vrischika(7)=Hemanta,
       // Dhanu(8)=Hemanta, Makara(9)=Shishira, Kumbha(10)=Shishira, Meena(11)=Vasanta
-      final knRutu = [
-        'ವಸಂತ ಋತು',   // 0  Mesha
-        'ಗ್ರೀಷ್ಮ ಋತು',  // 1  Vrishabha
-        'ಗ್ರೀಷ್ಮ ಋತು',  // 2  Mithuna
-        'ವರ್ಷಾ ಋತು',   // 3  Kataka
-        'ವರ್ಷಾ ಋತು',   // 4  Simha
-        'ಶರದೃತು',      // 5  Kanya
-        'ಶರದೃತು',      // 6  Tula
-        'ಹೇಮಂತ ಋತು',  // 7  Vrischika
-        'ಹೇಮಂತ ಋತು',  // 8  Dhanu
-        'ಶಿಶಿರ ಋತು',   // 9  Makara
-        'ಶಿಶಿರ ಋತು',   // 10 Kumbha
-        'ವಸಂತ ಋತು',   // 11 Meena
+      final rutuMap = [
+        AppLocale.l('rutuVasanta'),   // 0  Mesha
+        AppLocale.l('rutuGrishma'),   // 1  Vrishabha
+        AppLocale.l('rutuGrishma'),   // 2  Mithuna
+        AppLocale.l('rutuVarsha'),    // 3  Kataka
+        AppLocale.l('rutuVarsha'),    // 4  Simha
+        AppLocale.l('rutuSharad'),    // 5  Kanya
+        AppLocale.l('rutuSharad'),    // 6  Tula
+        AppLocale.l('rutuHemanta'),   // 7  Vrischika
+        AppLocale.l('rutuHemanta'),   // 8  Dhanu
+        AppLocale.l('rutuShishira'),  // 9  Makara
+        AppLocale.l('rutuShishira'),  // 10 Kumbha
+        AppLocale.l('rutuVasanta'),   // 11 Meena
       ];
-      final rutuStr = knRutu[sunRashiIdx];
+      final rutuStr = rutuMap[sunRashiIdx];
 
       // Divamana & Ratrimana
       final nextD = dob.add(const Duration(days: 1));
@@ -841,7 +842,7 @@ class AstroCalculator {
         int h = hours.floor();
         int m = ((hours - h) * 60).round();
         if (m == 60) { h += 1; m = 0; }
-        return '$h ಗಂಟೆ $m ನಿಮಿಷ (${formatGhati(ghatis)} ಘಟಿ)';
+        return '$h ${AppLocale.l('hourLabel')} $m ${AppLocale.l('minuteLabel')} (${formatGhati(ghatis)} ${AppLocale.l('ghatiUnit')})';
       }
       final divamanaStr = formatDuration(divamanaHours, divamanaGhatis);
       final ratrimanaStr = formatDuration(ratrimanaHours, ratrimanaGhatis);
@@ -860,7 +861,7 @@ class AstroCalculator {
       final srSun = normDeg(srPlanets['Sun']![0]);
       final tIdxSunrise = (((srMoon - srSun + 360) % 360) / 12).floor().clamp(0, 29);
       final agniVal = (tIdxSunrise + wIdx) % 4;
-      final agniVasaStr = (agniVal == 0 || agniVal == 3) ? 'ಭೂಮಿ (ಶುಭ)' : (agniVal == 1 ? 'ಆಕಾಶ (ಅಶುಭ)' : 'ಪಾತಾಳ (ಅಶುಭ)');
+      final agniVasaStr = (agniVal == 0 || agniVal == 3) ? AppLocale.l('bhumiShubha') : (agniVal == 1 ? AppLocale.l('akashaAshubha') : AppLocale.l('patalaAshubha'));
 
       // End Times
       final jdTEnd = findTithiLimit(jdBirth, (tIdx + 1) * 12.0, ayanamsaMode);
@@ -878,7 +879,7 @@ class AstroCalculator {
         gataGhati: gataGhati,
         paramaGhati: paramaGhati,
         shesha: sheshaGhati,
-        dashaBalance: '${bal.floor()}ವ ${((bal % 1) * 12).floor()}ತಿ ${((((bal % 1) * 12) % 1) * 30).floor()}ದಿ',
+        dashaBalance: '${bal.floor()}${AppLocale.l('yearShort')} ${((bal % 1) * 12).floor()}${AppLocale.l('monthShort')} ${((((bal % 1) * 12) % 1) * 30).floor()}${AppLocale.l('dayShort')}',
         dashaLord: dashaLord,
         nakshatraIndex: nIdx,
         nakPercent: perc,
@@ -892,8 +893,8 @@ class AstroCalculator {
         souraMasaGataDina: souraMasaGataDina,
         chandraMasa: chandraMasa,
         samvatsara: samvatsara,
-        vishaPraghati: '${vishaG.toInt()}ನೇ ಘಟಿ ($vishaStr)',
-        amrutaPraghati: '${amrutaG.toInt()}ನೇ ಘಟಿ ($amrutaStr)',
+        vishaPraghati: '${vishaG.toInt()}${AppLocale.l('ghatiSuffix')} ($vishaStr)',
+        amrutaPraghati: '${amrutaG.toInt()}${AppLocale.l('ghatiSuffix')} ($amrutaStr)',
         tithiEndTime: formatTimeFromJd(jdTEnd, tzOffset: hourUtcOffset),
         tithiEndsNextDay: isNextDay(jdBirth, jdTEnd),
         karanaEndTime: formatTimeFromJd(jdKEnd, tzOffset: hourUtcOffset),
@@ -906,7 +907,7 @@ class AstroCalculator {
         ratrimana: ratrimanaStr,
         rutu: rutuStr,
         agniVasa: agniVasaStr,
-        ayana: (sDeg >= 270 || sDeg < 90) ? 'ಉತ್ತರಾಯಣ' : 'ದಕ್ಷಿಣಾಯಣ',
+        ayana: (sDeg >= 270 || sDeg < 90) ? AppLocale.l('uttarayana') : AppLocale.l('dakshinayana'),
       );
 
       // Dashas
@@ -1018,15 +1019,15 @@ class AstroCalculator {
     final d12Idx  = (d1Idx + (dr / 2.5).floor()) % 12;
 
     // Sub-Drekkana Parts
-    String p1Part = dr < 10 ? '೧' : (dr < 20 ? '೨' : '೩');
+    String p1Part = dr < 10 ? AppLocale.l('drPart1') : (dr < 20 ? AppLocale.l('drPart2') : AppLocale.l('drPart3'));
     String d3D1Str = '${knRashi[d1Idx]} $p1Part';
 
     final degInD9 = d9Exact % 30;
-    String p9Part = degInD9 < 10 ? '೧' : (degInD9 < 20 ? '೨' : '೩');
+    String p9Part = degInD9 < 10 ? AppLocale.l('drPart1') : (degInD9 < 20 ? AppLocale.l('drPart2') : AppLocale.l('drPart3'));
     String d3D9Str = '${knRashi[d9Idx]} $p9Part';
 
     final degInD12 = (deg % 2.5) * 12;
-    String p12Part = degInD12 < 10 ? '೧' : (degInD12 < 20 ? '೨' : '೩');
+    String p12Part = degInD12 < 10 ? AppLocale.l('drPart1') : (degInD12 < 20 ? AppLocale.l('drPart2') : AppLocale.l('drPart3'));
     String d3D12Str = '${knRashi[d12Idx]} $p12Part';
 
     // Nava Navamsha (D9 of D9)
