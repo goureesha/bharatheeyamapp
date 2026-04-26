@@ -192,7 +192,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
   // ─── Chougadiya (Gauri Panchanga) ───
   // 8 day periods + 8 night periods. Each named after: Udveg, Char, Laabh, Amrut, Kaala, Shubh, Rog
   // Day sequence by weekday, Night sequence follows after
-  static const _chougNames = ['ಉದ್ವೇಗ', 'ಚಲ', 'ಲಾಭ', 'ಅಮೃತ', 'ಕಾಲ', 'ಶುಭ', 'ರೋಗ'];
+  static const _chougKeys = ['choug0', 'choug1', 'choug2', 'choug3', 'choug4', 'choug5', 'choug6'];
   static const _chougNature = ['⚠️', '⬆️', '✅', '🏆', '❌', '✅', '⚠️'];
   // Starting Chougadiya for each weekday (day): Sun=Udveg(0), Mon=Amrut(3), Tue=Rog(6), Wed=Laabh(2), Thu=Shubh(5), Fri=Chal(1), Sat=Kaal(4)
   static const _chougDayStart   = [0, 3, 6, 2, 5, 1, 4]; // Sun..Sat
@@ -223,7 +223,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
       final s = periodStart + i * duration;
       final e = s + duration;
       result.add({
-        'name': tr(_chougNames[idx]),
+        'name': AppLocale.l(_chougKeys[idx]),
         'nature': _chougNature[idx],
         'start': _minutesToTimeStr(s % (24 * 60)),
         'end': _minutesToTimeStr(e % (24 * 60)),
@@ -235,7 +235,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
   // ─── Hora (Planetary Hours) ───
   // Planet order for Hora: Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars
   // The first Hora of a day belongs to the weekday ruler
-  static const _horaOrder = ['ಸೂರ್ಯ', 'ಶುಕ್ರ', 'ಬುಧ', 'ಚಂದ್ರ', 'ಶನಿ', 'ಗುರು', 'ಮಂಗಳ'];
+  static const _horaKeys = ['horaSurya', 'horaShukra', 'horaBudha', 'horaChandra', 'horaShani', 'horaGuru', 'horaMangala'];
   static const _horaIcons = ['☀️', '♀️', '☿️', '🌙', '🪐', '♃', '♂️'];
   // Weekday ruler index in _horaOrder: Sun=0, Mon=3, Tue=6, Wed=2, Thu=5, Fri=1, Sat=4
   static const _weekdayHoraStart = [0, 3, 6, 2, 5, 1, 4]; // Sun..Sat
@@ -264,7 +264,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
       final s = periodStart + i * duration;
       final e = s + duration;
       result.add({
-        'planet': tr(_horaOrder[idx]),
+        'planet': AppLocale.l(_horaKeys[idx]),
         'icon': _horaIcons[idx],
         'start': _minutesToTimeStr(s % (24 * 60)),
         'end': _minutesToTimeStr(e % (24 * 60)),
@@ -459,21 +459,21 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
   // ─── Day Muhurtas (15 divisions of daytime) ───
   // Traditional names and nature: S=Shubha, A=Ashubha, M=Madhyama
   static List<Map<String, String>> get _muhurtaNames => [
-    {'name': tr('ರುದ್ರ'), 'nameEn': 'Rudra', 'nature': 'A'},
-    {'name': tr('ಅಹಿ'), 'nameEn': 'Ahi', 'nature': 'A'},
-    {'name': tr('ಮಿತ್ರ'), 'nameEn': 'Mitra', 'nature': 'S'},
-    {'name': tr('ಪಿತ್ರು'), 'nameEn': 'Pitru', 'nature': 'A'},
-    {'name': tr('ವಸು'), 'nameEn': 'Vasu', 'nature': 'S'},
-    {'name': tr('ವಾರಾಹ'), 'nameEn': 'Varaha', 'nature': 'S'},
-    {'name': tr('ವಿಶ್ವೇದೇವ'), 'nameEn': 'Vishwedeva', 'nature': 'S'},
-    {'name': tr('ವಿಧಿ'), 'nameEn': 'Vidhi', 'nature': 'M'},
-    {'name': tr('ಸತ್ಮುಖಿ'), 'nameEn': 'Satmukhi', 'nature': 'S'},
-    {'name': tr('ಪುರುಹೂತ'), 'nameEn': 'Puruhuta', 'nature': 'A'},
-    {'name': tr('ವಾಹಿನಿ'), 'nameEn': 'Vahini', 'nature': 'A'},
-    {'name': tr('ನಕ್ತನಕರ'), 'nameEn': 'Naktanakara', 'nature': 'M'},
-    {'name': tr('ವರುಣ'), 'nameEn': 'Varuna', 'nature': 'S'},
-    {'name': tr('ಅರ್ಯಮ'), 'nameEn': 'Aryama', 'nature': 'S'},
-    {'name': tr('ಭಗ'), 'nameEn': 'Bhaga', 'nature': 'A'},
+    {'name': AppLocale.l('muh0'), 'nameEn': 'Rudra', 'nature': 'A'},
+    {'name': AppLocale.l('muh1'), 'nameEn': 'Ahi', 'nature': 'A'},
+    {'name': AppLocale.l('muh2'), 'nameEn': 'Mitra', 'nature': 'S'},
+    {'name': AppLocale.l('muh3'), 'nameEn': 'Pitru', 'nature': 'A'},
+    {'name': AppLocale.l('muh4'), 'nameEn': 'Vasu', 'nature': 'S'},
+    {'name': AppLocale.l('muh5'), 'nameEn': 'Varaha', 'nature': 'S'},
+    {'name': AppLocale.l('muh6'), 'nameEn': 'Vishwedeva', 'nature': 'S'},
+    {'name': AppLocale.l('muh7'), 'nameEn': 'Vidhi', 'nature': 'M'},
+    {'name': AppLocale.l('muh8'), 'nameEn': 'Satmukhi', 'nature': 'S'},
+    {'name': AppLocale.l('muh9'), 'nameEn': 'Puruhuta', 'nature': 'A'},
+    {'name': AppLocale.l('muh10'), 'nameEn': 'Vahini', 'nature': 'A'},
+    {'name': AppLocale.l('muh11'), 'nameEn': 'Naktanakara', 'nature': 'M'},
+    {'name': AppLocale.l('muh12'), 'nameEn': 'Varuna', 'nature': 'S'},
+    {'name': AppLocale.l('muh13'), 'nameEn': 'Aryama', 'nature': 'S'},
+    {'name': AppLocale.l('muh14'), 'nameEn': 'Bhaga', 'nature': 'A'},
   ];
 
   Widget _buildMuhurtaCard() {
@@ -487,11 +487,11 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
         Row(children: [
           Icon(Icons.schedule, color: const Color(0xFF5B2C6F), size: 22),
           const SizedBox(width: 8),
-          Text(tr('ಹಗಲಿನ ಮುಹೂರ್ತ') + ' / Day Muhurtas', style: TextStyle(
+          Text(AppLocale.l('dayMuhurta') + ' / Day Muhurtas', style: TextStyle(
             fontWeight: FontWeight.w900, fontSize: 14, color: const Color(0xFF5B2C6F))),
         ]),
         const SizedBox(height: 6),
-        Text(tr('ದಿನವನ್ನು 15 ಸಮಭಾಗಗಳಾಗಿ ವಿಂಗಡಿಸಿದೆ'), style: TextStyle(color: kMuted, fontSize: 11)),
+        Text(AppLocale.l('dayMuhurtaDesc'), style: TextStyle(color: kMuted, fontSize: 11)),
         const SizedBox(height: 10),
         ...List.generate(15, (i) {
           final item = _muhurtaNames[i];
@@ -499,7 +499,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
           final end = start + duration;
           final nature = item['nature']!;
           final color = nature == 'S' ? Colors.green : nature == 'A' ? Colors.red : kOrange;
-          final label = nature == 'S' ? tr('ಶುಭ') : nature == 'A' ? tr('ಅಶುಭ') : tr('ಮಧ್ಯಮ');
+          final label = nature == 'S' ? AppLocale.l('shubha') : nature == 'A' ? AppLocale.l('ashubha') : AppLocale.l('madhyama');
 
           // Check if current time falls in this muhurta
           final now = DateTime.now();

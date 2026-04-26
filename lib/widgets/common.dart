@@ -313,6 +313,14 @@ class AppLocale {
       'nija': 'ನಿಜ', 'adhika': 'ಅಧಿಕ', 'cm0': 'ವೈಶಾಖ', 'cm1': 'ಜ್ಯೇಷ್ಠ', 'cm2': 'ಆಷಾಢ', 'cm3': 'ಶ್ರಾವಣ', 'cm4': 'ಭಾದ್ರಪದ', 'cm5': 'ಆಶ್ವಿನ', 'cm6': 'ಕಾರ್ತೀಕ', 'cm7': 'ಮಾರ್ಗಶಿರ', 'cm8': 'ಪುಷ್ಯ', 'cm9': 'ಮಾಘ', 'cm10': 'ಫಾಲ್ಗುಣ', 'cm11': 'ಚೈತ್ರ',
       // Ayana/Shaka
       'uttarayana': 'ಉತ್ತರಾಯಣ', 'dakshinayana': 'ದಕ್ಷಿಣಾಯನ', 'shakaLabel': 'ಶಕ',
+      // Chougadiya
+      'choug0': 'ಉದ್ವೇಗ', 'choug1': 'ಚಲ', 'choug2': 'ಲಾಭ', 'choug3': 'ಅಮೃತ', 'choug4': 'ಕಾಲ', 'choug5': 'ಶುಭ', 'choug6': 'ರೋಗ',
+      // Hora planets
+      'horaSurya': 'ಸೂರ್ಯ', 'horaShukra': 'ಶುಕ್ರ', 'horaBudha': 'ಬುಧ', 'horaChandra': 'ಚಂದ್ರ', 'horaShani': 'ಶನಿ', 'horaGuru': 'ಗುರು', 'horaMangala': 'ಮಂಗಳ',
+      // Muhurta names
+      'muh0': 'ರುದ್ರ', 'muh1': 'ಅಹಿ', 'muh2': 'ಮಿತ್ರ', 'muh3': 'ಪಿತ್ರು', 'muh4': 'ವಸು', 'muh5': 'ವಾರಾಹ', 'muh6': 'ವಿಶ್ವೇದೇವ', 'muh7': 'ವಿಧಿ', 'muh8': 'ಸತ್ಮುಖಿ', 'muh9': 'ಪುರುಹೂತ', 'muh10': 'ವಾಹಿನಿ', 'muh11': 'ನಕ್ತನಕರ', 'muh12': 'ವರುಣ', 'muh13': 'ಅರ್ಯಮ', 'muh14': 'ಭಗ',
+      // Muhurta nature / day label
+      'dayMuhurta': 'ಹಗಲಿನ ಮುಹೂರ್ತ', 'dayMuhurtaDesc': 'ದಿನವನ್ನು 15 ಸಮಭಾಗಗಳಾಗಿ ವಿಂಗಡಿಸಿದೆ', 'shubha': 'ಶುಭ', 'ashubha': 'ಅಶುಭ', 'madhyama': 'ಮಧ್ಯಮ',
     },
     'hi': {
 
@@ -472,6 +480,14 @@ class AppLocale {
       'noOtherProfiles': 'अन्य प्रोफ़ाइल नहीं', 'placeNotFoundDash': 'स्थान नहीं मिला.',
       'placeError': 'स्थान कनेक्शन त्रुटि.', 'dateLabel': 'दिनांक', 'timeLabel': 'समय',
       'searchPlace': 'स्थान खोजें',
+      // Chougadiya
+      'choug0': 'उद्वेग', 'choug1': 'चल', 'choug2': 'लाभ', 'choug3': 'अमृत', 'choug4': 'काल', 'choug5': 'शुभ', 'choug6': 'रोग',
+      // Hora planets
+      'horaSurya': 'सूर्य', 'horaShukra': 'शुक्र', 'horaBudha': 'बुध', 'horaChandra': 'चन्द्र', 'horaShani': 'शनि', 'horaGuru': 'गुरु', 'horaMangala': 'मंगल',
+      // Muhurta names
+      'muh0': 'रुद्र', 'muh1': 'अहि', 'muh2': 'मित्र', 'muh3': 'पितृ', 'muh4': 'वसु', 'muh5': 'वाराह', 'muh6': 'विश्वेदेव', 'muh7': 'विधि', 'muh8': 'सत्मुखी', 'muh9': 'पुरुहूत', 'muh10': 'वाहिनी', 'muh11': 'नक्तनकर', 'muh12': 'वरुण', 'muh13': 'अर्यम', 'muh14': 'भग',
+      // Muhurta nature / day label
+      'dayMuhurta': 'दिन के मुहूर्त', 'dayMuhurtaDesc': 'दिन को 15 समान भागों में विभाजित', 'shubha': 'शुभ', 'ashubha': 'अशुभ', 'madhyama': 'मध्यम',
     },
     'ta': {
 
@@ -631,6 +647,10 @@ class AppLocale {
       'noOtherProfiles': 'வேறு சுயவிவரம் இல்லை', 'placeNotFoundDash': 'இடம் கண்டுபிடிக்கவில்லை.',
       'placeError': 'இடம் இணைப்பு பிழை.', 'dateLabel': 'தேதி', 'timeLabel': 'நேரம்',
       'searchPlace': 'ஊர் தேடு',
+      'choug0': 'உத்வேகம்', 'choug1': 'சலம்', 'choug2': 'லாபம்', 'choug3': 'அமிர்தம்', 'choug4': 'காலம்', 'choug5': 'சுபம்', 'choug6': 'ரோகம்',
+      'horaSurya': 'சூரியன்', 'horaShukra': 'சுக்கிரன்', 'horaBudha': 'புதன்', 'horaChandra': 'சந்திரன்', 'horaShani': 'சனி', 'horaGuru': 'குரு', 'horaMangala': 'செவ்வாய்',
+      'muh0': 'ருத்ரம்', 'muh1': 'அஹி', 'muh2': 'மித்ரம்', 'muh3': 'பிதிரு', 'muh4': 'வசு', 'muh5': 'வராஹம்', 'muh6': 'விஸ்வேதேவம்', 'muh7': 'விதி', 'muh8': 'சத்முகி', 'muh9': 'புருஹூதம்', 'muh10': 'வாஹினி', 'muh11': 'நக்தநகரம்', 'muh12': 'வருணம்', 'muh13': 'அர்யமம்', 'muh14': 'பகம்',
+      'dayMuhurta': 'பகல் முஹூர்த்தம்', 'dayMuhurtaDesc': 'நாளை 15 சம பாகங்களாக பிரிக்கப்பட்டது', 'shubha': 'சுபம்', 'ashubha': 'அசுபம்', 'madhyama': 'மத்யமம்',
     },
     'te': {
 
@@ -790,6 +810,10 @@ class AppLocale {
       'noOtherProfiles': 'ఇతర ప్రొఫైల్‌లు లేవు', 'placeNotFoundDash': 'స్థలం కనుగొనలేదు.',
       'placeError': 'స్థలం కనెక్షన్ దోషం.', 'dateLabel': 'తేదీ', 'timeLabel': 'సమయం',
       'searchPlace': 'ఊరు వెతుకు',
+      'choug0': 'ఉద్వేగం', 'choug1': 'చలం', 'choug2': 'లాభం', 'choug3': 'అమృతం', 'choug4': 'కాలం', 'choug5': 'శుభం', 'choug6': 'రోగం',
+      'horaSurya': 'సూర్యుడు', 'horaShukra': 'శుక్ర', 'horaBudha': 'బుధ', 'horaChandra': 'చంద్రుడు', 'horaShani': 'శని', 'horaGuru': 'గురు', 'horaMangala': 'కుజ',
+      'muh0': 'రుద్రం', 'muh1': 'అహి', 'muh2': 'మిత్రం', 'muh3': 'పితృ', 'muh4': 'వసు', 'muh5': 'వరాహం', 'muh6': 'విశ్వేదేవం', 'muh7': 'విధి', 'muh8': 'సత్ముఖి', 'muh9': 'పురుహూతం', 'muh10': 'వాహిని', 'muh11': 'నక్తనకరం', 'muh12': 'వరుణం', 'muh13': 'అర్యమం', 'muh14': 'భగం',
+      'dayMuhurta': 'పగటి ముహూర్తం', 'dayMuhurtaDesc': 'రోజును 15 సమ భాగాలుగా విభజించారు', 'shubha': 'శుభం', 'ashubha': 'అశుభం', 'madhyama': 'మధ్యమం',
     },
     'ml': {
 
@@ -949,6 +973,10 @@ class AppLocale {
       'noOtherProfiles': 'മറ്റ് പ്രൊഫൈലുകൾ ഇല്ല', 'placeNotFoundDash': 'സ്ഥലം കണ്ടെത്തിയില്ല.',
       'placeError': 'സ്ഥല കണക്ഷൻ പിഴവ്.', 'dateLabel': 'തീയതി', 'timeLabel': 'സമയം',
       'searchPlace': 'സ്ഥലം തിരയുക',
+      'choug0': 'ഉദ്വേഗം', 'choug1': 'ചലം', 'choug2': 'ലാഭം', 'choug3': 'അമൃതം', 'choug4': 'കാലം', 'choug5': 'ശുഭം', 'choug6': 'രോഗം',
+      'horaSurya': 'സൂര്യൻ', 'horaShukra': 'ശുക്രൻ', 'horaBudha': 'ബുധൻ', 'horaChandra': 'ചന്ദ്രൻ', 'horaShani': 'ശനി', 'horaGuru': 'ഗുരു', 'horaMangala': 'ചൊവ്വ',
+      'muh0': 'രുദ്രം', 'muh1': 'അഹി', 'muh2': 'മിത്രം', 'muh3': 'പിതൃ', 'muh4': 'വസു', 'muh5': 'വരാഹം', 'muh6': 'വിശ്വേദേവം', 'muh7': 'വിധി', 'muh8': 'സത്മുഖി', 'muh9': 'പുരുഹൂതം', 'muh10': 'വാഹിനി', 'muh11': 'നക്തനകരം', 'muh12': 'വരുണം', 'muh13': 'അര്യമം', 'muh14': 'ഭഗം',
+      'dayMuhurta': 'പകൽ മുഹൂർത്തം', 'dayMuhurtaDesc': 'ദിവസത്തെ 15 സമഭാഗങ്ങളായി വിഭജിച്ചു', 'shubha': 'ശുഭം', 'ashubha': 'അശുഭം', 'madhyama': 'മധ്യമം',
     },
   };
 
