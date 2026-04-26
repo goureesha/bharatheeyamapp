@@ -536,7 +536,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                                 decoration: BoxDecoration(color: bgColor, border: Border.all(color: borderColor, width: 2), borderRadius: BorderRadius.circular(12)),
                                 child: Column(
                                   children: [
-                                    Text('${AppLocale.l('selectedDayNak')}: ${knNak[dinaIdx]}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
+                                    Text('${AppLocale.l('selectedDayNak')}: ${trAll(knNak[dinaIdx])}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
                                     if (isExcluded) ...[  
                                       const SizedBox(height: 4),
                                       Text('⚠️ ${AppLocale.l('excludedNak')}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.orange.shade700)),
@@ -559,7 +559,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                                 decoration: BoxDecoration(color: bgColor, border: Border.all(color: borderColor, width: 2), borderRadius: BorderRadius.circular(12)),
                                 child: Column(
                                   children: [
-                                    Text('${AppLocale.l('selectedDayNak')}: ${knNak[dinaIdx]}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
+                                    Text('${AppLocale.l('selectedDayNak')}: ${trAll(knNak[dinaIdx])}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
                                     const SizedBox(height: 12),
                                     Row(
                                       children: [
@@ -1149,7 +1149,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
 
         windows.add(LagnaWindow(
           rashiIndex: currentRashi,
-          rashiName: knRashi[currentRashi],
+          rashiName: appRashi[currentRashi],
           startTime: _minutesToTimeStr(startMins),
           endTime: _minutesToTimeStr(endMins),
           isAllowed: isLagnaAllowed,
@@ -1246,7 +1246,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
               Row(children: [
                 Icon(rowIcon, color: iconColor, size: 16),
                 const SizedBox(width: 8),
-                Expanded(child: Text(lw.rashiName, style: TextStyle(
+                Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(
                   fontWeight: lw.isShubha ? FontWeight.w800 : FontWeight.w500,
                   color: lw.isShubha ? kText : kMuted, fontSize: 13,
                 ))),
@@ -1296,7 +1296,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
 
   Widget _shuddhiChip(String label, bool isShuddha, List<String> malefics, {bool required = true}) {
     if (!required) {
-      final text = isShuddha ? '$label ✓' : '$label ✗ ${malefics.join(',')}';
+      final text = isShuddha ? '$label ✓' : '$label ✗ ${malefics.map((m) => trAll(m)).join(',')}';
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: BoxDecoration(
@@ -1308,7 +1308,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       );
     }
     final MaterialColor color = isShuddha ? Colors.green : Colors.red;
-    final text = isShuddha ? '$label ✓' : '$label ✗ ${malefics.join(',')}';
+    final text = isShuddha ? '$label ✓' : '$label ✗ ${malefics.map((m) => trAll(m)).join(',')}';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
