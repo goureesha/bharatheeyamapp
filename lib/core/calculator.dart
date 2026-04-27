@@ -755,13 +755,20 @@ class AstroCalculator {
         // Check if a Sankranti occurred: Sun must have changed Rashi
         final bool hasSankranti = (prevAmaRashi != nextAmaRashi);
         
-        final masaName = knChandraMasa[prevAmaRashi];
+        // Month name comes from the Rashi the Sun occupies at the END of this
+        // lunar month (next Amavasya).  That Rashi maps 1-to-1 with the Masa:
+        //   Mesha → Vaishakha, Vrishabha → Jyeshtha, Mithuna → Ashadha, etc.
+        //
+        // Adhika: no Sankranti inside → the month is an extra repetition of the
+        //         NEXT real month, so it takes the name of nextAmaRashi.
+        // Nija:   a Sankranti occurred → this is the normal month for that Rashi.
+        final masaName = knChandraMasa[nextAmaRashi];
         chandraMasaRaw = masaName;
         
         if (!hasSankranti) {
           chandraMasa = '${AppLocale.l('adhikaPrefix')} $masaName';
         } else {
-          chandraMasa = '${AppLocale.l('nijaPrefix')} $masaName';
+          chandraMasa = masaName;  // normal month — no prefix needed
         }
       } catch (_) {
         chandraMasa = knChandraMasa[sunRashiIdx];
