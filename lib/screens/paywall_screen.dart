@@ -24,7 +24,7 @@ class PaywallScreen extends StatelessWidget {
                   letterSpacing: 1.5,
                 )),
                 const SizedBox(height: 4),
-                Text('Vedic Astrology', style: TextStyle(
+                Text(AppLocale.l('vedicAstrology'), style: TextStyle(
                   fontSize: 14, color: kMuted, letterSpacing: 0.5,
                 )),
                 const SizedBox(height: 32),
@@ -48,7 +48,7 @@ class PaywallScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
-                    Text('Your 3-day free trial has ended',
+                    Text(AppLocale.l('trialExpiredSub'),
                       style: TextStyle(fontSize: 13, color: Colors.red.shade600),
                     ),
                   ]),
@@ -65,8 +65,7 @@ class PaywallScreen extends StatelessWidget {
                       const SizedBox(height: 14),
                       _benefit(Icons.auto_awesome, AppLocale.l('allKundali')),
                       _benefit(Icons.calendar_month, AppLocale.l('panchangaTara')),
-                      _benefit(Icons.favorite, '${AppLocale.l('matchMakingTitle')} / Match Making'),
-                      _benefit(Icons.menu_book, AppLocale.l('mantraCollection')),
+                      _benefit(Icons.favorite, AppLocale.l('matchMakingTitle')),
                       _benefit(Icons.save, AppLocale.l('dataBackup')),
                     ],
                   ),
