@@ -1,0 +1,6 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary":  "Updated walkthrough to summarize the extraction and translation of the first 5 shlokas and their vyakhyanas into `grantha_data.dart`.",
+  "updatedAt":  "2026-04-04T08:34:16.949241700Z",
+  "version":  "1"
+}
