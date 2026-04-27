@@ -759,16 +759,42 @@ class AstroCalculator {
         // lunar month (next Amavasya).  That Rashi maps 1-to-1 with the Masa:
         //   Mesha → Vaishakha, Vrishabha → Jyeshtha, Mithuna → Ashadha, etc.
         //
-        // Adhika: no Sankranti inside → the month is an extra repetition of the
-        //         NEXT real month, so it takes the name of nextAmaRashi.
-        // Nija:   a Sankranti occurred → this is the normal month for that Rashi.
+        // Adhika: no Sankranti inside → extra month, prefixed "Adhika".
+        // Nija:   Sankranti occurred AND previous month was Adhika of same name
+        //         → this is the real month, prefixed "Nija".
+        // Normal: Sankranti occurred, previous month was NOT Adhika → plain name.
         final masaName = knChandraMasa[nextAmaRashi];
         chandraMasaRaw = masaName;
         
         if (!hasSankranti) {
+          // Current month is Adhika
           chandraMasa = '${AppLocale.l('adhikaPrefix')} $masaName';
         } else {
-          chandraMasa = masaName;  // normal month — no prefix needed
+          // Current month has a Sankranti — check if PREVIOUS month was Adhika
+          // by looking at the Amavasya before the previous one (2 Amavasyas back)
+          bool prevWasAdhika = false;
+          try {
+            final jdTwoPrevAmavasya = jdPrevAmavasya - 29.530589;
+            final sunTwoPrevCalc = Sweph.swe_calc_ut(jdTwoPrevAmavasya, HeavenlyBody.SE_SUN, SwephFlag.SEFLG_SWIEPH);
+            final sunTwoPrevSid = ((sunTwoPrevCalc.longitude - ayn) % 360 + 360) % 360;
+            final twoPrevAmaRashi = (sunTwoPrevSid / 30).floor() % 12;
+            // Previous month was Adhika if Sun didn't change rashi between
+            // two-prev Amavasya and prev Amavasya
+            if (twoPrevAmaRashi == prevAmaRashi) {
+              // Previous month had no Sankranti (Adhika)
+              // Check if it shares the same name as current month
+              final prevMasaName = knChandraMasa[prevAmaRashi];
+              if (prevMasaName == masaName) {
+                prevWasAdhika = true;
+              }
+            }
+          } catch (_) {}
+          
+          if (prevWasAdhika) {
+            chandraMasa = '${AppLocale.l('nijaPrefix')} $masaName';
+          } else {
+            chandraMasa = masaName;  // normal month — no prefix
+          }
         }
       } catch (_) {
         chandraMasa = knChandraMasa[sunRashiIdx];
