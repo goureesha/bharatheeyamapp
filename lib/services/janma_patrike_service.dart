@@ -37,11 +37,11 @@ class JanmaPatrikeService {
   /// Select the correct font family based on the user's locale
   static String _fontForLocale() {
     switch (AppLocale.current) {
-      case 'hi': return 'Noto Sans Devanagari';
-      case 'ta': return 'Noto Sans Tamil';
-      case 'te': return 'Noto Sans Telugu';
-      case 'ml': return 'Noto Sans Malayalam';
-      default:   return 'Noto Sans Kannada';
+      case 'hi': return 'NotoSansDevanagari';
+      case 'ta': return 'NotoSansTamil';
+      case 'te': return 'NotoSansTelugu';
+      case 'ml': return 'NotoSansMalayalam';
+      default:   return 'NotoSansKannada';
     }
   }
 
