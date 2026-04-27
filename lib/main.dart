@@ -347,7 +347,7 @@ class _DeviceMismatchScreenState extends State<_DeviceMismatchScreen> {
           const SizedBox(height: 8),
           Text('Active on Another Device', style: TextStyle(fontSize: 16, color: kMuted)),
           const SizedBox(height: 24),
-          Text('ನಿಮ್ಮ Google ಖಾತೆ (${GoogleAuthService.userEmail ?? ''}) ಬೇರೆ ಸಾಧನದಲ್ಲಿ ಸಕ್ರಿಯವಾಗಿದೆ.\nಈ ಸಾಧನಕ್ಕೆ ಬದಲಾಯಿಸಲು "ಸಾಧನ ಬದಲಾಯಿಸಿ" ಒತ್ತಿ.',
+          Text(AppLocale.l('deviceMismatchMsg').replaceAll('{email}', GoogleAuthService.userEmail ?? ''),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, color: kText, height: 1.6)),
           const SizedBox(height: 32),
@@ -413,7 +413,7 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
           Text('Internet Connection Required', style: TextStyle(fontSize: 16, color: kMuted)),
           const SizedBox(height: 24),
           Text(
-            'ನಿಮ್ಮ ಚಂದಾದಾರಿಕೆ ಸ್ಥಿತಿಯನ್ನು ಪರಿಶೀಲಿಸಲು ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಅಗತ್ಯವಿದೆ.\nPlay Store ನೊಂದಿಗೆ ಪರಿಶೀಲಿಸಲು ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕಿಸಿ ಮತ್ತು ಕೆಳಗಿನ ಬಟನ್ ಒತ್ತಿ.',
+            AppLocale.l('internetRequiredMsg'),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, color: kText, height: 1.6),
           ),

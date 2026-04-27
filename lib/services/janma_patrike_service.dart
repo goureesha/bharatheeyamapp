@@ -205,7 +205,7 @@ class JanmaPatrikeService {
         child: Theme(
           data: ThemeData(fontFamily: _fontForLocale()),
           child: DefaultTextStyle(
-            style: const TextStyle(color: Colors.black, fontSize: 13),
+            style: TextStyle(color: Colors.black, fontSize: 13, fontFamily: _fontForLocale()),
             child: Material(
               color: Colors.white,
               child: theme.buildPageBorder(
