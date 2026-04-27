@@ -34,10 +34,33 @@ class UserDetails {
 }
 
 class JanmaPatrikeService {
-  static const _shortNames = <String, String>{
-    'ಲಗ್ನ': 'ಲ', 'ರವಿ': 'ರ', 'ಚಂದ್ರ': 'ಚಂ', 'ಕುಜ': 'ಕು', 'ಬುಧ': 'ಬು',
-    'ಗುರು': 'ಗು', 'ಶುಕ್ರ': 'ಶು', 'ಶನಿ': 'ಶ', 'ರಾಹು': 'ರಾ', 'ಕೇತು': 'ಕೇ', 'ಮಾಂದಿ': 'ಮಾ',
-  };
+  /// Select the correct font family based on the user's locale
+  static String _fontForLocale() {
+    switch (AppLocale.current) {
+      case 'hi': return 'Noto Sans Devanagari';
+      case 'ta': return 'Noto Sans Tamil';
+      case 'te': return 'Noto Sans Telugu';
+      case 'ml': return 'Noto Sans Malayalam';
+      default:   return 'Noto Sans Kannada';
+    }
+  }
+
+  /// Locale-aware short names for chart cells
+  static Map<String, String> get _shortNames {
+    return <String, String>{
+      'ಲಗ್ನ': AppLocale.l('abbrLagna'),
+      'ರವಿ': AppLocale.l('abbrRavi'),
+      'ಚಂದ್ರ': AppLocale.l('abbrChandra'),
+      'ಕುಜ': AppLocale.l('abbrKuja'),
+      'ಬುಧ': AppLocale.l('abbrBudha'),
+      'ಗುರು': AppLocale.l('abbrGuru'),
+      'ಶುಕ್ರ': AppLocale.l('abbrShukra'),
+      'ಶನಿ': AppLocale.l('abbrShani'),
+      'ರಾಹು': AppLocale.l('abbrRahu'),
+      'ಕೇತು': AppLocale.l('abbrKetu'),
+      'ಮಾಂದಿ': AppLocale.l('abbrMandi'),
+    };
+  }
 
   static List<List<String>> _computeChart(KundaliResult result, int Function(double deg) rashiResolver) {
     final List<List<String>> chart = List.generate(12, (_) => []);
@@ -180,7 +203,7 @@ class JanmaPatrikeService {
       child: MediaQuery(
         data: const MediaQueryData(),
         child: Theme(
-          data: ThemeData(fontFamily: 'Noto Sans Kannada'),
+          data: ThemeData(fontFamily: _fontForLocale()),
           child: DefaultTextStyle(
             style: const TextStyle(color: Colors.black, fontSize: 13),
             child: Material(
@@ -323,7 +346,7 @@ class JanmaPatrikeService {
               Image.asset('assets/images/ganapati.png', width: 48, height: 48),
               const SizedBox(width: 6),
               Expanded(
-                child: Text('ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ',
+                child: Text(AppLocale.l('shriGaneshaya'),
                   textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: shlokaColor)),
               ),
@@ -333,7 +356,7 @@ class JanmaPatrikeService {
                 ],
               ),
               Expanded(
-                child: Text('ಶ್ರೀ ಗುರುಭ್ಯೋ ನಮಃ',
+                child: Text(AppLocale.l('shriGurubhyo'),
                   textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: shlokaColor)),
               ),
@@ -342,7 +365,7 @@ class JanmaPatrikeService {
             ],
           ),
           const SizedBox(height: 3),
-          Text('ಜನ್ಮಕಾಲೇ ಗ್ರಹಾಃ ಯೇ ಯೇ ಯದ್ಭಾವಸ್ಥಿತಿಗಾಮಿನಃ ।\nತತ್ಫಲಂ ಪ್ರವದೇದ್ವಿದ್ವಾನ್ ಜಾತಕಂ ಜೀವನಪ್ರದಮ್ ॥',
+          Text(AppLocale.l('janmaShloka'),
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.w500, fontSize: 9, color: shlokaColor, fontStyle: FontStyle.italic, height: 1.3)),
           const SizedBox(height: 4),
