@@ -11811,11 +11811,11 @@ _.r=g
 _.w=h
 _.x=i
 _.y=j},
-byp(){switch($.ep().a){case"hi":return"Noto Sans Devanagari"
-case"ta":return"Noto Sans Tamil"
-case"te":return"Noto Sans Telugu"
-case"ml":return"Noto Sans Malayalam"
-default:return"Noto Sans Kannada"}},
+byp(){switch($.ep().a){case"hi":return"NotoSansDevanagari"
+case"ta":return"NotoSansTamil"
+case"te":return"NotoSansTelugu"
+case"ml":return"NotoSansMalayalam"
+default:return"NotoSansKannada"}},
 bjl(){var s=t.N
 return A.L(["\u0cb2\u0c97\u0ccd\u0ca8",A.d("abbrLagna"),"\u0cb0\u0cb5\u0cbf",A.d("abbrRavi"),"\u0c9a\u0c82\u0ca6\u0ccd\u0cb0",A.d("abbrChandra"),"\u0c95\u0cc1\u0c9c",A.d("abbrKuja"),"\u0cac\u0cc1\u0ca7",A.d("abbrBudha"),"\u0c97\u0cc1\u0cb0\u0cc1",A.d("abbrGuru"),"\u0cb6\u0cc1\u0c95\u0ccd\u0cb0",A.d("abbrShukra"),"\u0cb6\u0ca8\u0cbf",A.d("abbrShani"),"\u0cb0\u0cbe\u0cb9\u0cc1",A.d("abbrRahu"),"\u0c95\u0cc7\u0ca4\u0cc1",A.d("abbrKetu"),"\u0cae\u0cbe\u0c82\u0ca6\u0cbf",A.d("abbrMandi")],s,s)},
 bjk(a,b){var s,r,q,p,o,n,m,l=J.el(12,t.yp)
