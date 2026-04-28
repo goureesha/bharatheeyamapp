@@ -837,13 +837,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(height: 10),
                           OutlinedButton.icon(
                             icon: Icon(Icons.sync, size: 18, color: kPurple2),
-                            label: Text('NTP ಮರುಸಿಂಕ್ / Re-sync Clock', style: TextStyle(color: kPurple2, fontSize: 13)),
+                            label: Text(AppLocale.l('ntpResync'), style: TextStyle(color: kPurple2, fontSize: 13)),
                             onPressed: () async {
                               final ok = await TrustedTimeService.syncWithNtp();
                               if (mounted) {
                                 setState(() {});
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: Text(ok ? 'NTP ಸಿಂಕ್ ಯಶಸ್ವಿ!' : 'NTP ಸಿಂಕ್ ವಿಫಲ — ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ'),
+                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: Text(ok ? AppLocale.l('ntpSyncSuccess') : AppLocale.l('ntpSyncFailed')),
                                   backgroundColor: ok ? Colors.green : Colors.red,
                                 ));
                               }
@@ -936,7 +936,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Google Drive ಬ್ಯಾಕಪ್ ಬಳಸಲು ದಯವಿಟ್ಟು ಮೊದಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.',
+                          AppLocale.l('signInForBackup'),
                           style: TextStyle(fontSize: 12, color: Colors.orange.shade700),
                         ),
                       ),

@@ -570,6 +570,21 @@ class AppLocale {
 
       'trialExpiredSub': 'ನಿಮ್ಮ 3-ದಿನದ ಉಚಿತ ಪ್ರಯೋಗ ಅವಧಿ ಮುಗಿದಿದೆ',
       'vedicAstrology': 'ವೈದಿಕ ಜ್ಯೋತಿಷ',
+
+      'noSubscription': 'ಚಂದಾದಾರಿಕೆ ಇಲ್ಲ',
+      'trialActive': 'ಟ್ರಯಲ್ ಸಕ್ರಿಯ - {h} ಗಂಟೆ ಬಾಕಿ',
+      'premiumActive': 'ಪ್ರೀಮಿಯಂ ಸಕ್ರಿಯ - {days} ದಿನ ಬಾಕಿ',
+      'subExpired': 'ಚಂದಾದಾರಿಕೆ ಮುಗಿದಿದೆ',
+      'graceActive': 'ಗ್ರೇಸ್ ಸಕ್ರಿಯ - {hrs}h ಬಾಕಿ ({used}/{max} ಬಳಸಲಾಗಿದೆ)',
+      'graceInactive': 'ಗ್ರೇಸ್ ನಿಷ್ಕ್ರಿಯ ({used}/{max} ಬಳಸಲಾಗಿದೆ)',
+      'ntpNotSynced': 'NTP ಸಿಂಕ್ ಆಗಿಲ್ಲ',
+      'timeAccurate': 'ಸಮಯ ನಿಖರ',
+      'phoneClockAhead': 'ಫೋನ್ ಗಡಿಯಾರ ಮುಂದೆ',
+      'phoneClockBehind': 'ಫೋನ್ ಗಡಿಯಾರ ಹಿಂದೆ',
+      'ntpResync': 'NTP ಮರುಸಿಂಕ್ / Re-sync Clock',
+      'ntpSyncSuccess': 'NTP ಸಿಂಕ್ ಯಶಸ್ವಿ!',
+      'ntpSyncFailed': 'NTP ಸಿಂಕ್ ವಿಫಲ — ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ',
+      'signInForBackup': 'Google Drive ಬ್ಯಾಕಪ್ ಬಳಸಲು ದಯವಿಟ್ಟು ಮೊದಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.',
 },
     'hi': {
 
@@ -1011,6 +1026,21 @@ class AppLocale {
 
       'trialExpiredSub': 'आपकी 3-दिन की निःशुल्क परीक्षण अवधि समाप्त हो गई है',
       'vedicAstrology': 'वैदिक ज्योतिष',
+
+      'noSubscription': 'कोई सदस्यता नहीं',
+      'trialActive': 'ट्रायल सक्रिय - {h} घंटे शेष',
+      'premiumActive': 'प्रीमियम सक्रिय - {days} दिन शेष',
+      'subExpired': 'सदस्यता समाप्त हो गई',
+      'graceActive': 'ग्रेस सक्रिय - {hrs}h शेष ({used}/{max} उपयोग)',
+      'graceInactive': 'ग्रेस निष्क्रिय ({used}/{max} उपयोग)',
+      'ntpNotSynced': 'NTP सिंक नहीं हुआ',
+      'timeAccurate': 'समय सटीक',
+      'phoneClockAhead': 'फ़ोन की घड़ी आगे',
+      'phoneClockBehind': 'फ़ोन की घड़ी पीछे',
+      'ntpResync': 'NTP पुनः सिंक / Re-sync Clock',
+      'ntpSyncSuccess': 'NTP सिंक सफल!',
+      'ntpSyncFailed': 'NTP सिंक विफल — इंटरनेट जाँचें',
+      'signInForBackup': 'Google Drive बैकअप के लिए कृपया पहले साइन इन करें.',
 },
     'ta': {
 
@@ -1448,6 +1478,21 @@ class AppLocale {
 
       'trialExpiredSub': 'உங்கள் 3-நாள் இலவச சோதனை காலம் முடிந்தது',
       'vedicAstrology': 'வேத ஜோதிடம்',
+
+      'noSubscription': 'சந்தா இல்லை',
+      'trialActive': 'சோதனை செயலில் - {h} மணி நேரம் மீதம்',
+      'premiumActive': 'பிரீமியம் செயலில் - {days} நாட்கள் மீதம்',
+      'subExpired': 'சந்தா முடிந்தது',
+      'graceActive': 'கிரேஸ் செயலில் - {hrs}h மீதம் ({used}/{max} பயன்படுத்தப்பட்டது)',
+      'graceInactive': 'கிரேஸ் செயலற்றது ({used}/{max} பயன்படுத்தப்பட்டது)',
+      'ntpNotSynced': 'NTP ஒத்திசைக்கப்படவில்லை',
+      'timeAccurate': 'நேரம் சரியானது',
+      'phoneClockAhead': 'போன் கடிகாரம் முன்னால்',
+      'phoneClockBehind': 'போன் கடிகாரம் பின்னால்',
+      'ntpResync': 'NTP மறு ஒத்திசைவு / Re-sync Clock',
+      'ntpSyncSuccess': 'NTP ஒத்திசைவு வெற்றி!',
+      'ntpSyncFailed': 'NTP ஒத்திசைவு தோல்வி — இணையம் சரிபார்க்கவும்',
+      'signInForBackup': 'Google Drive காப்புப்பதிவுக்கு முதலில் உள்நுழையவும்.',
 },
     'te': {
 
@@ -1885,6 +1930,21 @@ class AppLocale {
 
       'trialExpiredSub': 'మీ 3-రోజుల ఉచిత ప్రయోగ కాలం ముగిసింది',
       'vedicAstrology': 'వైదిక జ్యోతిషం',
+
+      'noSubscription': 'చందా లేదు',
+      'trialActive': 'ట్రయల్ యాక్టివ్ - {h} గంటలు మిగిలి',
+      'premiumActive': 'ప్రీమియం యాక్టివ్ - {days} రోజులు మిగిలి',
+      'subExpired': 'చందా ముగిసింది',
+      'graceActive': 'గ్రేస్ యాక్టివ్ - {hrs}h మిగిలి ({used}/{max} వాడబడింది)',
+      'graceInactive': 'గ్రేస్ నిష్క్రియ ({used}/{max} వాడబడింది)',
+      'ntpNotSynced': 'NTP సింక్ కాలేదు',
+      'timeAccurate': 'సమయం సరిగ్గా ఉంది',
+      'phoneClockAhead': 'ఫోన్ గడియారం ముందు',
+      'phoneClockBehind': 'ఫోన్ గడియారం వెనుక',
+      'ntpResync': 'NTP రీ-సింక్ / Re-sync Clock',
+      'ntpSyncSuccess': 'NTP సింక్ విజయవంతం!',
+      'ntpSyncFailed': 'NTP సింక్ విఫలం — ఇంటర్నెట్ తనిఖీ చేయండి',
+      'signInForBackup': 'Google Drive బ్యాకప్ కోసం దయచేసి ముందుగా సైన్ ఇన్ చేయండి.',
 },
     'ml': {
 
@@ -2322,6 +2382,21 @@ class AppLocale {
 
       'trialExpiredSub': 'നിങ്ങളുടെ 3-ദിവസ ഉചിത പരീക്ഷണ കാലാവധി കഴിഞ്ഞു',
       'vedicAstrology': 'വൈദിക ജ്യോതിഷം',
+
+      'noSubscription': 'സബ്‌സ്‌ക്രിപ്ഷൻ ഇല്ല',
+      'trialActive': 'ട്രയൽ സജീവം - {h} മണിക്കൂർ ബാക്കി',
+      'premiumActive': 'പ്രീമിയം സജീവം - {days} ദിവസം ബാക്കി',
+      'subExpired': 'സബ്‌സ്‌ക്രിപ്ഷൻ കഴിഞ്ഞു',
+      'graceActive': 'ഗ്രേസ് സജീവം - {hrs}h ബാക്കി ({used}/{max} ഉപയോഗിച്ചു)',
+      'graceInactive': 'ഗ്രേസ് നിഷ്‌ക്രിയം ({used}/{max} ഉപയോഗിച്ചു)',
+      'ntpNotSynced': 'NTP സിങ്ക് ആയിട്ടില്ല',
+      'timeAccurate': 'സമയം കൃത്യം',
+      'phoneClockAhead': 'ഫോൺ ക്ലോക്ക് മുന്നിൽ',
+      'phoneClockBehind': 'ഫോൺ ക്ലോക്ക് പിന്നിൽ',
+      'ntpResync': 'NTP റീ-സിങ്ക് / Re-sync Clock',
+      'ntpSyncSuccess': 'NTP സിങ്ക് വിജയം!',
+      'ntpSyncFailed': 'NTP സിങ്ക് പരാജയം — ഇന്റർനെറ്റ് പരിശോധിക്കുക',
+      'signInForBackup': 'Google Drive ബാക്കപ്പിനായി ദയവായി ആദ്യം സൈൻ ഇൻ ചെയ്യുക.',
 },
   };
 

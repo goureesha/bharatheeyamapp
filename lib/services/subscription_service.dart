@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'trusted_time_service.dart';
+import '../widgets/common.dart';
 
 class SubscriptionService {
   static const String _subscriptionProductId = 'ad_free_yearly_500';
@@ -95,18 +96,18 @@ class SubscriptionService {
   /// Subscription status text for UI display
   static String get statusText {
     if (!hasSubscription && !isTrialActive) {
-      return 'ಚಂದಾದಾರಿಕೆ ಇಲ್ಲ (No subscription)';
+      return '${AppLocale.l('noSubscription')} (No subscription)';
     }
     if (isTrialActive) {
       final h = trialHoursRemaining;
-      return 'ಟ್ರಯಲ್ ಸಕ್ರಿಯ - $h ಗಂಟೆ ಬಾಕಿ ($h hrs left)';
+      return '${AppLocale.l('trialActive').replaceAll('{h}', '$h')} ($h hrs left)';
     }
     if (hasSubscription) {
       final days = subscriptionDaysRemaining;
       if (days > 0) {
-        return 'ಪ್ರೀಮಿಯಂ ಸಕ್ರಿಯ - $days ದಿನ ಬಾಕಿ';
+        return AppLocale.l('premiumActive').replaceAll('{days}', '$days');
       } else {
-        return 'ಚಂದಾದಾರಿಕೆ ಮುಗಿದಿದೆ';
+        return AppLocale.l('subExpired');
       }
     }
     return '';
@@ -116,9 +117,9 @@ class SubscriptionService {
   static String get graceStatusText {
     if (isGracePeriodActive) {
       final hrs = gracePeriodRemainingHours;
-      return 'ಗ್ರೇಸ್ ಸಕ್ರಿಯ - ${hrs}h ಬಾಕಿ ($gracePeriodsUsedThisYear/$_maxGracePeriodsPerYear ಬಳಸಲಾಗಿದೆ)';
+      return AppLocale.l('graceActive').replaceAll('{hrs}', '$hrs').replaceAll('{used}', '$gracePeriodsUsedThisYear').replaceAll('{max}', '$_maxGracePeriodsPerYear');
     }
-    return 'ಗ್ರೇಸ್ ನಿಷ್ಕ್ರಿಯ ($gracePeriodsUsedThisYear/$_maxGracePeriodsPerYear ಬಳಸಲಾಗಿದೆ)';
+    return AppLocale.l('graceInactive').replaceAll('{used}', '$gracePeriodsUsedThisYear').replaceAll('{max}', '$_maxGracePeriodsPerYear');
   }
 
   // ════════════════════════════════════════════════

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import '../widgets/common.dart';
 
 /// Provides a trusted time source using NTP (Network Time Protocol).
 ///
@@ -260,22 +261,23 @@ class TrustedTimeService {
   /// Get human-readable status for debugging/UI.
   static String get statusText {
     if (!hasTrustedTime) {
-      return 'NTP ಸಿಂಕ್ ಆಗಿಲ್ಲ (Not synced)';
+      return '${AppLocale.l('ntpNotSynced')} (Not synced)';
     }
     final absOffset = _offsetMs.abs();
+    final direction = _offsetMs > 0 ? AppLocale.l('phoneClockAhead') : AppLocale.l('phoneClockBehind');
     if (absOffset < 2000) {
-      return 'ಸಮಯ ನಿಖರ ✓ (${absOffset}ms)';
+      return '${AppLocale.l('timeAccurate')} \u2713 (${absOffset}ms)';
     }
     final seconds = absOffset ~/ 1000;
     if (seconds < 60) {
-      return 'ಫೋನ್ ಗಡಿಯಾರ ${_offsetMs > 0 ? "ಮುಂದೆ" : "ಹಿಂದೆ"} ${seconds}s';
+      return '$direction ${seconds}s';
     }
     final minutes = seconds ~/ 60;
     if (minutes < 60) {
-      return '⚠️ ಫೋನ್ ಗಡಿಯಾರ ${_offsetMs > 0 ? "ಮುಂದೆ" : "ಹಿಂದೆ"} ${minutes}m';
+      return '\u26A0\uFE0F $direction ${minutes}m';
     }
     final hours = minutes ~/ 60;
-    return '🚨 ಫೋನ್ ಗಡಿಯಾರ ${_offsetMs > 0 ? "ಮುಂದೆ" : "ಹಿಂದೆ"} ${hours}h ${minutes % 60}m';
+    return '\uD83D\uDEA8 $direction ${hours}h ${minutes % 60}m';
   }
 
   /// True if phone clock appears tampered (offset > 5 minutes).
