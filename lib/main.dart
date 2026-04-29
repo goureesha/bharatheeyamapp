@@ -132,11 +132,12 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
       TrustedTimeService.syncWithNtp();
       // Re-verify subscription when app comes back to foreground
       SubscriptionService.checkOnReconnect();
-      // Re-check device binding on resume (catches if user migrated from another device)
+      // Re-check device binding + sync trial on resume
       if (GoogleAuthService.isSignedIn) {
         DeviceBindingService.checkBinding().then((bound) {
           deviceBindingNotifier.value = bound;
         });
+        SubscriptionService.syncTrialWithFirestore();
       }
     }
   }
