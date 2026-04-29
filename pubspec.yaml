@@ -30,6 +30,7 @@ dependencies:
   uuid: ^4.5.1
   file_picker: ^10.3.10
   firebase_core: ^4.6.0
+  firebase_auth: ^5.5.0
   cloud_firestore: ^6.2.0
   screenshot: ^3.0.0
   device_info_plus: ^11.0.0

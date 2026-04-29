@@ -1,9 +1,10 @@
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'tester_service.dart';
 
 /// Google Sign-In service — email-only (no sensitive scopes).
-/// Used purely for user identity (1-Gmail-1-device binding).
+/// Used for user identity (1-Gmail-1-device binding) + Firebase Auth for Firestore rules.
 class GoogleAuthService {
   static const _webClientId =
       '330797161511-h4mb1l0i76ea37s6if93bml6gia4puva.apps.googleusercontent.com';
@@ -48,11 +49,27 @@ class GoogleAuthService {
     }
   }
 
+  /// Bridge Google Sign-In credentials to Firebase Auth
+  static Future<void> _signInToFirebaseAuth(GoogleSignInAccount account) async {
+    try {
+      final googleAuth = await account.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      debugPrint('Firebase Auth: signed in as ${account.email}');
+    } catch (e) {
+      debugPrint('Firebase Auth bridge error: $e');
+    }
+  }
+
   static Future<bool> signIn() async {
     try {
       _currentUser = await _instance.signIn();
       if (_currentUser != null) {
         debugPrint('Google Sign-In success: ${_currentUser!.email}');
+        await _signInToFirebaseAuth(_currentUser!);
         TesterService.checkTesterStatus(_currentUser!.email);
       }
       return _currentUser != null;
@@ -64,6 +81,7 @@ class GoogleAuthService {
 
   static Future<void> signOut() async {
     await _instance.signOut();
+    await FirebaseAuth.instance.signOut();
     _currentUser = null;
     await TesterService.onSignOut();
   }
@@ -72,6 +90,7 @@ class GoogleAuthService {
     try {
       _currentUser = await _instance.signInSilently();
       if (_currentUser != null) {
+        await _signInToFirebaseAuth(_currentUser!);
         TesterService.checkTesterStatus(_currentUser!.email);
       }
       return _currentUser != null;
