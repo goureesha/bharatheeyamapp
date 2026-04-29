@@ -47,7 +47,7 @@ const RESOURCES = {"assets/assets/fonts/NotoSansDevanagari-Bold.ttf": "c3ee3c730
 "canvaskit/skwasm_st.js": "d1326ceef381ad382ab492ba5d96f04d",
 "privacy_policy.html": "10094331e2887570d5e079618ca2fdc8",
 "flutter.js": "76f08d47ff9f5715220992f993002504",
-"flutter_bootstrap.js": "2d32066148794c8aa6353ab5c4073eca",
+"flutter_bootstrap.js": "0bf8b6e87cd70df0c16dcb61917864b4",
 "main.dart.js": "7177103eb6b3dea0eba5763421c4f8c8",
 "version.json": "ef8744097c0be2ab89d14c5640e8546a",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df"};
