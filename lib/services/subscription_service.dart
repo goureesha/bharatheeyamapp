@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'trusted_time_service.dart';
+import 'google_auth_service.dart';
 import '../widgets/common.dart';
 
 class SubscriptionService {
@@ -199,6 +201,54 @@ class SubscriptionService {
   static void dispose() {
     if (!kIsWeb) {
       _purchaseSub?.cancel();
+    }
+  }
+
+  // ════════════════════════════════════════════════
+  // FIRESTORE TRIAL SYNC (prevents trial reset on reinstall)
+  // ════════════════════════════════════════════════
+
+  /// Call AFTER sign-in + device binding. Syncs trial start with Firestore
+  /// so uninstall/reinstall with same Gmail does NOT reset the trial.
+  static Future<void> syncTrialWithFirestore() async {
+    if (kIsWeb) return;
+    final email = GoogleAuthService.userEmail;
+    if (email == null) return;
+
+    try {
+      final docRef = FirebaseFirestore.instance
+          .collection('device_bindings')
+          .doc(email.toLowerCase());
+
+      final doc = await docRef.get().timeout(const Duration(seconds: 8));
+      if (!doc.exists || doc.data() == null) return;
+
+      final data = doc.data()!;
+      final firestoreTrialTs = data['trialStartedAt'];
+
+      if (firestoreTrialTs != null && firestoreTrialTs is Timestamp) {
+        // Firestore has a trial start → restore it (prevents trial reset)
+        final firestoreTrialDate = firestoreTrialTs.toDate();
+        final prefs = await SharedPreferences.getInstance();
+        final localTs = prefs.getInt(_trialStartKey);
+
+        if (localTs == null || firestoreTrialDate.isBefore(DateTime.fromMillisecondsSinceEpoch(localTs))) {
+          // Firestore date is earlier (original) → use it
+          trialStartDate = firestoreTrialDate;
+          await prefs.setInt(_trialStartKey, firestoreTrialDate.millisecondsSinceEpoch);
+          debugPrint('🔄 Trial restored from Firestore: $firestoreTrialDate (no free trial on reinstall)');
+        }
+      } else {
+        // No trial in Firestore yet → write current trial start
+        if (trialStartDate != null) {
+          await docRef.update({
+            'trialStartedAt': Timestamp.fromDate(trialStartDate!),
+          }).catchError((_) {});
+          debugPrint('📝 Trial start written to Firestore: $trialStartDate');
+        }
+      }
+    } catch (e) {
+      debugPrint('Trial Firestore sync error: $e');
     }
   }
 

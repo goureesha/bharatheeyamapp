@@ -80,6 +80,8 @@ Future<void> _initAuthAndBinding() async {
       final bound = await DeviceBindingService.checkBinding();
       deviceBindingNotifier.value = bound;
       debugPrint('DeviceBinding: pre-render check result=$bound');
+      // Sync trial start with Firestore (prevents trial reset on reinstall)
+      await SubscriptionService.syncTrialWithFirestore();
     }
   } catch (e) {
     debugPrint('Auth/Binding init error: $e');
