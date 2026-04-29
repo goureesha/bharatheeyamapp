@@ -1,9 +1,14 @@
-﻿import 'package:flutter/foundation.dart';
+// dart:io is used only for Platform.isAndroid/isIOS checks (guarded by kIsWeb)
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'google_auth_service.dart';
+import 'subscription_service.dart';
 
 /// Manages one-Gmail-one-device binding using Firestore for cross-device enforcement.
 ///
@@ -43,6 +48,61 @@ class DeviceBindingService {
       debugPrint('DeviceBinding: new deviceId=$_deviceId');
     }
     return _deviceId!;
+  }
+
+  /// Collect rich device + subscription details for Firestore
+  static Future<Map<String, dynamic>> _getDeviceDetails(String email, String devId) async {
+    final data = <String, dynamic>{
+      'deviceId': devId,
+      'email': email.toLowerCase(),
+      'lastSeen': FieldValue.serverTimestamp(),
+    };
+
+    // Device info
+    try {
+      if (!kIsWeb) {
+        final deviceInfo = DeviceInfoPlugin();
+        if (Platform.isAndroid) {
+          final android = await deviceInfo.androidInfo;
+          data['deviceName'] = '${android.brand} ${android.model}';
+          data['deviceBrand'] = android.brand;
+          data['deviceModel'] = android.model;
+          data['androidVersion'] = android.version.release;
+          data['sdkInt'] = android.version.sdkInt;
+          data['manufacturer'] = android.manufacturer;
+          data['product'] = android.product;
+          data['fingerprint'] = android.fingerprint;
+        } else if (Platform.isIOS) {
+          final ios = await deviceInfo.iosInfo;
+          data['deviceName'] = ios.name;
+          data['deviceModel'] = ios.model;
+          data['iosVersion'] = ios.systemVersion;
+        }
+      }
+    } catch (e) {
+      debugPrint('DeviceBinding: device info error: $e');
+    }
+
+    // App version
+    try {
+      final pkgInfo = await PackageInfo.fromPlatform();
+      data['appVersion'] = pkgInfo.version;
+      data['buildNumber'] = pkgInfo.buildNumber;
+    } catch (_) {}
+
+    // Subscription details
+    data['hasSubscription'] = SubscriptionService.hasSubscription;
+    data['isTrialActive'] = SubscriptionService.isTrialActive;
+    data['trialMinutesRemaining'] = SubscriptionService.trialMinutesRemaining;
+    if (SubscriptionService.purchaseDate != null) {
+      data['subscribedAt'] = Timestamp.fromDate(SubscriptionService.purchaseDate!);
+      data['subscriptionDaysRemaining'] = SubscriptionService.subscriptionDaysRemaining;
+    }
+    if (SubscriptionService.trialStartDate != null) {
+      data['trialStartedAt'] = Timestamp.fromDate(SubscriptionService.trialStartDate!);
+    }
+
+    return data;
   }
 
   /// Ensure Firebase is initialized (reuse the centralized init)
@@ -115,12 +175,10 @@ class DeviceBindingService {
 
       if (!doc.exists || doc.data() == null) {
         // No binding exists → register this device (FIRST TIME)
-        await docRef.set({
-          'deviceId': devId,
-          'email': email.toLowerCase(),
-          'boundAt': FieldValue.serverTimestamp(),
-          'lastSeen': FieldValue.serverTimestamp(),
-        });
+        final details = await _getDeviceDetails(email, devId);
+        details['boundAt'] = FieldValue.serverTimestamp();
+        details['bindEvent'] = 'first_bind';
+        await docRef.set(details);
         await _cacheLocalBinding(email, devId);
         _isDeviceBound = true;
         _hasCheckedOnce = true;
@@ -132,12 +190,10 @@ class DeviceBindingService {
 
       if (storedDeviceId == null || storedDeviceId.isEmpty) {
         // Corrupted entry → re-register
-        await docRef.set({
-          'deviceId': devId,
-          'email': email.toLowerCase(),
-          'boundAt': FieldValue.serverTimestamp(),
-          'lastSeen': FieldValue.serverTimestamp(),
-        });
+        final details = await _getDeviceDetails(email, devId);
+        details['boundAt'] = FieldValue.serverTimestamp();
+        details['bindEvent'] = 'rebind_corrupted';
+        await docRef.set(details);
         await _cacheLocalBinding(email, devId);
         _isDeviceBound = true;
         _hasCheckedOnce = true;
@@ -146,8 +202,13 @@ class DeviceBindingService {
       }
 
       if (storedDeviceId == devId) {
-        // SAME device → allowed
-        await docRef.update({'lastSeen': FieldValue.serverTimestamp()}).catchError((_) {});
+        // SAME device → allowed — update with full details
+        try {
+          final details = await _getDeviceDetails(email, devId);
+          await docRef.update(details);
+        } catch (_) {
+          await docRef.update({'lastSeen': FieldValue.serverTimestamp()}).catchError((_) {});
+        }
         await _cacheLocalBinding(email, devId);
         _isDeviceBound = true;
         _hasCheckedOnce = true;
@@ -164,14 +225,12 @@ class DeviceBindingService {
       
       if (!hasActiveSub) {
         // Not subscribed → auto-rebind silently (no subscription to share)
-        await docRef.set({
-          'deviceId': devId,
-          'email': email.toLowerCase(),
-          'boundAt': FieldValue.serverTimestamp(),
-          'lastSeen': FieldValue.serverTimestamp(),
-          'autoRebound': true,
-          'previousDeviceId': storedDeviceId,
-        });
+        final details = await _getDeviceDetails(email, devId);
+        details['boundAt'] = FieldValue.serverTimestamp();
+        details['autoRebound'] = true;
+        details['previousDeviceId'] = storedDeviceId;
+        details['bindEvent'] = 'auto_rebind_no_sub';
+        await docRef.set(details);
         await _cacheLocalBinding(email, devId);
         _isDeviceBound = true;
         _hasCheckedOnce = true;
@@ -184,14 +243,12 @@ class DeviceBindingService {
       final rebindVersion = prefs.getInt('bharatheeyam_rebind_version') ?? 0;
       if (rebindVersion < 46) {
         // One-time auto-migrate for this version
-        await docRef.set({
-          'deviceId': devId,
-          'email': email.toLowerCase(),
-          'boundAt': FieldValue.serverTimestamp(),
-          'lastSeen': FieldValue.serverTimestamp(),
-          'migratedAt': FieldValue.serverTimestamp(),
-          'autoMigrateVersion': 46,
-        });
+        final details = await _getDeviceDetails(email, devId);
+        details['boundAt'] = FieldValue.serverTimestamp();
+        details['migratedAt'] = FieldValue.serverTimestamp();
+        details['autoMigrateVersion'] = 46;
+        details['bindEvent'] = 'auto_migrate_v46';
+        await docRef.set(details);
         await _cacheLocalBinding(email, devId);
         await prefs.setInt('bharatheeyam_rebind_version', 46);
         _isDeviceBound = true;
@@ -299,13 +356,11 @@ class DeviceBindingService {
           .collection(_firestoreCollection)
           .doc(email.toLowerCase());
 
-      await docRef.set({
-        'deviceId': devId,
-        'email': email.toLowerCase(),
-        'boundAt': FieldValue.serverTimestamp(),
-        'lastSeen': FieldValue.serverTimestamp(),
-        'migratedAt': FieldValue.serverTimestamp(),
-      });
+      final details = await _getDeviceDetails(email, devId);
+      details['boundAt'] = FieldValue.serverTimestamp();
+      details['migratedAt'] = FieldValue.serverTimestamp();
+      details['bindEvent'] = 'manual_migrate';
+      await docRef.set(details);
 
       // Cache locally
       await _cacheLocalBinding(email, devId);
