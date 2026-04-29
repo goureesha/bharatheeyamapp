@@ -9,9 +9,12 @@
 -keep class com.google.android.gms.** { *; }
 -dontwarn com.google.android.gms.**
 
-# Google APIs (Sheets, Calendar, etc.)
--keep class com.google.api.** { *; }
--dontwarn com.google.api.**
+# Firebase Auth + Core + Firestore
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
+-keep class com.google.android.recaptcha.** { *; }
+-dontwarn com.google.android.recaptcha.**
+
 
 # HTTP client
 -keep class com.google.common.** { *; }
