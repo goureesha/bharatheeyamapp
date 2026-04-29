@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -155,11 +155,34 @@ class DeviceBindingService {
         return true;
       }
 
-      // DIFFERENT device → check if one-time rebind is allowed (app update/reinstall)
-      // v39 force-rebind: auto-migrate on first mismatch after update
+      // ── DEVICE MISMATCH ──
+      // Import: only enforce for SUBSCRIBED users.
+      // Non-subscribed users get auto-rebound (nothing to protect).
+      // This prevents false blocks when SharedPreferences gets cleared
+      // (app update, clear cache, reinstall) which generates a new UUID.
+      final hasActiveSub = (await SharedPreferences.getInstance()).getBool('has_active_subscription') ?? false;
+      
+      if (!hasActiveSub) {
+        // Not subscribed → auto-rebind silently (no subscription to share)
+        await docRef.set({
+          'deviceId': devId,
+          'email': email.toLowerCase(),
+          'boundAt': FieldValue.serverTimestamp(),
+          'lastSeen': FieldValue.serverTimestamp(),
+          'autoRebound': true,
+          'previousDeviceId': storedDeviceId,
+        });
+        await _cacheLocalBinding(email, devId);
+        _isDeviceBound = true;
+        _hasCheckedOnce = true;
+        debugPrint('DeviceBinding: AUTO-REBIND (no subscription) ✅ email=$email devId=$devId oldDev=$storedDeviceId');
+        return true;
+      }
+
+      // SUBSCRIBED user on DIFFERENT device → check one-time auto-migrate
       final prefs = await SharedPreferences.getInstance();
       final rebindVersion = prefs.getInt('bharatheeyam_rebind_version') ?? 0;
-      if (rebindVersion < 39) {
+      if (rebindVersion < 46) {
         // One-time auto-migrate for this version
         await docRef.set({
           'deviceId': devId,
@@ -167,13 +190,13 @@ class DeviceBindingService {
           'boundAt': FieldValue.serverTimestamp(),
           'lastSeen': FieldValue.serverTimestamp(),
           'migratedAt': FieldValue.serverTimestamp(),
-          'autoMigrateVersion': 39,
+          'autoMigrateVersion': 46,
         });
         await _cacheLocalBinding(email, devId);
-        await prefs.setInt('bharatheeyam_rebind_version', 39);
+        await prefs.setInt('bharatheeyam_rebind_version', 46);
         _isDeviceBound = true;
         _hasCheckedOnce = true;
-        debugPrint('DeviceBinding: AUTO-MIGRATE v39 ✅ email=$email devId=$devId');
+        debugPrint('DeviceBinding: AUTO-MIGRATE v46 ✅ email=$email devId=$devId');
         return true;
       }
 
@@ -187,7 +210,6 @@ class DeviceBindingService {
       return _strictLocalFallback(email, devId);
     }
   }
-
   /// Cache a successful Firestore verification locally
   static Future<void> _cacheLocalBinding(String email, String devId) async {
     final prefs = await SharedPreferences.getInstance();
