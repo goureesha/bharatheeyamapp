@@ -29,7 +29,7 @@ const RESOURCES = {"assets/assets/fonts/NotoSansDevanagari-Bold.ttf": "c3ee3c730
 "assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8cb9b6ce",
 "assets/fonts/MaterialIcons-Regular.otf": "73d73e08aa33a559f1093538edda2c92",
 "assets/AssetManifest.bin": "97431ccc99cbad83d8e6e35ed496b23c",
-"assets/NOTICES": "6d4ecb533b20bddada1c6616b54d1637",
+"assets/NOTICES": "d94d6223f5226f026b75e2e85a1dbdc7",
 "assets/FontManifest.json": "8483a5e223c89751ce1424a84c218ccc",
 "index.html": "b7df8837a65841ef76449bb0fbf5438c",
 "/": "b7df8837a65841ef76449bb0fbf5438c",
@@ -47,8 +47,8 @@ const RESOURCES = {"assets/assets/fonts/NotoSansDevanagari-Bold.ttf": "c3ee3c730
 "canvaskit/skwasm_st.js": "d1326ceef381ad382ab492ba5d96f04d",
 "privacy_policy.html": "10094331e2887570d5e079618ca2fdc8",
 "flutter.js": "76f08d47ff9f5715220992f993002504",
-"flutter_bootstrap.js": "3de27365e54e5b472a8a85a817cb5f70",
-"main.dart.js": "287f35148365900c55db9f5832744ce3",
+"flutter_bootstrap.js": "59f07cb360ae6681b264f2dc8b39ab4e",
+"main.dart.js": "7177103eb6b3dea0eba5763421c4f8c8",
 "version.json": "ef8744097c0be2ab89d14c5640e8546a",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df"};
 // The application shell files that are downloaded before a service worker can
