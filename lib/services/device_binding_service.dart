@@ -1,5 +1,3 @@
-// dart:io is used only for Platform.isAndroid/isIOS checks (guarded by kIsWeb)
-import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -62,7 +60,7 @@ class DeviceBindingService {
     try {
       if (!kIsWeb) {
         final deviceInfo = DeviceInfoPlugin();
-        if (Platform.isAndroid) {
+        if (defaultTargetPlatform == TargetPlatform.android) {
           final android = await deviceInfo.androidInfo;
           data['deviceName'] = '${android.brand} ${android.model}';
           data['deviceBrand'] = android.brand;
@@ -72,7 +70,7 @@ class DeviceBindingService {
           data['manufacturer'] = android.manufacturer;
           data['product'] = android.product;
           data['fingerprint'] = android.fingerprint;
-        } else if (Platform.isIOS) {
+        } else if (defaultTargetPlatform == TargetPlatform.iOS) {
           final ios = await deviceInfo.iosInfo;
           data['deviceName'] = ios.name;
           data['deviceModel'] = ios.model;
