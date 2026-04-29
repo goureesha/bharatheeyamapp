@@ -517,6 +517,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Divider(color: kBorder),
                     const SizedBox(height: 24),
 
+                    // Device Binding Info
+                    SectionTitle('ಸಾಧನ ಬೈಂಡಿಂಗ್ / Device Binding'),
+                    const SizedBox(height: 12),
+                    FutureBuilder<String>(
+                      future: DeviceBindingService.getDeviceId(),
+                      builder: (context, snapshot) {
+                        final devId = snapshot.data ?? 'Loading...';
+                        final email = GoogleAuthService.userEmail ?? 'Not signed in';
+                        final isBound = DeviceBindingService.isDeviceBound;
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: kBorder.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: isBound ? Colors.green.withOpacity(0.3) : kBorder.withOpacity(0.3)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(children: [
+                                Icon(isBound ? Icons.link : Icons.link_off,
+                                  size: 20, color: isBound ? Colors.green : Colors.orange),
+                                const SizedBox(width: 8),
+                                Text(isBound ? 'Device Bound ✅' : 'Not Bound ⚠️',
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800,
+                                    color: isBound ? Colors.green : Colors.orange)),
+                              ]),
+                              const SizedBox(height: 12),
+                              _bindingInfoRow(Icons.smartphone, 'Device ID', devId),
+                              const SizedBox(height: 8),
+                              _bindingInfoRow(Icons.email_outlined, 'Gmail', email),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+                    Divider(color: kBorder),
+                    const SizedBox(height: 24),
 
 
 
@@ -1107,6 +1147,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _bindingInfoRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: kMuted),
+        const SizedBox(width: 8),
+        Text('$label: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+        Expanded(
+          child: SelectableText(value,
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kText, fontFamily: 'monospace'),
+          ),
+        ),
+      ],
     );
   }
 }

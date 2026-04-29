@@ -20,7 +20,7 @@ class SubscriptionService {
   static const String _lastPlayCheckKey = 'last_play_check_date';
 
   // ── Constants ──
-  static const int _trialDays = 3;
+  static const int _trialMinutes = 30;
   static const int _offlineGraceDays = 2;
   static const int _maxGracePeriodsPerYear = 10;
   static const int _subscriptionDurationDays = 365;
@@ -54,20 +54,20 @@ class SubscriptionService {
     return hasSubscription || isTrialActive;
   }
 
-  /// True if the free trial is still active
+  /// True if the free trial is still active (30 minutes)
   static bool get isTrialActive {
     if (trialStartDate == null) return false;
     final now = TrustedTimeService.now();
     final elapsed = now.difference(trialStartDate!);
-    return elapsed.inHours < _trialDays * 24;
+    return elapsed.inMinutes < _trialMinutes;
   }
 
-  /// Hours remaining in trial (0 if expired)
-  static int get trialHoursRemaining {
+  /// Minutes remaining in trial (0 if expired)
+  static int get trialMinutesRemaining {
     if (trialStartDate == null) return 0;
     final now = TrustedTimeService.now();
     final elapsed = now.difference(trialStartDate!);
-    final remaining = (_trialDays * 24) - elapsed.inHours;
+    final remaining = _trialMinutes - elapsed.inMinutes;
     return remaining > 0 ? remaining : 0;
   }
 
@@ -99,8 +99,8 @@ class SubscriptionService {
       return '${AppLocale.l('noSubscription')} (No subscription)';
     }
     if (isTrialActive) {
-      final h = trialHoursRemaining;
-      return '${AppLocale.l('trialActive').replaceAll('{h}', '$h')} ($h hrs left)';
+      final m = trialMinutesRemaining;
+      return '${AppLocale.l('trialActive').replaceAll('{h}', '$m')} ($m min left)';
     }
     if (hasSubscription) {
       final days = subscriptionDaysRemaining;
