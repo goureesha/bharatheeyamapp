@@ -204,8 +204,15 @@ class DeviceBindingService {
         try {
           final details = await _getDeviceDetails(email, devId);
           await docRef.update(details);
-        } catch (_) {
-          await docRef.update({'lastSeen': FieldValue.serverTimestamp()}).catchError((_) {});
+          debugPrint('DeviceBinding: MATCH ✅ full update OK email=$email');
+        } catch (e) {
+          debugPrint('DeviceBinding: full update failed=$e, trying lastSeen only');
+          try {
+            await docRef.update({'lastSeen': FieldValue.serverTimestamp()});
+            debugPrint('DeviceBinding: lastSeen update OK');
+          } catch (e2) {
+            debugPrint('DeviceBinding: lastSeen update ALSO failed=$e2');
+          }
         }
         await _cacheLocalBinding(email, devId);
         _isDeviceBound = true;
