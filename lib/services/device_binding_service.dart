@@ -406,4 +406,73 @@ class DeviceBindingService {
       return false;
     }
   }
+
+  /// Track every device install/launch in Firestore (installs/{deviceId})
+  /// This gives you visibility into ALL devices, not just per-email bindings.
+  static Future<void> trackInstall() async {
+    try {
+      if (kIsWeb) return; // Skip web
+
+      final firebaseReady = await _ensureFirebase();
+      if (!firebaseReady) return;
+
+      final devId = await getDeviceId();
+      final email = GoogleAuthService.userEmail;
+
+      final data = <String, dynamic>{
+        'deviceId': devId,
+        'email': email?.toLowerCase() ?? 'not_signed_in',
+        'lastLaunch': FieldValue.serverTimestamp(),
+        'platform': defaultTargetPlatform.name,
+      };
+
+      // Device info
+      try {
+        final deviceInfo = DeviceInfoPlugin();
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          final android = await deviceInfo.androidInfo;
+          data['deviceName'] = '${android.brand} ${android.model}';
+          data['brand'] = android.brand;
+          data['model'] = android.model;
+          data['androidVersion'] = android.version.release;
+          data['sdkInt'] = android.version.sdkInt;
+        } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+          final ios = await deviceInfo.iosInfo;
+          data['deviceName'] = ios.name;
+          data['model'] = ios.model;
+          data['iosVersion'] = ios.systemVersion;
+        }
+      } catch (_) {}
+
+      // App version
+      try {
+        final pkgInfo = await PackageInfo.fromPlatform();
+        data['appVersion'] = pkgInfo.version;
+        data['buildNumber'] = pkgInfo.buildNumber;
+      } catch (_) {}
+
+      // Subscription status
+      data['hasSubscription'] = SubscriptionService.hasSubscription;
+      data['isTrialActive'] = SubscriptionService.isTrialActive;
+
+      final docRef = FirebaseFirestore.instance
+          .collection('installs')
+          .doc(devId);
+
+      final doc = await docRef.get().timeout(const Duration(seconds: 5));
+      if (!doc.exists) {
+        data['firstInstall'] = FieldValue.serverTimestamp();
+        data['launchCount'] = 1;
+        await docRef.set(data);
+        debugPrint('InstallTracker: NEW install ✅ devId=$devId');
+      } else {
+        final prevCount = (doc.data()?['launchCount'] as int?) ?? 0;
+        data['launchCount'] = prevCount + 1;
+        await docRef.update(data);
+        debugPrint('InstallTracker: UPDATE ✅ devId=$devId launches=${prevCount + 1}');
+      }
+    } catch (e) {
+      debugPrint('InstallTracker error: $e');
+    }
+  }
 }

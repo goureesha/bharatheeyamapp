@@ -98,6 +98,9 @@ Future<void> _deferredInit() async {
     FirebaseService.listenForAppointments();
   }
 
+  // Track every device install/launch
+  DeviceBindingService.trackInstall();
+
   // Pre-load festival events lazily (non-blocking)
   FestivalCacheService.loadYear(DateTime.now().year);
 }
