@@ -20,6 +20,7 @@ class SubscriptionService {
   static const String _graceStartKey = 'grace_start_timestamp';
   static const String _graceActiveKey = 'grace_active';
   static const String _lastPlayCheckKey = 'last_play_check_date';
+  static const String _pendingAckKey = 'pending_purchase_ack';
 
   // ── Constants ──
   static const int _trialMinutes = 30;
@@ -189,6 +190,10 @@ class SubscriptionService {
       onDone: () => _purchaseSub?.cancel(),
       onError: (e) => debugPrint('Purchase stream error: $e'),
     );
+
+    // CRITICAL: Acknowledge any purchases that failed to acknowledge previously
+    // This prevents the 72-hour Google Play auto-refund
+    await _acknowledgePendingPurchases();
 
     // Verify subscription with Play Store — only once per day
     if (_shouldCheckToday()) {
@@ -538,7 +543,7 @@ class SubscriptionService {
       }
 
       if (pd.pendingCompletePurchase) {
-        await _iap.completePurchase(pd);
+        await _robustCompletePurchase(pd);
       }
     }
 
@@ -568,6 +573,71 @@ class SubscriptionService {
     await prefs.setBool(_subStatusKey, false);
     await prefs.setBool(_graceActiveKey, false);
     debugPrint('🔒 Subscription REVOKED — no active purchase found');
+  }
+
+  // ════════════════════════════════════════════════
+  // ROBUST PURCHASE ACKNOWLEDGMENT (prevents 72-hour auto-refund)
+  // ════════════════════════════════════════════════
+
+  /// Acknowledge a purchase with retry logic.
+  /// If it fails, saves the purchase token to SharedPreferences
+  /// so it can be retried on next app launch.
+  static Future<void> _robustCompletePurchase(PurchaseDetails pd) async {
+    for (int attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await _iap.completePurchase(pd);
+        debugPrint('✅ Purchase acknowledged on attempt #$attempt (${pd.productID})');
+
+        // Clear any saved pending acknowledgment
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(_pendingAckKey);
+        return;
+      } catch (e) {
+        debugPrint('⚠️ completePurchase attempt #$attempt failed: $e');
+        if (attempt < 3) {
+          await Future.delayed(Duration(seconds: attempt * 2));
+        }
+      }
+    }
+
+    // All 3 attempts failed — save purchase info for retry on next app start
+    debugPrint('🚨 All acknowledgment attempts failed! Saving for retry...');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_pendingAckKey, pd.purchaseID ?? pd.productID);
+      debugPrint('💾 Pending acknowledgment saved: ${pd.purchaseID ?? pd.productID}');
+    } catch (_) {}
+  }
+
+  /// Called at initialization — retries acknowledging any purchase that
+  /// failed to acknowledge in a previous session.
+  /// This is the safety net that prevents the 72-hour Google auto-refund.
+  static Future<void> _acknowledgePendingPurchases() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final pendingId = prefs.getString(_pendingAckKey);
+
+      if (pendingId == null) return;
+
+      debugPrint('🔄 Found pending acknowledgment: $pendingId — triggering restore...');
+
+      // Restore purchases to get the PurchaseDetails object again.
+      // The purchase stream listener (_listenToPurchaseUpdated) will
+      // handle calling _robustCompletePurchase again.
+      _foundActiveDuringRestore = false;
+      await _iap.restorePurchases();
+      await Future.delayed(const Duration(milliseconds: 3000));
+
+      // Check if the pending ack was cleared (meaning it was acknowledged)
+      final stillPending = prefs.getString(_pendingAckKey);
+      if (stillPending == null) {
+        debugPrint('✅ Pending purchase successfully acknowledged on retry!');
+      } else {
+        debugPrint('⚠️ Pending purchase still not acknowledged — will retry next launch');
+      }
+    } catch (e) {
+      debugPrint('Pending acknowledgment retry error: $e');
+    }
   }
 
   // ── Legacy compatibility ──
