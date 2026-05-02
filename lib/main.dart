@@ -380,8 +380,18 @@ class _DeviceMismatchScreenState extends State<_DeviceMismatchScreen> {
           TextButton(
             onPressed: () async {
               await GoogleAuthService.signOut();
-              // After sign-out, no email = binding is N/A → use notifier to rebuild
-              deviceBindingNotifier.value = true;
+              // Sign in with a different account
+              final signedIn = await GoogleAuthService.signIn();
+              if (signedIn) {
+                // Re-check device binding for the new account
+                final bound = await DeviceBindingService.checkBinding();
+                deviceBindingNotifier.value = bound;
+                if (bound) {
+                  await SubscriptionService.syncTrialWithFirestore();
+                }
+              }
+              // If sign-in cancelled/failed, stay on mismatch screen
+              // deviceBindingNotifier stays false → screen stays blocked
             },
             child: Text(AppLocale.l('signInDifferent'),
               style: TextStyle(color: kMuted, fontSize: 13)),

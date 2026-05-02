@@ -239,19 +239,19 @@ class DeviceBindingService {
       // SUBSCRIBED user on DIFFERENT device → check one-time auto-migrate
       final prefs = await SharedPreferences.getInstance();
       final rebindVersion = prefs.getInt('bharatheeyam_rebind_version') ?? 0;
-      if (rebindVersion < 46) {
+      if (rebindVersion < 47) {
         // One-time auto-migrate for this version
         final details = await _getDeviceDetails(email, devId);
         details['boundAt'] = FieldValue.serverTimestamp();
         details['migratedAt'] = FieldValue.serverTimestamp();
-        details['autoMigrateVersion'] = 46;
-        details['bindEvent'] = 'auto_migrate_v46';
+        details['autoMigrateVersion'] = 47;
+        details['bindEvent'] = 'auto_migrate_v47';
         await docRef.set(details);
         await _cacheLocalBinding(email, devId);
-        await prefs.setInt('bharatheeyam_rebind_version', 46);
+        await prefs.setInt('bharatheeyam_rebind_version', 47);
         _isDeviceBound = true;
         _hasCheckedOnce = true;
-        debugPrint('DeviceBinding: AUTO-MIGRATE v46 ✅ email=$email devId=$devId');
+        debugPrint('DeviceBinding: AUTO-MIGRATE v47 ✅ email=$email devId=$devId');
         return true;
       }
 
@@ -343,18 +343,44 @@ class DeviceBindingService {
   /// Migrate: bind current device to the signed-in email (overwrites old binding in Firestore)
   static Future<bool> migrateDevice() async {
     final email = GoogleAuthService.userEmail;
-    if (email == null) return false;
+    if (email == null) {
+      debugPrint('DeviceBinding migrate: NO EMAIL — user not signed in');
+      return false;
+    }
 
     try {
       final firebaseReady = await _ensureFirebase();
-      if (!firebaseReady) return false;
+      if (!firebaseReady) {
+        debugPrint('DeviceBinding migrate: Firebase NOT ready');
+        return false;
+      }
+
+      // Re-authenticate to ensure fresh Firebase Auth token for Firestore rules
+      try {
+        await GoogleAuthService.signInSilently();
+        debugPrint('DeviceBinding migrate: re-auth OK');
+      } catch (e) {
+        debugPrint('DeviceBinding migrate: re-auth failed=$e, trying anyway');
+      }
 
       final devId = await getDeviceId();
       final docRef = FirebaseFirestore.instance
           .collection(_firestoreCollection)
           .doc(email.toLowerCase());
 
-      final details = await _getDeviceDetails(email, devId);
+      // Try full details, fallback to minimal if _getDeviceDetails fails
+      Map<String, dynamic> details;
+      try {
+        details = await _getDeviceDetails(email, devId);
+      } catch (e) {
+        debugPrint('DeviceBinding migrate: details error=$e, using minimal');
+        details = {
+          'deviceId': devId,
+          'email': email.toLowerCase(),
+          'lastSeen': FieldValue.serverTimestamp(),
+        };
+      }
+
       details['boundAt'] = FieldValue.serverTimestamp();
       details['migratedAt'] = FieldValue.serverTimestamp();
       details['bindEvent'] = 'manual_migrate';
@@ -367,8 +393,9 @@ class DeviceBindingService {
       _hasCheckedOnce = true;
       debugPrint('DeviceBinding: MIGRATED ✅ email=$email devId=$devId');
       return true;
-    } catch (e) {
+    } catch (e, stack) {
       debugPrint('DeviceBinding migrate error: $e');
+      debugPrint('DeviceBinding migrate stack: $stack');
       return false;
     }
   }

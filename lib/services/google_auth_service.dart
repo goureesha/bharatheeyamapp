@@ -80,7 +80,11 @@ class GoogleAuthService {
   }
 
   static Future<void> signOut() async {
-    await _instance.signOut();
+    try {
+      await _instance.disconnect(); // Fully clear cached account so user can pick a different Gmail
+    } catch (_) {
+      await _instance.signOut(); // Fallback if disconnect fails
+    }
     await FirebaseAuth.instance.signOut();
     _currentUser = null;
     await TesterService.onSignOut();
