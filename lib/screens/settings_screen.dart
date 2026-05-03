@@ -767,6 +767,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                      ),
                                    ),
                                  ],
+                                  // ── Google Play Acknowledgment Status ──
+                                  const SizedBox(height: 14),
+                                  Divider(color: kBorder.withOpacity(0.3), height: 1),
+                                  const SizedBox(height: 10),
+                                  Row(children: [
+                                    Icon(
+                                      SubscriptionService.ackStatus == 'passed'
+                                          ? Icons.handshake_rounded
+                                          : SubscriptionService.ackStatus == 'failed'
+                                              ? Icons.error_rounded
+                                              : SubscriptionService.ackStatus == 'pending'
+                                                  ? Icons.hourglass_top_rounded
+                                                  : Icons.help_outline_rounded,
+                                      size: 16,
+                                      color: SubscriptionService.ackStatus == 'passed'
+                                          ? Colors.green
+                                          : SubscriptionService.ackStatus == 'failed'
+                                              ? Colors.red
+                                              : SubscriptionService.ackStatus == 'pending'
+                                                  ? Colors.orange
+                                                  : kMuted,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          SubscriptionService.ackStatus == 'passed'
+                                              ? 'Google Play Handshake: PASSED'
+                                              : SubscriptionService.ackStatus == 'failed'
+                                                  ? 'Google Play Handshake: FAILED'
+                                                  : SubscriptionService.ackStatus == 'pending'
+                                                      ? 'Google Play Handshake: PENDING...'
+                                                      : 'Google Play Handshake: Awaiting',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            color: SubscriptionService.ackStatus == 'passed'
+                                                ? Colors.green
+                                                : SubscriptionService.ackStatus == 'failed'
+                                                    ? Colors.red
+                                                    : kMuted,
+                                          ),
+                                        ),
+                                        if (SubscriptionService.lastAckTime != null)
+                                          Text(
+                                            'Acknowledged: ${SubscriptionService.lastAckTime!.day}/${SubscriptionService.lastAckTime!.month}/${SubscriptionService.lastAckTime!.year} ${SubscriptionService.lastAckTime!.hour}:${SubscriptionService.lastAckTime!.minute.toString().padLeft(2, '0')}',
+                                            style: TextStyle(fontSize: 10, color: kMuted),
+                                          ),
+                                        if (SubscriptionService.ackStatus == 'failed' && SubscriptionService.lastAckError != null)
+                                          Text(
+                                            'Error: ${SubscriptionService.lastAckError}',
+                                            style: const TextStyle(fontSize: 10, color: Colors.redAccent),
+                                            maxLines: 2, overflow: TextOverflow.ellipsis,
+                                          ),
+                                      ],
+                                    )),
+                                  ]),
                                ],
                              ),
                            ),

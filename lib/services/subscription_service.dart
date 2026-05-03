@@ -46,6 +46,11 @@ class SubscriptionService {
   /// Whether the app must show the "connect to internet" screen
   static bool needsInternetVerification = false;
 
+  // ── Acknowledgment tracking ──
+  static String ackStatus = 'unknown';  // 'passed', 'failed', 'pending', 'unknown'
+  static DateTime? lastAckTime;
+  static String? lastAckError;
+
   // ════════════════════════════════════════════════
   // COMPUTED PROPERTIES FOR UI
   // ════════════════════════════════════════════════
@@ -583,6 +588,8 @@ class SubscriptionService {
   /// If it fails, saves the purchase token to SharedPreferences
   /// so it can be retried on next app launch.
   static Future<void> _robustCompletePurchase(PurchaseDetails pd) async {
+    ackStatus = 'pending';
+    lastAckError = null;
     for (int attempt = 1; attempt <= 3; attempt++) {
       try {
         await _iap.completePurchase(pd);
@@ -591,9 +598,18 @@ class SubscriptionService {
         // Clear any saved pending acknowledgment
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove(_pendingAckKey);
+
+        // Track success
+        ackStatus = 'passed';
+        lastAckTime = TrustedTimeService.now();
+        lastAckError = null;
+        await prefs.setString('ack_status', 'passed');
+        await prefs.setInt('ack_time', lastAckTime!.millisecondsSinceEpoch);
+        await prefs.remove('ack_error');
         return;
       } catch (e) {
         debugPrint('⚠️ completePurchase attempt #$attempt failed: $e');
+        lastAckError = e.toString();
         if (attempt < 3) {
           await Future.delayed(Duration(seconds: attempt * 2));
         }
@@ -602,9 +618,12 @@ class SubscriptionService {
 
     // All 3 attempts failed — save purchase info for retry on next app start
     debugPrint('🚨 All acknowledgment attempts failed! Saving for retry...');
+    ackStatus = 'failed';
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_pendingAckKey, pd.purchaseID ?? pd.productID);
+      await prefs.setString('ack_status', 'failed');
+      await prefs.setString('ack_error', lastAckError ?? 'Unknown error');
       debugPrint('💾 Pending acknowledgment saved: ${pd.purchaseID ?? pd.productID}');
     } catch (_) {}
   }
@@ -615,11 +634,19 @@ class SubscriptionService {
   static Future<void> _acknowledgePendingPurchases() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+
+      // Load saved ack status
+      ackStatus = prefs.getString('ack_status') ?? 'unknown';
+      final ackTimeMs = prefs.getInt('ack_time');
+      if (ackTimeMs != null) lastAckTime = DateTime.fromMillisecondsSinceEpoch(ackTimeMs);
+      lastAckError = prefs.getString('ack_error');
+
       final pendingId = prefs.getString(_pendingAckKey);
 
       if (pendingId == null) return;
 
       debugPrint('🔄 Found pending acknowledgment: $pendingId — triggering restore...');
+      ackStatus = 'pending';
 
       // Restore purchases to get the PurchaseDetails object again.
       // The purchase stream listener (_listenToPurchaseUpdated) will
@@ -634,9 +661,13 @@ class SubscriptionService {
         debugPrint('✅ Pending purchase successfully acknowledged on retry!');
       } else {
         debugPrint('⚠️ Pending purchase still not acknowledged — will retry next launch');
+        ackStatus = 'failed';
+        await prefs.setString('ack_status', 'failed');
       }
     } catch (e) {
       debugPrint('Pending acknowledgment retry error: $e');
+      ackStatus = 'failed';
+      lastAckError = e.toString();
     }
   }
 
