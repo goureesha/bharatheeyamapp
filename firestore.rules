@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Device bindings — authenticated user can read/write their own binding
+    match /device_bindings/{email} {
+      allow read, write: if request.auth != null 
+                         && request.auth.token.email.lower() == email.lower();
+    }
+
+    // Install tracking — any authenticated user can write their own device doc
+    match /installs/{deviceId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Testers collection — any authenticated user can read their own doc
+    match /testers/{email} {
+      allow read: if request.auth != null 
+                  && request.auth.token.email.lower() == email.lower();
+      allow write: if false; // Admin-only via Firebase Console
+    }
+
+    // User data backup
+    match /user_data/{email} {
+      allow read, write: if request.auth != null 
+                         && request.auth.token.email.lower() == email.lower();
+    }
+    match /user_data/{email}/chunks/{chunkId} {
+      allow read, write: if request.auth != null 
+                         && request.auth.token.email.lower() == email.lower();
+    }
+
+    // Appointments
+    match /appointments/{email} {
+      allow read, write: if request.auth != null 
+                         && request.auth.token.email.lower() == email.lower();
+    }
+    match /appointments/{email}/requests/{requestId} {
+      allow read, write: if request.auth != null 
+                         && request.auth.token.email.lower() == email.lower();
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

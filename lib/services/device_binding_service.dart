@@ -401,6 +401,11 @@ class DeviceBindingService {
       debugPrint('DeviceBinding: MIGRATED ✅ email=$email devId=$devId');
       return true;
     } catch (e, stack) {
+      final errStr = e.toString();
+      if (errStr.contains('permission-denied')) {
+        debugPrint('DeviceBinding migrate PERMISSION DENIED: Firestore rules must allow write to device_bindings/${email.toLowerCase()}');
+        debugPrint('DeviceBinding: Ensure Firebase Auth is active and email matches doc ID');
+      }
       debugPrint('DeviceBinding migrate error: $e');
       debugPrint('DeviceBinding migrate stack: $stack');
       return false;

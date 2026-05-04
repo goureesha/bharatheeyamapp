@@ -48,7 +48,14 @@ class TesterService {
         debugPrint('TesterService: Status updated -> isTester: $isTesterNow');
       }
     } catch (e) {
-      statusMessage.value = 'Firestore Error: $e';
+      final errStr = e.toString();
+      if (errStr.contains('permission-denied')) {
+        statusMessage.value = 'Firestore rules need update — see firestore.rules';
+      } else if (errStr.contains('unavailable') || errStr.contains('timeout')) {
+        statusMessage.value = 'Offline — using cached status';
+      } else {
+        statusMessage.value = 'Check failed — using cached status';
+      }
       debugPrint('TesterService: Failed to check tester status: $e');
       // On failure, we retain the cached status so users don't lose access if offline
     }
