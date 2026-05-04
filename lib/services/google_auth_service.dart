@@ -29,6 +29,14 @@ class GoogleAuthService {
   static String? get userName => _currentUser?.displayName;
   static String? get userPhoto => _currentUser?.photoUrl;
 
+  /// Check if Firebase Auth is active (needed for Firestore rules)
+  static bool get isFirebaseAuthActive =>
+      FirebaseAuth.instance.currentUser != null;
+
+  /// Get the Firebase Auth email (may differ from Google Sign-In email if bridge failed)
+  static String? get firebaseAuthEmail =>
+      FirebaseAuth.instance.currentUser?.email;
+
   /// Get auth headers for Google API calls (e.g., Drive API)
   static Future<Map<String, String>?> getAuthHeaders() async {
     return _currentUser?.authHeaders;
@@ -49,19 +57,51 @@ class GoogleAuthService {
     }
   }
 
-  /// Bridge Google Sign-In credentials to Firebase Auth
-  static Future<void> _signInToFirebaseAuth(GoogleSignInAccount account) async {
+  /// Bridge Google Sign-In credentials to Firebase Auth.
+  /// Returns true if Firebase Auth is now active.
+  static Future<bool> _signInToFirebaseAuth(GoogleSignInAccount account) async {
     try {
       final googleAuth = await account.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      await FirebaseAuth.instance.signInWithCredential(credential);
-      debugPrint('Firebase Auth: signed in as ${account.email}');
+      final result = await FirebaseAuth.instance.signInWithCredential(credential);
+      final ok = result.user != null;
+      debugPrint('Firebase Auth: ${ok ? "✅ signed in" : "❌ failed"} as ${account.email}');
+      return ok;
     } catch (e) {
       debugPrint('Firebase Auth bridge error: $e');
+      return false;
     }
+  }
+
+  /// Ensure Firebase Auth is active. If not, attempt to re-bridge.
+  /// Call this before any Firestore operation that needs auth.
+  static Future<bool> ensureFirebaseAuth() async {
+    // Already active
+    if (FirebaseAuth.instance.currentUser != null) return true;
+
+    // Try to re-bridge from current Google Sign-In account
+    if (_currentUser != null) {
+      debugPrint('Firebase Auth: re-bridging from existing Google Sign-In...');
+      final ok = await _signInToFirebaseAuth(_currentUser!);
+      if (ok) return true;
+    }
+
+    // Try silent sign-in as last resort
+    try {
+      final account = await _instance.signInSilently();
+      if (account != null) {
+        _currentUser = account;
+        return await _signInToFirebaseAuth(account);
+      }
+    } catch (e) {
+      debugPrint('Firebase Auth: silent re-auth failed: $e');
+    }
+
+    debugPrint('Firebase Auth: ❌ could not establish auth session');
+    return false;
   }
 
   static Future<bool> signIn() async {
@@ -69,7 +109,10 @@ class GoogleAuthService {
       _currentUser = await _instance.signIn();
       if (_currentUser != null) {
         debugPrint('Google Sign-In success: ${_currentUser!.email}');
-        await _signInToFirebaseAuth(_currentUser!);
+        final authOk = await _signInToFirebaseAuth(_currentUser!);
+        if (!authOk) {
+          debugPrint('WARNING: Google Sign-In OK but Firebase Auth bridge FAILED');
+        }
         TesterService.checkTesterStatus(_currentUser!.email);
       }
       return _currentUser != null;
@@ -94,7 +137,10 @@ class GoogleAuthService {
     try {
       _currentUser = await _instance.signInSilently();
       if (_currentUser != null) {
-        await _signInToFirebaseAuth(_currentUser!);
+        final authOk = await _signInToFirebaseAuth(_currentUser!);
+        if (!authOk) {
+          debugPrint('WARNING: Silent sign-in OK but Firebase Auth bridge FAILED');
+        }
         TesterService.checkTesterStatus(_currentUser!.email);
       }
       return _currentUser != null;
@@ -104,4 +150,3 @@ class GoogleAuthService {
     }
   }
 }
-

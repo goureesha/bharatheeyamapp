@@ -362,13 +362,13 @@ class DeviceBindingService {
         return false;
       }
 
-      // Re-authenticate to ensure fresh Firebase Auth token for Firestore rules
-      try {
-        await GoogleAuthService.signInSilently();
-        debugPrint('DeviceBinding migrate: re-auth OK');
-      } catch (e) {
-        debugPrint('DeviceBinding migrate: re-auth failed=$e, trying anyway');
+      // Ensure Firebase Auth is active for Firestore rules
+      final authOk = await GoogleAuthService.ensureFirebaseAuth();
+      if (!authOk) {
+        debugPrint('DeviceBinding migrate: Firebase Auth NOT active — cannot write to Firestore');
+        return false;
       }
+      debugPrint('DeviceBinding migrate: Firebase Auth confirmed ✅');
 
       final devId = await getDeviceId();
       final docRef = FirebaseFirestore.instance

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
+import 'google_auth_service.dart';
 
 class TesterService {
   static const String _testerCacheKey = 'is_beta_tester';
@@ -28,6 +29,14 @@ class TesterService {
     statusMessage.value = 'Checking $email...';
 
     try {
+      // Ensure Firebase Auth is active before Firestore query
+      final authOk = await GoogleAuthService.ensureFirebaseAuth();
+      if (!authOk) {
+        statusMessage.value = 'Firebase Auth not active — sign in again';
+        debugPrint('TesterService: Firebase Auth not active, skipping Firestore');
+        return;
+      }
+
       final doc = await FirebaseFirestore.instance
           .collection('testers')
           .doc(email.toLowerCase())

@@ -432,8 +432,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.bold,
-                                          color: msg.contains('Verified') ? Colors.green : Colors.red),
+                                          color: msg.contains('Verified') ? Colors.green
+                                              : msg.contains('rules') || msg.contains('Auth') ? Colors.orange
+                                              : msg.contains('Offline') || msg.contains('cached') ? Colors.grey
+                                              : Colors.red),
                                     ),
+                                  ),
+                                  Text(
+                                    'Firebase Auth: ${GoogleAuthService.isFirebaseAuthActive ? "Active ✅" : "Inactive ❌"}',
+                                    style: TextStyle(fontSize: 10, color: GoogleAuthService.isFirebaseAuthActive ? Colors.green : Colors.red),
                                   ),
                                 ],
                               )),
