@@ -47,8 +47,8 @@ const RESOURCES = {"assets/assets/fonts/NotoSansDevanagari-Bold.ttf": "c3ee3c730
 "canvaskit/skwasm_st.js": "d1326ceef381ad382ab492ba5d96f04d",
 "privacy_policy.html": "10094331e2887570d5e079618ca2fdc8",
 "flutter.js": "76f08d47ff9f5715220992f993002504",
-"flutter_bootstrap.js": "f95ab70baacb688c610ff1d1501dff19",
-"main.dart.js": "293d52503dd8669166d69bc3e5d0b720",
+"flutter_bootstrap.js": "a3997d4c8e7d8139135aacb82914b804",
+"main.dart.js": "02aceddef4c7a61709bf45a8835255ff",
 "version.json": "030ce92b282a9396a3b7a12594646c2c",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df"};
 // The application shell files that are downloaded before a service worker can
