@@ -1,5 +1,0 @@
-{
-  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Saved project plan for an automated trading strategy scanner and backtester. Targets Nifty 500 stocks using Fyers API, with 5-minute candles for intraday and 15-minute candles for swing trading. Includes 15 technical analysis strategies to test, tech stack decisions, and a phased approach (backtest first, then live paper trading). Marked as 'start later' after Bharatheeyam astrology app completion.",
-  "updatedAt":  "2026-04-05T16:23:07.861076600Z"
-}

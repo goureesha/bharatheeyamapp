@@ -1,5 +1,0 @@
-{
-  "artifactType": "ARTIFACT_TYPE_OTHER",
-  "summary": "Complete scan of Jyotish Marga's Ashtamangala calculation logic vs our Bharatheeyam implementation. Maps all JNI API parameters (pruchaka, sprushtanga, birthRashi, asmNumber, swarna, tambula, isMale), output enums (63 getAsmPart fields, 37 getAsmSputa fields), and identifies gaps.",
-  "updatedAt": "2026-03-26T01:02:13.412210Z"
-}

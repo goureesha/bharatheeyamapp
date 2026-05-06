@@ -1,6 +1,0 @@
-{
-  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
-  "summary": "Complete walkthrough of reverting to build #527 (removing 9 broken commits) and safely re-implementing the web Gmail whitelist feature using only cross-platform APIs (kIsWeb + GoogleAuthService) instead of dart:html which broke the Android build. Documents the 2 whitelisted emails, the routing logic, and why this approach is Android-safe.",
-  "updatedAt": "2026-04-09T07:19:08.739362200Z",
-  "version": "1"
-}

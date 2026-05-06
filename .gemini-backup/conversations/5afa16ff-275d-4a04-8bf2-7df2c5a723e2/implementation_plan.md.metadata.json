@@ -1,7 +1,0 @@
-{
-  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Plan to add automatic cloud sync of app data (clients, appointments, profiles) to Firestore, with once-per-day auto-sync and manual sync button in Settings.",
-  "updatedAt":  "2026-04-08T15:59:03.697895500Z",
-  "version":  "74",
-  "requestFeedback":  true
-}

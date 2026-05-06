@@ -12,7 +12,20 @@
           "package_name": "com.bharatheeyam.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "212430902387-38iq1ubv4ldc7trikqavc8tj28hhutif.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bharatheeyam.app",
+            "certificate_hash": "bb35147343d47d53a5827bb5794ffa3be9ccf13e"
+          }
+        },
+        {
+          "client_id": "212430902387-ko5eqtpf1044c7bs0jok7uldqbpnu8a2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA3RzpXGv6yMXwqz7px7Fg2nZQ0Bn6Ep80"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "212430902387-ko5eqtpf1044c7bs0jok7uldqbpnu8a2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
