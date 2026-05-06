@@ -160,6 +160,14 @@ class DeviceBindingService {
         return _strictLocalFallback(email, devId);
       }
 
+      // Ensure Firebase Auth is active before any Firestore operations.
+      // Without this, new devices fail to register due to permission-denied.
+      final authOk = await GoogleAuthService.ensureFirebaseAuth();
+      if (!authOk) {
+        debugPrint('DeviceBinding: Firebase Auth NOT active — falling back to local');
+        return _strictLocalFallback(email, devId);
+      }
+
       final docRef = FirebaseFirestore.instance
           .collection(_firestoreCollection)
           .doc(email.toLowerCase());
