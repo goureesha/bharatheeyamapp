@@ -7,7 +7,7 @@ import 'tester_service.dart';
 /// Used for user identity (1-Gmail-1-device binding) + Firebase Auth for Firestore rules.
 class GoogleAuthService {
   static const _webClientId =
-      '330797161511-h4mb1l0i76ea37s6if93bml6gia4puva.apps.googleusercontent.com';
+      '212430902387-ko5eqtpf1044c7bs0jok7uldqbpnu8a2.apps.googleusercontent.com';
 
   static GoogleSignIn? _googleSignIn;
   static GoogleSignInAccount? _currentUser;
