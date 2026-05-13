@@ -33,6 +33,8 @@ class SubscriptionService {
 
   // ── State ──
   static bool hasSubscription = false;
+  static bool manualPremium = false;
+  static DateTime? manualPremiumExpiry;
   static DateTime? trialStartDate;
   static DateTime? lastVerifiedDate;
   static DateTime? purchaseDate;
@@ -55,9 +57,10 @@ class SubscriptionService {
   // COMPUTED PROPERTIES FOR UI
   // ════════════════════════════════════════════════
 
-  /// True if the user has access (subscribed + verified recently, OR trial active)
+  /// True if the user has access (subscribed + verified recently, OR trial active, OR manual premium)
   static bool get hasAccess {
     if (kIsWeb) return true;
+    if (manualPremium) return true;
     if (needsInternetVerification) return false;
     return hasSubscription || isTrialActive;
   }
@@ -103,6 +106,13 @@ class SubscriptionService {
 
   /// Subscription status text for UI display
   static String get statusText {
+    if (manualPremium) {
+      if (manualPremiumExpiry != null) {
+        final days = manualPremiumExpiry!.difference(TrustedTimeService.now()).inDays;
+        return 'Premium Active ✅ ($days days left)';
+      }
+      return 'Premium Active ✅ (Lifetime)';
+    }
     if (!hasSubscription && !isTrialActive) {
       return '${AppLocale.l('noSubscription')} (No subscription)';
     }
@@ -189,6 +199,15 @@ class SubscriptionService {
 
     if (kIsWeb) return;
 
+    // Check manual premium from Firestore (admin-set)
+    await checkManualPremium();
+
+    // If manual premium is active, skip Play Store verification entirely
+    if (manualPremium) {
+      debugPrint('📋 Manual premium active — skipping Play Store check');
+      return;
+    }
+
     // Setup purchase listener
     _purchaseSub = _iap.purchaseStream.listen(
       (list) => _listenToPurchaseUpdated(list),
@@ -259,6 +278,57 @@ class SubscriptionService {
       }
     } catch (e) {
       debugPrint('Trial Firestore sync error: $e');
+    }
+  }
+
+  // ════════════════════════════════════════════════
+  // MANUAL PREMIUM (admin-set via Firestore)
+  // ════════════════════════════════════════════════
+
+  /// Check if the admin has manually granted premium for this user.
+  /// Reads `manualPremium` flag from Firestore `device_bindings/{email}`.
+  static Future<void> checkManualPremium() async {
+    final email = GoogleAuthService.userEmail;
+    if (email == null) return;
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('device_bindings')
+          .doc(email.toLowerCase())
+          .get()
+          .timeout(const Duration(seconds: 8));
+
+      if (!doc.exists || doc.data() == null) return;
+
+      final data = doc.data()!;
+      final isPremium = data['manualPremium'] == true;
+
+      if (isPremium) {
+        // Check expiry if set
+        final expiryTs = data['manualPremiumExpiry'];
+        if (expiryTs != null && expiryTs is Timestamp) {
+          final expiryDate = expiryTs.toDate();
+          if (expiryDate.isBefore(TrustedTimeService.now())) {
+            // Expired
+            manualPremium = false;
+            manualPremiumExpiry = null;
+            debugPrint('🔒 Manual premium EXPIRED on $expiryDate');
+            return;
+          }
+          manualPremiumExpiry = expiryDate;
+        } else {
+          manualPremiumExpiry = null; // Lifetime
+        }
+
+        manualPremium = true;
+        debugPrint('✅ Manual premium ACTIVE for $email');
+      } else {
+        manualPremium = false;
+        manualPremiumExpiry = null;
+      }
+    } catch (e) {
+      debugPrint('Manual premium check error: $e');
+      // Don't change state on error — keep whatever was cached
     }
   }
 
@@ -572,6 +642,11 @@ class SubscriptionService {
   }
 
   static Future<void> _revokeAccess() async {
+    // Don't revoke if manual premium is active
+    if (manualPremium) {
+      debugPrint('🛡️ Manual premium active — ignoring Play Store revocation');
+      return;
+    }
     hasSubscription = false;
     isGracePeriodActive = false;
     final prefs = await SharedPreferences.getInstance();

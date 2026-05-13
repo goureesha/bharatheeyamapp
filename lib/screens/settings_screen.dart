@@ -442,6 +442,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     'Firebase Auth: ${GoogleAuthService.isFirebaseAuthActive ? "Active ✅" : "Inactive ❌"}',
                                     style: TextStyle(fontSize: 10, color: GoogleAuthService.isFirebaseAuthActive ? Colors.green : Colors.red),
                                   ),
+                                  if (SubscriptionService.manualPremium)
+                                    Text(
+                                      'Manual Premium: Active ✅${SubscriptionService.manualPremiumExpiry != null ? " (expires ${SubscriptionService.manualPremiumExpiry!.day}/${SubscriptionService.manualPremiumExpiry!.month}/${SubscriptionService.manualPremiumExpiry!.year})" : " (Lifetime)"}',
+                                      style: const TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold),
+                                    ),
                                 ],
                               )),
                             ]),
@@ -691,20 +696,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                            Row(
                              children: [
                                Icon(
-                                 SubscriptionService.hasSubscription ? Icons.check_circle : Icons.star, 
-                                 color: SubscriptionService.hasSubscription ? Colors.green.shade700 : kOrange,
+                                 (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Icons.check_circle : Icons.star, 
+                                 color: (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Colors.green.shade700 : kOrange,
                                  size: 28,
                                ),
                                const SizedBox(width: 12),
                                Expanded(
                                  child: Text(
-                                   SubscriptionService.hasSubscription 
+                                   (SubscriptionService.hasSubscription || SubscriptionService.manualPremium)
                                       ? '${AppLocale.l('premiumActive')} (Premium Active)' 
                                       : AppLocale.l('getPremium'),
                                    style: TextStyle(
-                                     fontSize: SubscriptionService.hasSubscription ? 16 : 18, 
+                                     fontSize: (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? 16 : 18, 
                                      fontWeight: FontWeight.bold,
-                                     color: SubscriptionService.hasSubscription ? Colors.green.shade800 : kPurple1
+                                     color: (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Colors.green.shade800 : kPurple1
                                    ),
                                  ),
                                ),
