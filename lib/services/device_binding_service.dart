@@ -90,7 +90,6 @@ class DeviceBindingService {
 
     // Subscription details
     data['hasSubscription'] = SubscriptionService.hasSubscription;
-    data['manualPremium'] = SubscriptionService.manualPremium;
     data['isTrialActive'] = SubscriptionService.isTrialActive;
     data['trialMinutesRemaining'] = SubscriptionService.trialMinutesRemaining;
     if (SubscriptionService.trialStartDate != null) {
@@ -181,7 +180,7 @@ class DeviceBindingService {
         final details = await _getDeviceDetails(email, devId);
         details['boundAt'] = FieldValue.serverTimestamp();
         details['bindEvent'] = 'first_bind';
-        await docRef.set(details);
+        await docRef.set(details, SetOptions(merge: true));
         await _cacheLocalBinding(email, devId);
         _isDeviceBound = true;
         _hasCheckedOnce = true;
@@ -196,7 +195,7 @@ class DeviceBindingService {
         final details = await _getDeviceDetails(email, devId);
         details['boundAt'] = FieldValue.serverTimestamp();
         details['bindEvent'] = 'rebind_corrupted';
-        await docRef.set(details);
+        await docRef.set(details, SetOptions(merge: true));
         await _cacheLocalBinding(email, devId);
         _isDeviceBound = true;
         _hasCheckedOnce = true;
@@ -240,7 +239,7 @@ class DeviceBindingService {
         details['autoRebound'] = true;
         details['previousDeviceId'] = storedDeviceId;
         details['bindEvent'] = 'auto_rebind_no_sub';
-        await docRef.set(details);
+        await docRef.set(details, SetOptions(merge: true));
         await _cacheLocalBinding(email, devId);
         _isDeviceBound = true;
         _hasCheckedOnce = true;
@@ -258,7 +257,7 @@ class DeviceBindingService {
         details['migratedAt'] = FieldValue.serverTimestamp();
         details['autoMigrateVersion'] = 47;
         details['bindEvent'] = 'auto_migrate_v47';
-        await docRef.set(details);
+        await docRef.set(details, SetOptions(merge: true));
         await _cacheLocalBinding(email, devId);
         await prefs.setInt('bharatheeyam_rebind_version', 47);
         _isDeviceBound = true;
@@ -396,7 +395,7 @@ class DeviceBindingService {
       details['boundAt'] = FieldValue.serverTimestamp();
       details['migratedAt'] = FieldValue.serverTimestamp();
       details['bindEvent'] = 'manual_migrate';
-      await docRef.set(details);
+      await docRef.set(details, SetOptions(merge: true));
 
       // Cache locally
       await _cacheLocalBinding(email, devId);
