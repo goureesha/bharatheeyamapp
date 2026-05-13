@@ -12,6 +12,7 @@ import '../main.dart';
 import '../services/tester_service.dart';
 import '../services/local_export_service.dart';
 import '../services/drive_backup_service.dart';
+import 'paywall_screen.dart';
 
 import 'about_screen.dart';
 import 'privacy_policy_screen.dart';
@@ -735,148 +736,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText),
                                    )),
                                  ]),
-                                 if (SubscriptionService.hasSubscription && SubscriptionService.subscriptionDaysRemaining > 0) ...[
-                                   const SizedBox(height: 8),
-                                   ClipRRect(
-                                     borderRadius: BorderRadius.circular(4),
-                                     child: LinearProgressIndicator(
-                                       value: SubscriptionService.subscriptionDaysRemaining / 365,
-                                       backgroundColor: kBorder.withOpacity(0.3),
-                                       color: SubscriptionService.subscriptionDaysRemaining > 30 ? Colors.green : Colors.orange,
-                                       minHeight: 6,
-                                     ),
-                                   ),
-                                   const SizedBox(height: 4),
-                                   Text('${SubscriptionService.subscriptionDaysRemaining} / 365 ${AppLocale.l('daysRemaining')}',
-                                     style: TextStyle(fontSize: 11, color: kMuted)),
-                                 ],
-                                 const SizedBox(height: 10),
-                                 Row(children: [
-                                   Icon(
-                                     SubscriptionService.isGracePeriodActive ? Icons.shield : Icons.shield_outlined,
-                                     size: 16,
-                                     color: SubscriptionService.isGracePeriodActive ? Colors.orange : kMuted,
-                                   ),
-                                   const SizedBox(width: 8),
-                                   Expanded(child: Text(
-                                     SubscriptionService.graceStatusText,
-                                     style: TextStyle(
-                                       fontSize: 12,
-                                       color: SubscriptionService.isGracePeriodActive ? Colors.orange.shade800 : kMuted,
-                                       fontWeight: SubscriptionService.isGracePeriodActive ? FontWeight.w700 : FontWeight.normal,
-                                     ),
-                                   )),
-                                 ]),
-                                 if (SubscriptionService.isGracePeriodActive) ...[
-                                   const SizedBox(height: 6),
-                                   ClipRRect(
-                                     borderRadius: BorderRadius.circular(4),
-                                     child: LinearProgressIndicator(
-                                       value: SubscriptionService.gracePeriodRemainingHours / 48,
-                                       backgroundColor: kBorder.withOpacity(0.3),
-                                       color: Colors.orange,
-                                       minHeight: 4,
-                                     ),
-                                   ),
-                                 ],
-                                  // ── Google Play Acknowledgment Status ──
-                                  const SizedBox(height: 14),
-                                  Divider(color: kBorder.withOpacity(0.3), height: 1),
-                                  const SizedBox(height: 10),
-                                  Row(children: [
-                                    Icon(
-                                      SubscriptionService.ackStatus == 'passed'
-                                          ? Icons.handshake_rounded
-                                          : SubscriptionService.ackStatus == 'failed'
-                                              ? Icons.error_rounded
-                                              : SubscriptionService.ackStatus == 'pending'
-                                                  ? Icons.hourglass_top_rounded
-                                                  : Icons.help_outline_rounded,
-                                      size: 16,
-                                      color: SubscriptionService.ackStatus == 'passed'
-                                          ? Colors.green
-                                          : SubscriptionService.ackStatus == 'failed'
-                                              ? Colors.red
-                                              : SubscriptionService.ackStatus == 'pending'
-                                                  ? Colors.orange
-                                                  : kMuted,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          SubscriptionService.ackStatus == 'passed'
-                                              ? 'Google Play Handshake: PASSED'
-                                              : SubscriptionService.ackStatus == 'failed'
-                                                  ? 'Google Play Handshake: FAILED'
-                                                  : SubscriptionService.ackStatus == 'pending'
-                                                      ? 'Google Play Handshake: PENDING...'
-                                                      : 'Google Play Handshake: Awaiting',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            color: SubscriptionService.ackStatus == 'passed'
-                                                ? Colors.green
-                                                : SubscriptionService.ackStatus == 'failed'
-                                                    ? Colors.red
-                                                    : kMuted,
-                                          ),
-                                        ),
-                                        if (SubscriptionService.lastAckTime != null)
-                                          Text(
-                                            'Acknowledged: ${SubscriptionService.lastAckTime!.day}/${SubscriptionService.lastAckTime!.month}/${SubscriptionService.lastAckTime!.year} ${SubscriptionService.lastAckTime!.hour}:${SubscriptionService.lastAckTime!.minute.toString().padLeft(2, '0')}',
-                                            style: TextStyle(fontSize: 10, color: kMuted),
-                                          ),
-                                        if (SubscriptionService.ackStatus == 'failed' && SubscriptionService.lastAckError != null)
-                                          Text(
-                                            'Error: ${SubscriptionService.lastAckError}',
-                                            style: const TextStyle(fontSize: 10, color: Colors.redAccent),
-                                            maxLines: 2, overflow: TextOverflow.ellipsis,
-                                          ),
-                                      ],
-                                    )),
-                                  ]),
                                ],
                              ),
                            ),
-                           if (!SubscriptionService.hasSubscription) ...[
+                           if (!SubscriptionService.hasSubscription && !SubscriptionService.manualPremium) ...[
                              const SizedBox(height: 12),
                              Text(
                                AppLocale.l('premiumDesc'),
                                style: TextStyle(fontSize: 14, color: kText, height: 1.4),
                              ),
                              const SizedBox(height: 20),
-                             ElevatedButton(
-                               onPressed: () async {
-                                 final success = await SubscriptionService.buySubscription();
-                                 if (!success && mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(AppLocale.l('subFailed')))
-                                    );
-                                 }
+                             OutlinedButton.icon(
+                               onPressed: () {
+                                 Navigator.push(context, MaterialPageRoute(
+                                   builder: (_) => const PaywallScreen()));
                                },
-                               style: ElevatedButton.styleFrom(
-                                 backgroundColor: kOrange,
-                                 foregroundColor: Colors.white,
+                               icon: Icon(Icons.support_agent, color: kPurple2),
+                               label: Text('Contact Support',
+                                 style: TextStyle(color: kPurple2, fontSize: 16, fontWeight: FontWeight.w700)),
+                               style: OutlinedButton.styleFrom(
                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                 side: BorderSide(color: kPurple2),
                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                ),
-                               child: Text(AppLocale.l('subscribeBtn'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                              ),
-                             const SizedBox(height: 12),
-                             TextButton(
-                               onPressed: () async {
-                                  await SubscriptionService.restorePurchases();
-                                  if (mounted) {
-                                    setState(() {});
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(AppLocale.l('purchasesRestored')))
-                                    );
-                                  }
-                               },
-                               child: Text('${AppLocale.l('restorePurchases')} (Restore)', style: TextStyle(color: kPurple2, fontWeight: FontWeight.w600)),
-                             )
                            ]
                         ],
                       ),
