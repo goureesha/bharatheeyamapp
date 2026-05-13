@@ -90,12 +90,9 @@ class DeviceBindingService {
 
     // Subscription details
     data['hasSubscription'] = SubscriptionService.hasSubscription;
+    data['manualPremium'] = SubscriptionService.manualPremium;
     data['isTrialActive'] = SubscriptionService.isTrialActive;
     data['trialMinutesRemaining'] = SubscriptionService.trialMinutesRemaining;
-    if (SubscriptionService.purchaseDate != null) {
-      data['subscribedAt'] = Timestamp.fromDate(SubscriptionService.purchaseDate!);
-      data['subscriptionDaysRemaining'] = SubscriptionService.subscriptionDaysRemaining;
-    }
     if (SubscriptionService.trialStartDate != null) {
       data['trialStartedAt'] = Timestamp.fromDate(SubscriptionService.trialStartDate!);
     }
