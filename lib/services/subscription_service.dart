@@ -70,23 +70,23 @@ class SubscriptionService {
     return remaining > 0 ? remaining : 0;
   }
 
-  /// Subscription status text for UI display
+  /// App status text for UI display
   static String get statusText {
     if (manualPremium) {
       if (manualPremiumExpiry != null) {
         final days = manualPremiumExpiry!.difference(TrustedTimeService.now()).inDays;
-        return 'Premium Active ✅ ($days days left)';
+        return 'Beta Access ✅ ($days ${AppLocale.l('daysRemaining')})';
       }
-      return 'Premium Active ✅ (Lifetime)';
+      return 'Beta Access ✅';
     }
     if (hasSubscription) {
-      return '${AppLocale.l('premiumActive')} (Premium Active)';
+      return '${AppLocale.l('premiumActive')}';
     }
     if (isTrialActive) {
       final m = trialMinutesRemaining;
       return '${AppLocale.l('trialActive').replaceAll('{h}', '$m')} ($m min left)';
     }
-    return '${AppLocale.l('trialExpired')} (Trial Ended)';
+    return '${AppLocale.l('trialExpired')}';
   }
 
   // ════════════════════════════════════════════════

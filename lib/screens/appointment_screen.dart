@@ -226,7 +226,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                                 ),
                                 const Spacer(),
                                 Text(
-                                  '${dayAppointments.length} ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್',
+                                  '${dayAppointments.length} ${AppLocale.l('apptCount')}',
                                   style: TextStyle(fontSize: 13, color: kMuted),
                                 ),
                               ],
@@ -509,7 +509,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
             children: [
               Icon(Icons.people, color: kTeal, size: 18),
               const SizedBox(width: 6),
-              Text('${allClients.length} \u0c97\u0ccd\u0cb0\u0cbe\u0cb9\u0c95\u0cb0\u0cc1', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
+              Text('${allClients.length} ${AppLocale.l('clientsCount')}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
             ],
           ),
         ),
@@ -524,7 +524,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                     children: [
                       Icon(Icons.person_off, size: 60, color: kMuted.withOpacity(0.3)),
                       const SizedBox(height: 12),
-                      Text(_clientSearch.isEmpty ? '\u0c97\u0ccd\u0cb0\u0cbe\u0cb9\u0c95\u0cb0\u0cc1 \u0c87\u0cb2\u0ccd\u0cb2' : '\u0caf\u0cbe\u0cb5\u0cc1\u0ca6\u0cc7 \u0cab\u0cb2\u0cbf\u0ca4\u0cbe\u0c82\u0cb6 \u0c87\u0cb2\u0ccd\u0cb2', style: TextStyle(color: kMuted)),
+                      Text(_clientSearch.isEmpty ? AppLocale.l('noClients') : AppLocale.l('noSearchResults'), style: TextStyle(color: kMuted)),
                     ],
                   ),
                 )
@@ -598,11 +598,11 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                         const SizedBox(width: 12),
                         Icon(Icons.event, size: 12, color: kMuted),
                         const SizedBox(width: 4),
-                        Text('$visits ಭೇಟಿ', style: TextStyle(fontSize: 12, color: kMuted)),
+                        Text('$visits ${AppLocale.l('visitLabel')}', style: TextStyle(fontSize: 12, color: kMuted)),
                         const SizedBox(width: 12),
                         Icon(Icons.people, size: 12, color: kMuted),
                         const SizedBox(width: 4),
-                        Text('${members.length} ಸದಸ್ಯ', style: TextStyle(fontSize: 12, color: kMuted)),
+                        Text('${members.length} ${AppLocale.l('memberLabel')}', style: TextStyle(fontSize: 12, color: kMuted)),
                       ],
                     ),
                   ],
@@ -633,13 +633,13 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
       builder: (ctx) => AlertDialog(
         backgroundColor: kCard,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('\u0c97\u0ccd\u0cb0\u0cbe\u0cb9\u0c95\u0cb0\u0ca8\u0ccd\u0ca8\u0cc1 \u0c85\u0cb3\u0cbf\u0cb8\u0cbf', style: TextStyle(color: kText)),
-        content: Text('${client.name} \u0c85\u0cb5\u0cb0\u0ca8\u0ccd\u0ca8\u0cc1 \u0ca8\u0cbf\u0c9c\u0cb5\u0cbe\u0c97\u0cbf\u0caf\u0cc2 \u0c85\u0cb3\u0cbf\u0cb8\u0cb2\u0cc1 \u0cac\u0caf\u0cb8\u0cc1\u0ca4\u0ccd\u0ca4\u0cc0\u0cb0\u0cbe?', style: TextStyle(color: kText)),
+        title: Text(AppLocale.l('deleteClient'), style: TextStyle(color: kText)),
+        content: Text('${client.name} - ${AppLocale.l('deleteClientConfirm')}', style: TextStyle(color: kText)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('\u0cb0\u0ca6\u0ccd\u0ca6\u0cc1', style: TextStyle(color: kMuted))), // Cancel
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppLocale.l('cancel'), style: TextStyle(color: kMuted))),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('\u0c85\u0cb3\u0cbf\u0cb8\u0cbf', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)), // Delete
+            child: Text(AppLocale.l('delete'), style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -652,11 +652,11 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
       if (success) {
         await _loadData(); // reload clients list
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('\u0c97\u0ccd\u0cb0\u0cbe\u0cb9\u0c95\u0cb0\u0ca8\u0ccd\u0ca8\u0cc1 \u0c85\u0cb3\u0cbf\u0cb8\u0cb2\u0cbe\u0c97\u0cbf\u0ca6\u0cc6'))); // Client deleted
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocale.l('clientDeleted'))));
       } else {
         setState(() => _isLoading = false);
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('\u0cac\u0cc6\u0cb0\u0cb3\u0c9a\u0ccd\u0c9a\u0cc1 \u0ca6\u0ccb\u0cb7'))); // Error
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocale.l('deleteError'))));
       }
     }
   }
@@ -667,7 +667,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
     final isCancelled = appt.status == 'cancelled';
     final statusColor = isCompleted ? Colors.green : (isCancelled ? Colors.red : kTeal);
     final statusIcon = isCompleted ? Icons.check_circle : (isCancelled ? Icons.cancel : Icons.schedule);
-    final statusText = isCompleted ? '\u0cae\u0cc1\u0c97\u0cbf\u0ca6\u0cbf\u0ca6\u0cc6' : (isCancelled ? '\u0cb0\u0ca6\u0ccd\u0ca6\u0cbe\u0c97\u0cbf\u0ca6\u0cc6' : '\u0cac\u0cc1\u0c95\u0ccd \u0c86\u0c97\u0cbf\u0ca6\u0cc6');
+    final statusText = isCompleted ? AppLocale.l('statusCompleted') : (isCancelled ? AppLocale.l('statusCancelled') : AppLocale.l('statusBooked'));
 
     // Check if returning client
     Client? client;
@@ -777,7 +777,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
                       Icon(Icons.repeat, size: 12, color: kOrange),
                       const SizedBox(width: 2),
-                      Text('${visitCount}\u0ca8\u0cc7 \u0cad\u0cc7\u0c9f\u0cbf', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: kOrange)),
+                      Text('$visitCount${AppLocale.l('nthVisit')}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: kOrange)),
                     ]),
                   ),
                 Container(
@@ -1135,15 +1135,15 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                     child: Container(width: 40, height: 4, decoration: BoxDecoration(color: kMuted.withOpacity(0.3), borderRadius: BorderRadius.circular(2))),
                   ),
                   const SizedBox(height: 16),
-                  Text('\u0c95\u0ccd\u0caf\u0cbe\u0cb2\u0cc6\u0c82\u0ca1\u0cb0\u0ccd \u0cb9\u0c82\u0c9a\u0cbf\u0c95\u0cca\u0cb3\u0ccd\u0cb3\u0cbf', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: kText)),
+                  Text(AppLocale.l('shareConfigTitle'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: kText)),
                   const SizedBox(height: 6),
-                  Text('\u0ca6\u0cbf\u0ca8\u0cbe\u0c82\u0c95 \u0cae\u0ca4\u0ccd\u0ca4\u0cc1 \u0cb8\u0cae\u0caf \u0c86\u0caf\u0ccd\u0c95\u0cc6 \u0cae\u0cbe\u0ca1\u0cbf', style: TextStyle(color: kMuted, fontSize: 13)),
+                  Text(AppLocale.l('shareConfigDesc'), style: TextStyle(color: kMuted, fontSize: 13)),
                   const SizedBox(height: 20),
 
                   // FROM DATE
                   _configTile(
                     icon: Icons.calendar_today,
-                    label: '\u0caa\u0ccd\u0cb0\u0cbe\u0cb0\u0c82\u0cad \u0ca6\u0cbf\u0ca8\u0cbe\u0c82\u0c95',
+                    label: AppLocale.l('fromDateLabel'),
                     value: _formatDate(fromDate),
                     onTap: () async {
                       final d = await showDatePicker(
@@ -1159,7 +1159,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                   // TO DATE
                   _configTile(
                     icon: Icons.event,
-                    label: '\u0c85\u0c82\u0ca4\u0ccd\u0caf \u0ca6\u0cbf\u0ca8\u0cbe\u0c82\u0c95',
+                    label: AppLocale.l('toDateLabel'),
                     value: _formatDate(toDate),
                     onTap: () async {
                       final d = await showDatePicker(
@@ -1175,7 +1175,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                   // FROM TIME
                   _configTile(
                     icon: Icons.access_time,
-                    label: '\u0caa\u0ccd\u0cb0\u0cbe\u0cb0\u0c82\u0cad \u0cb8\u0cae\u0caf',
+                    label: AppLocale.l('fromTimeLabel'),
                     value: fromTime.format(ctx),
                     onTap: () async {
                       final t = await showTimePicker(context: ctx, initialTime: fromTime);
@@ -1187,7 +1187,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                   // TO TIME
                   _configTile(
                     icon: Icons.access_time_filled,
-                    label: '\u0c85\u0c82\u0ca4\u0ccd\u0caf \u0cb8\u0cae\u0caf',
+                    label: AppLocale.l('toTimeLabel'),
                     value: toTime.format(ctx),
                     onTap: () async {
                       final t = await showTimePicker(context: ctx, initialTime: toTime);
@@ -1275,10 +1275,10 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                           toHour: toTime.hour, toMinute: toTime.minute,
                           phone: phoneCtrl.text,
                         );
-                        final msg = '\u0ca8\u0cae\u0cb8\u0ccd\u0c95\u0cbe\u0cb0,\n\n'
-                            '\u0c85\u0caa\u0cbe\u0caf\u0cbf\u0c82\u0c9f\u0ccd\u200c\u0cae\u0cc6\u0c82\u0c9f\u0ccd \u0cac\u0cc1\u0c95\u0ccd \u0cae\u0cbe\u0ca1\u0cb2\u0cc1 \u0c88 \u0cb2\u0cbf\u0c82\u0c95\u0ccd \u0ca4\u0cc6\u0cb0\u0cc6\u0caf\u0cbf\u0cb0\u0cbf:\n'
+                        final msg = '${AppLocale.l('bookingMsgNamaskara')}\n\n'
+                            '${AppLocale.l('bookingMsgBody')}\n'
                             '$bookingUrl\n\n'
-                            '- \u0cad\u0cbe\u0cb0\u0ca4\u0cc0\u0caf\u0cae\u0ccd \u2728';
+                            '${AppLocale.l('bookingMsgSign')}';
                         final encoded = Uri.encodeComponent(msg);
                         launchUrl(Uri.parse('https://wa.me/?text=$encoded'), mode: LaunchMode.externalApplication);
                       },

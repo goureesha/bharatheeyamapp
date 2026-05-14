@@ -12,7 +12,7 @@ import '../main.dart';
 import '../services/tester_service.dart';
 import '../services/local_export_service.dart';
 import '../services/drive_backup_service.dart';
-import 'paywall_screen.dart';
+import 'support_screen.dart';
 
 import 'about_screen.dart';
 import 'privacy_policy_screen.dart';
@@ -445,7 +445,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                   if (SubscriptionService.manualPremium)
                                     Text(
-                                      'Manual Premium: Active ✅${SubscriptionService.manualPremiumExpiry != null ? " (expires ${SubscriptionService.manualPremiumExpiry!.day}/${SubscriptionService.manualPremiumExpiry!.month}/${SubscriptionService.manualPremiumExpiry!.year})" : " (Lifetime)"}',
+                                      'Beta Access: Active ✅${SubscriptionService.manualPremiumExpiry != null ? " (${SubscriptionService.manualPremiumExpiry!.day}/${SubscriptionService.manualPremiumExpiry!.month}/${SubscriptionService.manualPremiumExpiry!.year})" : ""}',
                                       style: const TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold),
                                     ),
                                 ],
@@ -681,8 +681,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Divider(color: kBorder),
                     const SizedBox(height: 24),
                     
-                    // Purchase Premium
-                    SectionTitle(AppLocale.l('premiumSub')),
+                    // App Status
+                    SectionTitle('${AppLocale.l('appStatus')} / App Status'),
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -709,10 +709,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                Expanded(
                                  child: Text(
                                    (SubscriptionService.hasSubscription || SubscriptionService.manualPremium)
-                                      ? '${AppLocale.l('premiumActive')} (Premium Active)'
+                                      ? AppLocale.l('premiumActive')
                                       : SubscriptionService.isTrialActive
-                                        ? '${AppLocale.l('trialActive').replaceAll('{h}', '${SubscriptionService.trialMinutesRemaining}')}'
-                                        : '${AppLocale.l('trialExpired')} (Trial Ended)',
+                                        ? AppLocale.l('trialActive').replaceAll('{h}', '${SubscriptionService.trialMinutesRemaining}')
+                                        : AppLocale.l('trialExpired'),
                                    style: TextStyle(
                                      fontSize: 16, 
                                      fontWeight: FontWeight.bold,
@@ -788,7 +788,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                              OutlinedButton.icon(
                                onPressed: () {
                                  Navigator.push(context, MaterialPageRoute(
-                                   builder: (_) => const PaywallScreen()));
+                                   builder: (_) => const SupportScreen()));
                                },
                                icon: Icon(Icons.support_agent, color: kPurple2),
                                label: Text('Contact Support',

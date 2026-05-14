@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/home_screen.dart';
-import 'screens/paywall_screen.dart';
+import 'screens/support_screen.dart';
 import 'widgets/common.dart';
 import 'services/subscription_service.dart';
 import 'services/trusted_time_service.dart';
@@ -278,7 +278,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   ? const _DeviceMismatchScreen()
                   : SubscriptionService.needsInternetVerification
                     ? const _InternetRequiredScreen()
-                    : SubscriptionService.hasAccess ? const HomeScreen() : const PaywallScreen(),
+                    : SubscriptionService.hasAccess ? const HomeScreen() : const SupportScreen(),
             );
           },
         );
@@ -459,7 +459,7 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
                       MaterialPageRoute(
                         builder: (_) => SubscriptionService.hasAccess
                           ? const HomeScreen()
-                          : const PaywallScreen(),
+                          : const SupportScreen(),
                       ),
                       (_) => false,
                     );

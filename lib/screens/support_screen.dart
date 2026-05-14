@@ -5,8 +5,8 @@ import '../widgets/common.dart';
 import '../services/google_auth_service.dart';
 import '../services/device_binding_service.dart';
 
-class PaywallScreen extends StatelessWidget {
-  const PaywallScreen({super.key});
+class SupportScreen extends StatelessWidget {
+  const SupportScreen({super.key});
 
   static const _supportPhone = '+918762629847';
   static const _supportEmail = 'goureesh3690@gmail.com';
@@ -37,27 +37,27 @@ class PaywallScreen extends StatelessWidget {
                 )),
                 const SizedBox(height: 32),
 
-                // Trial expired message
+                // Access info
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
+                    color: kBorder.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.red.shade200),
+                    border: Border.all(color: kBorder.withOpacity(0.3)),
                   ),
                   child: Column(children: [
-                    Icon(Icons.timer_off, color: Colors.red.shade700, size: 40),
+                    Icon(Icons.info_outline, color: kMuted, size: 40),
                     const SizedBox(height: 12),
                     Text(AppLocale.l('trialExpired'),
                       style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800,
-                        color: Colors.red.shade800,
+                        color: kText,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
                     Text(AppLocale.l('trialExpiredSub'),
-                      style: TextStyle(fontSize: 13, color: Colors.red.shade600),
+                      style: TextStyle(fontSize: 13, color: kMuted),
                     ),
                   ]),
                 ),

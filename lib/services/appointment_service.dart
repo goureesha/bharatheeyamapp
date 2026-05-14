@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'google_auth_service.dart';
 import 'client_service.dart';
+import '../widgets/common.dart';
 
 /// Appointment data model
 class Appointment {
@@ -298,32 +299,32 @@ class AppointmentService {
 
   /// Generate WhatsApp confirmation message
   static String confirmationMessage(Appointment appt) {
-    final idLine = appt.clientId.isNotEmpty ? '🆔 ಗ್ರಾಹಕ ID: ${appt.clientId}\n' : '';
-    return 'ನಮಸ್ಕಾರ ${appt.clientName},\n\n'
-        'ನಿಮ್ಮ ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್ ದೃಢಪಡಿಸಲಾಗಿದೆ ✅\n\n'
-        '📅 ದಿನಾಂಕ: ${appt.dateStr}\n'
-        '⏰ ಸಮಯ: ${appt.timeRange}\n'
+    final idLine = appt.clientId.isNotEmpty ? '🆔 ${AppLocale.l("waClientId")}: ${appt.clientId}\n' : '';
+    return '${AppLocale.l("bookingMsgNamaskara")} ${appt.clientName},\n\n'
+        '${AppLocale.l("waConfirmed")}\n\n'
+        '📅 ${AppLocale.l("waDate")}: ${appt.dateStr}\n'
+        '⏰ ${AppLocale.l("waTime")}: ${appt.timeRange}\n'
         '$idLine\n'
-        'ದಯವಿಟ್ಟು ಸಮಯಕ್ಕೆ ಸರಿಯಾಗಿ ಬನ್ನಿ.\n\n'
-        '- ಭಾರತೀಯಮ್ ✨';
+        '${AppLocale.l("waComeOnTime")}\n\n'
+        '${AppLocale.l("bookingMsgSign")}';
   }
 
   /// Generate WhatsApp reminder message
   static String reminderMessage(Appointment appt) {
-    final idLine = appt.clientId.isNotEmpty ? '🆔 ಗ್ರಾಹಕ ID: ${appt.clientId}\n' : '';
-    return 'ನಮಸ್ಕಾರ ${appt.clientName},\n\n'
-        'ನಿಮ್ಮ ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್ ನಾಳೆಯ ಜ್ಞಾಪನೆ 🔔\n\n'
-        '📅 ದಿನಾಂಕ: ${appt.dateStr}\n'
-        '⏰ ಸಮಯ: ${appt.timeRange}\n'
+    final idLine = appt.clientId.isNotEmpty ? '🆔 ${AppLocale.l("waClientId")}: ${appt.clientId}\n' : '';
+    return '${AppLocale.l("bookingMsgNamaskara")} ${appt.clientName},\n\n'
+        '${AppLocale.l("waReminder")}\n\n'
+        '📅 ${AppLocale.l("waDate")}: ${appt.dateStr}\n'
+        '⏰ ${AppLocale.l("waTime")}: ${appt.timeRange}\n'
         '$idLine\n'
-        'ದಯವಿಟ್ಟು ಸಮಯಕ್ಕೆ ಸರಿಯಾಗಿ ಬನ್ನಿ.\n\n'
-        '- ಭಾರತೀಯಮ್ ✨';
+        '${AppLocale.l("waComeOnTime")}\n\n'
+        '${AppLocale.l("bookingMsgSign")}';
   }
 
   /// Generate available slots message to share with clients
   static String availableSlotsMessage(DateTime date) {
     final slots = getAvailableSlotsForDate(date);
-    if (slots.isEmpty) return 'ಈ ದಿನಾಂಕದಲ್ಲಿ ಯಾವುದೇ ಸ್ಲಾಟ್ ಲಭ್ಯವಿಲ್ಲ.';
+    if (slots.isEmpty) return AppLocale.l('waNoSlots');
 
     final dateStr = '${date.day}/${date.month}/${date.year}';
     final slotStr = slots.map((s) {
@@ -334,26 +335,26 @@ class AppointmentService {
       return '  ⏰ $h12:${parts[1]} $amPm';
     }).join('\n');
 
-    return 'ನಮಸ್ಕಾರ,\n\n'
-        '📅 $dateStr ದಿನಾಂಕದಲ್ಲಿ ಲಭ್ಯವಿರುವ ಸ್ಲಾಟ್‌ಗಳು:\n\n'
+    return '${AppLocale.l("bookingMsgNamaskara")}\n\n'
+        '📅 $dateStr ${AppLocale.l("waSlotsOn")}\n\n'
         '$slotStr\n\n'
-        'ಬುಕ್ ಮಾಡಲು ದಯವಿಟ್ಟು ಸಂಪರ್ಕಿಸಿ.\n\n'
-        '- ಭಾರತೀಯಮ್ ✨';
+        '${AppLocale.l("waBookContact")}\n\n'
+        '${AppLocale.l("bookingMsgSign")}';
   }
 
   /// Generate a full weekly/monthly calendar of available slots for sharing
   static String weeklyCalendarMessage({int days = 7}) {
-    const dayNames = ['ಸೋಮವಾರ', 'ಮಂಗಳವಾರ', 'ಬುಧವಾರ', 'ಗುರುವಾರ', 'ಶುಕ್ರವಾರ', 'ಶನಿವಾರ', 'ರವಿವಾರ'];
-    const months = ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ', 'ಮಾರ್ಚ್', 'ಏಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 'ಜುಲೈ', 'ಆಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್'];
+    final dayNames = [AppLocale.l('dayFullMon'), AppLocale.l('dayFullTue'), AppLocale.l('dayFullWed'), AppLocale.l('dayFullThu'), AppLocale.l('dayFullFri'), AppLocale.l('dayFullSat'), AppLocale.l('dayFullSun')];
+    final months = [AppLocale.l('month0'), AppLocale.l('month1'), AppLocale.l('month2'), AppLocale.l('month3'), AppLocale.l('month4'), AppLocale.l('month5'), AppLocale.l('month6'), AppLocale.l('month7'), AppLocale.l('month8'), AppLocale.l('month9'), AppLocale.l('month10'), AppLocale.l('month11')];
 
     final today = DateTime.now();
     final buf = StringBuffer();
 
-    buf.writeln('🙏 *ಭಾರತೀಯಮ್ - ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್ ಕ್ಯಾಲೆಂಡರ್*');
+    buf.writeln('🙏 *${AppLocale.l("waCalTitle")}*');
     buf.writeln('━━━━━━━━━━━━━━━━━━━━━');
     buf.writeln('');
-    buf.writeln('ಕೆಳಗಿನ ದಿನಾಂಕಗಳಲ್ಲಿ ಲಭ್ಯವಿರುವ ಸಮಯಗಳನ್ನು ನೋಡಿ.');
-    buf.writeln('ನಿಮಗೆ ಬೇಕಾದ ದಿನಾಂಕ ಮತ್ತು ಸಮಯವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ಉತ್ತರಿಸಿ.');
+    buf.writeln(AppLocale.l('waCalView'));
+    buf.writeln(AppLocale.l('waCalSelect'));
     buf.writeln('');
 
     bool anySlots = false;
@@ -378,13 +379,13 @@ class AppointmentService {
     }
 
     if (!anySlots) {
-      buf.writeln('❌ ಮುಂದಿನ $days ದಿನಗಳಲ್ಲಿ ಯಾವುದೇ ಸ್ಲಾಟ್ ಲಭ್ಯವಿಲ್ಲ.');
+      buf.writeln('❌ ${AppLocale.l("waCalNoSlots").replaceAll("{d}", days.toString())}');
     }
 
     buf.writeln('━━━━━━━━━━━━━━━━━━━━━');
-    buf.writeln('ಬುಕ್ ಮಾಡಲು: ನಿಮ್ಮ ಹೆಸರು, ಫೋನ್ ಸಂಖ್ಯೆ, ಮತ್ತು ಬೇಕಾದ ದಿನಾಂಕ+ಸಮಯವನ್ನು ಕಳುಹಿಸಿ.');
+    buf.writeln(AppLocale.l('waCalBook'));
     buf.writeln('');
-    buf.writeln('- *ಭಾರತೀಯಮ್* ✨');
+    buf.writeln('- *${AppLocale.l("bookingMsgSign")}*');
 
     return buf.toString();
   }
@@ -398,14 +399,14 @@ class AppointmentService {
     required int toHour,
     required int toMinute,
   }) {
-    const dayNames = ['ಸೋಮವಾರ', 'ಮಂಗಳವಾರ', 'ಬುಧವಾರ', 'ಗುರುವಾರ', 'ಶುಕ್ರವಾರ', 'ಶನಿವಾರ', 'ರವಿವಾರ'];
-    const months = ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ', 'ಮಾರ್ಚ್', 'ಏಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 'ಜುಲೈ', 'ಆಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್'];
+    final dayNames = [AppLocale.l('dayFullMon'), AppLocale.l('dayFullTue'), AppLocale.l('dayFullWed'), AppLocale.l('dayFullThu'), AppLocale.l('dayFullFri'), AppLocale.l('dayFullSat'), AppLocale.l('dayFullSun')];
+    final months = [AppLocale.l('month0'), AppLocale.l('month1'), AppLocale.l('month2'), AppLocale.l('month3'), AppLocale.l('month4'), AppLocale.l('month5'), AppLocale.l('month6'), AppLocale.l('month7'), AppLocale.l('month8'), AppLocale.l('month9'), AppLocale.l('month10'), AppLocale.l('month11')];
 
     final customFromMin = fromHour * 60 + fromMinute;
     final customToMin = toHour * 60 + toMinute;
 
     final buf = StringBuffer();
-    buf.writeln('🙏 *ಭಾರತೀಯಮ್ - ಅಪಾಯಿಂಟ್\u200cಮೆಂಟ್ ಕ್ಯಾಲೆಂಡರ್*');
+    buf.writeln('🙏 *${AppLocale.l("waCalTitle")}*');
     buf.writeln('━━━━━━━━━━━━━━━━━━━━━');
     buf.writeln('');
 
@@ -416,8 +417,8 @@ class AppointmentService {
       return '$h12:${m.toString().padLeft(2, '0')} $amPm';
     }
 
-    buf.writeln('⏰ ಸಮಯ: ${_fmt(fromHour, fromMinute)} - ${_fmt(toHour, toMinute)}');
-    buf.writeln('ನಿಮಗೆ ಬೇಕಾದ ಸ್ಲಾಟ್ ಆಯ್ಕೆ ಮಾಡಿ ಉತ್ತರಿಸಿ.');
+    buf.writeln('⏰ ${AppLocale.l("waTime")}: ${_fmt(fromHour, fromMinute)} - ${_fmt(toHour, toMinute)}');
+    buf.writeln(AppLocale.l('waCalSlotSel'));
     buf.writeln('');
 
     bool anySlots = false;
@@ -449,15 +450,15 @@ class AppointmentService {
     }
 
     if (!anySlots) {
-      buf.writeln('❌ ಈ ಅವಧಿಯಲ್ಲಿ ಯಾವುದೇ ಸ್ಲಾಟ್ ಲಭ್ಯವಿಲ್ಲ.');
+      buf.writeln('❌ ${AppLocale.l("waCalNoSlotsP")}');
     }
 
     buf.writeln('━━━━━━━━━━━━━━━━━━━━━');
-    buf.writeln('*ಬುಕ್ ಮಾಡಲು:*');
-    buf.writeln('✅ ನಿಮಗೆ ಬೇಕಾದ ಸ್ಲಾಟ್ ಆಯ್ಕೆ ಮಾಡಿ');
-    buf.writeln('✅ ನಿಮ್ಮ ಹೆಸರು ಮತ್ತು ಫೋನ್ ಸಂಖ್ಯೆ ಕಳುಹಿಸಿ');
+    buf.writeln('*${AppLocale.l("waCalBookTo")}*');
+    buf.writeln('✅ ${AppLocale.l("waCalSelSlot")}');
+    buf.writeln('✅ ${AppLocale.l("waCalSendInfo")}');
     buf.writeln('');
-    buf.writeln('- *ಭಾರತೀಯಮ್* ✨');
+    buf.writeln('- *${AppLocale.l("bookingMsgSign")}*');
 
     return buf.toString();
   }
