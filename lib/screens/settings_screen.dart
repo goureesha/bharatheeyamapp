@@ -697,20 +697,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                            Row(
                              children: [
                                Icon(
-                                 (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Icons.check_circle : Icons.star, 
-                                 color: (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Colors.green.shade700 : kOrange,
+                                 (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Icons.check_circle
+                                   : SubscriptionService.isTrialActive ? Icons.hourglass_bottom
+                                   : Icons.info_outline, 
+                                 color: (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Colors.green.shade700
+                                   : SubscriptionService.isTrialActive ? kOrange
+                                   : kMuted,
                                  size: 28,
                                ),
                                const SizedBox(width: 12),
                                Expanded(
                                  child: Text(
                                    (SubscriptionService.hasSubscription || SubscriptionService.manualPremium)
-                                      ? '${AppLocale.l('premiumActive')} (Premium Active)' 
-                                      : AppLocale.l('getPremium'),
+                                      ? '${AppLocale.l('premiumActive')} (Premium Active)'
+                                      : SubscriptionService.isTrialActive
+                                        ? '${AppLocale.l('trialActive').replaceAll('{h}', '${SubscriptionService.trialMinutesRemaining}')}'
+                                        : '${AppLocale.l('trialExpired')} (Trial Ended)',
                                    style: TextStyle(
-                                     fontSize: (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? 16 : 18, 
+                                     fontSize: 16, 
                                      fontWeight: FontWeight.bold,
-                                     color: (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Colors.green.shade800 : kPurple1
+                                     color: (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Colors.green.shade800
+                                       : SubscriptionService.isTrialActive ? kOrange
+                                       : kMuted
                                    ),
                                  ),
                                ),
@@ -777,11 +785,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                            ),
                            if (!SubscriptionService.hasSubscription && !SubscriptionService.manualPremium) ...[
                              const SizedBox(height: 12),
-                             Text(
-                               AppLocale.l('premiumDesc'),
-                               style: TextStyle(fontSize: 14, color: kText, height: 1.4),
-                             ),
-                             const SizedBox(height: 20),
                              OutlinedButton.icon(
                                onPressed: () {
                                  Navigator.push(context, MaterialPageRoute(
@@ -789,9 +792,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                },
                                icon: Icon(Icons.support_agent, color: kPurple2),
                                label: Text('Contact Support',
-                                 style: TextStyle(color: kPurple2, fontSize: 16, fontWeight: FontWeight.w700)),
+                                 style: TextStyle(color: kPurple2, fontSize: 14, fontWeight: FontWeight.w700)),
                                style: OutlinedButton.styleFrom(
-                                 padding: const EdgeInsets.symmetric(vertical: 14),
+                                 padding: const EdgeInsets.symmetric(vertical: 12),
                                  side: BorderSide(color: kPurple2),
                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                ),

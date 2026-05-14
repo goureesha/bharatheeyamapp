@@ -86,7 +86,7 @@ class SubscriptionService {
       final m = trialMinutesRemaining;
       return '${AppLocale.l('trialActive').replaceAll('{h}', '$m')} ($m min left)';
     }
-    return '${AppLocale.l('noSubscription')} (No subscription)';
+    return '${AppLocale.l('trialExpired')} (Trial Ended)';
   }
 
   // ════════════════════════════════════════════════
