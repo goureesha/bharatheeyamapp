@@ -95,6 +95,11 @@ class DeviceBindingService {
     if (SubscriptionService.trialStartDate != null) {
       data['trialStartedAt'] = Timestamp.fromDate(SubscriptionService.trialStartDate!);
     }
+    // Premium remaining days (for admin visibility in Firestore Console)
+    if (SubscriptionService.manualPremiumExpiry != null) {
+      final remaining = SubscriptionService.manualPremiumExpiry!.difference(DateTime.now()).inDays;
+      data['premiumDaysRemaining'] = remaining > 0 ? remaining : 0;
+    }
 
     return data;
   }
