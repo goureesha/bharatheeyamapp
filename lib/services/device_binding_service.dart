@@ -88,18 +88,19 @@ class DeviceBindingService {
       data['buildNumber'] = pkgInfo.buildNumber;
     } catch (_) {}
 
-    // Subscription details
-    data['hasSubscription'] = SubscriptionService.hasSubscription;
-    data['isTrialActive'] = SubscriptionService.isTrialActive;
-    data['trialMinutesRemaining'] = SubscriptionService.trialMinutesRemaining;
-    if (SubscriptionService.trialStartDate != null) {
-      data['trialStartedAt'] = Timestamp.fromDate(SubscriptionService.trialStartDate!);
-    }
     // Premium remaining days (for admin visibility in Firestore Console)
     if (SubscriptionService.manualPremiumExpiry != null) {
       final remaining = SubscriptionService.manualPremiumExpiry!.difference(DateTime.now()).inDays;
       data['premiumDaysRemaining'] = remaining > 0 ? remaining : 0;
     }
+
+    // Clean up old billing fields + unnecessary subscription fields
+    data['subscribedAt'] = FieldValue.delete();
+    data['subscriptionDaysRemaining'] = FieldValue.delete();
+    data['hasSubscription'] = FieldValue.delete();
+    data['isTrialActive'] = FieldValue.delete();
+    data['trialMinutesRemaining'] = FieldValue.delete();
+    data['trialStartedAt'] = FieldValue.delete();
 
     return data;
   }
@@ -465,9 +466,8 @@ class DeviceBindingService {
         data['buildNumber'] = pkgInfo.buildNumber;
       } catch (_) {}
 
-      // Subscription status
-      data['hasSubscription'] = SubscriptionService.hasSubscription;
-      data['isTrialActive'] = SubscriptionService.isTrialActive;
+      // Premium status
+      data['manualPremium'] = SubscriptionService.manualPremium;
 
       final docRef = FirebaseFirestore.instance
           .collection('installs')
