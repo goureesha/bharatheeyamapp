@@ -88,19 +88,26 @@ class DeviceBindingService {
       data['buildNumber'] = pkgInfo.buildNumber;
     } catch (_) {}
 
-    // Premium remaining days (for admin visibility in Firestore Console)
+    // Trial details
+    data['isTrialActive'] = SubscriptionService.isTrialActive;
+    data['trialMinutesRemaining'] = SubscriptionService.trialMinutesRemaining;
+    if (SubscriptionService.trialStartDate != null) {
+      data['trialStartedAt'] = Timestamp.fromDate(SubscriptionService.trialStartDate!);
+    }
+
+    // Manual premium status (written by app, manualPremium flag is admin-only)
+    data['premiumActive'] = SubscriptionService.manualPremium;
     if (SubscriptionService.manualPremiumExpiry != null) {
       final remaining = SubscriptionService.manualPremiumExpiry!.difference(DateTime.now()).inDays;
       data['premiumDaysRemaining'] = remaining > 0 ? remaining : 0;
+    } else {
+      data['premiumDaysRemaining'] = 0;
     }
 
-    // Clean up old billing fields + unnecessary subscription fields
+    // Clean up old Play Store billing fields
     data['subscribedAt'] = FieldValue.delete();
     data['subscriptionDaysRemaining'] = FieldValue.delete();
     data['hasSubscription'] = FieldValue.delete();
-    data['isTrialActive'] = FieldValue.delete();
-    data['trialMinutesRemaining'] = FieldValue.delete();
-    data['trialStartedAt'] = FieldValue.delete();
 
     return data;
   }
