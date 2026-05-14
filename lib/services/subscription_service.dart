@@ -10,15 +10,18 @@ class SubscriptionService {
   // ── Pref keys ──
   static const String _subStatusKey = 'has_active_subscription';
   static const String _trialStartKey = 'trial_start_timestamp';
+  static const String _lastOnlineCheckKey = 'last_online_check_timestamp';
 
   // ── Constants ──
   static const int _trialMinutes = 30;
+  static const int _maxOfflineHours = 24;
 
   // ── State ──
   static bool hasSubscription = false;
   static bool manualPremium = false;
   static DateTime? manualPremiumExpiry;
   static DateTime? trialStartDate;
+  static DateTime? lastOnlineCheck;
 
   // ════════════════════════════════════════════════
   // COMPUTED PROPERTIES FOR UI
@@ -27,8 +30,27 @@ class SubscriptionService {
   /// True if the user has access (manual premium OR trial active)
   static bool get hasAccess {
     if (kIsWeb) return true;
+    // If offline > 24 hours → no access (must connect)
+    if (needsInternetVerification) return false;
     if (manualPremium) return true;
     return hasSubscription || isTrialActive;
+  }
+
+  /// True if the user hasn't connected to the internet in > 24 hours
+  static bool get needsInternetVerification {
+    if (kIsWeb) return false;
+    if (isTrialActive) return false; // Don't block during free trial
+    if (lastOnlineCheck == null) return true; // Never verified
+    final hoursSinceCheck = TrustedTimeService.now().difference(lastOnlineCheck!).inHours;
+    return hoursSinceCheck >= _maxOfflineHours;
+  }
+
+  /// Record a successful online verification
+  static Future<void> recordOnlineCheck() async {
+    lastOnlineCheck = TrustedTimeService.now();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_lastOnlineCheckKey, lastOnlineCheck!.millisecondsSinceEpoch);
+    debugPrint('🌐 Online check recorded: $lastOnlineCheck');
   }
 
   /// True if the free trial is still active (30 minutes)
@@ -86,9 +108,16 @@ class SubscriptionService {
       await prefs.setInt(_trialStartKey, trialStartDate!.millisecondsSinceEpoch);
     }
 
+    // Load last online check timestamp
+    final lastCheckTs = prefs.getInt(_lastOnlineCheckKey);
+    if (lastCheckTs != null) {
+      lastOnlineCheck = DateTime.fromMillisecondsSinceEpoch(lastCheckTs);
+    }
+
     if (kIsWeb) return;
 
     // Check manual premium from Firestore (admin-set)
+    // If successful, this also counts as an online check
     await checkManualPremium();
   }
 
@@ -159,7 +188,14 @@ class SubscriptionService {
           .get()
           .timeout(const Duration(seconds: 8));
 
-      if (!doc.exists || doc.data() == null) return;
+      if (!doc.exists || doc.data() == null) {
+        // Successfully reached Firestore — record online check
+        await recordOnlineCheck();
+        return;
+      }
+
+      // Successfully reached Firestore — record online check
+      await recordOnlineCheck();
 
       final data = doc.data()!;
       final isPremium = data['manualPremium'] == true;

@@ -134,6 +134,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
       // Re-sync NTP clock on resume (updates offset if internet is now available)
       TrustedTimeService.syncWithNtp();
       // Re-check manual premium + device binding on resume
+      // checkManualPremium also records online check if Firestore is reachable
       SubscriptionService.checkManualPremium();
       if (GoogleAuthService.isSignedIn) {
         DeviceBindingService.checkBinding().then((bound) {
@@ -275,7 +276,9 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                 ? const _SideloadBlockedScreen()
                 : !isBound
                   ? const _DeviceMismatchScreen()
-                  : SubscriptionService.hasAccess ? const HomeScreen() : const PaywallScreen(),
+                  : SubscriptionService.needsInternetVerification
+                    ? const _InternetRequiredScreen()
+                    : SubscriptionService.hasAccess ? const HomeScreen() : const PaywallScreen(),
             );
           },
         );
@@ -402,3 +405,78 @@ class _DeviceMismatchScreenState extends State<_DeviceMismatchScreen> {
   }
 }
 
+/// Shown when user hasn't connected to internet in > 24 hours
+class _InternetRequiredScreen extends StatefulWidget {
+  const _InternetRequiredScreen();
+  @override
+  State<_InternetRequiredScreen> createState() => _InternetRequiredScreenState();
+}
+
+class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
+  bool _checking = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: kBg,
+      body: Center(child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.wifi_off_rounded, size: 80, color: Colors.orange[400]),
+          const SizedBox(height: 24),
+          Text(AppLocale.l('internetRequired'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kText)),
+          const SizedBox(height: 8),
+          Text('Internet Connection Required', style: TextStyle(fontSize: 16, color: kMuted)),
+          const SizedBox(height: 24),
+          Text(
+            AppLocale.l('internetRequiredMsg'),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, color: kText, height: 1.6),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Please connect to the internet at least once every 24 hours to continue using the app.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, color: kMuted, height: 1.5),
+          ),
+          const SizedBox(height: 24),
+          if (_checking)
+            CircularProgressIndicator(color: kPurple2)
+          else
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh, color: Colors.white),
+              label: Text(AppLocale.l('verifyNow')),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPurple2,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              ),
+              onPressed: () async {
+                setState(() => _checking = true);
+                await SubscriptionService.checkManualPremium();
+                if (mounted) {
+                  if (!SubscriptionService.needsInternetVerification) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (_) => SubscriptionService.hasAccess
+                          ? const HomeScreen()
+                          : const PaywallScreen(),
+                      ),
+                      (_) => false,
+                    );
+                  } else {
+                    setState(() => _checking = false);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(AppLocale.l('internetFailed')),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
+        ]),
+      )),
+    );
+  }
+}
