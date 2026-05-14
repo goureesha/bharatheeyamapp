@@ -278,7 +278,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   ? const _DeviceMismatchScreen()
                   : SubscriptionService.needsInternetVerification
                     ? const _InternetRequiredScreen()
-                    : const HomeScreen(),
+                    : SubscriptionService.hasAccess ? const HomeScreen() : const SupportScreen(),
             );
           },
         );
@@ -457,7 +457,9 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
                   if (!SubscriptionService.needsInternetVerification) {
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
-                        builder: (_) => const HomeScreen(),
+                        builder: (_) => SubscriptionService.hasAccess
+                          ? const HomeScreen()
+                          : const SupportScreen(),
                       ),
                       (_) => false,
                     );
