@@ -206,13 +206,24 @@ class SubscriptionService {
         if (expiryTs != null && expiryTs is Timestamp) {
           final expiryDate = expiryTs.toDate();
           if (expiryDate.isBefore(TrustedTimeService.now())) {
-            // Expired
+            // Expired — update local state
             manualPremium = false;
             manualPremiumExpiry = null;
             hasSubscription = false;
             final prefs = await SharedPreferences.getInstance();
             await prefs.setBool(_subStatusKey, false);
             debugPrint('🔒 Manual premium EXPIRED on $expiryDate');
+
+            // Write back to Firestore so admin dashboard reflects it
+            try {
+              await FirebaseFirestore.instance
+                  .collection('device_bindings')
+                  .doc(email!.toLowerCase())
+                  .update({'manualPremium': false});
+              debugPrint('🔄 Firestore updated: manualPremium → false');
+            } catch (_) {
+              // Non-critical — dashboard will catch up on next check
+            }
             return;
           }
           manualPremiumExpiry = expiryDate;
