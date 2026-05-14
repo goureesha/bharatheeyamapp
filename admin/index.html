@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bharatheeyam Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Login Screen -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">ಭ</div>
+      <h1>Bharatheeyam Admin</h1>
+      <p class="login-subtitle">Sign in with your admin Google account</p>
+      <button id="googleSignIn" class="btn-google" onclick="signInWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
+        Sign in with Google
+      </button>
+      <p class="login-note">Only authorized admin accounts can access this dashboard</p>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="dashboard hidden">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <span class="logo">ಭ</span>
+        <h1>Bharatheeyam Admin</h1>
+      </div>
+      <div class="header-right">
+        <span id="adminEmail" class="admin-email"></span>
+        <button class="btn-signout" onclick="signOut()">Sign Out</button>
+      </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+          <svg width="24" height="24" fill="none" stroke="white" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value" id="totalClients">—</span>
+          <span class="stat-label">Total Clients</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+          <svg width="24" height="24" fill="none" stroke="white" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value" id="premiumClients">—</span>
+          <span class="stat-label">Premium Users</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+          <svg width="24" height="24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value" id="trialClients">—</span>
+          <span class="stat-label">On Free Trial</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+          <svg width="24" height="24" fill="none" stroke="white" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value" id="expiringClients">—</span>
+          <span class="stat-label">Expiring in 7 Days</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expiry Timeline -->
+    <div class="section-card">
+      <h2 class="section-title">📅 Upcoming Expirations</h2>
+      <div id="expiryTimeline" class="expiry-timeline">
+        <p class="empty-state">Loading...</p>
+      </div>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="controls">
+      <input type="text" id="searchBox" class="search-box" placeholder="🔍 Search by email, device, or name..." oninput="filterClients()">
+      <select id="filterSelect" class="filter-select" onchange="filterClients()">
+        <option value="all">All Clients</option>
+        <option value="premium">Premium Only</option>
+        <option value="trial">Trial Active</option>
+        <option value="expired">Expired / Free</option>
+        <option value="expiring7">Expiring in 7 Days</option>
+        <option value="expiring30">Expiring in 30 Days</option>
+      </select>
+      <button class="btn-refresh" onclick="loadClients()">↻ Refresh</button>
+    </div>
+
+    <!-- Client Table -->
+    <div class="table-wrapper">
+      <table class="client-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Email</th>
+            <th>Device</th>
+            <th>Status</th>
+            <th>Days Left</th>
+            <th>Expiry Date</th>
+            <th>Last Seen</th>
+            <th>App Version</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="clientTableBody">
+          <tr><td colspan="9" class="empty-state">Loading clients...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Bharatheeyam Admin Dashboard • Data from Firestore <code>device_bindings</code></p>
+    </footer>
+  </div>
+
+  <!-- Unlock Modal -->
+  <div id="unlockModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>🔓 Unlock Premium</h2>
+      <p id="unlockEmail" class="modal-email"></p>
+      <div class="modal-field">
+        <label>Duration</label>
+        <select id="unlockDuration">
+          <option value="30">30 Days</option>
+          <option value="90">90 Days</option>
+          <option value="180">6 Months</option>
+          <option value="365" selected>1 Year</option>
+          <option value="0">Lifetime</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-confirm" onclick="confirmUnlock()">Unlock Premium</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revoke Modal -->
+  <div id="revokeModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>🔒 Revoke Premium</h2>
+      <p id="revokeEmail" class="modal-email"></p>
+      <p style="color: #ef4444; margin-top: 8px;">This will immediately remove premium access.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-revoke" onclick="confirmRevoke()">Revoke Access</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
