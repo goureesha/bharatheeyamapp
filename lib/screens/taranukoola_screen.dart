@@ -768,7 +768,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
 
     String nakText = rules.allowedNakshatras == null
         ? AppLocale.l('allNak')
-        : rules.allowedNakshatras!.map((i) => trAll(knNak[i].split(' ')[0])).join(', ');
+        : rules.allowedNakshatras!.map((i) => trAll(knNak[i]).split(' ')[0]).join(', ');
     String varaText = rules.allowedVaras == null
         ? AppLocale.l('allVara')
         : rules.allowedVaras!.map((i) => trAll(knVara[i])).join(', ');
@@ -1205,10 +1205,10 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(headerText, style: TextStyle(fontWeight: FontWeight.w800, color: headerColor, fontSize: 14)),
+            Text(headerText, style: TextStyle(fontWeight: FontWeight.w800, color: headerColor, fontSize: 14), softWrap: true),
             const SizedBox(height: 4),
             Text('${AppLocale.l('needShuddhi')}: ${parts.join(' + ')} ${AppLocale.l('shuddhaLabel')} + ${AppLocale.l('guruAnukoola').split(' ')[0]} ${AppLocale.l('anukoola')}',
-                style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w500)),
+                style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w500), softWrap: true, maxLines: 3),
           ]),
         ),
         ...windows.asMap().entries.map((entry) {
@@ -1304,7 +1304,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
           borderRadius: BorderRadius.circular(4),
           border: Border.all(color: Colors.grey.shade300, width: 0.5),
         ),
-        child: Text(text, style: TextStyle(fontSize: 9, color: kMuted, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic)),
+        child: Text(text, style: TextStyle(fontSize: 9, color: kMuted, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic), softWrap: true),
       );
     }
     final MaterialColor color = isShuddha ? Colors.green : Colors.red;
@@ -1316,7 +1316,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: color.withOpacity(0.3), width: 0.5),
       ),
-      child: Text(text, style: TextStyle(fontSize: 10, color: color.shade700, fontWeight: FontWeight.w700)),
+      child: Text(text, style: TextStyle(fontSize: 10, color: color.shade700, fontWeight: FontWeight.w700), softWrap: true),
     );
   }
 }
