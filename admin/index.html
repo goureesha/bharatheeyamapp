@@ -95,7 +95,9 @@
         <option value="expiring7">Expiring in 7 Days</option>
         <option value="expiring30">Expiring in 30 Days</option>
       </select>
-      <button class="btn-refresh" onclick="loadClients()">↻ Refresh</button>
+      <button class="btn-refresh" onclick="refreshData()">↻ Refresh</button>
+      <span class="live-indicator"><span class="live-dot"></span> LIVE</span>
+      <span id="lastUpdated" class="last-updated"></span>
     </div>
 
     <!-- Client Table -->
