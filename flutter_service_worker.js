@@ -27,7 +27,7 @@ const RESOURCES = {"assets/assets/fonts/NotoSansDevanagari-Bold.ttf": "c3ee3c730
 "assets/packages/sweph/assets/ephe/seasnam.txt": "b81323f1dc15e087893f3ed5d9a7fe37",
 "assets/packages/sweph/assets/sweph.wasm": "86bb41f54251a2f842df92029ea5a9f9",
 "assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8cb9b6ce",
-"assets/fonts/MaterialIcons-Regular.otf": "512114ec9a11efb3d7fa1056cc14857d",
+"assets/fonts/MaterialIcons-Regular.otf": "34a1d30e4826b40d7dc4dea5618be8b1",
 "assets/AssetManifest.bin": "97431ccc99cbad83d8e6e35ed496b23c",
 "assets/NOTICES": "672eb934e2b2d805c77c31ebb8003f00",
 "assets/FontManifest.json": "8483a5e223c89751ce1424a84c218ccc",
@@ -47,8 +47,8 @@ const RESOURCES = {"assets/assets/fonts/NotoSansDevanagari-Bold.ttf": "c3ee3c730
 "canvaskit/skwasm_st.js": "d1326ceef381ad382ab492ba5d96f04d",
 "privacy_policy.html": "10094331e2887570d5e079618ca2fdc8",
 "flutter.js": "76f08d47ff9f5715220992f993002504",
-"flutter_bootstrap.js": "92a9618afa8966474e2a991bd46e6aa0",
-"main.dart.js": "140677ed6faf8775d33242c78e2f4d3a",
+"flutter_bootstrap.js": "aa8e472278a677ff98e5a34fa900a401",
+"main.dart.js": "1380894f18f5ade56386460f2a8d8d0f",
 "version.json": "d5e8f2adefe37dbb006de23d18686b1a",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df"};
 // The application shell files that are downloaded before a service worker can
