@@ -32,7 +32,16 @@ class SubscriptionService {
     if (kIsWeb) return true;
     // If offline > 24 hours → no access (must connect)
     if (needsInternetVerification) return false;
-    if (manualPremium) return true;
+    if (manualPremium) {
+      // Even offline, check local expiry date — lock out immediately when expired
+      if (manualPremiumExpiry != null &&
+          manualPremiumExpiry!.isBefore(TrustedTimeService.now())) {
+        manualPremium = false;
+        hasSubscription = false;
+        return false;
+      }
+      return true;
+    }
     return hasSubscription || isTrialActive;
   }
 
