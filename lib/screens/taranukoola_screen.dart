@@ -830,15 +830,13 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
   Widget _ruleRow(String label, String value, {Color? valueColor, bool valueBold = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 2),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-        Padding(
-          padding: const EdgeInsets.only(left: 20),
-          child: Text(value, style: TextStyle(
-            color: valueColor ?? kMuted, fontSize: 12,
-            fontWeight: valueBold ? FontWeight.w700 : FontWeight.w400,
-          ), softWrap: true),
-        ),
+        const SizedBox(width: 4),
+        Expanded(child: Text(value, style: TextStyle(
+          color: valueColor ?? kMuted, fontSize: 12,
+          fontWeight: valueBold ? FontWeight.w700 : FontWeight.w400,
+        ), softWrap: true)),
       ]),
     );
   }
