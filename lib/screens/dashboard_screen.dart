@@ -1287,16 +1287,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
-  @override
-  void dispose() {
-    _tabCtrl.dispose();
-    _fatherNameCtrl.dispose();
-    _motherNameCtrl.dispose();
-    _gotraCtrl.dispose();
-    _jyotishiNameCtrl.dispose();
-    _jyotishiPhoneCtrl.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
