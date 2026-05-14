@@ -94,7 +94,7 @@ class _PersonEntry {
 }
 
 class _DashboardScreenState extends State<DashboardScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabCtrl;
   String _notes = '';
   final _newNoteController = TextEditingController();
@@ -162,6 +162,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _tabCtrl = TabController(length: _tabs.length, vsync: this); // 11 tabs
     _notes = widget.initialNotes;
     _aroodhas = Map.from(widget.initialAroodhas);
@@ -193,6 +194,26 @@ class _DashboardScreenState extends State<DashboardScreen>
     _loadJyotishiDetails();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _tabCtrl.dispose();
+    _newNoteController.dispose();
+    _fatherNameCtrl.dispose();
+    _motherNameCtrl.dispose();
+    _gotraCtrl.dispose();
+    _jyotishiNameCtrl.dispose();
+    _jyotishiPhoneCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Force rebuild on resume — fixes blank kundali charts on Android tablets
+    if (state == AppLifecycleState.resumed && mounted) {
+      setState(() {});
+    }
+  }
   Future<void> _loadJyotishiDetails() async {
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
