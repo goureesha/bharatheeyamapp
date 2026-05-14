@@ -736,6 +736,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText),
                                    )),
                                  ]),
+                                 if (SubscriptionService.manualPremium && SubscriptionService.manualPremiumExpiry != null) ...[
+                                   const SizedBox(height: 10),
+                                   Builder(builder: (_) {
+                                     final expiry = SubscriptionService.manualPremiumExpiry!;
+                                     final now = DateTime.now();
+                                     final totalDays = 365;
+                                     final remaining = expiry.difference(now).inDays;
+                                     final fraction = (remaining / totalDays).clamp(0.0, 1.0);
+                                     final expiryStr = '${expiry.day}/${expiry.month}/${expiry.year}';
+                                     return Column(
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: [
+                                         ClipRRect(
+                                           borderRadius: BorderRadius.circular(4),
+                                           child: LinearProgressIndicator(
+                                             value: fraction,
+                                             backgroundColor: kBorder.withOpacity(0.3),
+                                             color: remaining > 30 ? Colors.green : Colors.orange,
+                                             minHeight: 6,
+                                           ),
+                                         ),
+                                         const SizedBox(height: 6),
+                                         Row(
+                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                           children: [
+                                             Text('$remaining days remaining',
+                                               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700,
+                                                 color: remaining > 30 ? Colors.green : Colors.orange)),
+                                             Text('Expires: $expiryStr',
+                                               style: TextStyle(fontSize: 11, color: kMuted)),
+                                           ],
+                                         ),
+                                       ],
+                                     );
+                                   }),
+                                 ],
                                ],
                              ),
                            ),
