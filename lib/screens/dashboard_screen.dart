@@ -1712,13 +1712,16 @@ class _DashboardScreenState extends State<DashboardScreen>
         adjMonth = adjDate.month;
         adjDay = adjDate.day;
       }
+      // Use same ayanamsa & node settings as the birth chart
+      final ayanamsa = widget.extraInfo['ayanamsa'] ?? 'lahiri';
+      final trueNode = (widget.extraInfo['nodeMode'] ?? 'mean') == 'true';
       final result = await AstroCalculator.calculate(
         year: adjYear, month: adjMonth, day: adjDay,
         hourUtcOffset: useTz,
         hour24: adjHour,
         lat: useLat, lon: useLon,
-        ayanamsaMode: 'lahiri',
-        trueNode: true,
+        ayanamsaMode: ayanamsa,
+        trueNode: trueNode,
       );
       if (mounted) Navigator.pop(context); // close dialog
       if (result != null && mounted) {

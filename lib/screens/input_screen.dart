@@ -389,7 +389,7 @@ class _InputScreenState extends State<InputScreen> {
             ampm: _ampm,
             lat: lat,
             lon: lon,
-            extraInfo: {'clientId': activeClientId ?? ''},
+            extraInfo: {'clientId': activeClientId ?? '', 'ayanamsa': _ayanamsa, 'nodeMode': _nodeMode},
             initialNotes: uiNotes,
             initialAroodhas: _loadedAroodhas,
             initialJanmaNakshatraIdx: _loadedJanmaNakshatraIdx,
