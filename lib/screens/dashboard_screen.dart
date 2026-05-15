@@ -103,6 +103,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   int? _dinaNakshatraIdx;
   String? _bhavaPlanet; // planet selected for bhava recalculation
   KundaliResult? _prastutaResult; // For Aroodha tab's Prastuta button
+  DateTime? _prastutaTime; // Time used for prastuta chart
+  String _prastutaPlace = ''; // Place used for prastuta chart
+  double _prastutaLat = 0;
+  double _prastutaLon = 0;
+  double _prastutaTz = 5.5;
   
   // Janma Patrike states
   final _fatherNameCtrl = TextEditingController();
@@ -1678,14 +1683,19 @@ class _DashboardScreenState extends State<DashboardScreen>
   // ─────────────────────────────────────────────
   Future<void> _openPrastutaChart() async {
     final now = DateTime.now();
+    // Use custom prastuta location if set, else default
+    final useLat = _prastutaLat != 0 ? _prastutaLat : LocationService.lat;
+    final useLon = _prastutaLon != 0 ? _prastutaLon : LocationService.lon;
+    final useTz = _prastutaLat != 0 ? _prastutaTz : LocationService.tzOffset;
+    final usePlace = _prastutaPlace.isNotEmpty ? _prastutaPlace : LocationService.place;
     showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
     try {
       final localHour = now.hour + now.minute / 60.0;
       final result = await AstroCalculator.calculate(
         year: now.year, month: now.month, day: now.day,
-        hourUtcOffset: LocationService.tzOffset,
+        hourUtcOffset: useTz,
         hour24: localHour,
-        lat: LocationService.lat, lon: LocationService.lon,
+        lat: useLat, lon: useLon,
         ayanamsaMode: 'lahiri',
         trueNode: true,
       );
@@ -1693,12 +1703,72 @@ class _DashboardScreenState extends State<DashboardScreen>
       if (result != null && mounted) {
         setState(() {
           _prastutaResult = result;
+          _prastutaTime = now;
+          _prastutaPlace = usePlace;
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocale.l('loadingPrastuta')))); // Current-time chart loaded
       }
     } catch (e) {
       if (mounted) Navigator.pop(context);
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${AppLocale.l('errorLabel')}: $e')));
+    }
+  }
+
+  Future<void> _searchPrastutaPlace(String query) async {
+    if (query.trim().isEmpty) return;
+    try {
+      final q = Uri.encodeComponent(query.trim());
+      final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$q&format=json&limit=5');
+      final resp = await http.get(url, headers: {'User-Agent': 'BharatheeyamApp/1.0'}).timeout(const Duration(seconds: 10));
+      if (resp.statusCode == 200 && mounted) {
+        final data = jsonDecode(resp.body) as List;
+        if (data.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocale.l('placeNotFoundDash'))));
+        } else {
+          final selected = data.length == 1 ? data[0] : await showDialog<Map<String, dynamic>>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: kCard,
+              title: Text('${AppLocale.l('selectLocation')}', style: TextStyle(color: kText, fontWeight: FontWeight.w900, fontSize: 16)),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: data.length,
+                  separatorBuilder: (_, __) => Divider(height: 1, color: kBorder),
+                  itemBuilder: (ctx, i) {
+                    final item = data[i];
+                    return ListTile(
+                      dense: true,
+                      leading: Icon(Icons.location_on, color: kPurple2, size: 20),
+                      title: Text(item['display_name'] ?? '', style: TextStyle(fontSize: 13, color: kText), maxLines: 2, overflow: TextOverflow.ellipsis),
+                      subtitle: Text('${double.tryParse(item['lat']?.toString() ?? '')?.toStringAsFixed(2)}°, ${double.tryParse(item['lon']?.toString() ?? '')?.toStringAsFixed(2)}°', style: TextStyle(fontSize: 11, color: kMuted)),
+                      onTap: () => Navigator.pop(ctx, item),
+                    );
+                  },
+                ),
+              ),
+              actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocale.l('cancel'), style: TextStyle(color: kMuted)))],
+            ),
+          );
+          if (selected != null && mounted) {
+            final lat = double.parse(selected['lat'].toString());
+            final lon = double.parse(selected['lon'].toString());
+            final displayName = selected['display_name'] as String;
+            final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+            setState(() {
+              _prastutaPlace = query.trim();
+              _prastutaLat = lat;
+              _prastutaLon = lon;
+              _prastutaTz = autoTz;
+              _prastutaResult = null; // Clear old result since location changed
+            });
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('📍 $displayName'), backgroundColor: Colors.green));
+          }
+        }
+      }
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocale.l('placeError'))));
     }
   }
 
@@ -1742,7 +1812,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       return SingleChildScrollView(
         child: Column(
           children: [
-            // ── Aroodha controls ──
+            // ── Prastuta Location & Time ──
             AppCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1764,6 +1834,62 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                     ],
                   ),
+                  // ── Location search ──
+                  const SizedBox(height: 8),
+                  Row(children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: '${AppLocale.l('searchLocation')} / Search',
+                          prefixIcon: Icon(Icons.location_on, size: 18, color: kPurple2),
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        style: TextStyle(fontSize: 13, color: kText),
+                        onSubmitted: (v) => _searchPrastutaPlace(v),
+                      ),
+                    ),
+                  ]),
+                  // ── Current place info ──
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: kPurple2.withOpacity(0.06),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(children: [
+                      Icon(Icons.place, size: 14, color: kPurple2),
+                      const SizedBox(width: 4),
+                      Expanded(child: Text(
+                        _prastutaPlace.isNotEmpty ? _prastutaPlace : LocationService.place,
+                        style: TextStyle(fontSize: 11, color: kText, fontWeight: FontWeight.w600),
+                        overflow: TextOverflow.ellipsis,
+                      )),
+                    ]),
+                  ),
+                  // ── Prastuta time display ──
+                  if (_prastutaTime != null) ...[
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.06),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(children: [
+                        Icon(Icons.access_time, size: 14, color: Colors.green.shade700),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${AppLocale.l('prastuta')}: ${_prastutaTime!.day.toString().padLeft(2,'0')}/${_prastutaTime!.month.toString().padLeft(2,'0')}/${_prastutaTime!.year} ${_prastutaTime!.hour.toString().padLeft(2,'0')}:${_prastutaTime!.minute.toString().padLeft(2,'0')}:${_prastutaTime!.second.toString().padLeft(2,'0')}',
+                          style: TextStyle(fontSize: 11, color: Colors.green.shade800, fontWeight: FontWeight.w700),
+                        ),
+                      ]),
+                    ),
+                  ],
+                  // ── Aroodha controls ──
+                  const SizedBox(height: 8),
                   Row(children: [
                     Expanded(
                       child: DropdownButtonFormField<String>(

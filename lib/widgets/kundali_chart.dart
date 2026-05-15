@@ -166,7 +166,43 @@ class KundaliChart extends StatelessWidget {
       for (final pName in planetOrder) {
         final info = result.planets[pName];
         if (info == null) continue;
-        final ri = _rashinFor(info.longitude);
+        int ri;
+        if (isBhava) {
+          // Bhav chart: use same bhav madhya/sandhi logic as normal branch
+          final d = info.longitude;
+          List<double> madhyas;
+          if (bhavaFromPlanet != null) {
+            final offset = (refLongitude - lagnaLong + 360.0) % 360.0;
+            madhyas = List.generate(12, (i) => (result.bhavas[i] + offset) % 360.0);
+          } else {
+            madhyas = result.bhavas;
+          }
+          List<double> boundaries = List.filled(12, 0.0);
+          for (int i = 0; i < 12; i++) {
+            final m1 = madhyas[i];
+            final m2 = madhyas[(i + 1) % 12];
+            double diff = (m2 - m1 + 360.0) % 360.0;
+            boundaries[i] = (m1 + (diff / 2.0)) % 360.0;
+          }
+          int bhavaIdx = 0;
+          for (int i = 0; i < 12; i++) {
+            final startBoundary = boundaries[(i + 11) % 12];
+            final endBoundary = boundaries[i];
+            if (startBoundary < endBoundary) {
+              if (d >= startBoundary && d < endBoundary) { bhavaIdx = i; break; }
+            } else {
+              if (d >= startBoundary || d < endBoundary) { bhavaIdx = i; break; }
+            }
+          }
+          if (bhavaFromPlanet != null) {
+            final planetRashiIdx = (refLongitude / 30).floor() % 12;
+            ri = (planetRashiIdx + bhavaIdx) % 12;
+          } else {
+            ri = (lagnaIdx + bhavaIdx) % 12;
+          }
+        } else {
+          ri = _rashinFor(info.longitude);
+        }
         if (ri >= 0 && ri < 12) {
           final dd = _amshaDegree(info.longitude);
           boxData[ri]!.add((name: pName, info: info, degree: info.longitude % 30, displayDeg: dd, type: pName == 'ಲಗ್ನ' ? ChipType.lagna : ChipType.planet));
