@@ -559,9 +559,10 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                               int tara2 = (dinaIdx - _janmaNakshatraIdx2! + 27) % 27 % 9;
                               bool isGood2 = _isDayGood(dinaIdx, _janmaNakshatraIdx2!);
                               
-                              Color bgColor = (isGood1 && isGood2) ? Colors.green.shade50 : (!isGood1 && !isGood2) ? Colors.red.shade50 : Colors.orange.shade50;
-                              Color borderColor = (isGood1 && isGood2) ? Colors.green.shade500 : (!isGood1 && !isGood2) ? Colors.red.shade500 : Colors.orange.shade500;
-                              Color textColor = (isGood1 && isGood2) ? Colors.green.shade900 : (!isGood1 && !isGood2) ? Colors.red.shade900 : Colors.orange.shade900;
+                              // If excluded, always show RED
+                              Color bgColor = isExcluded ? Colors.red.shade50 : ((isGood1 && isGood2) ? Colors.green.shade50 : (!isGood1 && !isGood2) ? Colors.red.shade50 : Colors.orange.shade50);
+                              Color borderColor = isExcluded ? Colors.red.shade500 : ((isGood1 && isGood2) ? Colors.green.shade500 : (!isGood1 && !isGood2) ? Colors.red.shade500 : Colors.orange.shade500);
+                              Color textColor = isExcluded ? Colors.red.shade900 : ((isGood1 && isGood2) ? Colors.green.shade900 : (!isGood1 && !isGood2) ? Colors.red.shade900 : Colors.orange.shade900);
 
                               return Container(
                                 padding: const EdgeInsets.all(16),
@@ -569,6 +570,18 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                                 child: Column(
                                   children: [
                                     Text('${AppLocale.l('selectedDayNak')}: ${trAll(knNak[dinaIdx])}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
+                                    if (isExcluded) ...[  
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.orange.shade100,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: Colors.orange.shade400),
+                                        ),
+                                        child: Text('⚠️ ${AppLocale.l('excludedNak')}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.orange.shade900)),
+                                      ),
+                                    ],
                                     const SizedBox(height: 12),
                                     Row(
                                       children: [
