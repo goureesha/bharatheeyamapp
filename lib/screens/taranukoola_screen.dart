@@ -1244,7 +1244,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
             Text(headerText, style: TextStyle(fontWeight: FontWeight.w800, color: headerColor, fontSize: 14), softWrap: true),
             const SizedBox(height: 4),
             Text('${AppLocale.l('needShuddhi')}: ${parts.join(' + ')} ${AppLocale.l('shuddhaLabel')} + ${AppLocale.l('guruAnukoola').split(' ')[0]} ${AppLocale.l('anukoola')}',
-                style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w500), softWrap: true, maxLines: 3),
+                style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w500), softWrap: true),
           ]),
         ),
         ...windows.asMap().entries.map((entry) {
