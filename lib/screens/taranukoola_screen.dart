@@ -527,9 +527,10 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                           bool isExcluded = _excludeNakshatras && _excludedNakIndices.contains(dinaIdx);
                           
                           if (!_isTwoPersonMode) {
-                              Color bgColor = isGood1 ? Colors.green.shade50 : Colors.red.shade50;
-                              Color borderColor = isGood1 ? Colors.green.shade500 : Colors.red.shade500;
-                              Color textColor = isGood1 ? Colors.green.shade900 : Colors.red.shade900;
+                              // If excluded, always show RED
+                              Color bgColor = isExcluded ? Colors.red.shade50 : (isGood1 ? Colors.green.shade50 : Colors.red.shade50);
+                              Color borderColor = isExcluded ? Colors.red.shade500 : (isGood1 ? Colors.green.shade500 : Colors.red.shade500);
+                              Color textColor = isExcluded ? Colors.red.shade900 : (isGood1 ? Colors.green.shade900 : Colors.red.shade900);
                               
                               return Container(
                                 padding: const EdgeInsets.all(16),
@@ -538,8 +539,16 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                                   children: [
                                     Text('${AppLocale.l('selectedDayNak')}: ${trAll(knNak[dinaIdx])}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
                                     if (isExcluded) ...[  
-                                      const SizedBox(height: 4),
-                                      Text('⚠️ ${AppLocale.l('excludedNak')}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.orange.shade700)),
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.orange.shade100,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: Colors.orange.shade400),
+                                        ),
+                                        child: Text('⚠️ ${AppLocale.l('excludedNak')}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.orange.shade900)),
+                                      ),
                                     ],
                                     const SizedBox(height: 8),
                                     Text(_taras[tara1], style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: textColor), textAlign: TextAlign.center),
@@ -791,7 +800,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
 
     String nakText = rules.allowedNakshatras == null
         ? AppLocale.l('allNak')
-        : rules.allowedNakshatras!.map((i) => trAll(knNak[i]).split(' ')[0]).join(', ');
+        : rules.allowedNakshatras!.map((i) => trAll(knNak[i])).join(', ');
     String varaText = rules.allowedVaras == null
         ? AppLocale.l('allVara')
         : rules.allowedVaras!.map((i) => trAll(knVara[i])).join(', ');
