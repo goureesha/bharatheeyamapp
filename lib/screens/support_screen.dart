@@ -4,15 +4,61 @@ import 'package:url_launcher/url_launcher.dart';
 import '../widgets/common.dart';
 import '../services/google_auth_service.dart';
 import '../services/device_binding_service.dart';
+import '../services/subscription_service.dart';
+import '../main.dart';
 
-class SupportScreen extends StatelessWidget {
+class SupportScreen extends StatefulWidget {
   const SupportScreen({super.key});
 
+  @override
+  State<SupportScreen> createState() => _SupportScreenState();
+}
+
+class _SupportScreenState extends State<SupportScreen> {
   static const _supportPhone = '+918762629847';
   static const _supportEmail = 'goureesh3690@gmail.com';
+  bool _signingIn = false;
+
+  Future<void> _handleGmailSignIn() async {
+    setState(() => _signingIn = true);
+    try {
+      final ok = await GoogleAuthService.signIn();
+      if (ok && mounted) {
+        // After sign-in, register device binding + check manual premium
+        await DeviceBindingService.checkBinding();
+        await SubscriptionService.checkManualPremium();
+        await SubscriptionService.syncTrialWithFirestore();
+        deviceBindingNotifier.value = await DeviceBindingService.checkBinding();
+
+        if (SubscriptionService.hasAccess && mounted) {
+          // User has access now — refresh the whole app
+          deviceBindingNotifier.value = true;
+          // Force app rebuild by notifying
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('✅ ${GoogleAuthService.userEmail} — signed in!'), backgroundColor: Colors.green),
+          );
+          // Trigger rebuild
+          (context as Element).markNeedsBuild();
+        } else if (mounted) {
+          setState(() {});
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Signed in as ${GoogleAuthService.userEmail}'), backgroundColor: kPurple2),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign-in failed: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+    if (mounted) setState(() => _signingIn = false);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isSignedIn = GoogleAuthService.isSignedIn;
     final email = GoogleAuthService.userEmail ?? 'Not signed in';
 
     return Scaffold(
@@ -62,6 +108,51 @@ class SupportScreen extends StatelessWidget {
                   ]),
                 ),
                 const SizedBox(height: 24),
+
+                // ── Gmail Sign-In (if not signed in) ──
+                if (!isSignedIn) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [kPurple2.withOpacity(0.08), kOrange.withOpacity(0.08)],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: kPurple2.withOpacity(0.3)),
+                    ),
+                    child: Column(children: [
+                      Icon(Icons.account_circle, color: kPurple2, size: 48),
+                      const SizedBox(height: 12),
+                      Text('Gmail Login Required',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: kText)),
+                      const SizedBox(height: 4),
+                      Text(AppLocale.l('gmailLoginHint'),
+                        style: TextStyle(fontSize: 12, color: kMuted),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: _signingIn ? null : _handleGmailSignIn,
+                          icon: _signingIn
+                            ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                            : const Icon(Icons.login),
+                          label: Text(_signingIn ? 'Signing in...' : 'Sign in with Google',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: kPurple2,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                      ),
+                    ]),
+                  ),
+                  const SizedBox(height: 16),
+                ],
 
                 // Your details card
                 AppCard(
@@ -160,6 +251,38 @@ class SupportScreen extends StatelessWidget {
                     },
                   ),
                 ),
+
+                // ── Re-check Premium button (if signed in but locked out) ──
+                if (isSignedIn) ...[
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        await SubscriptionService.checkManualPremium();
+                        if (SubscriptionService.hasAccess && mounted) {
+                          deviceBindingNotifier.value = true;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('✅ Access restored!'), backgroundColor: Colors.green),
+                          );
+                        } else if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('No active access found'), backgroundColor: Colors.orange),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Re-check Access',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: kPurple2,
+                        side: BorderSide(color: kPurple2),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             )),
           ),

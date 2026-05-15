@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/home_screen.dart';
@@ -274,11 +275,13 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
               ),
               home: !InstallChecker.isFromPlayStore
                 ? const _SideloadBlockedScreen()
-                : !isBound
-                  ? const _DeviceMismatchScreen()
-                  : SubscriptionService.needsInternetVerification
-                    ? const _InternetRequiredScreen()
-                    : SubscriptionService.hasAccess ? const HomeScreen() : const SupportScreen(),
+                : !GoogleAuthService.isSignedIn && !kIsWeb
+                  ? const _GmailRequiredScreen()
+                  : !isBound
+                    ? const _DeviceMismatchScreen()
+                    : SubscriptionService.needsInternetVerification
+                      ? const _InternetRequiredScreen()
+                      : SubscriptionService.hasAccess ? const HomeScreen() : const SupportScreen(),
             );
           },
         );
@@ -477,6 +480,115 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
             ),
         ]),
       )),
+    );
+  }
+}
+
+/// Shown when user has never signed in with Gmail (first-ever app open)
+class _GmailRequiredScreen extends StatefulWidget {
+  const _GmailRequiredScreen();
+  @override
+  State<_GmailRequiredScreen> createState() => _GmailRequiredScreenState();
+}
+
+class _GmailRequiredScreenState extends State<_GmailRequiredScreen> {
+  bool _signingIn = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: kBg,
+      body: SafeArea(
+        child: Center(child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Image.asset('assets/images/logo.png', width: 90, height: 90),
+            const SizedBox(height: 16),
+            Text(AppLocale.l('appName'), style: TextStyle(
+              fontSize: 28, fontWeight: FontWeight.w900, color: kOrange,
+              letterSpacing: 1.5,
+            )),
+            const SizedBox(height: 4),
+            Text(AppLocale.l('vedicAstrology'), style: TextStyle(
+              fontSize: 14, color: kMuted, letterSpacing: 0.5,
+            )),
+            const SizedBox(height: 40),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [kPurple2.withOpacity(0.08), kOrange.withOpacity(0.06)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: kPurple2.withOpacity(0.3)),
+              ),
+              child: Column(children: [
+                Icon(Icons.account_circle_rounded, color: kPurple2, size: 64),
+                const SizedBox(height: 16),
+                Text(AppLocale.l('gmailRequired'), style: TextStyle(
+                  fontSize: 20, fontWeight: FontWeight.w800, color: kText)),
+                const SizedBox(height: 8),
+                Text('Gmail Login Required', style: TextStyle(
+                  fontSize: 14, color: kMuted)),
+                const SizedBox(height: 16),
+                Text(AppLocale.l('gmailRequiredMsg'),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: kText, height: 1.6)),
+                const SizedBox(height: 8),
+                Text('Sign in with your Google account to continue using the app.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: kMuted, height: 1.5)),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _signingIn ? null : () async {
+                      setState(() => _signingIn = true);
+                      try {
+                        final ok = await GoogleAuthService.signIn();
+                        if (ok && mounted) {
+                          // Complete post-login tasks
+                          final bound = await DeviceBindingService.checkBinding();
+                          deviceBindingNotifier.value = bound;
+                          await SubscriptionService.syncTrialWithFirestore();
+                          await SubscriptionService.checkManualPremium();
+                          // Force full rebuild
+                          if (mounted) deviceBindingNotifier.notifyListeners();
+                        } else if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Sign-in cancelled'), backgroundColor: Colors.orange),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Sign-in error: \$e'), backgroundColor: Colors.red),
+                          );
+                        }
+                      }
+                      if (mounted) setState(() => _signingIn = false);
+                    },
+                    icon: _signingIn
+                      ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Icon(Icons.login),
+                    label: Text(_signingIn ? 'Signing in...' : 'Sign in with Google',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kPurple2,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 3,
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+          ]),
+        )),
+      ),
     );
   }
 }
