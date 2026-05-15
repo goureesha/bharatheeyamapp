@@ -748,28 +748,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
         const SizedBox(height: 12),
         _buildEventRulesCard(rules),
 
-        // ── Varjya Nakshatra Warning ──
-        if (rules.allowedNakshatras != null && !rules.allowedNakshatras!.contains(pan.nakshatraIndex))
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                border: Border.all(color: Colors.red.shade400, width: 1.5),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(children: [
-                Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 22),
-                const SizedBox(width: 10),
-                Expanded(child: Text(
-                  '⚠️ ${trAll(pan.nakshatra)} — ${AppLocale.l('varjyaNakWarning')}',
-                  style: TextStyle(color: Colors.red.shade900, fontWeight: FontWeight.w700, fontSize: 13),
-                  softWrap: true,
-                )),
-              ]),
-            ),
-          ),
 
         // ── Panchanga Shuddhi ──
         const SizedBox(height: 12),
