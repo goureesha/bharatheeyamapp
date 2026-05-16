@@ -95,16 +95,13 @@ class DeviceBindingService {
       data['trialStartedAt'] = Timestamp.fromDate(SubscriptionService.trialStartDate!);
     }
 
-    // Manual premium status (written by app, manualPremium flag is admin-only)
-    data['premiumActive'] = SubscriptionService.manualPremium;
-    if (SubscriptionService.manualPremiumExpiry != null) {
-      final remaining = SubscriptionService.manualPremiumExpiry!.difference(DateTime.now()).inDays;
-      data['premiumDaysRemaining'] = remaining > 0 ? remaining : 0;
-    } else {
-      data['premiumDaysRemaining'] = 0;
-    }
+    // NOTE: Do NOT write premiumActive or premiumDaysRemaining here.
+    // The manualPremium field in Firestore is admin-controlled (read-only for the app).
+    // Writing premiumActive from the app was overwriting admin revocations.
 
-    // Clean up old Play Store billing fields
+    // Clean up old/stale fields that the app should NOT control
+    data['premiumActive'] = FieldValue.delete();
+    data['premiumDaysRemaining'] = FieldValue.delete();
     data['subscribedAt'] = FieldValue.delete();
     data['subscriptionDaysRemaining'] = FieldValue.delete();
     data['hasSubscription'] = FieldValue.delete();
@@ -473,8 +470,7 @@ class DeviceBindingService {
         data['buildNumber'] = pkgInfo.buildNumber;
       } catch (_) {}
 
-      // Premium status
-      data['manualPremium'] = SubscriptionService.manualPremium;
+      // NOTE: Do not write premium status — admin-controlled via device_bindings only
 
       final docRef = FirebaseFirestore.instance
           .collection('installs')
