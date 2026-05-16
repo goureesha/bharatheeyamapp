@@ -47,23 +47,32 @@ class SubscriptionService {
   }
 
   /// True if the user hasn't connected to the internet within the allowed window.
-  /// ALL users (including trial) must connect every 24 hours.
-  /// After 10 days offline, even cached premium is invalidated.
+  /// - Trial users: NO grace period — must always have internet.
+  /// - Premium users: 10-day offline grace, but must connect every 24 hours.
   static bool get needsInternetVerification {
     if (kIsWeb) return false;
     if (lastOnlineCheck == null) return true; // Never verified
 
     final now = TrustedTimeService.now();
     final hoursSinceCheck = now.difference(lastOnlineCheck!).inHours;
-    final daysSinceCheck = now.difference(lastOnlineCheck!).inDays;
 
-    // Hard limit: 10-day offline grace period expired → must connect
+    // Trial users get NO offline grace — must always have internet
+    if (!manualPremium && !hasSubscription) {
+      if (hoursSinceCheck >= 1) {
+        debugPrint('🔒 Trial user offline > 1 hour. No grace period. Must connect.');
+        return true;
+      }
+      return false;
+    }
+
+    // Premium users: 10-day hard grace limit
+    final daysSinceCheck = now.difference(lastOnlineCheck!).inDays;
     if (daysSinceCheck >= _offlineGraceDays) {
       debugPrint('🔒 Offline grace period expired ($daysSinceCheck days). Must connect.');
       return true;
     }
 
-    // Soft limit: must connect at least once every 24 hours
+    // Premium users: must connect at least once every 24 hours
     if (hoursSinceCheck >= _maxOfflineHours) {
       debugPrint('🔒 Offline > $_maxOfflineHours hours ($hoursSinceCheck h). Must connect.');
       return true;
