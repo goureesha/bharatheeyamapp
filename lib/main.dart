@@ -36,9 +36,9 @@ Future<void> main() async {
   // TesterService.checkTesterStatus() which uses FirebaseFirestore.instance
   await FirebaseService.init();
 
-  // Run ALL critical startup tasks in PARALLEL (not sequentially)
-  // Including silent sign-in + device binding check — these MUST complete
-  // before the first frame so we can show the correct screen
+  // Phase 1: Run subscription check + other tasks in parallel.
+  // Auth/binding MUST wait for subscription to finish so premium state is accurate
+  // when device details are written to Firestore.
   await Future.wait([
     _initEphemeris(),
     SubscriptionService.initialize(),
@@ -48,8 +48,11 @@ Future<void> main() async {
     LocationService.init(),
     TesterService.init(),
     InstallChecker.check(),
-    _initAuthAndBinding(), // ← Sign in + device binding check BEFORE first frame
   ]);
+
+  // Phase 2: Now that subscription state is resolved, run auth + binding.
+  // This ensures premiumDaysRemaining written to Firestore is accurate.
+  await _initAuthAndBinding();
 
   // Now show the app — binding state is already resolved
   runApp(const BharatheeyamApp());

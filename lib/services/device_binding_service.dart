@@ -95,13 +95,17 @@ class DeviceBindingService {
       data['trialStartedAt'] = Timestamp.fromDate(SubscriptionService.trialStartDate!);
     }
 
-    // NOTE: Do NOT write premiumActive or premiumDaysRemaining here.
-    // The manualPremium field in Firestore is admin-controlled (read-only for the app).
-    // Writing premiumActive from the app was overwriting admin revocations.
+    // NOTE: Do NOT write premiumActive — it was overwriting admin revocations.
+    // premiumDaysRemaining is informational only (safe to write, runs after subscription check).
+    if (SubscriptionService.manualPremiumExpiry != null) {
+      final remaining = SubscriptionService.manualPremiumExpiry!.difference(DateTime.now()).inDays;
+      data['premiumDaysRemaining'] = remaining > 0 ? remaining : 0;
+    } else {
+      data['premiumDaysRemaining'] = SubscriptionService.manualPremium ? -1 : 0; // -1 = lifetime
+    }
 
-    // Clean up old/stale fields that the app should NOT control
+    // Clean up old/stale fields
     data['premiumActive'] = FieldValue.delete();
-    data['premiumDaysRemaining'] = FieldValue.delete();
     data['subscribedAt'] = FieldValue.delete();
     data['subscriptionDaysRemaining'] = FieldValue.delete();
     data['hasSubscription'] = FieldValue.delete();
