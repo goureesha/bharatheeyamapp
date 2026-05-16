@@ -14,7 +14,8 @@ class SubscriptionService {
 
   // ── Constants ──
   static const int _trialMinutes = 30;
-  static const int _maxOfflineHours = 24;
+  static const int _maxOfflineHours = 24;       // Must connect every 24h
+  static const int _offlineGraceDays = 10;      // Max offline grace: 10 days
 
   // ── State ──
   static bool hasSubscription = false;
@@ -30,7 +31,7 @@ class SubscriptionService {
   /// True if the user has access (manual premium OR trial active)
   static bool get hasAccess {
     if (kIsWeb) return true;
-    // If offline > 24 hours → no access (must connect)
+    // Must connect to internet every 24 hours — no exceptions
     if (needsInternetVerification) return false;
     if (manualPremium) {
       // Even offline, check local expiry date — lock out immediately when expired
@@ -45,13 +46,30 @@ class SubscriptionService {
     return hasSubscription || isTrialActive;
   }
 
-  /// True if the user hasn't connected to the internet in > 24 hours
+  /// True if the user hasn't connected to the internet within the allowed window.
+  /// ALL users (including trial) must connect every 24 hours.
+  /// After 10 days offline, even cached premium is invalidated.
   static bool get needsInternetVerification {
     if (kIsWeb) return false;
-    if (isTrialActive) return false; // Don't block during free trial
     if (lastOnlineCheck == null) return true; // Never verified
-    final hoursSinceCheck = TrustedTimeService.now().difference(lastOnlineCheck!).inHours;
-    return hoursSinceCheck >= _maxOfflineHours;
+
+    final now = TrustedTimeService.now();
+    final hoursSinceCheck = now.difference(lastOnlineCheck!).inHours;
+    final daysSinceCheck = now.difference(lastOnlineCheck!).inDays;
+
+    // Hard limit: 10-day offline grace period expired → must connect
+    if (daysSinceCheck >= _offlineGraceDays) {
+      debugPrint('🔒 Offline grace period expired ($daysSinceCheck days). Must connect.');
+      return true;
+    }
+
+    // Soft limit: must connect at least once every 24 hours
+    if (hoursSinceCheck >= _maxOfflineHours) {
+      debugPrint('🔒 Offline > $_maxOfflineHours hours ($hoursSinceCheck h). Must connect.');
+      return true;
+    }
+
+    return false;
   }
 
   /// Record a successful online verification
@@ -127,13 +145,21 @@ class SubscriptionService {
     // Do NOT load cached subscription status first — always check server.
     // This ensures admin revocations take effect immediately on next app open.
     // If Firestore check succeeds → use server value (authoritative).
-    // If Firestore check fails → fall back to cached value (offline tolerance).
+    // If Firestore check fails → fall back to cached value (10-day offline grace).
     final firestoreChecked = await checkManualPremium();
     if (!firestoreChecked) {
-      // Firestore unreachable — use cached value as fallback
+      // Firestore unreachable — use cached value as offline fallback.
+      // The 10-day grace period is enforced by needsInternetVerification.
+      // After 10 days without successful Firestore check, app locks.
       hasSubscription = prefs.getBool(_subStatusKey) ?? false;
       manualPremium = hasSubscription;
       debugPrint('⚠️ Firestore unreachable — using cached subscription: $hasSubscription');
+      debugPrint('⚠️ Last online check: $lastOnlineCheck');
+      if (lastOnlineCheck != null) {
+        final daysSince = TrustedTimeService.now().difference(lastOnlineCheck!).inDays;
+        final hoursSince = TrustedTimeService.now().difference(lastOnlineCheck!).inHours;
+        debugPrint('⚠️ Offline for $daysSince days ($hoursSince hours). Grace: $_offlineGraceDays days.');
+      }
     }
   }
 

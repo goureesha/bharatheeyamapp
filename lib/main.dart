@@ -445,6 +445,18 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12, color: kMuted, height: 1.5),
           ),
+          if (SubscriptionService.lastOnlineCheck != null) ...[
+            const SizedBox(height: 12),
+            Builder(builder: (_) {
+              final hoursSince = TrustedTimeService.now().difference(SubscriptionService.lastOnlineCheck!).inHours;
+              final graceDaysLeft = 10 - TrustedTimeService.now().difference(SubscriptionService.lastOnlineCheck!).inDays;
+              return Text(
+                'Last verified: ${hoursSince}h ago  •  Grace: ${graceDaysLeft > 0 ? graceDaysLeft : 0} days left',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 11, color: Colors.orange[300], fontWeight: FontWeight.w600),
+              );
+            }),
+          ],
           const SizedBox(height: 24),
           if (_checking)
             CircularProgressIndicator(color: kPurple2)
