@@ -95,17 +95,13 @@ class DeviceBindingService {
       data['trialStartedAt'] = Timestamp.fromDate(SubscriptionService.trialStartDate!);
     }
 
-    // NOTE: Do NOT write premiumActive — it was overwriting admin revocations.
-    // premiumDaysRemaining is informational only (safe to write, runs after subscription check).
-    if (SubscriptionService.manualPremiumExpiry != null) {
-      final remaining = SubscriptionService.manualPremiumExpiry!.difference(DateTime.now()).inDays;
-      data['premiumDaysRemaining'] = remaining > 0 ? remaining : 0;
-    } else {
-      data['premiumDaysRemaining'] = SubscriptionService.manualPremium ? -1 : 0; // -1 = lifetime
-    }
+    // NOTE: Do NOT write premiumActive or premiumDaysRemaining from the app.
+    // Only manualPremium (admin-set) controls access.
+    // Writing these fields from the app was causing lockout failures.
 
-    // Clean up old/stale fields
+    // Clean up all stale/app-written fields — admin uses manualPremium only
     data['premiumActive'] = FieldValue.delete();
+    data['premiumDaysRemaining'] = FieldValue.delete();
     data['subscribedAt'] = FieldValue.delete();
     data['subscriptionDaysRemaining'] = FieldValue.delete();
     data['hasSubscription'] = FieldValue.delete();
