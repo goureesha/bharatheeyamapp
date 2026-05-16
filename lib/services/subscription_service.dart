@@ -108,12 +108,9 @@ class SubscriptionService {
 
   /// App status text for UI display
   static String get statusText {
-    if (manualPremium) {
-      if (manualPremiumExpiry != null) {
-        final days = manualPremiumExpiry!.difference(TrustedTimeService.now()).inDays;
-        return 'Beta Access ✅ ($days ${AppLocale.l('daysRemaining')})';
-      }
-      return 'Beta Access ✅';
+    if (manualPremium && manualPremiumExpiry != null) {
+      final days = manualPremiumExpiry!.difference(TrustedTimeService.now()).inDays;
+      return 'Beta Access ✅ ($days ${AppLocale.l('daysRemaining')})';
     }
     if (hasSubscription) {
       return '${AppLocale.l('premiumActive')}';
@@ -258,7 +255,7 @@ class SubscriptionService {
       final isPremium = data['manualPremium'] == true;
 
       if (isPremium) {
-        // Check expiry if set
+        // manualPremiumExpiry is REQUIRED — no lifetime access
         final expiryTs = data['manualPremiumExpiry'];
         if (expiryTs != null && expiryTs is Timestamp) {
           final expiryDate = expiryTs.toDate();
@@ -282,15 +279,20 @@ class SubscriptionService {
             return true;
           }
           manualPremiumExpiry = expiryDate;
+          manualPremium = true;
+          hasSubscription = true;
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool(_subStatusKey, true);
+          debugPrint('✅ Manual premium ACTIVE for $email (expires: $expiryDate)');
         } else {
-          manualPremiumExpiry = null; // Lifetime
+          // manualPremium=true but NO expiry set → deny access
+          manualPremium = false;
+          manualPremiumExpiry = null;
+          hasSubscription = false;
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool(_subStatusKey, false);
+          debugPrint('🔒 manualPremium=true but NO expiry set — access denied');
         }
-
-        manualPremium = true;
-        hasSubscription = true;
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool(_subStatusKey, true);
-        debugPrint('✅ Manual premium ACTIVE for $email');
       } else {
         manualPremium = false;
         manualPremiumExpiry = null;
