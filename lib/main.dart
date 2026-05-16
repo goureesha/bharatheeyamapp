@@ -154,9 +154,12 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
         return ValueListenableBuilder<bool>(
           valueListenable: deviceBindingNotifier,
           builder: (context, isBound, child) {
+            return ValueListenableBuilder<int>(
+              valueListenable: SubscriptionService.accessChangeNotifier,
+              builder: (context, accessVer, child) {
             return MaterialApp(
               navigatorKey: navigatorKey,
-              key: ValueKey('theme_${themeIndex}_bound_$isBound'),
+              key: ValueKey('theme_${themeIndex}_bound_${isBound}_acc_$accessVer'),
               title: AppLocale.l('appName'),
               debugShowCheckedModeBanner: false,
               locale: const Locale('en', 'IN'),
@@ -283,6 +286,8 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                       ? const _InternetRequiredScreen()
                       : SubscriptionService.hasAccess ? const HomeScreen() : const SupportScreen(),
             );
+          },
+        );
           },
         );
       },

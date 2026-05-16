@@ -15,6 +15,7 @@ class SubscriptionService {
   // ── Constants ──
   static const int _trialMinutes = 30;
   static const int _maxOfflineHours = 24;
+  static const int _recheckIntervalMinutes = 5; // Re-check Firestore every 5 minutes
 
   // ── State ──
   static bool hasSubscription = false;
@@ -22,6 +23,13 @@ class SubscriptionService {
   static DateTime? manualPremiumExpiry;
   static DateTime? trialStartDate;
   static DateTime? lastOnlineCheck;
+
+  // ── Periodic re-check timer ──
+  static Timer? _recheckTimer;
+
+  /// Notifier that fires when access status changes (revoked or granted).
+  /// main.dart listens to this to rebuild the UI and show SupportScreen.
+  static final ValueNotifier<int> accessChangeNotifier = ValueNotifier<int>(0);
 
   // ════════════════════════════════════════════════
   // COMPUTED PROPERTIES FOR UI
@@ -128,9 +136,46 @@ class SubscriptionService {
     // Check manual premium from Firestore (admin-set)
     // If successful, this also counts as an online check
     await checkManualPremium();
+
+    // Start periodic re-check so revoked access takes effect without app restart
+    _startPeriodicRecheck();
   }
 
-  static void dispose() {}
+  static void dispose() {
+    _recheckTimer?.cancel();
+    _recheckTimer = null;
+  }
+
+  // ════════════════════════════════════════════════
+  // PERIODIC RE-CHECK (detects server-side revocation)
+  // ════════════════════════════════════════════════
+
+  /// Starts a timer that re-checks Firestore every N minutes.
+  /// If manualPremium is revoked server-side, this will detect it and
+  /// trigger a UI rebuild to lock out the user.
+  static void _startPeriodicRecheck() {
+    _recheckTimer?.cancel();
+    _recheckTimer = Timer.periodic(
+      Duration(minutes: _recheckIntervalMinutes),
+      (_) => _periodicAccessCheck(),
+    );
+    debugPrint('🔄 Periodic access re-check started (every $_recheckIntervalMinutes min)');
+  }
+
+  static Future<void> _periodicAccessCheck() async {
+    if (kIsWeb) return;
+    if (!GoogleAuthService.isSignedIn) return;
+
+    final hadAccess = hasAccess;
+    await checkManualPremium();
+    final nowHasAccess = hasAccess;
+
+    if (hadAccess != nowHasAccess) {
+      debugPrint('🔒 Access status changed: $hadAccess → $nowHasAccess — triggering UI rebuild');
+      // Bump the notifier to trigger ValueListenableBuilder rebuild in main.dart
+      accessChangeNotifier.value++;
+    }
+  }
 
   // ════════════════════════════════════════════════
   // FIRESTORE TRIAL SYNC (prevents trial reset on reinstall)
@@ -251,6 +296,7 @@ class SubscriptionService {
         hasSubscription = false;
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool(_subStatusKey, false);
+        debugPrint('🔒 Manual premium REVOKED for $email');
       }
     } catch (e) {
       debugPrint('Manual premium check error: $e');
