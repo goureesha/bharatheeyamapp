@@ -15,7 +15,6 @@ class SubscriptionService {
   // ── Constants ──
   static const int _trialMinutes = 30;
   static const int _maxOfflineHours = 24;
-  static const int _recheckIntervalMinutes = 5; // Re-check Firestore every 5 minutes
 
   // ── State ──
   static bool hasSubscription = false;
@@ -23,13 +22,6 @@ class SubscriptionService {
   static DateTime? manualPremiumExpiry;
   static DateTime? trialStartDate;
   static DateTime? lastOnlineCheck;
-
-  // ── Periodic re-check timer ──
-  static Timer? _recheckTimer;
-
-  /// Notifier that fires when access status changes (revoked or granted).
-  /// main.dart listens to this to rebuild the UI and show SupportScreen.
-  static final ValueNotifier<int> accessChangeNotifier = ValueNotifier<int>(0);
 
   // ════════════════════════════════════════════════
   // COMPUTED PROPERTIES FOR UI
@@ -107,15 +99,13 @@ class SubscriptionService {
   }
 
   // ════════════════════════════════════════════════
-  // INITIALIZATION
+  // INITIALIZATION — runs on EVERY app open
   // ════════════════════════════════════════════════
 
   static Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Load cached state
-    hasSubscription = prefs.getBool(_subStatusKey) ?? false;
-
+    // Load trial start (for trial-only logic)
     final trialTs = prefs.getInt(_trialStartKey);
     if (trialTs != null) {
       trialStartDate = DateTime.fromMillisecondsSinceEpoch(trialTs);
@@ -133,49 +123,21 @@ class SubscriptionService {
 
     if (kIsWeb) return;
 
-    // Check manual premium from Firestore (admin-set)
-    // If successful, this also counts as an online check
-    await checkManualPremium();
-
-    // Start periodic re-check so revoked access takes effect without app restart
-    _startPeriodicRecheck();
-  }
-
-  static void dispose() {
-    _recheckTimer?.cancel();
-    _recheckTimer = null;
-  }
-
-  // ════════════════════════════════════════════════
-  // PERIODIC RE-CHECK (detects server-side revocation)
-  // ════════════════════════════════════════════════
-
-  /// Starts a timer that re-checks Firestore every N minutes.
-  /// If manualPremium is revoked server-side, this will detect it and
-  /// trigger a UI rebuild to lock out the user.
-  static void _startPeriodicRecheck() {
-    _recheckTimer?.cancel();
-    _recheckTimer = Timer.periodic(
-      Duration(minutes: _recheckIntervalMinutes),
-      (_) => _periodicAccessCheck(),
-    );
-    debugPrint('🔄 Periodic access re-check started (every $_recheckIntervalMinutes min)');
-  }
-
-  static Future<void> _periodicAccessCheck() async {
-    if (kIsWeb) return;
-    if (!GoogleAuthService.isSignedIn) return;
-
-    final hadAccess = hasAccess;
-    await checkManualPremium();
-    final nowHasAccess = hasAccess;
-
-    if (hadAccess != nowHasAccess) {
-      debugPrint('🔒 Access status changed: $hadAccess → $nowHasAccess — triggering UI rebuild');
-      // Bump the notifier to trigger ValueListenableBuilder rebuild in main.dart
-      accessChangeNotifier.value++;
+    // ── CRITICAL: Check Firestore on EVERY app open ──
+    // Do NOT load cached subscription status first — always check server.
+    // This ensures admin revocations take effect immediately on next app open.
+    // If Firestore check succeeds → use server value (authoritative).
+    // If Firestore check fails → fall back to cached value (offline tolerance).
+    final firestoreChecked = await checkManualPremium();
+    if (!firestoreChecked) {
+      // Firestore unreachable — use cached value as fallback
+      hasSubscription = prefs.getBool(_subStatusKey) ?? false;
+      manualPremium = hasSubscription;
+      debugPrint('⚠️ Firestore unreachable — using cached subscription: $hasSubscription');
     }
   }
+
+  static void dispose() {}
 
   // ════════════════════════════════════════════════
   // FIRESTORE TRIAL SYNC (prevents trial reset on reinstall)
@@ -231,9 +193,10 @@ class SubscriptionService {
 
   /// Check if the admin has manually granted premium for this user.
   /// Reads `manualPremium` flag from Firestore `device_bindings/{email}`.
-  static Future<void> checkManualPremium() async {
+  /// Returns true if Firestore was successfully reached, false on error.
+  static Future<bool> checkManualPremium() async {
     final email = GoogleAuthService.userEmail;
-    if (email == null) return;
+    if (email == null) return false;
 
     try {
       final doc = await FirebaseFirestore.instance
@@ -244,8 +207,13 @@ class SubscriptionService {
 
       if (!doc.exists || doc.data() == null) {
         // Successfully reached Firestore — record online check
+        // No document = no premium
         await recordOnlineCheck();
-        return;
+        manualPremium = false;
+        hasSubscription = false;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool(_subStatusKey, false);
+        return true;
       }
 
       // Successfully reached Firestore — record online check
@@ -275,10 +243,8 @@ class SubscriptionService {
                   .doc(email!.toLowerCase())
                   .update({'manualPremium': false});
               debugPrint('🔄 Firestore updated: manualPremium → false');
-            } catch (_) {
-              // Non-critical — dashboard will catch up on next check
-            }
-            return;
+            } catch (_) {}
+            return true;
           }
           manualPremiumExpiry = expiryDate;
         } else {
@@ -296,11 +262,13 @@ class SubscriptionService {
         hasSubscription = false;
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool(_subStatusKey, false);
-        debugPrint('🔒 Manual premium REVOKED for $email');
+        debugPrint('🔒 Manual premium REVOKED/OFF for $email');
       }
+      return true;
     } catch (e) {
       debugPrint('Manual premium check error: $e');
-      // Don't change state on error — keep whatever was cached
+      // Firestore unreachable — return false so caller knows to use cache
+      return false;
     }
   }
 
