@@ -31,7 +31,7 @@ const RESOURCES = {"assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8
 "assets/packages/sweph/assets/ephe/semo_18.se1": "7d67f3203b5277865235529ed26eaf19",
 "assets/packages/sweph/assets/sweph.wasm": "86bb41f54251a2f842df92029ea5a9f9",
 "assets/AssetManifest.json": "2c34c50e74dfa9c7ae4b1887fc1f89a5",
-"version.json": "72b6dbcf4e903e2fcf58f993a910fb87",
+"version.json": "c9c07bd95b2525189e6ed86cc17bcd53",
 "index.html": "b7df8837a65841ef76449bb0fbf5438c",
 "/": "b7df8837a65841ef76449bb0fbf5438c",
 "flutter.js": "76f08d47ff9f5715220992f993002504",
@@ -48,7 +48,7 @@ const RESOURCES = {"assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8
 "canvaskit/chromium/canvaskit.js": "ba4a8ae1a65ff3ad81c6818fd47e348b",
 "canvaskit/canvaskit.js": "6cfe36b4647fbfa15683e09e7dd366bc",
 "canvaskit/skwasm.wasm": "f0dfd99007f989368db17c9abeed5a49",
-"flutter_bootstrap.js": "d019aa72790e5ac0733130381c8e08a2",
+"flutter_bootstrap.js": "69e78b179cdb018f29bc305fc7935e7e",
 "main.dart.js": "18aad6d66b66ea1173beb4306fccf197",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df"};
 // The application shell files that are downloaded before a service worker can
