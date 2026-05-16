@@ -36,12 +36,11 @@ Future<void> main() async {
   // TesterService.checkTesterStatus() which uses FirebaseFirestore.instance
   await FirebaseService.init();
 
-  // Phase 1: Run subscription check + other tasks in parallel.
-  // Auth/binding MUST wait for subscription to finish so premium state is accurate
-  // when device details are written to Firestore.
+  // Phase 1: Sign in + other init tasks in PARALLEL.
+  // Auth MUST complete before subscription check (needs userEmail).
   await Future.wait([
     _initEphemeris(),
-    SubscriptionService.initialize(),
+    GoogleAuthService.signInSilently(), // ← Auth runs here so email is available
     AppThemes.loadTheme(),
     ChartStyle.loadStyle(),
     AppLocale.loadLang(),
@@ -50,8 +49,11 @@ Future<void> main() async {
     InstallChecker.check(),
   ]);
 
-  // Phase 2: Now that subscription state is resolved, run auth + binding.
-  // This ensures premiumDaysRemaining written to Firestore is accurate.
+  // Phase 2: Now that auth is done, check subscription from Firestore.
+  // This MUST run after sign-in so GoogleAuthService.userEmail is available.
+  await SubscriptionService.initialize();
+
+  // Phase 3: Device binding (needs accurate premium state for premiumDaysRemaining).
   await _initAuthAndBinding();
 
   // Now show the app — binding state is already resolved
@@ -75,11 +77,12 @@ Future<void> _initEphemeris() async {
 /// Notifier for device binding status — triggers UI rebuild when binding changes
 final ValueNotifier<bool> deviceBindingNotifier = ValueNotifier<bool>(true);
 
-/// Sign in silently and check device binding BEFORE the app renders.
+/// Check device binding BEFORE the app renders.
+/// Auth (signInSilently) already completed in Phase 1.
 /// This ensures the correct screen is shown on the very first frame.
 Future<void> _initAuthAndBinding() async {
   try {
-    await GoogleAuthService.signInSilently();
+    // Auth already done in Phase 1 — just do binding + trial sync
     if (GoogleAuthService.isSignedIn) {
       final bound = await DeviceBindingService.checkBinding();
       deviceBindingNotifier.value = bound;
