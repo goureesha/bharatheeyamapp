@@ -1690,35 +1690,17 @@ class _DashboardScreenState extends State<DashboardScreen>
     final usePlace = _prastutaPlace.isNotEmpty ? _prastutaPlace : LocationService.place;
     showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
     try {
-      // Convert device local time to UTC, then to the target timezone's local time
-      // This avoids any mismatch between device timezone and calculation timezone
-      final utcNow = now.toUtc();
-      final targetLocalHour = utcNow.hour + utcNow.minute / 60.0 + utcNow.second / 3600.0 + useTz;
-      // Adjust day if target local hour wraps past midnight
-      int adjYear = utcNow.year;
-      int adjMonth = utcNow.month;
-      int adjDay = utcNow.day;
-      double adjHour = targetLocalHour;
-      if (adjHour >= 24.0) {
-        adjHour -= 24.0;
-        final adjDate = DateTime.utc(adjYear, adjMonth, adjDay).add(const Duration(days: 1));
-        adjYear = adjDate.year;
-        adjMonth = adjDate.month;
-        adjDay = adjDate.day;
-      } else if (adjHour < 0) {
-        adjHour += 24.0;
-        final adjDate = DateTime.utc(adjYear, adjMonth, adjDay).subtract(const Duration(days: 1));
-        adjYear = adjDate.year;
-        adjMonth = adjDate.month;
-        adjDay = adjDate.day;
-      }
+      // Same method as InputScreen: pass local time directly.
+      // The calculator internally does (hour24 - hourUtcOffset) to get UTC.
+      final localHour = now.hour + now.minute / 60.0 + now.second / 3600.0;
+
       // Use same ayanamsa & node settings as the birth chart
       final ayanamsa = widget.extraInfo['ayanamsa'] ?? 'lahiri';
       final trueNode = (widget.extraInfo['nodeMode'] ?? 'mean') == 'true';
       final result = await AstroCalculator.calculate(
-        year: adjYear, month: adjMonth, day: adjDay,
+        year: now.year, month: now.month, day: now.day,
         hourUtcOffset: useTz,
-        hour24: adjHour,
+        hour24: localHour,
         lat: useLat, lon: useLon,
         ayanamsaMode: ayanamsa,
         trueNode: trueNode,
