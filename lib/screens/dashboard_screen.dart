@@ -98,6 +98,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   late TabController _tabCtrl;
   String _notes = '';
   final _newNoteController = TextEditingController();
+  int _resumeKey = 0; // Incremented on app resume to force full repaint
   Map<String, int> _aroodhas = {};
   int? _janmaNakshatraIdx;
   int? _dinaNakshatraIdx;
@@ -214,9 +215,15 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Force rebuild on resume — fixes blank kundali charts on Android tablets
+    // Force full repaint on resume — fixes blank kundali charts on Android
+    // Incrementing _resumeKey changes the KeyedSubtree key, which forces
+    // Flutter to discard and recreate the entire widget subtree, ensuring
+    // all Text widgets and chart canvases are properly repainted after the
+    // Skia rendering surface is restored.
     if (state == AppLifecycleState.resumed && mounted) {
-      setState(() {});
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) setState(() => _resumeKey++);
+      });
     }
   }
   Future<void> _loadJyotishiDetails() async {
@@ -1297,7 +1304,9 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBg,
-      body: SafeArea(
+      body: KeyedSubtree(
+        key: ValueKey(_resumeKey),
+        child: SafeArea(
         child: Column(
           children: [
             // Minimal header with back/save
@@ -1448,6 +1457,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
           ],
         ),
+      ),
       ),
     );
   }

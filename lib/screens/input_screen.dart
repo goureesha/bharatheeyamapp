@@ -944,9 +944,10 @@ class _InputScreenState extends State<InputScreen> {
           // Name
           TextField(
             controller: _nameCtrl,
+            style: TextStyle(color: kText),
             decoration: InputDecoration(
               labelText: AppLocale.l('name'),
-              prefixIcon: Icon(Icons.person_outline),
+              prefixIcon: Icon(Icons.person_outline, color: kMuted),
             ),
           ),
           const SizedBox(height: 14),
@@ -1009,6 +1010,7 @@ class _InputScreenState extends State<InputScreen> {
               return TextField(
                 controller: textEditingController,
                 focusNode: focusNode,
+                style: TextStyle(color: kText),
                 decoration: InputDecoration(
                   labelText: AppLocale.l('searchPlace'),
                   prefixIcon: Icon(Icons.search),
@@ -1083,6 +1085,7 @@ class _InputScreenState extends State<InputScreen> {
               flex: 4,
               child: TextField(
                 controller: _latCtrl,
+                style: TextStyle(color: kText),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
                 decoration: InputDecoration(labelText: AppLocale.l('lat'), isDense: true),
               ),
@@ -1092,6 +1095,7 @@ class _InputScreenState extends State<InputScreen> {
               flex: 4,
               child: TextField(
                 controller: _lonCtrl,
+                style: TextStyle(color: kText),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
                 decoration: InputDecoration(labelText: AppLocale.l('lon'), isDense: true),
               ),
@@ -1101,6 +1105,7 @@ class _InputScreenState extends State<InputScreen> {
               flex: 3,
               child: TextField(
                 controller: _tzCtrl,
+                style: TextStyle(color: kText),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
                 decoration: InputDecoration(labelText: AppLocale.l('tzOffset'), isDense: true),
               ),
@@ -1112,7 +1117,7 @@ class _InputScreenState extends State<InputScreen> {
           Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
-              title: Text('⚙️ ${AppLocale.l('advancedSettings')}', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+              title: Text('⚙️ ${AppLocale.l('advancedSettings')}', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: kText)),
               children: [
                 const SizedBox(height: 8),
                 Row(children: [
@@ -1121,7 +1126,7 @@ class _InputScreenState extends State<InputScreen> {
                       value: _ayanamsa,
                       decoration: InputDecoration(labelText: AppLocale.l('ayanamsa')),
                       items: [{'v':'lahiri','l':'Lahiri'},{'v':'raman','l':'Raman'},{'v':'kp','l':'KP'}].map((m) => DropdownMenuItem(
-                        value: m['v']!, child: Text(m['l']!, style: TextStyle()))).toList(),
+                        value: m['v']!, child: Text(m['l']!, style: TextStyle(color: kText)))).toList(),
                       onChanged: (v) => setState(() => _ayanamsa = v!),
                     ),
                   ),
@@ -1131,7 +1136,7 @@ class _InputScreenState extends State<InputScreen> {
                       value: _nodeMode,
                       decoration: InputDecoration(labelText: AppLocale.l('nodeType')),
                       items: [{'v':'true','l':'True Node'},{'v':'mean','l':'Mean Node'}].map((m) => DropdownMenuItem(
-                        value: m['v']!, child: Text(m['l']!, style: TextStyle()))).toList(),
+                        value: m['v']!, child: Text(m['l']!, style: TextStyle(color: kText)))).toList(),
                       onChanged: (v) => setState(() => _nodeMode = v!),
                     ),
                   ),

@@ -267,6 +267,10 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kPurple2, width: 2)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   labelStyle: TextStyle(color: kMuted),
+                  hintStyle: TextStyle(color: kMuted),
+                ),
+                dropdownMenuTheme: DropdownMenuThemeData(
+                  textStyle: TextStyle(color: kText),
                 ),
                 elevatedButtonTheme: ElevatedButtonThemeData(
                   style: ElevatedButton.styleFrom(
