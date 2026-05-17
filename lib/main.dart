@@ -603,7 +603,8 @@ class _OfflineVerifyScreenState extends State<_OfflineVerifyScreen> {
 
   Future<void> _checkConnection() async {
     setState(() => _checking = true);
-    _isOnline = await NetworkService.checkAndInitialize();
+    // Use actual connectivity check — not the cached 48h grace window
+    _isOnline = await NetworkService.isActuallyOnline();
     if (mounted) setState(() => _checking = false);
   }
 

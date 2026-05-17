@@ -4,21 +4,25 @@ import 'package:flutter/foundation.dart';
 
 class NetworkService {
   static const String _timeKey = 'last_online_time';
-  
+
+  /// Pure connectivity check — actually pings the internet.
+  /// Returns true only if the device can reach the network right now.
+  /// No caching, no grace period.
+  static Future<bool> isActuallyOnline() async {
+    try {
+      if (kIsWeb) return true;
+      final response = await http.get(Uri.parse('https://google.com'))
+          .timeout(const Duration(seconds: 3));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<bool> checkAndInitialize() async {
     final prefs = await SharedPreferences.getInstance();
     
-    bool isConnected = false;
-    try {
-      if (kIsWeb) {
-        isConnected = true;
-      } else {
-        final response = await http.get(Uri.parse('https://google.com')).timeout(const Duration(seconds: 3));
-        isConnected = response.statusCode == 200;
-      }
-    } catch (_) {
-      isConnected = false;
-    }
+    final isConnected = await isActuallyOnline();
 
     if (isConnected) {
       await prefs.setString(_timeKey, DateTime.now().toIso8601String());
