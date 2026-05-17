@@ -31,7 +31,7 @@ const RESOURCES = {"assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8
 "assets/packages/sweph/assets/ephe/semo_18.se1": "7d67f3203b5277865235529ed26eaf19",
 "assets/packages/sweph/assets/sweph.wasm": "86bb41f54251a2f842df92029ea5a9f9",
 "assets/AssetManifest.json": "2c34c50e74dfa9c7ae4b1887fc1f89a5",
-"version.json": "f00df50e221e00ff91b2abf1d869a59a",
+"version.json": "b460a7113432889942b5643cf7bf87ae",
 "index.html": "b7df8837a65841ef76449bb0fbf5438c",
 "/": "b7df8837a65841ef76449bb0fbf5438c",
 "flutter.js": "76f08d47ff9f5715220992f993002504",
@@ -48,8 +48,8 @@ const RESOURCES = {"assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8
 "canvaskit/chromium/canvaskit.js": "ba4a8ae1a65ff3ad81c6818fd47e348b",
 "canvaskit/canvaskit.js": "6cfe36b4647fbfa15683e09e7dd366bc",
 "canvaskit/skwasm.wasm": "f0dfd99007f989368db17c9abeed5a49",
-"flutter_bootstrap.js": "5c5ad154b8121d14d596e9bac7578f23",
-"main.dart.js": "1e984e8972f3f68fa059dc28ad7ccde0",
+"flutter_bootstrap.js": "855f332cb924c82bbb6c822b507ea83e",
+"main.dart.js": "dbfe8bdd95e171151fcf0d5967516f9b",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df"};
 // The application shell files that are downloaded before a service worker can
 // start.
