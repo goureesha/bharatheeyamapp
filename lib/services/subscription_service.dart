@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'trusted_time_service.dart';
 import 'google_auth_service.dart';
+import 'offline_access_service.dart';
 import '../widgets/common.dart';
 
 class SubscriptionService {
@@ -28,9 +29,11 @@ class SubscriptionService {
   // COMPUTED PROPERTIES FOR UI
   // ════════════════════════════════════════════════
 
-  /// True if the user has access (manual premium OR trial active)
+  /// True if the user has access (manual premium OR trial active OR active offline claim)
   static bool get hasAccess {
     if (kIsWeb) return true;
+    // If the user has an active offline day claim, grant access regardless of internet
+    if (OfflineAccessService.hasActiveClaim) return true;
     // Must connect to internet every 24 hours — no exceptions
     if (needsInternetVerification) return false;
     if (manualPremium) {
