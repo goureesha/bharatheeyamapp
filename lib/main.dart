@@ -182,17 +182,32 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
     if (state == AppLifecycleState.resumed) {
       // Re-sync NTP clock on resume (updates offset if internet is now available)
       TrustedTimeService.syncWithNtp();
-      // Re-check manual premium + device binding on resume
-      // checkManualPremium also records online check if Firestore is reachable
-      SubscriptionService.checkManualPremium();
       // Sync offline usage when coming back online
       OfflineAccessService.syncToServer();
       OfflineAccessService.clearExpiredClaim();
-      if (GoogleAuthService.isSignedIn) {
-        DeviceBindingService.checkBinding().then((bound) {
-          deviceBindingNotifier.value = bound;
-        });
-        SubscriptionService.syncTrialWithFirestore();
+      // Re-check subscription + device binding on resume.
+      // If access has been revoked (offline too long, premium expired, etc.)
+      // redirect to the root gate screen.
+      _verifyAccessOnResume();
+    }
+  }
+
+  Future<void> _verifyAccessOnResume() async {
+    // checkManualPremium also records online check if Firestore is reachable
+    await SubscriptionService.checkManualPremium();
+    if (GoogleAuthService.isSignedIn) {
+      final bound = await DeviceBindingService.checkBinding();
+      deviceBindingNotifier.value = bound;
+      SubscriptionService.syncTrialWithFirestore();
+    }
+    // If access is now revoked, force navigate to root gate
+    if (!SubscriptionService.hasAccess && !kIsWeb) {
+      final ctx = navigatorKey.currentContext;
+      if (ctx != null) {
+        Navigator.of(ctx).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const BharatheeyamApp()),
+          (_) => false,
+        );
       }
     }
   }
