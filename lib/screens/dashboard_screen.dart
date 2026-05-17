@@ -1690,9 +1690,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     final usePlace = _prastutaPlace.isNotEmpty ? _prastutaPlace : LocationService.place;
     showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
     try {
-      // Same method as InputScreen: pass local time directly.
+      // Same method as InputScreen: pass local time directly (hour + minute, NO seconds — matches birth chart precision).
       // The calculator internally does (hour24 - hourUtcOffset) to get UTC.
-      final localHour = now.hour + now.minute / 60.0 + now.second / 3600.0;
+      final localHour = now.hour + now.minute / 60.0;
 
       // Use same ayanamsa & node settings as the birth chart
       final ayanamsa = widget.extraInfo['ayanamsa'] ?? 'lahiri';
