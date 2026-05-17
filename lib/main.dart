@@ -20,6 +20,7 @@ import 'services/tester_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sweph/sweph.dart' hide kIsWeb;
 import 'core/ephemeris.dart';
+import 'core/calculator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -115,6 +116,42 @@ Future<void> _deferredInit() async {
 
   // Pre-load festival events lazily (non-blocking)
   FestivalCacheService.loadYear(DateTime.now().year);
+
+  // Write sunrise data for the native Android home screen widget.
+  // This ensures the Ghati Clock widget has valid sunrise_hour24 even
+  // if the user has never opened the Vedic Clock screen.
+  _writeSunriseForWidget();
+}
+
+/// Calculate today's sunrise and save to SharedPreferences for native widget
+Future<void> _writeSunriseForWidget() async {
+  try {
+    final now = DateTime.now();
+    final result = await AstroCalculator.calculate(
+      year: now.year, month: now.month, day: now.day,
+      hourUtcOffset: LocationService.tzOffset,
+      hour24: now.hour + now.minute / 60.0,
+      lat: LocationService.lat, lon: LocationService.lon,
+      ayanamsaMode: 'lahiri', trueNode: true,
+    );
+    if (result == null) return;
+
+    // Parse sunrise time from panchanga string (format: "06:23 AM")
+    final srParts = result.panchang.sunrise.split(':');
+    final srHour = double.tryParse(srParts[0].replaceAll(RegExp(r'[^0-9]'), '')) ?? 6;
+    final srMin = double.tryParse(srParts.length > 1 ? srParts[1].replaceAll(RegExp(r'[^0-9]'), '') : '0') ?? 0;
+    final isPM = result.panchang.sunrise.toUpperCase().contains('PM');
+    double sunriseH24 = srHour + srMin / 60.0;
+    // Sunrise is always AM so no PM conversion needed, but guard against edge cases
+    if (isPM && srHour != 12) sunriseH24 += 12;
+    if (!isPM && srHour == 12) sunriseH24 = srMin / 60.0;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('sunrise_hour24', sunriseH24);
+    debugPrint('Widget sunrise_hour24 written: $sunriseH24');
+  } catch (e) {
+    debugPrint('Widget sunrise write failed: $e');
+  }
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
