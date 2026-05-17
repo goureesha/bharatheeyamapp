@@ -193,13 +193,30 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
   }
 
   Future<void> _verifyAccessOnResume() async {
-    // checkManualPremium also records online check if Firestore is reachable
-    await SubscriptionService.checkManualPremium();
+    // Always try to verify with the server, even during active offline claims.
+    // This ensures admin revocations take effect even if the user claimed a day.
+    final serverReached = await SubscriptionService.checkManualPremium();
     if (GoogleAuthService.isSignedIn) {
       final bound = await DeviceBindingService.checkBinding();
       deviceBindingNotifier.value = bound;
       SubscriptionService.syncTrialWithFirestore();
     }
+
+    // If the server was successfully reached and says no access,
+    // the offline claim should NOT override an explicit server revocation.
+    // Clear the claim and kick the user to the gate screen.
+    if (serverReached &&
+        !SubscriptionService.manualPremium &&
+        !SubscriptionService.hasSubscription &&
+        !SubscriptionService.isTrialActive) {
+      // Server confirmed: no premium, no subscription, no trial.
+      // If there's an active offline claim, invalidate it — server authority wins.
+      if (OfflineAccessService.hasActiveClaim) {
+        await OfflineAccessService.clearActiveClaim();
+        debugPrint('🔒 Server revoked access — offline claim invalidated');
+      }
+    }
+
     // If access is now revoked, force navigate to root gate
     if (!SubscriptionService.hasAccess && !kIsWeb) {
       final ctx = navigatorKey.currentContext;

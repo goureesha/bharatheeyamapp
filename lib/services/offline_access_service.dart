@@ -116,6 +116,15 @@ class OfflineAccessService {
     }
   }
 
+  /// Force-clear an active claim (called when server explicitly revokes access).
+  /// Unlike clearExpiredClaim, this clears even if the claim hasn't expired yet.
+  static Future<void> clearActiveClaim() async {
+    _currentClaimStart = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_claimStartKey);
+    debugPrint('OfflineAccess: Active claim force-cleared (server revocation)');
+  }
+
   // ── Server sync (incremental, no overwrites) ──
 
   /// Sync offline usage to Firestore using FieldValue.increment.
