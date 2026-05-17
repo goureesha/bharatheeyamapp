@@ -11,6 +11,8 @@ import 'services/google_auth_service.dart';
 import 'services/install_checker.dart';
 import 'services/device_binding_service.dart';
 import 'services/firebase_service.dart';
+import 'services/offline_access_service.dart';
+import 'services/network_service.dart';
 
 import 'services/festival_cache_service.dart';
 import 'services/location_service.dart';
@@ -52,6 +54,7 @@ Future<void> main() async {
   // Phase 2: Now that auth is done, check subscription from Firestore.
   // This MUST run after sign-in so GoogleAuthService.userEmail is available.
   await SubscriptionService.initialize();
+  await OfflineAccessService.initialize();
 
   // Phase 3: Device binding (needs accurate premium state for premiumDaysRemaining).
   await _initAuthAndBinding();
@@ -89,6 +92,8 @@ Future<void> _initAuthAndBinding() async {
       debugPrint('DeviceBinding: pre-render check result=$bound');
       // Sync trial start with Firestore (prevents trial reset on reinstall)
       await SubscriptionService.syncTrialWithFirestore();
+      // Restore offline day count from server (prevents reset on reinstall)
+      await OfflineAccessService.restoreFromServer();
     }
   } catch (e) {
     debugPrint('Auth/Binding init error: $e');
@@ -143,6 +148,9 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
       // Re-check manual premium + device binding on resume
       // checkManualPremium also records online check if Firestore is reachable
       SubscriptionService.checkManualPremium();
+      // Sync offline usage when coming back online
+      OfflineAccessService.syncToServer();
+      OfflineAccessService.clearExpiredClaim();
       if (GoogleAuthService.isSignedIn) {
         DeviceBindingService.checkBinding().then((bound) {
           deviceBindingNotifier.value = bound;
@@ -282,10 +290,10 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
               home: !InstallChecker.isFromPlayStore
                 ? const _SideloadBlockedScreen()
                 : !GoogleAuthService.isSignedIn && !kIsWeb
-                  ? const _GmailRequiredScreen()
+                  ? const _OfflineVerifyScreen() // Show offline verify instead of Gmail login when offline
                   : !isBound
                     ? const _DeviceMismatchScreen()
-                    : SubscriptionService.needsInternetVerification
+                    : SubscriptionService.needsInternetVerification && !OfflineAccessService.hasActiveClaim
                       ? const _InternetRequiredScreen()
                       : SubscriptionService.hasAccess ? const HomeScreen() : const SupportScreen(),
             );
@@ -498,6 +506,252 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
             ),
         ]),
       )),
+    );
+  }
+}
+
+/// Smart gate: If online → show Google login. If offline → show offline day claim.
+class _OfflineVerifyScreen extends StatefulWidget {
+  const _OfflineVerifyScreen();
+  @override
+  State<_OfflineVerifyScreen> createState() => _OfflineVerifyScreenState();
+}
+
+class _OfflineVerifyScreenState extends State<_OfflineVerifyScreen> {
+  bool _checking = true;
+  bool _isOnline = false;
+  bool _claiming = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkConnection();
+  }
+
+  Future<void> _checkConnection() async {
+    setState(() => _checking = true);
+    _isOnline = await NetworkService.checkAndInitialize();
+    if (mounted) setState(() => _checking = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // While checking connectivity, show loading
+    if (_checking) {
+      return Scaffold(
+        backgroundColor: kBg,
+        body: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Image.asset('assets/images/logo.png', width: 80, height: 80),
+          const SizedBox(height: 24),
+          CircularProgressIndicator(color: kPurple2),
+          const SizedBox(height: 16),
+          Text('Checking connection...', style: TextStyle(color: kMuted)),
+        ])),
+      );
+    }
+
+    // If online, show the normal Gmail login screen
+    if (_isOnline) {
+      return const _GmailRequiredScreen();
+    }
+
+    // OFFLINE — check if user has EVER signed in before
+    // If never signed in (first install), they MUST connect to internet for Gmail login
+    final hasEverSignedIn = SubscriptionService.lastOnlineCheck != null;
+    if (!hasEverSignedIn) {
+      // First-time user, never logged in — cannot use offline days
+      return Scaffold(
+        backgroundColor: kBg,
+        body: SafeArea(
+          child: Center(child: SingleChildScrollView(
+            padding: const EdgeInsets.all(32),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Image.asset('assets/images/logo.png', width: 80, height: 80),
+              const SizedBox(height: 16),
+              Text(AppLocale.l('appName'), style: TextStyle(
+                fontSize: 26, fontWeight: FontWeight.w900, color: kOrange, letterSpacing: 1.5)),
+              const SizedBox(height: 32),
+              Icon(Icons.wifi_off_rounded, color: Colors.orange[400], size: 64),
+              const SizedBox(height: 16),
+              Text(AppLocale.l('internetRequired'), style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.w800, color: kText)),
+              const SizedBox(height: 8),
+              Text('First-time setup requires internet',
+                style: TextStyle(fontSize: 14, color: kMuted)),
+              const SizedBox(height: 16),
+              Text(AppLocale.l('gmailRequiredMsg'),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: kText, height: 1.6)),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: Text(AppLocale.l('retryConnection'),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPurple2, foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+                onPressed: () => _checkConnection(),
+              ),
+            ]),
+          )),
+        ),
+      );
+    }
+
+    // Returning user (has signed in before) — show offline access claim screen
+    final daysLeft = OfflineAccessService.daysRemaining;
+    final hasClaim = OfflineAccessService.hasActiveClaim;
+    final hoursLeft = OfflineAccessService.claimHoursRemaining;
+
+    return Scaffold(
+      backgroundColor: kBg,
+      body: SafeArea(
+        child: Center(child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Image.asset('assets/images/logo.png', width: 80, height: 80),
+            const SizedBox(height: 16),
+            Text(AppLocale.l('appName'), style: TextStyle(
+              fontSize: 26, fontWeight: FontWeight.w900, color: kOrange, letterSpacing: 1.5)),
+            const SizedBox(height: 4),
+            Text('Vedic Astrology', style: TextStyle(fontSize: 13, color: kMuted)),
+            const SizedBox(height: 32),
+
+            // Status card
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [kPurple2.withOpacity(0.08), kOrange.withOpacity(0.06)],
+                  begin: Alignment.topLeft, end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: kPurple2.withOpacity(0.3)),
+              ),
+              child: Column(children: [
+                Icon(Icons.wifi_off_rounded, color: Colors.orange[400], size: 56),
+                const SizedBox(height: 16),
+                Text(AppLocale.l('offlineMode'), style: TextStyle(
+                  fontSize: 20, fontWeight: FontWeight.w800, color: kText)),
+                const SizedBox(height: 4),
+                Text('Offline Access', style: TextStyle(fontSize: 14, color: kMuted)),
+                const SizedBox(height: 16),
+
+                if (hasClaim) ...[
+                  // Active claim — show remaining hours
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: kGreen.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(Icons.check_circle, color: kGreen, size: 20),
+                      const SizedBox(width: 8),
+                      Text('${AppLocale.l('offlineActive')} — $hoursLeft ${AppLocale.l('hoursLeft')}',
+                        style: TextStyle(color: kGreen, fontWeight: FontWeight.w700, fontSize: 14)),
+                    ]),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(width: double.infinity, child: ElevatedButton.icon(
+                    icon: const Icon(Icons.home),
+                    label: Text(AppLocale.l('continueToApp'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kPurple2, foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    onPressed: () {
+                      // Navigate directly to home — bypass auth gate
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                        (_) => false,
+                      );
+                    },
+                  )),
+                ] else if (daysLeft > 0) ...[
+                  // Can claim offline day
+                  Text(AppLocale.l('offlineClaimDesc'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: kText, height: 1.6)),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: kOrange.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text('$daysLeft / ${OfflineAccessService.maxOfflineDays} ${AppLocale.l('daysLeft')}',
+                      style: TextStyle(color: kOrange, fontWeight: FontWeight.w800, fontSize: 16)),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(width: double.infinity, child: ElevatedButton.icon(
+                    icon: _claiming
+                      ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Icon(Icons.offline_bolt),
+                    label: Text(_claiming ? 'Claiming...' : AppLocale.l('claimOfflineDay'),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kOrange, foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    onPressed: _claiming ? null : () async {
+                      setState(() => _claiming = true);
+                      final ok = await OfflineAccessService.claimOfflineDay();
+                      if (ok && mounted) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => const HomeScreen()),
+                          (_) => false,
+                        );
+                      } else if (mounted) {
+                        setState(() => _claiming = false);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(AppLocale.l('claimFailed')), backgroundColor: Colors.red),
+                        );
+                      }
+                    },
+                  )),
+                ] else ...[
+                  // No days left
+                  Icon(Icons.block, color: Colors.red[400], size: 40),
+                  const SizedBox(height: 12),
+                  Text(AppLocale.l('offlineDaysExhausted'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: kText, height: 1.6)),
+                  const SizedBox(height: 8),
+                  Text('All 10 offline days have been used. Please connect to the internet or contact support.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 12, color: kMuted, height: 1.5)),
+                  const SizedBox(height: 20),
+                  SizedBox(width: double.infinity, child: ElevatedButton.icon(
+                    icon: const Icon(Icons.support_agent),
+                    label: Text(AppLocale.l('contactSupport'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[400], foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportScreen()));
+                    },
+                  )),
+                ],
+
+                const SizedBox(height: 20),
+                // Retry connection button
+                TextButton.icon(
+                  icon: Icon(Icons.refresh, color: kPurple2, size: 18),
+                  label: Text(AppLocale.l('retryConnection'), style: TextStyle(color: kPurple2, fontSize: 13)),
+                  onPressed: () => _checkConnection(),
+                ),
+              ]),
+            ),
+          ]),
+        )),
+      ),
     );
   }
 }
