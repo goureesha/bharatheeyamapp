@@ -12,7 +12,6 @@ import 'planets_screen.dart';
 import 'settings_screen.dart';
 import 'vedic_clock_screen.dart';
 import 'appointment_screen.dart';
-import 'ashtamangala_screen.dart';
 import '../services/tester_service.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -49,12 +48,7 @@ class HomeScreen extends StatelessWidget {
       }),
     ];
 
-    // Tester-only sections (incomplete features)
-    final testerSections = [
-      _Section(AppLocale.l('ashtamangala'), 'Ashtamangala', Icons.auto_fix_high, Color(0xFFE67E22), () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const AshtamangalaScreen()));
-      }),
-    ];
+
 
     return ValueListenableBuilder<String>(
       valueListenable: AppLocale.langNotifier,
@@ -107,10 +101,6 @@ class HomeScreen extends StatelessWidget {
                       valueListenable: TesterService.isTesterNotifier,
                       builder: (context, isTester, _) {
                         final allSections = List<_Section>.from(sections);
-                        if (isTester) {
-                          // Insert tester sections before Settings (last item)
-                          allSections.insertAll(allSections.length - 1, testerSections);
-                        }
                         return GridView.count(
                           crossAxisCount: tablet ? 3 : 2,
                           mainAxisSpacing: 14,
