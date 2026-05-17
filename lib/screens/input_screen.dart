@@ -9,7 +9,7 @@ import '../services/history_service.dart';
 import '../core/calculator.dart';
 import '../constants/places.dart';
 import '../core/ephemeris.dart';
-import '../services/network_service.dart';
+
 import '../services/google_auth_service.dart';
 import '../services/calendar_service.dart';
 import '../services/location_service.dart';
@@ -42,8 +42,7 @@ class _InputScreenState extends State<InputScreen> {
   Map<String, Profile> _savedProfiles = {};
   String? _selName;
 
-  bool _isInitStatus = true;
-  bool _isNetworkBlocked = false;
+  bool _isInitStatus = false;
   bool _loadedFromSaved = false; // true when user opened an existing profile
 
   String _loadedNotes = '';
@@ -62,7 +61,6 @@ class _InputScreenState extends State<InputScreen> {
     _lonCtrl = TextEditingController(text: LocationService.lon.toStringAsFixed(4));
     _tzCtrl = TextEditingController(text: '${LocationService.tzOffset >= 0 ? '+' : ''}${LocationService.tzOffset}');
     _loadProfiles();
-    _checkNetwork();
     HistoryService.load();
   }
 
@@ -75,15 +73,7 @@ class _InputScreenState extends State<InputScreen> {
     super.dispose();
   }
 
-  Future<void> _checkNetwork() async {
-    final allowed = await NetworkService.checkAndInitialize();
-    if (mounted) {
-      setState(() {
-        _isNetworkBlocked = !allowed;
-        _isInitStatus = false;
-      });
-    }
-  }
+
 
   Future<void> _loadProfiles() async {
     final p = await StorageService.loadAll();
@@ -468,39 +458,7 @@ class _InputScreenState extends State<InputScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isInitStatus) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-    if (_isNetworkBlocked) {
-      return Scaffold(
-        backgroundColor: kBg,
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.wifi_off, size: 80, color: Colors.red.shade400),
-                const SizedBox(height: 24),
-                Text(AppLocale.l('webBlockedTitle'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.red), textAlign: TextAlign.center),
-                const SizedBox(height: 16),
-                Text(AppLocale.l('checkInternet'), 
-                    style: TextStyle(fontSize: 16, height: 1.5), textAlign: TextAlign.center),
-                const SizedBox(height: 32),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() => _isInitStatus = true);
-                    _checkNetwork();
-                  },
-                  icon: Icon(Icons.refresh, color: Colors.white),
-                  label: Text(AppLocale.l('retryBtn')),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
+
 
     return Scaffold(
       backgroundColor: kBg,
