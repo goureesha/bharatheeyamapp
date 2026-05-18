@@ -85,7 +85,7 @@ class HomeScreen extends StatelessWidget {
                           letterSpacing: 1.5,
                         )),
                         const SizedBox(height: 4),
-                        Text('Vedic Astrology', style: TextStyle(
+                        Text('made by Goureesh Bhat Mudebail', style: TextStyle(
                           fontSize: tablet ? 15 : 13,
                           color: kMuted, letterSpacing: 0.5,
                         )),
