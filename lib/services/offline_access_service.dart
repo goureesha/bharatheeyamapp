@@ -88,24 +88,46 @@ class OfflineAccessService {
 
   // ── Fetch max days from server ──
 
-  /// Read max_offline_days from Firestore app_config/settings.
-  /// Admin sets this value in the Firebase console.
-  /// App reads it on every connection and caches locally.
+  /// Read max_offline_days from Firestore.
+  /// Priority: user's device_bindings/{email} → global app_config/settings → default 10.
+  /// Admin sets the field per-user in Firebase Console for specific users.
   static Future<void> fetchMaxDaysFromServer() async {
     try {
-      final doc = await FirebaseFirestore.instance
+      // 1. Check per-user override first
+      final email = GoogleAuthService.userEmail;
+      if (email != null) {
+        final userDoc = await FirebaseFirestore.instance
+            .collection('device_bindings')
+            .doc(email.toLowerCase())
+            .get()
+            .timeout(const Duration(seconds: 5));
+
+        if (userDoc.exists && userDoc.data() != null) {
+          final userMax = userDoc.data()!['max_offline_days'];
+          if (userMax != null && userMax is int && userMax > 0) {
+            _maxOfflineDays = userMax;
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setInt(_maxDaysKey, _maxOfflineDays);
+            debugPrint('OfflineAccess: Per-user max_offline_days = $_maxOfflineDays');
+            return; // per-user value found, no need to check global
+          }
+        }
+      }
+
+      // 2. Fall back to global config
+      final globalDoc = await FirebaseFirestore.instance
           .collection('app_config')
           .doc('settings')
           .get()
           .timeout(const Duration(seconds: 5));
 
-      if (doc.exists && doc.data() != null) {
-        final serverMax = doc.data()!['max_offline_days'];
-        if (serverMax != null && serverMax is int && serverMax > 0) {
-          _maxOfflineDays = serverMax;
+      if (globalDoc.exists && globalDoc.data() != null) {
+        final globalMax = globalDoc.data()!['max_offline_days'];
+        if (globalMax != null && globalMax is int && globalMax > 0) {
+          _maxOfflineDays = globalMax;
           final prefs = await SharedPreferences.getInstance();
           await prefs.setInt(_maxDaysKey, _maxOfflineDays);
-          debugPrint('OfflineAccess: Server max_offline_days = $_maxOfflineDays');
+          debugPrint('OfflineAccess: Global max_offline_days = $_maxOfflineDays');
         }
       }
     } catch (e) {
