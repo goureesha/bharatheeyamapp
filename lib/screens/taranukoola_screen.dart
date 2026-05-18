@@ -1307,12 +1307,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                     style: TextStyle(fontSize: 10, color: lw.guruAnukoola ? Colors.amber.shade800 : kMuted, fontWeight: FontWeight.w700),
                   ),
                 ),
-                if (!lw.isAllowed)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
-                    child: Text('${AppLocale.l('guruvaarVichar')}', style: TextStyle(fontSize: 10, color: Colors.red.shade700, fontWeight: FontWeight.w700)),
-                  ),
               ]),
             ]),
           );
