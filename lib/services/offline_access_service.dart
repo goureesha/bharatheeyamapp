@@ -4,36 +4,42 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'trusted_time_service.dart';
 import 'google_auth_service.dart';
 
-/// Manages the 10-day offline access feature.
+/// Manages the offline access feature.
 ///
 /// Rules:
-/// - Users get 10 offline days TOTAL (lifetime, not consecutive).
+/// - Users get N offline days TOTAL (lifetime, not consecutive).
+/// - N is configured on the server (app_config/settings → max_offline_days).
 /// - Each claim grants 24 hours of offline access.
 /// - After 24 hours, the app locks until internet is restored.
-/// - After all 10 days are used, user must contact support.
+/// - After all days are used, user must contact support.
 /// - Usage is synced to Firestore using FieldValue.increment (no overwrites).
 class OfflineAccessService {
   // ── Pref keys ──
   static const String _totalUsedKey = 'offline_days_used';
   static const String _claimStartKey = 'offline_claim_start';
   static const String _syncedToServerKey = 'offline_days_synced_count';
+  static const String _maxDaysKey = 'offline_max_days';
 
   // ── Constants ──
-  static const int maxOfflineDays = 10;
+  static const int _defaultMaxDays = 10; // fallback if server hasn't been read yet
   static const int claimDurationHours = 24;
 
   // ── State ──
   static int _totalDaysUsed = 0;
   static DateTime? _currentClaimStart;
   static int _syncedToServer = 0;
+  static int _maxOfflineDays = _defaultMaxDays;
 
   // ── Computed ──
+
+  /// Max offline days (server-configurable, cached locally)
+  static int get maxOfflineDays => _maxOfflineDays;
 
   /// How many offline days have been used
   static int get daysUsed => _totalDaysUsed;
 
   /// How many offline days remain
-  static int get daysRemaining => (maxOfflineDays - _totalDaysUsed).clamp(0, maxOfflineDays);
+  static int get daysRemaining => (_maxOfflineDays - _totalDaysUsed).clamp(0, _maxOfflineDays);
 
   /// Whether the user has any offline days left
   static bool get hasOfflineDaysLeft => daysRemaining > 0;
@@ -70,13 +76,42 @@ class OfflineAccessService {
     final prefs = await SharedPreferences.getInstance();
     _totalDaysUsed = prefs.getInt(_totalUsedKey) ?? 0;
     _syncedToServer = prefs.getInt(_syncedToServerKey) ?? 0;
+    _maxOfflineDays = prefs.getInt(_maxDaysKey) ?? _defaultMaxDays;
 
     final claimTs = prefs.getInt(_claimStartKey);
     if (claimTs != null) {
       _currentClaimStart = DateTime.fromMillisecondsSinceEpoch(claimTs);
     }
 
-    debugPrint('OfflineAccess: $daysRemaining days remaining, claim active: $hasActiveClaim');
+    debugPrint('OfflineAccess: $daysRemaining/$_maxOfflineDays days remaining, claim active: $hasActiveClaim');
+  }
+
+  // ── Fetch max days from server ──
+
+  /// Read max_offline_days from Firestore app_config/settings.
+  /// Admin sets this value in the Firebase console.
+  /// App reads it on every connection and caches locally.
+  static Future<void> fetchMaxDaysFromServer() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('app_config')
+          .doc('settings')
+          .get()
+          .timeout(const Duration(seconds: 5));
+
+      if (doc.exists && doc.data() != null) {
+        final serverMax = doc.data()!['max_offline_days'];
+        if (serverMax != null && serverMax is int && serverMax > 0) {
+          _maxOfflineDays = serverMax;
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setInt(_maxDaysKey, _maxOfflineDays);
+          debugPrint('OfflineAccess: Server max_offline_days = $_maxOfflineDays');
+        }
+      }
+    } catch (e) {
+      // Silently fail — use cached value
+      debugPrint('OfflineAccess: Failed to fetch max days from server: $e');
+    }
   }
 
   // ── Claim an offline day ──
@@ -102,7 +137,7 @@ class OfflineAccessService {
     await prefs.setInt(_totalUsedKey, _totalDaysUsed);
     await prefs.setInt(_claimStartKey, _currentClaimStart!.millisecondsSinceEpoch);
 
-    debugPrint('OfflineAccess: Claimed day $_totalDaysUsed/$maxOfflineDays');
+    debugPrint('OfflineAccess: Claimed day $_totalDaysUsed/$_maxOfflineDays');
     return true;
   }
 
@@ -133,6 +168,9 @@ class OfflineAccessService {
   static Future<void> syncToServer() async {
     final email = GoogleAuthService.userEmail;
     if (email == null) return;
+
+    // Also fetch latest max days while we're online
+    await fetchMaxDaysFromServer();
 
     final delta = _totalDaysUsed - _syncedToServer;
     if (delta <= 0) {
@@ -167,6 +205,9 @@ class OfflineAccessService {
   static Future<void> restoreFromServer() async {
     final email = GoogleAuthService.userEmail;
     if (email == null) return;
+
+    // Fetch max days config while we're at it
+    await fetchMaxDaysFromServer();
 
     try {
       final doc = await FirebaseFirestore.instance
