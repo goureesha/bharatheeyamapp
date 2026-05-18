@@ -63394,7 +63394,7 @@ s=A.c("appName")
 s=A.j(s,p,p,p,p,A.r(p,p,B.az,p,p,p,p,p,p,p,p,o?32:26,p,p,B.K,p,p,!0,p,1.5,p,p,p,p,p,p),p,p,p)
 r=o?15:13
 q=t.p
-return A.a7(A.a([new A.a3(B.YG,A.d8(p,A.a7(A.a([n,B.bg,s,B.bm,A.j("Vedic Astrology",p,p,p,p,A.r(p,p,$.am(),p,p,p,p,p,p,p,p,r,p,p,p,p,p,!0,p,0.5,p,p,p,p,p,p),p,p,p)],q),B.j,B.f,B.i,B.m),B.t,!1,p,new A.avX(a),p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p),p),new A.a3(B.ck,new A.fr($.UV(),new A.avY(this.a,this.b,o),p,p,t.D0),p),B.as],q),B.j,B.f,B.i,B.m)},
+return A.a7(A.a([new A.a3(B.YG,A.d8(p,A.a7(A.a([n,B.bg,s,B.bm,A.j("made by Goureesh Bhat Mudebail",p,p,p,p,A.r(p,p,$.am(),p,p,p,p,p,p,p,p,r,p,p,p,p,p,!0,p,0.5,p,p,p,p,p,p),p,p,p)],q),B.j,B.f,B.i,B.m),B.t,!1,p,new A.avX(a),p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p),p),new A.a3(B.ck,new A.fr($.UV(),new A.avY(this.a,this.b,o),p,p,t.D0),p),B.as],q),B.j,B.f,B.i,B.m)},
 $S:184}
 A.avX.prototype={
 $0(){$.UV().sB(0,!0)
