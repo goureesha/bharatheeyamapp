@@ -911,7 +911,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     final moonHouse = ((moonRashi - janmaRashi + 12) % 12) + 1;
     final chandraBala = const [3, 6, 10, 11].contains(moonHouse);
 
-    final label = _isTwoPersonMode ? '👤 ${AppLocale.l('person1')} $personNum ${AppLocale.l('personBalas')}' : '👤 ${AppLocale.l('yourBalas')}';
+    final label = _isTwoPersonMode ? '👤 ${AppLocale.l(personNum == 1 ? 'person1' : 'person2')} ${AppLocale.l('personBalas')}' : '👤 ${AppLocale.l('yourBalas')}';
 
     return Container(
       padding: const EdgeInsets.all(12),
