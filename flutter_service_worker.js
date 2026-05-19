@@ -17,11 +17,11 @@ const RESOURCES = {"assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8
 "assets/assets/images/logo.png": "8b3be256f8c343bfe505d1de18b50462",
 "assets/assets/images/shiva.png": "2199b48165564022798ea38c471754fb",
 "assets/assets/images/ganapati.png": "22e33acfbc05962d2d2dcef91164a88a",
-"assets/fonts/MaterialIcons-Regular.otf": "ca1a86253669c2fbe6e96a0c51935aa8",
+"assets/fonts/MaterialIcons-Regular.otf": "d2b356d089ef6ee808ce2e7df73c3c2a",
 "assets/AssetManifest.bin": "97431ccc99cbad83d8e6e35ed496b23c",
 "assets/FontManifest.json": "8483a5e223c89751ce1424a84c218ccc",
 "assets/AssetManifest.bin.json": "0934c27b6b5b52b2c689c8534174e588",
-"assets/NOTICES": "672eb934e2b2d805c77c31ebb8003f00",
+"assets/NOTICES": "59da21a77d946243581cdb2176334dc8",
 "assets/packages/sweph/assets/ephe/seas_18.se1": "728e0c0d609c52f8b23c8cfdd7ac544a",
 "assets/packages/sweph/assets/ephe/sepl_18.se1": "76235ef7e2365da3e1e4492d5c3f7801",
 "assets/packages/sweph/assets/ephe/sefstars.txt": "437dec72670ed3d3c40a27b09ee8dd59",
@@ -48,8 +48,8 @@ const RESOURCES = {"assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8
 "canvaskit/chromium/canvaskit.js": "ba4a8ae1a65ff3ad81c6818fd47e348b",
 "canvaskit/canvaskit.js": "6cfe36b4647fbfa15683e09e7dd366bc",
 "canvaskit/skwasm.wasm": "f0dfd99007f989368db17c9abeed5a49",
-"flutter_bootstrap.js": "22e426e525630f25de4c10c6e91ccb37",
-"main.dart.js": "4de4b7d06199f6c67b73213aaa38e0ae",
+"flutter_bootstrap.js": "1997615bd48e82786c334bfb5827d16e",
+"main.dart.js": "50d0f3320581fdfe6e6e8a287b2a6d11",
 "googled477f94eebb558c3.html": "b609deddf10e215d559e8f07f04425df"};
 // The application shell files that are downloaded before a service worker can
 // start.
