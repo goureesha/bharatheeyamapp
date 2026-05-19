@@ -17,7 +17,7 @@ dependencies:
   intl: ^0.19.0
   sweph: ^3.2.1+2.10.3
   shared_preferences: any
-  google_mobile_ads: any
+
   share_plus: ^10.0.0
   path_provider: any
   google_sign_in: ^6.2.0
