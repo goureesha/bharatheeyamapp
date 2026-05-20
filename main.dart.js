@@ -62952,30 +62952,48 @@ A.aSP.prototype={
 $1(a){return A.a0(["name",a.a,"result",a.b,"dob",a.c,"hour",a.d,"minute",a.e,"ampm",a.f,"place",a.x],t.N,t.z)},
 $S:48}
 A.aSQ.prototype={
-$1(a){var s,r,q=null,p=J.a_(a),o=t.Ny.a(p.h(a,"result")),n=o.c,m=A.aV(p.h(a,"name")),l=t.CG.a(p.h(a,"dob")),k=B.e.ak(B.b.j(A.aL(l)),2,"0"),j=B.e.ak(B.b.j(A.ac(l)),2,"0"),i=A.l(p.h(a,"hour")),h=B.e.ak(B.b.j(A.b1(p.h(a,"minute"))),2,"0"),g=A.l(p.h(a,"ampm")),f=t.p,e=A.a([],f),d=this.b
-if(d.length>1)e.push(new A.a3(B.YN,A.j(m,q,q,q,q,A.r(q,q,B.w,q,q,q,q,q,q,q,q,15,q,q,B.K,q,q,!0,q,q,q,q,q,q,q,q),q,q,q),q))
-s=A.a([],f)
-if(m.length!==0)s.push(this.a.Fv(A.c("nameLabel"),m))
+$1(a1){var s,r,q,p,o=null,n="sheshaGhati",m="ghatiUnit",l=J.a_(a1),k=t.Ny.a(l.h(a1,"result")),j=k.c,i=A.aV(l.h(a1,"name")),h=t.CG.a(l.h(a1,"dob")),g=B.e.ak(B.b.j(A.aL(h)),2,"0"),f=B.e.ak(B.b.j(A.ac(h)),2,"0"),e=A.l(l.h(a1,"hour")),d=B.e.ak(B.b.j(A.b1(l.h(a1,"minute"))),2,"0"),c=A.l(l.h(a1,"ampm")),b=t.p,a=A.a([],b),a0=this.b
+if(a0.length>1)a.push(new A.a3(B.YN,A.j(i,o,o,o,o,A.r(o,o,B.w,o,o,o,o,o,o,o,o,15,o,o,B.K,o,o,!0,o,o,o,o,o,o,o,o),o,o,o),o))
+s=A.a([],b)
+if(i.length!==0)s.push(this.a.Fv(A.c("nameLabel"),i))
 r=this.a
-s.push(r.Fv(A.c("placeLabel"),A.aV(p.h(a,"place"))))
-s.push(r.Fv(A.c("dateLabel"),k+"-"+j+"-"+A.ad(l)))
-s.push(r.Fv(A.c("timeLabel"),i+":"+h+" "+g))
-e.push(new A.dD(A.a7(s,B.M,B.f,B.i,B.m),q,q))
-e.push(B.a9)
+s.push(r.Fv(A.c("placeLabel"),A.aV(l.h(a1,"place"))))
+s.push(r.Fv(A.c("dateLabel"),g+"-"+f+"-"+A.ad(h)))
+s.push(r.Fv(A.c("timeLabel"),e+":"+d+" "+c))
+a.push(new A.dD(A.a7(s,B.M,B.f,B.i,B.m),o,o))
+a.push(B.a9)
 s=t.s
-e.push(new A.dD(A.a7(A.a([r.iA(A.a([A.c("samvatsara"),A.bu(n.fr)],s)),r.iA(A.a([A.c("varaLabel"),A.bu(n.a)],s)),r.iA(A.a([A.c("tithiLabel"),A.bu(n.b)],s)),r.iA(A.a([A.c("chandraNakshatra"),new A.aSO(o,n).$0()],s)),r.iA(A.a([A.c("yogaLabel"),A.bu(n.d)],s)),r.iA(A.a([A.c("karanaLabel"),A.bu(n.e)],s)),r.iA(A.a([A.c("chandraRashiLabel"),A.bu(n.f)],s)),r.iA(A.a([A.c("chandraMasa"),A.bu(n.dy)],s)),r.iA(A.a([A.c("suryaNakshatraLabel"),A.bu(n.cx)+" - "+A.c("padaLabel")+" "+n.cy],s)),r.iA(A.a([A.c("souraMasa"),A.bu(n.db)],s)),r.iA(A.a([A.c("souraMasaGataDina"),n.dx],s)),r.iA(A.a([A.c("sunrise"),n.ax],s)),r.iA(A.a([A.c("sunset"),n.ay],s)),r.iA(A.a([A.c("udayadiGhati"),n.r],s)),r.iA(A.a([A.c("gataGhati"),n.w],s)),r.iA(A.a([A.c("paramaGhati"),n.x],s)),r.iA(A.a([A.c("sheshaGhati"),n.y],s)),r.iA(A.a([A.c("vishaPraghati"),n.fx],s)),r.iA(A.a([A.c("amrutaPraghati"),n.fy],s))],f),B.j,B.f,B.i,B.m),B.O,q))
-if(d.length>1)e.push(A.eN($.b6(),q,2))
-e.push(B.S)
-return A.a7(e,B.M,B.f,B.i,B.m)},
+c=r.iA(A.a([A.c("samvatsara"),A.bu(j.fr)],s))
+d=r.iA(A.a([A.c("varaLabel"),A.bu(j.a)],s))
+e=A.c("tithiLabel")
+f=A.bu(j.b)
+l=j.rx
+l=r.iA(A.a([e,f+(l.length!==0?"\n"+A.c(n)+": "+l+" / "+j.ry+" "+A.c(m):"")],s))
+g=r.iA(A.a([A.c("chandraNakshatra"),new A.aSO(k,j).$0()],s))
+f=A.c("yogaLabel")
+e=A.bu(j.d)
+q=j.x2
+f=r.iA(A.a([f,e+(q.length!==0?"\n"+A.c(n)+": "+q+" / "+j.xr+" "+A.c(m):"")],s))
+e=A.c("karanaLabel")
+q=A.bu(j.e)
+p=j.to
+a.push(new A.dD(A.a7(A.a([c,d,l,g,f,r.iA(A.a([e,q+(p.length!==0?"\n"+A.c(n)+": "+p+" / "+j.x1+" "+A.c(m):"")],s)),r.iA(A.a([A.c("chandraRashiLabel"),A.bu(j.f)],s)),r.iA(A.a([A.c("chandraMasa"),A.bu(j.dy)],s)),r.iA(A.a([A.c("suryaNakshatraLabel"),A.bu(j.cx)+" - "+A.c("padaLabel")+" "+j.cy],s)),r.iA(A.a([A.c("souraMasa"),A.bu(j.db)],s)),r.iA(A.a([A.c("souraMasaGataDina"),j.dx],s)),r.iA(A.a([A.c("sunrise"),j.ax],s)),r.iA(A.a([A.c("sunset"),j.ay],s)),r.iA(A.a([A.c("udayadiGhati"),j.r],s)),r.iA(A.a([A.c("gataGhati"),j.w],s)),r.iA(A.a([A.c("paramaGhati"),j.x],s)),r.iA(A.a([A.c(n),j.y],s)),r.iA(A.a([A.c("vishaPraghati"),j.fx],s)),r.iA(A.a([A.c("amrutaPraghati"),j.fy],s))],b),B.j,B.f,B.i,B.m),B.O,o))
+if(a0.length>1)a.push(A.eN($.b6(),o,2))
+a.push(B.S)
+return A.a7(a,B.M,B.f,B.i,B.m)},
 $S:57}
 A.aSO.prototype={
-$0(){var s,r,q,p=this.a.a.h(0,"\u0c9a\u0c82\u0ca6\u0ccd\u0cb0"),o=p==null?null:p.e
-p=this.b
-s=B.c.bq(p.at*4)+1
-if(o==null)if(s<1)r=1
+$0(){var s,r,q,p,o,n=this.a.a.h(0,"\u0c9a\u0c82\u0ca6\u0ccd\u0cb0"),m=n==null?null:n.e
+n=this.b
+s=B.c.bq(n.at*4)+1
+if(m==null)if(s<1)r=1
 else{q=s>4?4:s
-r=q}else r=o
-return A.bu(p.c)+" - "+A.c("padaLabel")+" "+r},
+r=q}else r=m
+q=A.bu(n.c)
+p=A.c("padaLabel")
+o=n.y
+n=o.length!==0?"\n"+A.c("sheshaGhati")+": "+o+" / "+n.x+" "+A.c("ghatiUnit"):""
+return q+" - "+p+" "+r+n},
 $S:26}
 A.aS6.prototype={
 $1(a){return A.a0(["name",a.a,"result",a.b],t.N,t.z)},
