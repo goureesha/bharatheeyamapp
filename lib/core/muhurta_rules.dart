@@ -730,8 +730,8 @@ BalaScore calculateGuruBala(int janmaRashiIdx, int jupiterRashiIdx) {
 // ============================================================
 
 /// Malefic planets (Paapa Grahas) for shuddhi checks
-/// Mars(ಕುಜ), Saturn(ಶನಿ), Rahu(ರಾಹು), Ketu(ಕೇತು), Sun(ರವಿ)
-const List<String> paapGrahas = ['ಕುಜ', 'ಶನಿ', 'ರಾಹು', 'ಕೇತು', 'ರವಿ'];
+/// Mars(ಕುಜ), Saturn(ಶನಿ), Rahu(ರಾಹು), Ketu(ಕೇತು), Sun(ರವಿ), Mandi(ಮಾಂದಿ)
+const List<String> paapGrahas = ['ಕುಜ', 'ಶನಿ', 'ರಾಹು', 'ಕೇತು', 'ರವಿ', 'ಮಾಂದಿ'];
 
 class LagnaWindow {
   final int rashiIndex;    // 0-11
@@ -799,7 +799,7 @@ class LagnaWindow {
 List<String> findAllPlanetsInRashi(int rashiIdx, Map<String, int> planetRashis) {
   final List<String> found = [];
   planetRashis.forEach((planet, rIdx) {
-    if (rIdx == rashiIdx && planet != 'ರಾಹು' && planet != 'ಕೇತು') {
+    if (rIdx == rashiIdx && planet != 'ರಾಹು' && planet != 'ಕೇತು' && planet != 'ಲಗ್ನ') {
       found.add(planet);
     }
   });
