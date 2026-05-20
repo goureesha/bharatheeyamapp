@@ -82,6 +82,13 @@ class PanchangData {
   final String rutu;
   final String agniVasa;
   final String ayana;
+  // Ghati-Vighati remaining for Tithi, Karana, Yoga
+  final String tithiShesha;   // remaining ghati-vighati
+  final String tithiParama;   // total duration ghati-vighati
+  final String karanaShesha;
+  final String karanaParama;
+  final String yogaShesha;
+  final String yogaParama;
 
   PanchangData({
     required this.vara,
@@ -123,6 +130,12 @@ class PanchangData {
     this.rutu = '',
     this.agniVasa = '',
     this.ayana = '',
+    this.tithiShesha = '',
+    this.tithiParama = '',
+    this.karanaShesha = '',
+    this.karanaParama = '',
+    this.yogaShesha = '',
+    this.yogaParama = '',
   });
 }
 
@@ -868,6 +881,19 @@ class AstroCalculator {
       final jdKEnd = findKaranaLimit(jdBirth, (kIdx + 1) * 6.0, ayanamsaMode);
       final jdYEnd = findYogaLimit(jdBirth, (yIdx + 1) * _nakSize, ayanamsaMode);
 
+      // Start Times (for computing total duration)
+      final jdTStart = findTithiLimit(jdBirth, tIdx * 12.0, ayanamsaMode);
+      final jdKStart = findKaranaLimit(jdBirth, kIdx * 6.0, ayanamsaMode);
+      final jdYStart = findYogaLimit(jdBirth, yIdx * _nakSize, ayanamsaMode);
+
+      // Remaining (shesha) and total (parama) in ghati-vighati
+      final tithiSheshaGhati = formatGhati((jdTEnd - jdBirth) * 60);
+      final tithiParamaGhati = formatGhati((jdTEnd - jdTStart) * 60);
+      final karanaSheshaGhati = formatGhati((jdKEnd - jdBirth) * 60);
+      final karanaParamaGhati = formatGhati((jdKEnd - jdKStart) * 60);
+      final yogaSheshaGhati = formatGhati((jdYEnd - jdBirth) * 60);
+      final yogaParamaGhati = formatGhati((jdYEnd - jdYStart) * 60);
+
       final panchang = PanchangData(
         vara: knVara[wIdx],
         tithi: knTithi[tIdx],
@@ -908,6 +934,12 @@ class AstroCalculator {
         rutu: rutuStr,
         agniVasa: agniVasaStr,
         ayana: (sDeg >= 270 || sDeg < 90) ? AppLocale.l('uttarayana') : AppLocale.l('dakshinayana'),
+        tithiShesha: tithiSheshaGhati,
+        tithiParama: tithiParamaGhati,
+        karanaShesha: karanaSheshaGhati,
+        karanaParama: karanaParamaGhati,
+        yogaShesha: yogaSheshaGhati,
+        yogaParama: yogaParamaGhati,
       );
 
       // Dashas

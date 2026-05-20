@@ -390,11 +390,11 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
                       padding: EdgeInsets.zero,
                       child: Column(children: [
                         _sectionHeader(Icons.auto_awesome, AppLocale.l('panchanga') + ' / Five Limbs', kPurple2),
-                        _tableRow([AppLocale.l('tithi'), _formatEnd(trAll(_panchang!.tithi), _panchang!.tithiEndTime, _panchang!.tithiEndsNextDay)]),
+                        _tableRow([AppLocale.l('tithi'), _formatEndWithGhati(trAll(_panchang!.tithi), _panchang!.tithiEndTime, _panchang!.tithiEndsNextDay, _panchang!.tithiShesha, _panchang!.tithiParama)]),
                         _tableRow([AppLocale.l('vara'), trAll(_panchang!.vara)]),
-                        _tableRow([AppLocale.l('chandraNak'), _formatEnd('${trAll(_panchang!.nakshatra)} - ${AppLocale.l('pada')} ${_chandraPada()}', _panchang!.nakEndTime, _panchang!.nakEndsNextDay)]),
-                        _tableRow([AppLocale.l('yoga'), _formatEnd(trAll(_panchang!.yoga), _panchang!.yogaEndTime, _panchang!.yogaEndsNextDay)]),
-                        _tableRow([AppLocale.l('karana'), _formatEnd(trAll(_panchang!.karana), _panchang!.karanaEndTime, _panchang!.karanaEndsNextDay)]),
+                        _tableRow([AppLocale.l('chandraNak'), _formatEndWithGhati('${trAll(_panchang!.nakshatra)} - ${AppLocale.l('pada')} ${_chandraPada()}', _panchang!.nakEndTime, _panchang!.nakEndsNextDay, _panchang!.shesha, _panchang!.paramaGhati)]),
+                        _tableRow([AppLocale.l('yoga'), _formatEndWithGhati(trAll(_panchang!.yoga), _panchang!.yogaEndTime, _panchang!.yogaEndsNextDay, _panchang!.yogaShesha, _panchang!.yogaParama)]),
+                        _tableRow([AppLocale.l('karana'), _formatEndWithGhati(trAll(_panchang!.karana), _panchang!.karanaEndTime, _panchang!.karanaEndsNextDay, _panchang!.karanaShesha, _panchang!.karanaParama)]),
                       ]),
                     ),
 
@@ -835,6 +835,13 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
     return '$base (${AppLocale.l('endLabel')}: $endTime${nextDay ? ' ${AppLocale.l('nextDayLabel')}' : ''})';
   }
 
+  String _formatEndWithGhati(String base, String endTime, bool nextDay, String shesha, String parama) {
+    if (endTime.isEmpty) return base;
+    final endStr = '${AppLocale.l('endLabel')}: $endTime${nextDay ? ' ${AppLocale.l('nextDayLabel')}' : ''}';
+    if (shesha.isEmpty || parama.isEmpty) return '$base ($endStr)';
+    return '$base\n$endStr | ${AppLocale.l('sheshaGhati')}: $shesha / $parama ${AppLocale.l('ghatiUnit')}';
+  }
+
   int _chandraPada() {
     if (_panchang == null) return 1;
     int p = (_panchang!.nakPercent * 4).floor() + 1;
@@ -856,7 +863,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
                 fontWeight: e.key == 0 ? FontWeight.w700 : FontWeight.normal,
                 color: kText,
               ),
-              maxLines: 2,
+              maxLines: 4,
               overflow: TextOverflow.ellipsis,
             ),
           ),
