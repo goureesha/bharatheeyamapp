@@ -1152,7 +1152,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
         final ashtamaRashi = (currentRashi + 7) % 12;
         final dashamaRashi = (currentRashi + 9) % 12;
 
-        final lagnaM = findMaleficsInRashi(currentRashi, planetRashis);
+        final lagnaM = findAllPlanetsInRashi(currentRashi, planetRashis);
         final saptamaM = _selectedMuhurtaEvent == MuhurtaEvent.vivaha
             ? findAllPlanetsInRashi(saptamaRashi, planetRashis)
             : findMaleficsInRashi(saptamaRashi, planetRashis);
@@ -1315,9 +1315,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     );
   }
 
-  Widget _shuddhiChip(String label, bool isShuddha, List<String> malefics, {bool required = true}) {
+  Widget _shuddhiChip(String label, bool isShuddha, List<String> grahas, {bool required = true}) {
     if (!required) {
-      final text = isShuddha ? '$label ✓' : '$label ✗ ${malefics.map((m) => trAll(m)).join(',')}';
+      final text = isShuddha ? '$label ✓' : '$label ✗ ${grahas.map((m) => trAll(m)).join(',')}';
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: BoxDecoration(

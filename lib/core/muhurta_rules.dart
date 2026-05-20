@@ -741,7 +741,7 @@ class LagnaWindow {
   final bool isAllowed;    // true if this lagna is allowed for the event
 
   // Shuddhi checks
-  final bool lagnaShuddhi;         // No malefics in lagna rashi (1st house)
+  final bool lagnaShuddhi;         // No planet in lagna rashi (graha varjita)
   final bool saptamaShuddhi;       // Clean 7th house (varies by event)
   final bool ashtamaShuddhi;       // Clean 8th house
   final bool dashamaShuddhi;       // Empty 10th house
