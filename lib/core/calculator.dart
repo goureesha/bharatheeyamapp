@@ -82,11 +82,14 @@ class PanchangData {
   final String rutu;
   final String agniVasa;
   final String ayana;
-  // Ghati-Vighati remaining for Tithi, Karana, Yoga
+  // Ghati-Vighati for Tithi, Karana, Yoga
+  final String tithiGata;     // elapsed ghati-vighati
   final String tithiShesha;   // remaining ghati-vighati
   final String tithiParama;   // total duration ghati-vighati
+  final String karanaGata;
   final String karanaShesha;
   final String karanaParama;
+  final String yogaGata;
   final String yogaShesha;
   final String yogaParama;
 
@@ -130,10 +133,13 @@ class PanchangData {
     this.rutu = '',
     this.agniVasa = '',
     this.ayana = '',
+    this.tithiGata = '',
     this.tithiShesha = '',
     this.tithiParama = '',
+    this.karanaGata = '',
     this.karanaShesha = '',
     this.karanaParama = '',
+    this.yogaGata = '',
     this.yogaShesha = '',
     this.yogaParama = '',
   });
@@ -886,11 +892,14 @@ class AstroCalculator {
       final jdKStart = findKaranaLimit(jdBirth, kIdx * 6.0, ayanamsaMode);
       final jdYStart = findYogaLimit(jdBirth, yIdx * _nakSize, ayanamsaMode);
 
-      // Remaining (shesha) and total (parama) in ghati-vighati
+      // Gata (elapsed), Shesha (remaining), Parama (total) in ghati-vighati
+      final tithiGataGhati = formatGhati((jdBirth - jdTStart) * 60);
       final tithiSheshaGhati = formatGhati((jdTEnd - jdBirth) * 60);
       final tithiParamaGhati = formatGhati((jdTEnd - jdTStart) * 60);
+      final karanaGataGhati = formatGhati((jdBirth - jdKStart) * 60);
       final karanaSheshaGhati = formatGhati((jdKEnd - jdBirth) * 60);
       final karanaParamaGhati = formatGhati((jdKEnd - jdKStart) * 60);
+      final yogaGataGhati = formatGhati((jdBirth - jdYStart) * 60);
       final yogaSheshaGhati = formatGhati((jdYEnd - jdBirth) * 60);
       final yogaParamaGhati = formatGhati((jdYEnd - jdYStart) * 60);
 
@@ -934,10 +943,13 @@ class AstroCalculator {
         rutu: rutuStr,
         agniVasa: agniVasaStr,
         ayana: (sDeg >= 270 || sDeg < 90) ? AppLocale.l('uttarayana') : AppLocale.l('dakshinayana'),
+        tithiGata: tithiGataGhati,
         tithiShesha: tithiSheshaGhati,
         tithiParama: tithiParamaGhati,
+        karanaGata: karanaGataGhati,
         karanaShesha: karanaSheshaGhati,
         karanaParama: karanaParamaGhati,
+        yogaGata: yogaGataGhati,
         yogaShesha: yogaSheshaGhati,
         yogaParama: yogaParamaGhati,
       );
