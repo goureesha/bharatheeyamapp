@@ -1329,7 +1329,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       );
     }
     final MaterialColor color = isShuddha ? Colors.green : Colors.red;
-    final text = isShuddha ? '$label ✓' : '$label ✗ ${malefics.map((m) => trAll(m)).join(',')}';
+    final text = isShuddha ? '$label ✓' : '$label ✗ ${grahas.map((m) => trAll(m)).join(',')}';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
