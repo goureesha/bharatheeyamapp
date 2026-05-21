@@ -646,17 +646,60 @@ class _OfflineVerifyScreenState extends State<_OfflineVerifyScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: kText, height: 1.6)),
               const SizedBox(height: 24),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.refresh),
-                label: Text(AppLocale.l('retryConnection'),
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: kPurple2, foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              if (_claiming)
+                CircularProgressIndicator(color: kPurple2)
+              else ...[
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.refresh),
+                  label: Text(AppLocale.l('retryConnection'),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kPurple2, foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  onPressed: () => _checkConnection(),
                 ),
-                onPressed: () => _checkConnection(),
-              ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () async {
+                    setState(() => _claiming = true);
+                    try {
+                      final ok = await GoogleAuthService.signIn()
+                          .timeout(const Duration(seconds: 10), onTimeout: () => false);
+                      if (ok && mounted) {
+                        try {
+                          await Future.wait([
+                            SubscriptionService.recordOnlineCheck(),
+                            DeviceBindingService.checkBinding(),
+                            SubscriptionService.syncTrialWithFirestore(),
+                            SubscriptionService.checkManualPremium(),
+                          ]).timeout(const Duration(seconds: 5), onTimeout: () => []);
+                        } catch (_) {}
+                        if (mounted) {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (_) => const HomeScreen()),
+                            (_) => false,
+                          );
+                        }
+                      } else if (mounted) {
+                        setState(() => _claiming = false);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Sign-in failed. Please check your internet.'), backgroundColor: Colors.red),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        setState(() => _claiming = false);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Sign-in failed. Please check your internet.'), backgroundColor: Colors.red),
+                        );
+                      }
+                    }
+                  },
+                  child: Text('Try Sign-in Anyway', style: TextStyle(color: kPurple2, fontWeight: FontWeight.w700, fontSize: 14)),
+                ),
+              ],
             ]),
           )),
         ),
