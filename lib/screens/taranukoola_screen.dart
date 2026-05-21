@@ -1081,13 +1081,12 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     final rules = muhurtaRules[_selectedMuhurtaEvent];
     final allowedLagnas = rules?.allowedLagnas;
 
-    // Get planet rashi positions (base — all planets except Mandi)
-    final Map<String, int> basePlanetRashis = {};
+    // Get planet rashi positions
+    final Map<String, int> planetRashis = {};
     for (final entry in r.planets.entries) {
-      if (entry.key == 'ಮಾಂದಿ') continue; // We'll compute Mandi separately
-      basePlanetRashis[entry.key] = entry.value.rashiIndex;
+      planetRashis[entry.key] = entry.value.rashiIndex;
     }
-    final guruRashiIdx = basePlanetRashis['ಗುರು'] ?? -1;
+    final guruRashiIdx = planetRashis['ಗುರು'] ?? -1;
 
     try {
       final srSs = Ephemeris.findSunriseSetForDate(
@@ -1100,31 +1099,17 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
       final ayn = Sweph.swe_get_ayanamsa(srJd);
 
-      // Compute Mandi for DAY (sunrise to sunset)
-      final dayMandiRashi = _computeMandiRashiForPeriod(
-        srJd, ssJd, _selectedDay!, false, ayn,
-      );
-      final dayPlanetRashis = Map<String, int>.from(basePlanetRashis);
-      if (dayMandiRashi >= 0) dayPlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
-
       // Day windows: sunrise to sunset
-      final dayW = _scanLagnaRange(srJd, ssJd, ayn, dayPlanetRashis, guruRashiIdx, allowedLagnas, rules);
+      final dayW = _scanLagnaRange(srJd, ssJd, ayn, planetRashis, guruRashiIdx, allowedLagnas, rules);
 
-      // Compute Mandi for NIGHT (sunset to next sunrise)
+      // Night windows: sunset to next sunrise
       final nextDay = _selectedDay!.add(const Duration(days: 1));
       final nextSrSs = Ephemeris.findSunriseSetForDate(
         nextDay.year, nextDay.month, nextDay.day,
         LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
       );
       final double nextSrJd = nextSrSs[0];
-
-      final nightMandiRashi = _computeMandiRashiForPeriod(
-        ssJd, nextSrJd, _selectedDay!, true, ayn,
-      );
-      final nightPlanetRashis = Map<String, int>.from(basePlanetRashis);
-      if (nightMandiRashi >= 0) nightPlanetRashis['ಮಾಂದಿ'] = nightMandiRashi;
-
-      final nightW = _scanLagnaRange(ssJd, nextSrJd, ayn, nightPlanetRashis, guruRashiIdx, allowedLagnas, rules);
+      final nightW = _scanLagnaRange(ssJd, nextSrJd, ayn, planetRashis, guruRashiIdx, allowedLagnas, rules);
 
       if (mounted) setState(() {
         _dayLagnaWindows = dayW;
@@ -1137,45 +1122,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       });
     }
   }
-
-  /// Compute Mandi rashi for a specific day/night period.
-  /// Day factors:   Sun=26, Mon=22, Tue=18, Wed=14, Thu=10, Fri=6, Sat=2
-  /// Night factors: Sun=10, Mon=6,  Tue=2,  Wed=26, Thu=22, Fri=18, Sat=14
-  int _computeMandiRashiForPeriod(
-    double startJd, double endJd, DateTime dateObj, bool isNight, double ayn,
-  ) {
-    try {
-      // Vedic weekday: Sun=0..Sat=6
-      int pyWeekday = dateObj.weekday - 1; // Mon=0..Sun=6
-      int civilWeekdayIdx = (pyWeekday + 1) % 7; // Sun=0..Sat=6
-      int vedicWday = civilWeekdayIdx;
-
-      // For night before sunrise (jdBirth < sunrise), the vedic day is previous day
-      // But since we're explicitly computing for night after sunset, vedic day = same day
-      final List<int> factors;
-      if (!isNight) {
-        factors = [26, 22, 18, 14, 10, 6, 2]; // Day
-      } else {
-        factors = [10, 6, 2, 26, 22, 18, 14]; // Night
-      }
-
-      final duration = endJd - startJd;
-      final factor = factors[vedicWday];
-      final mandiJd = startJd + (duration * factor / 30.0);
-
-      final houses = Ephemeris.placidusHousesFull(
-        mandiJd, LocationService.lat, LocationService.lon,
-      );
-      if (houses != null && houses.ascmc.length >= 1) {
-        final mandiDeg = ((houses.ascmc[0] as double) - ayn) % 360.0;
-        final normalizedDeg = ((mandiDeg % 360.0) + 360.0) % 360.0;
-        return (normalizedDeg / 30.0).floor() % 12;
-      }
-    } catch (_) {}
-    return -1;
-  }
-
-
   List<LagnaWindow> _scanLagnaRange(double startJd, double endJd, double ayn,
       Map<String, int> planetRashis, int guruRashiIdx, List<int>? allowedLagnas, MuhurtaEventRules? rules) {
     final double step = 10.0 / (24.0 * 60.0); // 10 min
