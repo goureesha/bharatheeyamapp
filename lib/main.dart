@@ -360,7 +360,9 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                 ),
               ),
               home: !GoogleAuthService.isSignedIn && !kIsWeb
-                  ? const _OfflineVerifyScreen()
+                  ? (SubscriptionService.lastOnlineCheck == null
+                    ? const _FirstTimeSignInScreen()    // First-time: instant, no internet check
+                    : const _OfflineVerifyScreen())      // Returning: check online/offline claim
                   : !isBound
                     ? const _DeviceMismatchScreen()
                     : SubscriptionService.needsInternetVerification && !OfflineAccessService.hasActiveClaim
@@ -592,99 +594,6 @@ class _OfflineVerifyScreenState extends State<_OfflineVerifyScreen> {
       return const _GmailRequiredScreen();
     }
 
-    // OFFLINE — check if user has EVER signed in before
-    // If never signed in (first install), they MUST connect to internet for Gmail login
-    final hasEverSignedIn = SubscriptionService.lastOnlineCheck != null;
-    if (!hasEverSignedIn) {
-      // First-time user, never logged in — direct Google sign-in
-      return Scaffold(
-        backgroundColor: kBg,
-        body: SafeArea(
-          child: Center(child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Image.asset('assets/images/logo.png', width: 80, height: 80),
-              const SizedBox(height: 16),
-              Text(AppLocale.l('appName'), style: TextStyle(
-                fontSize: 26, fontWeight: FontWeight.w900, color: kOrange, letterSpacing: 1.5)),
-              const SizedBox(height: 32),
-              Icon(Icons.account_circle_rounded, color: kPurple2, size: 64),
-              const SizedBox(height: 16),
-              Text(AppLocale.l('gmailRequired'), style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.w800, color: kText)),
-              const SizedBox(height: 8),
-              Text('Sign in to get started',
-                style: TextStyle(fontSize: 14, color: kMuted)),
-              const SizedBox(height: 16),
-              Text(AppLocale.l('gmailRequiredMsg'),
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: kText, height: 1.6)),
-              const SizedBox(height: 24),
-              if (_claiming)
-                CircularProgressIndicator(color: kPurple2)
-              else
-                SizedBox(width: double.infinity, child: ElevatedButton.icon(
-                  icon: const Icon(Icons.login),
-                  label: Text('Sign in with Google',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: kPurple2, foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  onPressed: () async {
-                    setState(() => _claiming = true);
-                    try {
-                      final ok = await GoogleAuthService.signIn();
-                      if (ok && mounted) {
-                        try {
-                          await Future.wait([
-                            SubscriptionService.recordOnlineCheck(),
-                            DeviceBindingService.checkBinding(),
-                            SubscriptionService.syncTrialWithFirestore(),
-                            SubscriptionService.checkManualPremium(),
-                          ]).timeout(const Duration(seconds: 5), onTimeout: () => []);
-                        } catch (_) {}
-                        if (mounted) {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(builder: (_) => const HomeScreen()),
-                            (_) => false,
-                          );
-                        }
-                      } else if (mounted) {
-                        setState(() => _claiming = false);
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        setState(() => _claiming = false);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Sign-in failed. Please check your internet.'), backgroundColor: Colors.red),
-                        );
-                      }
-                    }
-                  },
-                )),
-              const SizedBox(height: 32),
-              Divider(color: kBorder),
-              const SizedBox(height: 12),
-              Text('Need help? Contact support', style: TextStyle(fontSize: 13, color: kMuted, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Icon(Icons.phone, size: 14, color: kPurple2),
-                const SizedBox(width: 4),
-                Text('+91 8762629847', style: TextStyle(fontSize: 12, color: kText)),
-              ]),
-              const SizedBox(height: 4),
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Icon(Icons.email, size: 14, color: kPurple2),
-                const SizedBox(width: 4),
-                Text('goureesh3690@gmail.com', style: TextStyle(fontSize: 12, color: kText)),
-              ]),
-            ]),
-          )),
-        ),
-      );
-    }
 
     // Returning user (has signed in before) — show offline access claim screen
     final daysLeft = OfflineAccessService.daysRemaining;
@@ -836,6 +745,110 @@ class _OfflineVerifyScreenState extends State<_OfflineVerifyScreen> {
               ]),
             ),
             const SizedBox(height: 24),
+            Divider(color: kBorder),
+            const SizedBox(height: 12),
+            Text('Need help? Contact support', style: TextStyle(fontSize: 13, color: kMuted, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(Icons.phone, size: 14, color: kPurple2),
+              const SizedBox(width: 4),
+              Text('+91 8762629847', style: TextStyle(fontSize: 12, color: kText)),
+            ]),
+            const SizedBox(height: 4),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(Icons.email, size: 14, color: kPurple2),
+              const SizedBox(width: 4),
+              Text('goureesh3690@gmail.com', style: TextStyle(fontSize: 12, color: kText)),
+            ]),
+          ]),
+        )),
+      ),
+    );
+  }
+}
+
+/// First-time sign-in: instant UI, no internet check, no lag.
+class _FirstTimeSignInScreen extends StatefulWidget {
+  const _FirstTimeSignInScreen();
+  @override
+  State<_FirstTimeSignInScreen> createState() => _FirstTimeSignInScreenState();
+}
+
+class _FirstTimeSignInScreenState extends State<_FirstTimeSignInScreen> {
+  bool _signingIn = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: kBg,
+      body: SafeArea(
+        child: Center(child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Image.asset('assets/images/logo.png', width: 80, height: 80),
+            const SizedBox(height: 16),
+            Text(AppLocale.l('appName'), style: TextStyle(
+              fontSize: 26, fontWeight: FontWeight.w900, color: kOrange, letterSpacing: 1.5)),
+            const SizedBox(height: 32),
+            Icon(Icons.account_circle_rounded, color: kPurple2, size: 64),
+            const SizedBox(height: 16),
+            Text(AppLocale.l('gmailRequired'), style: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.w800, color: kText)),
+            const SizedBox(height: 8),
+            Text('Sign in to get started',
+              style: TextStyle(fontSize: 14, color: kMuted)),
+            const SizedBox(height: 16),
+            Text(AppLocale.l('gmailRequiredMsg'),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: kText, height: 1.6)),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: _signingIn
+                  ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Icon(Icons.login),
+                label: Text(_signingIn ? 'Signing in...' : 'Sign in with Google',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPurple2, foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+                onPressed: _signingIn ? null : () async {
+                  setState(() => _signingIn = true);
+                  try {
+                    final ok = await GoogleAuthService.signIn();
+                    if (ok && mounted) {
+                      try {
+                        await Future.wait([
+                          SubscriptionService.recordOnlineCheck(),
+                          DeviceBindingService.checkBinding(),
+                          SubscriptionService.syncTrialWithFirestore(),
+                          SubscriptionService.checkManualPremium(),
+                        ]).timeout(const Duration(seconds: 5), onTimeout: () => []);
+                      } catch (_) {}
+                      if (mounted) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => const HomeScreen()),
+                          (_) => false,
+                        );
+                      }
+                    } else if (mounted) {
+                      setState(() => _signingIn = false);
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      setState(() => _signingIn = false);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Sign-in failed. Please check your internet.'), backgroundColor: Colors.red),
+                      );
+                    }
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 32),
             Divider(color: kBorder),
             const SizedBox(height: 12),
             Text('Need help? Contact support', style: TextStyle(fontSize: 13, color: kMuted, fontWeight: FontWeight.w600)),
