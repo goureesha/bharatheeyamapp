@@ -965,6 +965,10 @@ class _InputScreenState extends State<InputScreen> {
                   (name) => name.toLowerCase().contains(query));
             },
             fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
+              // Pre-fill with default location if empty
+              if (textEditingController.text.isEmpty && _placeCtrl.text.isNotEmpty) {
+                textEditingController.text = _placeCtrl.text;
+              }
               return TextField(
                 controller: textEditingController,
                 focusNode: focusNode,
@@ -1158,18 +1162,22 @@ class _InputScreenState extends State<InputScreen> {
             Expanded(
               child: ElevatedButton(
                 onPressed: () {
-                  final now = DateTime.now();
+                  // Get the timezone of the currently selected location
+                  final selectedTz = double.tryParse(_tzCtrl.text) ?? LocationService.tzOffset;
+                  // Convert device UTC time to the selected location's local time
+                  final nowUtc = DateTime.now().toUtc();
+                  final locationNow = nowUtc.add(Duration(
+                    hours: selectedTz.truncate(),
+                    minutes: ((selectedTz - selectedTz.truncate()) * 60).round(),
+                  ));
                   setState(() {
                     _loadedFromSaved = false;
                     _nameCtrl.clear();
-                    _placeCtrl.text = LocationService.place;
-                    _latCtrl.text = LocationService.lat.toStringAsFixed(4);
-                    _lonCtrl.text = LocationService.lon.toStringAsFixed(4);
-                    _tzCtrl.text = '${LocationService.tzOffset >= 0 ? '+' : ''}${LocationService.tzOffset}';
-                    _dob = now;
-                    _hour = now.hour % 12 == 0 ? 12 : now.hour % 12;
-                    _minute = now.minute;
-                    _ampm = now.hour >= 12 ? 'PM' : 'AM';
+                    // Keep the currently selected place — don't reset to default
+                    _dob = locationNow;
+                    _hour = locationNow.hour % 12 == 0 ? 12 : locationNow.hour % 12;
+                    _minute = locationNow.minute;
+                    _ampm = locationNow.hour >= 12 ? 'PM' : 'AM';
                     _loadedNotes = '';
                     _loadedClientId = null;
                     _loadedAroodhas = {};
