@@ -512,7 +512,12 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
               ),
               onPressed: () async {
                 setState(() => _checking = true);
-                await SubscriptionService.checkManualPremium();
+                try {
+                  await Future.wait([
+                    SubscriptionService.checkManualPremium(),
+                    SubscriptionService.recordOnlineCheck(),
+                  ]).timeout(const Duration(seconds: 5), onTimeout: () => []);
+                } catch (_) {}
                 if (mounted) {
                   if (!SubscriptionService.needsInternetVerification) {
                     Navigator.of(context).pushAndRemoveUntil(
@@ -535,37 +540,6 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
                 }
               },
             ),
-          const SizedBox(height: 16),
-          TextButton(
-            onPressed: () async {
-              setState(() => _checking = true);
-              try {
-                final ok = await GoogleAuthService.signIn();
-                if (ok && mounted) {
-                  await SubscriptionService.recordOnlineCheck();
-                  await DeviceBindingService.checkBinding();
-                  await SubscriptionService.syncTrialWithFirestore();
-                  await SubscriptionService.checkManualPremium();
-                  if (mounted) {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const HomeScreen()),
-                      (_) => false,
-                    );
-                  }
-                } else if (mounted) {
-                  setState(() => _checking = false);
-                }
-              } catch (e) {
-                if (mounted) {
-                  setState(() => _checking = false);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Sign-in failed. Check your internet.'), backgroundColor: Colors.red),
-                  );
-                }
-              }
-            },
-            child: Text('Try Sign-in Anyway', style: TextStyle(color: kPurple2, fontWeight: FontWeight.w700, fontSize: 14)),
-          ),
         ]),
       )),
     );
@@ -622,7 +596,7 @@ class _OfflineVerifyScreenState extends State<_OfflineVerifyScreen> {
     // If never signed in (first install), they MUST connect to internet for Gmail login
     final hasEverSignedIn = SubscriptionService.lastOnlineCheck != null;
     if (!hasEverSignedIn) {
-      // First-time user, never logged in — cannot use offline days
+      // First-time user, never logged in — direct Google sign-in
       return Scaffold(
         backgroundColor: kBg,
         body: SafeArea(
@@ -634,12 +608,12 @@ class _OfflineVerifyScreenState extends State<_OfflineVerifyScreen> {
               Text(AppLocale.l('appName'), style: TextStyle(
                 fontSize: 26, fontWeight: FontWeight.w900, color: kOrange, letterSpacing: 1.5)),
               const SizedBox(height: 32),
-              Icon(Icons.wifi_off_rounded, color: Colors.orange[400], size: 64),
+              Icon(Icons.account_circle_rounded, color: kPurple2, size: 64),
               const SizedBox(height: 16),
-              Text(AppLocale.l('internetRequired'), style: TextStyle(
+              Text(AppLocale.l('gmailRequired'), style: TextStyle(
                 fontSize: 20, fontWeight: FontWeight.w800, color: kText)),
               const SizedBox(height: 8),
-              Text('First-time setup requires internet',
+              Text('Sign in to get started',
                 style: TextStyle(fontSize: 14, color: kMuted)),
               const SizedBox(height: 16),
               Text(AppLocale.l('gmailRequiredMsg'),
@@ -648,25 +622,20 @@ class _OfflineVerifyScreenState extends State<_OfflineVerifyScreen> {
               const SizedBox(height: 24),
               if (_claiming)
                 CircularProgressIndicator(color: kPurple2)
-              else ...[
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.refresh),
-                  label: Text(AppLocale.l('retryConnection'),
+              else
+                SizedBox(width: double.infinity, child: ElevatedButton.icon(
+                  icon: const Icon(Icons.login),
+                  label: Text('Sign in with Google',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPurple2, foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  onPressed: () => _checkConnection(),
-                ),
-                const SizedBox(height: 16),
-                TextButton(
                   onPressed: () async {
                     setState(() => _claiming = true);
                     try {
-                      final ok = await GoogleAuthService.signIn()
-                          .timeout(const Duration(seconds: 10), onTimeout: () => false);
+                      final ok = await GoogleAuthService.signIn();
                       if (ok && mounted) {
                         try {
                           await Future.wait([
@@ -684,9 +653,6 @@ class _OfflineVerifyScreenState extends State<_OfflineVerifyScreen> {
                         }
                       } else if (mounted) {
                         setState(() => _claiming = false);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Sign-in failed. Please check your internet.'), backgroundColor: Colors.red),
-                        );
                       }
                     } catch (e) {
                       if (mounted) {
@@ -697,9 +663,7 @@ class _OfflineVerifyScreenState extends State<_OfflineVerifyScreen> {
                       }
                     }
                   },
-                  child: Text('Try Sign-in Anyway', style: TextStyle(color: kPurple2, fontWeight: FontWeight.w700, fontSize: 14)),
-                ),
-              ],
+                )),
             ]),
           )),
         ),
@@ -927,12 +891,17 @@ class _GmailRequiredScreenState extends State<_GmailRequiredScreen> {
                       try {
                         final ok = await GoogleAuthService.signIn();
                         if (ok && mounted) {
-                          // Complete post-login tasks
-                          final bound = await DeviceBindingService.checkBinding();
-                          deviceBindingNotifier.value = bound;
-                          await SubscriptionService.syncTrialWithFirestore();
-                          await SubscriptionService.checkManualPremium();
-                          // Force full rebuild
+                          // Post-login tasks with 5s timeout
+                          try {
+                            await Future.wait([
+                              SubscriptionService.recordOnlineCheck(),
+                              DeviceBindingService.checkBinding().then((bound) {
+                                deviceBindingNotifier.value = bound;
+                              }),
+                              SubscriptionService.syncTrialWithFirestore(),
+                              SubscriptionService.checkManualPremium(),
+                            ]).timeout(const Duration(seconds: 5), onTimeout: () => []);
+                          } catch (_) {}
                           if (mounted) deviceBindingNotifier.notifyListeners();
                         } else if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
