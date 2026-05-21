@@ -577,6 +577,37 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
                 }
               },
             ),
+          const SizedBox(height: 16),
+          TextButton(
+            onPressed: () async {
+              setState(() => _checking = true);
+              try {
+                final ok = await GoogleAuthService.signIn();
+                if (ok && mounted) {
+                  await SubscriptionService.recordOnlineCheck();
+                  await DeviceBindingService.checkBinding();
+                  await SubscriptionService.syncTrialWithFirestore();
+                  await SubscriptionService.checkManualPremium();
+                  if (mounted) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      (_) => false,
+                    );
+                  }
+                } else if (mounted) {
+                  setState(() => _checking = false);
+                }
+              } catch (e) {
+                if (mounted) {
+                  setState(() => _checking = false);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Sign-in failed. Check your internet.'), backgroundColor: Colors.red),
+                  );
+                }
+              }
+            },
+            child: Text('Try Sign-in Anyway', style: TextStyle(color: kPurple2, fontWeight: FontWeight.w700, fontSize: 14)),
+          ),
         ]),
       )),
     );

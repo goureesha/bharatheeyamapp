@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'trusted_time_service.dart';
 import 'google_auth_service.dart';
+import 'subscription_service.dart';
 
 /// Manages the offline access feature.
 ///
@@ -140,6 +141,12 @@ class OfflineAccessService {
 
   /// Claim one offline day (24 hours). Returns true if successful.
   static Future<bool> claimOfflineDay() async {
+    // Only paid users can claim offline days
+    if (!SubscriptionService.manualPremium && !SubscriptionService.hasSubscription) {
+      debugPrint('OfflineAccess: Free/trial user — offline days not available');
+      return false;
+    }
+
     if (!hasOfflineDaysLeft) {
       debugPrint('OfflineAccess: No days remaining!');
       return false;
