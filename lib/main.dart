@@ -39,31 +39,29 @@ Future<void> main() async {
   // TesterService.checkTesterStatus() which uses FirebaseFirestore.instance
   await FirebaseService.init();
 
-  // Phase 1: Sign in + other init tasks in PARALLEL.
-  // Auth MUST complete before subscription check (needs userEmail).
+  // Phase 1: FAST init — UI-critical only (theme, locale, location).
+  // Auth + ephemeris run in parallel but we don't wait for ephemeris.
+  final ephFuture = _initEphemeris(); // Start but don't await
   await Future.wait([
-    _initEphemeris(),
-    GoogleAuthService.signInSilently(), // ← Auth runs here so email is available
+    GoogleAuthService.signInSilently(),
     AppThemes.loadTheme(),
     ChartStyle.loadStyle(),
     AppLocale.loadLang(),
     LocationService.init(),
-    TesterService.init(),
   ]);
 
-  // Phase 2: Now that auth is done, check subscription from Firestore.
-  // This MUST run after sign-in so GoogleAuthService.userEmail is available.
+  // Phase 2: Subscription (needs userEmail from sign-in)
   await SubscriptionService.initialize();
   await OfflineAccessService.initialize();
 
-  // Phase 3: Device binding (needs accurate premium state for premiumDaysRemaining).
-  await _initAuthAndBinding();
-
-  // Now show the app — binding state is already resolved
+  // Show the app IMMEDIATELY — no more blocking on binding/tester
   runApp(const BharatheeyamApp());
 
-  // Defer non-critical tasks to AFTER the first frame
-  WidgetsBinding.instance.addPostFrameCallback((_) {
+  // Phase 3: Heavy tasks AFTER first frame (no more black screen)
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    await ephFuture; // Ensure ephemeris is ready before sunrise calc
+    await _initAuthAndBinding();
+    TesterService.init();
     _deferredInit();
   });
 }
