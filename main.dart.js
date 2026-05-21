@@ -41580,13 +41580,13 @@ if($.xZ==null)return!1
 s=new A.aw(Date.now(),0,!1).dq(0-A.d1(0,0,0,$.jR,0,0).a)
 r=$.xZ
 r.toString
-return B.b.aT(s.eI(r).a,6e7)<30},
+return B.b.aT(s.eI(r).a,36e8)<24},
 bAe(){var s,r
 if($.xZ==null)return!1
 s=new A.aw(Date.now(),0,!1).dq(0-A.d1(0,0,0,$.jR,0,0).a)
 r=$.xZ
 r.toString
-return B.b.aT(s.eI(r).a,6e7)>=30},
+return B.b.aT(s.eI(r).a,36e8)>=24},
 aDB(){var s=0,r=A.z(t.H),q,p,o,n
 var $async$aDB=A.A(function(a,b){if(a===1)return A.w(b,r)
 while(true)switch(s){case 0:s=2
@@ -41598,7 +41598,7 @@ $.y_=n==null?0:n
 n=A.db(o.h(p,"offline_days_synced_count"))
 $.Lw=n==null?0:n
 n=A.db(o.h(p,"offline_max_days"))
-$.u2=n==null?1:n
+$.u2=n==null?10:n
 q=A.db(o.h(p,"offline_claim_start"))
 if(q!=null)$.xZ=new A.aw(A.mX(q,0,!1),0,!1)
 p=$.u2
@@ -154128,7 +154128,7 @@ $.qs="\u0caf\u0cb2\u0ccd\u0cb2\u0cbe\u0caa\u0cc1\u0cb0 (Yellapur)"
 $.y_=0
 $.xZ=null
 $.Lw=0
-$.u2=1
+$.u2=10
 $.kz=!1
 $.lx=!1
 $.uP=null
