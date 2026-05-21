@@ -1081,14 +1081,16 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     final rules = muhurtaRules[_selectedMuhurtaEvent];
     final allowedLagnas = rules?.allowedLagnas;
 
-    // Get planet rashi positions
-    final Map<String, int> planetRashis = {};
+    // Get planet rashi positions (exclude Mandi — we compute it per-period)
+    final Map<String, int> basePlanetRashis = {};
     for (final entry in r.planets.entries) {
-      planetRashis[entry.key] = entry.value.rashiIndex;
+      if (entry.key == 'ಮಾಂದಿ') continue;
+      basePlanetRashis[entry.key] = entry.value.rashiIndex;
     }
-    final guruRashiIdx = planetRashis['ಗುರು'] ?? -1;
+    final guruRashiIdx = basePlanetRashis['ಗುರು'] ?? -1;
 
     try {
+      // Panchanga sunrise/sunset (with tzOffset) — for lagna window scanning
       final srSs = Ephemeris.findSunriseSetForDate(
         _selectedDay!.year, _selectedDay!.month, _selectedDay!.day,
         LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
@@ -1099,17 +1101,53 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
       final ayn = Sweph.swe_get_ayanamsa(srJd);
 
-      // Day windows: sunrise to sunset
-      final dayW = _scanLagnaRange(srJd, ssJd, ayn, planetRashis, guruRashiIdx, allowedLagnas, rules);
+      // Mandi sunrise/sunset (WITHOUT tzOffset, 0° horizon) — matching calcMandi exactly
+      final mandiSrSs = Ephemeris.findSunriseSetForDate(
+        _selectedDay!.year, _selectedDay!.month, _selectedDay!.day,
+        LocationService.lat, LocationService.lon,
+      );
+      final double mandiSr = mandiSrSs[0];
+      final double mandiSs = mandiSrSs[1];
 
-      // Night windows: sunset to next sunrise
+      // Vedic weekday: Sun=0..Sat=6
+      int pyWeekday = _selectedDay!.weekday - 1; // Mon=0..Sun=6
+      int vedicWday = (pyWeekday + 1) % 7; // Sun=0..Sat=6
+
+      // ── DAY Mandi ──
+      final dayDuration = mandiSs - mandiSr;
+      const dayFactors = [26, 22, 18, 14, 10, 6, 2];
+      final dayMandiJd = mandiSr + (dayDuration * dayFactors[vedicWday] / 30.0);
+      final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
+
+      final dayPlanetRashis = Map<String, int>.from(basePlanetRashis);
+      if (dayMandiRashi >= 0) dayPlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
+
+      final dayW = _scanLagnaRange(srJd, ssJd, ayn, dayPlanetRashis, guruRashiIdx, allowedLagnas, rules);
+
+      // ── NIGHT Mandi ──
       final nextDay = _selectedDay!.add(const Duration(days: 1));
       final nextSrSs = Ephemeris.findSunriseSetForDate(
         nextDay.year, nextDay.month, nextDay.day,
         LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
       );
       final double nextSrJd = nextSrSs[0];
-      final nightW = _scanLagnaRange(ssJd, nextSrJd, ayn, planetRashis, guruRashiIdx, allowedLagnas, rules);
+
+      // Night Mandi sunrise: next day's sunrise WITHOUT tzOffset
+      final nextMandiSrSs = Ephemeris.findSunriseSetForDate(
+        nextDay.year, nextDay.month, nextDay.day,
+        LocationService.lat, LocationService.lon,
+      );
+      final double nextMandiSr = nextMandiSrSs[0];
+
+      final nightDuration = nextMandiSr - mandiSs;
+      const nightFactors = [10, 6, 2, 26, 22, 18, 14];
+      final nightMandiJd = mandiSs + (nightDuration * nightFactors[vedicWday] / 30.0);
+      final nightMandiRashi = _mandiRashiFromJd(nightMandiJd);
+
+      final nightPlanetRashis = Map<String, int>.from(basePlanetRashis);
+      if (nightMandiRashi >= 0) nightPlanetRashis['ಮಾಂದಿ'] = nightMandiRashi;
+
+      final nightW = _scanLagnaRange(ssJd, nextSrJd, ayn, nightPlanetRashis, guruRashiIdx, allowedLagnas, rules);
 
       if (mounted) setState(() {
         _dayLagnaWindows = dayW;
@@ -1122,6 +1160,24 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       });
     }
   }
+
+  /// Get Mandi rashi from its JD — matches calculator.dart lines 612-617 exactly
+  int _mandiRashiFromJd(double mandiJd) {
+    try {
+      final houses = Ephemeris.placidusHousesFull(
+        mandiJd, LocationService.lat, LocationService.lon,
+      );
+      if (houses != null && houses.ascmc.length >= 1) {
+        // Ayanamsa at mandiJd — NOT at sunrise (matching calcMandi)
+        Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+        final aMandi = Sweph.swe_get_ayanamsa(mandiJd);
+        final mandiDeg = ((houses.ascmc[0] as double) - aMandi + 360.0) % 360.0;
+        return (mandiDeg / 30.0).floor() % 12;
+      }
+    } catch (_) {}
+    return -1;
+  }
+
   List<LagnaWindow> _scanLagnaRange(double startJd, double endJd, double ayn,
       Map<String, int> planetRashis, int guruRashiIdx, List<int>? allowedLagnas, MuhurtaEventRules? rules) {
     final double step = 10.0 / (24.0 * 60.0); // 10 min
