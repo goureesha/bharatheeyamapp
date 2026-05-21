@@ -8,7 +8,7 @@ import 'widgets/common.dart';
 import 'services/subscription_service.dart';
 import 'services/trusted_time_service.dart';
 import 'services/google_auth_service.dart';
-import 'services/install_checker.dart';
+
 import 'services/device_binding_service.dart';
 import 'services/firebase_service.dart';
 import 'services/offline_access_service.dart';
@@ -49,7 +49,6 @@ Future<void> main() async {
     AppLocale.loadLang(),
     LocationService.init(),
     TesterService.init(),
-    InstallChecker.check(),
   ]);
 
   // Phase 2: Now that auth is done, check subscription from Firestore.
@@ -360,10 +359,8 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   indicatorSize: TabBarIndicatorSize.tab,
                 ),
               ),
-              home: !InstallChecker.isFromPlayStore
-                ? const _SideloadBlockedScreen()
-                : !GoogleAuthService.isSignedIn && !kIsWeb
-                  ? const _OfflineVerifyScreen() // Show offline verify instead of Gmail login when offline
+              home: !GoogleAuthService.isSignedIn && !kIsWeb
+                  ? const _OfflineVerifyScreen()
                   : !isBound
                     ? const _DeviceMismatchScreen()
                     : SubscriptionService.needsInternetVerification && !OfflineAccessService.hasActiveClaim
@@ -380,45 +377,6 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
 // ============================================================
 // BLOCKED SCREENS
 // ============================================================
-
-/// Shown when app is sideloaded (not from Play Store)
-class _SideloadBlockedScreen extends StatelessWidget {
-  const _SideloadBlockedScreen();
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBg,
-      body: Center(child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Icons.block, size: 80, color: Colors.red[400]),
-          const SizedBox(height: 24),
-          Text(AppLocale.l('unauthorizedInstall'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kText)),
-          const SizedBox(height: 8),
-          Text('Unauthorized Installation', style: TextStyle(fontSize: 16, color: kMuted)),
-          const SizedBox(height: 24),
-          Text(AppLocale.l('downloadFromPlayStore'),
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 15, color: kText, height: 1.5)),
-          const SizedBox(height: 8),
-          Text('This app can only be used when downloaded from the Google Play Store.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: kMuted, height: 1.5)),
-          const SizedBox(height: 32),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.shop, color: Colors.white),
-            label: Text(AppLocale.l('goToPlayStore')),
-            style: ElevatedButton.styleFrom(backgroundColor: kPurple2, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14)),
-            onPressed: () {
-              // Open Play Store listing
-              // url_launcher can be used here if needed
-            },
-          ),
-        ]),
-      )),
-    );
-  }
-}
 
 /// Shown when user's Gmail is bound to a different device
 class _DeviceMismatchScreen extends StatefulWidget {
