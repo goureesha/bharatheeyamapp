@@ -52,55 +52,42 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-// ─── Load Clients (Real-time) ───
+async function loadClients() {
+  try {
+    const snapshot = await db.collection('device_bindings').get();
+    allClients = [];
 
-let clientsListener = null; // Firestore snapshot listener
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      allClients.push({
+        email: doc.id,
+        ...data,
+        _isPremium: data.manualPremium === true,
+        _isTrialActive: data.isTrialActive === true,
+        _daysLeft: getDaysLeft(data),
+        _expiryDate: getExpiryDate(data),
+        _lastSeenStr: formatTimestamp(data.lastSeen),
+        _lastSeenDate: data.lastSeen ? data.lastSeen.toDate() : null,
+      });
+    });
 
-function loadClients() {
-  // Unsubscribe any existing listener first
-  if (clientsListener) {
-    clientsListener();
-    clientsListener = null;
+    // Sort: premium first, then by last seen
+    allClients.sort((a, b) => {
+      if (a._isPremium && !b._isPremium) return -1;
+      if (!a._isPremium && b._isPremium) return 1;
+      if (a._lastSeenDate && b._lastSeenDate) return b._lastSeenDate - a._lastSeenDate;
+      return 0;
+    });
+
+    updateStats();
+    updateExpiryTimeline();
+    filterClients();
+    updateLastRefresh();
+  } catch (err) {
+    console.error('Load error:', err);
+    document.getElementById('clientTableBody').innerHTML =
+      '<tr><td colspan="9" class="empty-state">Error loading data: ' + err.message + '</td></tr>';
   }
-
-  // Use onSnapshot for real-time updates — fires on EVERY change
-  clientsListener = db.collection('device_bindings').onSnapshot(
-    snapshot => {
-      allClients = [];
-
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        allClients.push({
-          email: doc.id,
-          ...data,
-          _isPremium: data.manualPremium === true,
-          _isTrialActive: data.isTrialActive === true,
-          _daysLeft: getDaysLeft(data),
-          _expiryDate: getExpiryDate(data),
-          _lastSeenStr: formatTimestamp(data.lastSeen),
-          _lastSeenDate: data.lastSeen ? data.lastSeen.toDate() : null,
-        });
-      });
-
-      // Sort: premium first, then by last seen
-      allClients.sort((a, b) => {
-        if (a._isPremium && !b._isPremium) return -1;
-        if (!a._isPremium && b._isPremium) return 1;
-        if (a._lastSeenDate && b._lastSeenDate) return b._lastSeenDate - a._lastSeenDate;
-        return 0;
-      });
-
-      updateStats();
-      updateExpiryTimeline();
-      filterClients();
-      updateLastRefresh();
-    },
-    err => {
-      console.error('Realtime listener error:', err);
-      document.getElementById('clientTableBody').innerHTML =
-        '<tr><td colspan="9" class="empty-state">Error loading data: ' + err.message + '</td></tr>';
-    }
-  );
 }
 
 // Show last updated time
