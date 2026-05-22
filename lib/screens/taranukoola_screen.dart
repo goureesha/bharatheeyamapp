@@ -1375,9 +1375,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                     required: lw.requiredShuddhis.contains(ShuddhiType.saptama)),
                 _shuddhiChip(AppLocale.l('ashtamaShort'), lw.ashtamaShuddhi, lw.ashtamaGrahas,
                     required: lw.requiredShuddhis.contains(ShuddhiType.ashtama)),
-                if (lw.requiredShuddhis.contains(ShuddhiType.dashama) || lw.dashamaGrahas.isNotEmpty)
-                  _shuddhiChip(AppLocale.l('dashamaShort'), lw.dashamaShuddhi, lw.dashamaGrahas,
-                      required: lw.requiredShuddhis.contains(ShuddhiType.dashama)),
+                _shuddhiChip(AppLocale.l('dashamaShort'), lw.dashamaShuddhi, lw.dashamaGrahas,
+                    required: lw.requiredShuddhis.contains(ShuddhiType.dashama)),
                 if (lw.requiredShuddhis.contains(ShuddhiType.chandraSaptama) || lw.chandraSaptamaGrahas.isNotEmpty)
                   _shuddhiChip(AppLocale.l('chandraSaptamaShort'), lw.chandraSaptamaShuddhi, lw.chandraSaptamaGrahas,
                       required: lw.requiredShuddhis.contains(ShuddhiType.chandraSaptama)),
