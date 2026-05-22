@@ -4,6 +4,7 @@ import '../constants/strings.dart';
 
 class TransitEvent {
   final DateTime date;
+  final String time; // HH:MM AM/PM format
   final String planetName;
   final String description;
   final String fromRashi;
@@ -11,6 +12,7 @@ class TransitEvent {
   
   TransitEvent({
     required this.date,
+    this.time = '',
     required this.planetName,
     required this.description,
     required this.fromRashi,
@@ -49,6 +51,50 @@ class TransitData {
 }
 
 class TransitCalculator {
+  /// Binary search to find exact JD when planet changes rashi.
+  /// prevJd: JD where planet was in prevRashi, curJd: JD where planet is in newRashi.
+  /// Returns the JD of the exact rashi boundary crossing.
+  static double _findExactTransitJd(String engPlanet, double prevJd, double curJd, int prevRashiIdx) {
+    double low = prevJd;
+    double high = curJd;
+    for (int i = 0; i < 20; i++) {
+      final mid = (low + high) / 2;
+      final pos = Ephemeris.calcAll(mid, 'lahiri', true);
+      if (!pos.containsKey(engPlanet)) break;
+      final lng = pos[engPlanet]![0];
+      final rIdx = (lng / 30).floor() % 12;
+      if (rIdx == prevRashiIdx) {
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+    return (low + high) / 2;
+  }
+
+  /// Convert a JD to local time string (HH:MM AM/PM) for IST (tzOffset=5.5)
+  static String _jdToLocalTime(double jd, {double tzOffset = 5.5}) {
+    final localJd = jd + 0.5 + (tzOffset / 24.0);
+    double frac = localJd - localJd.floor();
+    frac = ((frac % 1.0) + 1.0) % 1.0;
+    int totalMinutes = (frac * 24 * 60).round();
+    if (totalMinutes >= 1440) totalMinutes -= 1440;
+    int h = totalMinutes ~/ 60;
+    int m = totalMinutes % 60;
+    String amPm = h >= 12 ? 'PM' : 'AM';
+    int h12 = h % 12;
+    if (h12 == 0) h12 = 12;
+    return '${h12.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $amPm';
+  }
+
+  /// Convert a JD to a DateTime in local timezone
+  static DateTime _jdToLocalDate(double jd, {double tzOffset = 5.5}) {
+    final localJd = jd + (tzOffset / 24.0);
+    // swe_revjul gives calendar date from JD
+    final y = Sweph.swe_revjul(localJd, CalendarType.SE_GREG_CAL);
+    return DateTime(y.year, y.month, y.day);
+  }
+
   static Future<TransitData> calculateAnnualEvents(int year) async {
     await Ephemeris.initSweph();
     
@@ -117,6 +163,12 @@ class TransitCalculator {
     // Now loop through the year
     int daysInYear = DateTime(year + 1, 1, 1).difference(DateTime(year, 1, 1)).inDays;
     
+    // Store previous JDs for binary search
+    Map<String, double> prevJd = {};
+    for (final p in planetsToCheck.keys) {
+      prevJd[p] = jdStartBase;
+    }
+    
     for (int d = 1; d <= daysInYear; d++) {
        final currentDate = DateTime(year, 1, 1).add(Duration(days: d - 1));
        
@@ -137,12 +189,14 @@ class TransitCalculator {
              final prevName = knRashi[prevRashi[p]!];
              final nextName = knRashi[rIdx];
              
-             // Check if it's a retrograde move or normal move
-             // If a planet goes from Aries (0) to Pisces (11), it's Vakri
-             // Or if it's Rahu/Ketu, they normally go backwards.
+             // Binary search for exact transit time
+             final exactJd = _findExactTransitJd(p, prevJd[p]!, jd, prevRashi[p]!);
+             final transitTime = _jdToLocalTime(exactJd);
+             final transitDate = _jdToLocalDate(exactJd);
              
              transits.add(TransitEvent(
-                date: currentDate,
+                date: transitDate,
+                time: transitTime,
                 planetName: knName,
                 description: '${prevRashi[p]} -> $rIdx',
                 fromRashi: prevName,
@@ -150,6 +204,7 @@ class TransitCalculator {
              ));
              prevRashi[p] = rIdx;
           }
+          prevJd[p] = jd;
           
           // 2. VAKRI / ASTA
           if (['Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'].contains(p)) {

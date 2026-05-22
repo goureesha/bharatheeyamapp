@@ -236,7 +236,15 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
             ),
             title: Text(_planetLabel(ev.planetName), style: TextStyle(fontWeight: FontWeight.bold, color: kText)),
             subtitle: Text('${trAll(ev.fromRashi)} → ${trAll(ev.toRashi)}', style: TextStyle(color: kMuted)),
-            trailing: Text(_formatDate(ev.date), style: TextStyle(color: kText, fontWeight: FontWeight.w600, fontSize: 12)),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(_formatDate(ev.date), style: TextStyle(color: kText, fontWeight: FontWeight.w600, fontSize: 12)),
+                if (ev.time.isNotEmpty)
+                  Text(ev.time, style: TextStyle(color: kMuted, fontWeight: FontWeight.w500, fontSize: 11)),
+              ],
+            ),
           ),
         );
       },

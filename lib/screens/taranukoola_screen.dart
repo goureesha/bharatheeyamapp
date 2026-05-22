@@ -1196,37 +1196,67 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     }
     if (samples.isEmpty) return [];
 
+    // English → Kannada planet name mapping for Ephemeris.calcAll keys
+    const engToKn = {
+      'Sun': 'ರವಿ', 'Moon': 'ಚಂದ್ರ', 'Mercury': 'ಬುಧ', 'Venus': 'ಶುಕ್ರ',
+      'Mars': 'ಕುಜ', 'Jupiter': 'ಗುರು', 'Saturn': 'ಶನಿ',
+      'Rahu': 'ರಾಹು', 'Ketu': 'ಕೇತು',
+    };
+
     final List<LagnaWindow> windows = [];
     int currentRashi = samples.first.rashiIdx;
     double startMins = samples.first.localMins;
+    double windowStartJd = samples.first.jd;
 
     for (int i = 1; i < samples.length; i++) {
       if (samples[i].rashiIdx != currentRashi || i == samples.length - 1) {
         final endMins = samples[i].localMins;
+        final windowEndJd = samples[i].jd;
+
+        // ── Recalculate planet positions at this window's midpoint ──
+        final midJd = (windowStartJd + windowEndJd) / 2.0;
+        final freshPositions = Ephemeris.calcAll(midJd, 'lahiri', true);
+
+        // Build per-window planet rashi map from fresh sidereal longitudes
+        final Map<String, int> windowPlanetRashis = {};
+        for (final entry in freshPositions.entries) {
+          final knName = engToKn[entry.key];
+          if (knName != null) {
+            windowPlanetRashis[knName] = (entry.value[0] / 30.0).floor() % 12;
+          }
+        }
+        // Keep Mandi from the passed-in map (already computed for day/night)
+        if (planetRashis.containsKey('ಮಾಂದಿ')) {
+          windowPlanetRashis['ಮಾಂದಿ'] = planetRashis['ಮಾಂದಿ']!;
+        }
+
+        // Per-window Guru rashi from fresh positions
+        final windowGuruRashiIdx = windowPlanetRashis['ಗುರು'] ?? -1;
+
         final saptamaRashi = (currentRashi + 6) % 12;
         final ashtamaRashi = (currentRashi + 7) % 12;
         final dashamaRashi = (currentRashi + 9) % 12;
 
-        final lagnaM = findAllPlanetsInRashi(currentRashi, planetRashis);
+        final lagnaM = findAllPlanetsInRashi(currentRashi, windowPlanetRashis);
         final saptamaM = _selectedMuhurtaEvent == MuhurtaEvent.vivaha
-            ? findAllPlanetsInRashi(saptamaRashi, planetRashis)
-            : findMaleficsInRashi(saptamaRashi, planetRashis);
-        final ashtamaM = findAllPlanetsInRashi(ashtamaRashi, planetRashis);
+            ? findAllPlanetsInRashi(saptamaRashi, windowPlanetRashis)
+            : findMaleficsInRashi(saptamaRashi, windowPlanetRashis);
+        final ashtamaM = findAllPlanetsInRashi(ashtamaRashi, windowPlanetRashis);
         final rashiLords = [4, 5, 3, 1, 0, 3, 5, 4, 8, 6, 6, 8];
         if (rashiLords[currentRashi] == rashiLords[ashtamaRashi]) ashtamaM.clear();
-        final dashamaM = findAllPlanetsInRashi(dashamaRashi, planetRashis);
+        final dashamaM = findAllPlanetsInRashi(dashamaRashi, windowPlanetRashis);
 
-        final chandraRashi = planetRashis['ಚಂದ್ರ'] ?? -1;
+        final chandraRashi = windowPlanetRashis['ಚಂದ್ರ'] ?? -1;
         final chandraSaptamaRashi = chandraRashi >= 0 ? (chandraRashi + 6) % 12 : -1;
         final List<String> chandraSaptamaM = [];
         if (chandraSaptamaRashi >= 0) {
-          if (planetRashis['ರವಿ'] == chandraSaptamaRashi) chandraSaptamaM.add('ರವಿ');
-          if (planetRashis['ಕುಜ'] == chandraSaptamaRashi) chandraSaptamaM.add('ಕುಜ');
-          if (planetRashis['ಶನಿ'] == chandraSaptamaRashi) chandraSaptamaM.add('ಶನಿ');
+          if (windowPlanetRashis['ರವಿ'] == chandraSaptamaRashi) chandraSaptamaM.add('ರವಿ');
+          if (windowPlanetRashis['ಕುಜ'] == chandraSaptamaRashi) chandraSaptamaM.add('ಕುಜ');
+          if (windowPlanetRashis['ಶನಿ'] == chandraSaptamaRashi) chandraSaptamaM.add('ಶನಿ');
         }
 
-        final guruOk = guruRashiIdx >= 0 ? isGuruAnukoolaForLagna(currentRashi, guruRashiIdx) : false;
-        final guruHouse = guruRashiIdx >= 0 ? ((guruRashiIdx - currentRashi + 12) % 12) + 1 : 0;
+        final guruOk = windowGuruRashiIdx >= 0 ? isGuruAnukoolaForLagna(currentRashi, windowGuruRashiIdx) : false;
+        final guruHouse = windowGuruRashiIdx >= 0 ? ((windowGuruRashiIdx - currentRashi + 12) % 12) + 1 : 0;
         final bool isLagnaAllowed = allowedLagnas == null || allowedLagnas.contains(currentRashi);
 
         windows.add(LagnaWindow(
@@ -1252,6 +1282,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
 
         currentRashi = samples[i].rashiIdx;
         startMins = samples[i].localMins;
+        windowStartJd = samples[i].jd;
       }
     }
     return windows;
