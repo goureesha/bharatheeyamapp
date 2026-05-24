@@ -23,6 +23,7 @@ const ADMIN_EMAIL = 'goureesh3690@gmail.com';
 let allClients = [];
 let currentUnlockEmail = null;
 let currentRevokeEmail = null;
+let currentOfflineEmail = null;
 
 // ─── Auth ───
 
@@ -302,7 +303,8 @@ function renderTable(clients) {
     const device = c.deviceName || c.deviceModel || '—';
     const version = c.appVersion || '—';
     const offlineDays = c._offlineDays;
-    const offlineColor = offlineDays >= 8 ? 'var(--red)' : offlineDays >= 5 ? 'var(--orange)' : 'var(--muted)';
+    const offlineMax = c.max_offline_days || 10;
+    const offlineColor = offlineDays >= offlineMax - 2 ? 'var(--red)' : offlineDays >= offlineMax / 2 ? 'var(--orange)' : 'var(--muted)';
 
     return `
       <tr>
@@ -311,7 +313,10 @@ function renderTable(clients) {
         <td style="color: var(--muted); font-size: 12px">${device}</td>
         <td>${statusBadge}</td>
         <td>${daysDisplay}</td>
-        <td style="font-size: 12px; font-weight: 600; color: ${offlineColor}">${offlineDays}/10</td>
+        <td style="font-size: 12px;">
+          <span style="font-weight: 600; color: ${offlineColor}">${offlineDays}/${offlineMax}</span>
+          <button onclick="openOfflineModal('${c.email}', ${offlineDays}, ${offlineMax})" style="margin-left:4px; padding:1px 6px; font-size:10px; cursor:pointer; background:var(--card); border:1px solid var(--border); border-radius:4px; color:var(--purple);">✎</button>
+        </td>
         <td style="font-size: 12px; color: var(--muted)">${formatDate(c._expiryDate)}</td>
         <td style="font-size: 12px; color: var(--muted)">${c._lastSeenStr}</td>
         <td style="font-size: 12px; color: var(--muted)">${version}</td>
@@ -338,8 +343,10 @@ function openRevokeModal(email) {
 function closeModal() {
   document.getElementById('unlockModal').classList.add('hidden');
   document.getElementById('revokeModal').classList.add('hidden');
+  document.getElementById('offlineModal').classList.add('hidden');
   currentUnlockEmail = null;
   currentRevokeEmail = null;
+  currentOfflineEmail = null;
 }
 
 async function confirmUnlock() {
@@ -454,5 +461,44 @@ async function loadInstalls() {
   } catch (err) {
     console.error('Installs load error:', err);
     tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Error: ' + err.message + '</td></tr>';
+  }
+}
+
+// ─── Offline Days Edit ───
+
+function openOfflineModal(email, usedDays, maxDays) {
+  currentOfflineEmail = email;
+  document.getElementById('offlineEmail').textContent = email;
+  document.getElementById('offlineCurrentUsed').textContent = usedDays;
+  document.getElementById('offlineCurrentMax').textContent = maxDays;
+  document.getElementById('offlineMaxInput').value = maxDays;
+  document.getElementById('offlineUsedInput').value = usedDays;
+  document.getElementById('offlineModal').classList.remove('hidden');
+}
+
+async function confirmOfflineEdit() {
+  if (!currentOfflineEmail) return;
+
+  const newMax = parseInt(document.getElementById('offlineMaxInput').value);
+  const newUsed = parseInt(document.getElementById('offlineUsedInput').value);
+
+  if (isNaN(newMax) || newMax < 0) {
+    alert('Invalid max days value');
+    return;
+  }
+  if (isNaN(newUsed) || newUsed < 0) {
+    alert('Invalid used days value');
+    return;
+  }
+
+  try {
+    await db.collection('device_bindings').doc(currentOfflineEmail).update({
+      max_offline_days: newMax,
+      offlineDaysUsed: newUsed,
+    });
+    closeModal();
+    loadClients();
+  } catch (err) {
+    alert('Error: ' + err.message);
   }
 }

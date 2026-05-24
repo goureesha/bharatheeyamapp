@@ -192,6 +192,30 @@
     </div>
   </div>
 
+  <!-- Edit Offline Days Modal -->
+  <div id="offlineModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>📴 Edit Offline Days</h2>
+      <p id="offlineEmail" class="modal-email"></p>
+      <div style="margin: 16px 0; padding: 12px; background: rgba(99,102,241,0.08); border-radius: 8px;">
+        <p style="font-size: 13px; color: var(--muted); margin: 0 0 4px;">Current usage: <strong id="offlineCurrentUsed" style="color: var(--text)">0</strong> / <strong id="offlineCurrentMax" style="color: var(--text)">10</strong> days</p>
+      </div>
+      <div class="modal-field">
+        <label>Max Offline Days</label>
+        <input type="number" id="offlineMaxInput" min="0" max="365" value="10" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text); font-size: 16px;">
+      </div>
+      <div class="modal-field" style="margin-top: 12px;">
+        <label>Reset Used Days To</label>
+        <input type="number" id="offlineUsedInput" min="0" max="365" value="0" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text); font-size: 16px;">
+        <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Set to 0 to reset all offline days</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-confirm" onclick="confirmOfflineEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
