@@ -423,18 +423,23 @@ async function loadInstalls() {
       });
     });
 
-    // Sort by last launch (most recent first)
-    installs.sort((a, b) => {
-      if (a.lastLaunch && b.lastLaunch) return b.lastLaunch - a.lastLaunch;
-      return 0;
-    });
+    // Sort: not_signed_in first, then by last launch
+    const notSignedIn = installs.filter(i => i.email === 'not_signed_in' || i.email === '—');
+    const signedIn = installs.filter(i => i.email !== 'not_signed_in' && i.email !== '—');
+    notSignedIn.sort((a, b) => (b.lastLaunch || 0) - (a.lastLaunch || 0));
+    signedIn.sort((a, b) => (b.lastLaunch || 0) - (a.lastLaunch || 0));
+    const sorted = [...notSignedIn, ...signedIn];
 
-    if (installs.length === 0) {
+    if (sorted.length === 0) {
       tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No installs found</td></tr>';
       return;
     }
 
-    tbody.innerHTML = installs.map((inst, i) => {
+    // Update header with count
+    const header = section.querySelector('.section-title');
+    header.innerHTML = `📱 Device Installs — <span style="color: var(--text)">${sorted.length} total</span>, <span style="color: #ef4444; font-weight: 700">${notSignedIn.length} without login</span>`;
+
+    tbody.innerHTML = sorted.map((inst, i) => {
       const firstStr = inst.firstInstall
         ? inst.firstInstall.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
         : '—';
@@ -443,12 +448,17 @@ async function loadInstalls() {
           + ' ' + inst.lastLaunch.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
         : '—';
       const shortId = inst.deviceId.length > 12 ? inst.deviceId.substring(0, 12) + '…' : inst.deviceId;
+      const isUnsigned = inst.email === 'not_signed_in' || inst.email === '—';
+      const rowBg = isUnsigned ? 'background: rgba(239,68,68,0.06);' : '';
+      const emailDisplay = isUnsigned
+        ? '<span class="badge badge-expired" style="font-size: 10px;">⚠ No Login</span>'
+        : `<span style="font-weight: 600">${inst.email}</span>`;
 
       return `
-        <tr>
+        <tr style="${rowBg}">
           <td style="color: var(--muted)">${i + 1}</td>
           <td style="font-size: 11px; color: var(--muted); font-family: monospace;" title="${inst.deviceId}">${shortId}</td>
-          <td style="font-weight: 600">${inst.email}</td>
+          <td>${emailDisplay}</td>
           <td style="font-size: 12px; color: var(--muted)">${inst.deviceName}</td>
           <td style="font-size: 12px;">${inst.platform}</td>
           <td style="font-size: 12px; color: var(--muted)">${inst.appVersion}</td>
