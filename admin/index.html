@@ -96,7 +96,7 @@
         <option value="expiring30">Expiring in 30 Days</option>
       </select>
       <button class="btn-refresh" onclick="refreshData()">↻ Refresh</button>
-      <span class="live-indicator"><span class="live-dot"></span> LIVE</span>
+      <button class="btn-refresh" onclick="loadInstalls()" style="background: #334155;">📱 Installs</button>
       <span id="lastUpdated" class="last-updated"></span>
     </div>
 
@@ -110,6 +110,7 @@
             <th>Device</th>
             <th>Status</th>
             <th>Days Left</th>
+            <th>Offline Days</th>
             <th>Expiry Date</th>
             <th>Last Seen</th>
             <th>App Version</th>
@@ -117,9 +118,37 @@
           </tr>
         </thead>
         <tbody id="clientTableBody">
-          <tr><td colspan="9" class="empty-state">Loading clients...</td></tr>
+          <tr><td colspan="10" class="empty-state">Loading clients...</td></tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Installs Section -->
+    <div id="installsSection" class="section-card hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h2 class="section-title" style="margin: 0;">📱 Device Installs</h2>
+        <button class="btn-cancel" onclick="document.getElementById('installsSection').classList.add('hidden')" style="padding: 4px 12px; font-size: 12px;">✕ Close</button>
+      </div>
+      <div class="table-wrapper">
+        <table class="client-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Device ID</th>
+              <th>Email</th>
+              <th>Device</th>
+              <th>Platform</th>
+              <th>App Version</th>
+              <th>Launches</th>
+              <th>First Install</th>
+              <th>Last Launch</th>
+            </tr>
+          </thead>
+          <tbody id="installsTableBody">
+            <tr><td colspan="9" class="empty-state">Click "📱 Installs" to load</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Footer -->

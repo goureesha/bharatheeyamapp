@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Complete implementation plan for adding Google Calendar 2-way sync to the Bharatheeyam appointment section. Covers what the user needs to set up in Google Cloud Console, the OAuth consent screen verification process, the Flutter packages required, and the full technical approach for bidirectional sync (local ↔ Google Calendar). Includes step-by-step setup instructions, data mapping, conflict resolution strategy, and verification plan.",
+  "updatedAt": "2026-05-22T13:04:43.860724200Z",
+  "requestFeedback": true
+}

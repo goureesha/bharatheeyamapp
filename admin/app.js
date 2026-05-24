@@ -68,6 +68,7 @@ async function loadClients() {
         _expiryDate: getExpiryDate(data),
         _lastSeenStr: formatTimestamp(data.lastSeen),
         _lastSeenDate: data.lastSeen ? data.lastSeen.toDate() : null,
+        _offlineDays: data.offlineDaysUsed || 0,
       });
     });
 
@@ -86,7 +87,7 @@ async function loadClients() {
   } catch (err) {
     console.error('Load error:', err);
     document.getElementById('clientTableBody').innerHTML =
-      '<tr><td colspan="9" class="empty-state">Error loading data: ' + err.message + '</td></tr>';
+      '<tr><td colspan="10" class="empty-state">Error loading data: ' + err.message + '</td></tr>';
   }
 }
 
@@ -257,7 +258,7 @@ function renderTable(clients) {
   const tbody = document.getElementById('clientTableBody');
 
   if (clients.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No clients found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No clients found</td></tr>';
     return;
   }
 
@@ -300,6 +301,8 @@ function renderTable(clients) {
 
     const device = c.deviceName || c.deviceModel || '—';
     const version = c.appVersion || '—';
+    const offlineDays = c._offlineDays;
+    const offlineColor = offlineDays >= 8 ? 'var(--red)' : offlineDays >= 5 ? 'var(--orange)' : 'var(--muted)';
 
     return `
       <tr>
@@ -308,6 +311,7 @@ function renderTable(clients) {
         <td style="color: var(--muted); font-size: 12px">${device}</td>
         <td>${statusBadge}</td>
         <td>${daysDisplay}</td>
+        <td style="font-size: 12px; font-weight: 600; color: ${offlineColor}">${offlineDays}/10</td>
         <td style="font-size: 12px; color: var(--muted)">${formatDate(c._expiryDate)}</td>
         <td style="font-size: 12px; color: var(--muted)">${c._lastSeenStr}</td>
         <td style="font-size: 12px; color: var(--muted)">${version}</td>
@@ -385,3 +389,70 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal();
 });
+
+// ─── Installs ───
+
+async function loadInstalls() {
+  const section = document.getElementById('installsSection');
+  const tbody = document.getElementById('installsTableBody');
+  section.classList.remove('hidden');
+  tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Loading installs...</td></tr>';
+
+  try {
+    const snapshot = await db.collection('installs').get();
+    const installs = [];
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      installs.push({
+        deviceId: doc.id,
+        email: data.email || '—',
+        deviceName: data.deviceName || data.model || '—',
+        platform: data.platform || '—',
+        appVersion: data.appVersion || '—',
+        launchCount: data.launchCount || 0,
+        firstInstall: data.firstInstall ? data.firstInstall.toDate() : null,
+        lastLaunch: data.lastLaunch ? data.lastLaunch.toDate() : null,
+      });
+    });
+
+    // Sort by last launch (most recent first)
+    installs.sort((a, b) => {
+      if (a.lastLaunch && b.lastLaunch) return b.lastLaunch - a.lastLaunch;
+      return 0;
+    });
+
+    if (installs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No installs found</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = installs.map((inst, i) => {
+      const firstStr = inst.firstInstall
+        ? inst.firstInstall.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        : '—';
+      const lastStr = inst.lastLaunch
+        ? inst.lastLaunch.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+          + ' ' + inst.lastLaunch.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+        : '—';
+      const shortId = inst.deviceId.length > 12 ? inst.deviceId.substring(0, 12) + '…' : inst.deviceId;
+
+      return `
+        <tr>
+          <td style="color: var(--muted)">${i + 1}</td>
+          <td style="font-size: 11px; color: var(--muted); font-family: monospace;" title="${inst.deviceId}">${shortId}</td>
+          <td style="font-weight: 600">${inst.email}</td>
+          <td style="font-size: 12px; color: var(--muted)">${inst.deviceName}</td>
+          <td style="font-size: 12px;">${inst.platform}</td>
+          <td style="font-size: 12px; color: var(--muted)">${inst.appVersion}</td>
+          <td style="font-weight: 700; color: var(--purple)">${inst.launchCount}</td>
+          <td style="font-size: 12px; color: var(--muted)">${firstStr}</td>
+          <td style="font-size: 12px; color: var(--muted)">${lastStr}</td>
+        </tr>
+      `;
+    }).join('');
+  } catch (err) {
+    console.error('Installs load error:', err);
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Error: ' + err.message + '</td></tr>';
+  }
+}
