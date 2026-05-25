@@ -197,13 +197,13 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
   }
 
   Future<void> _verifyAccessOnResume() async {
-    // Check device block first — if blocked, kick immediately
-    final blocked = await DeviceBindingService.isDeviceBlocked();
-    if (blocked) {
-      deviceBlockedNotifier.value = true;
-      debugPrint('DeviceBlock: BLOCKED on resume — kicking to block screen');
-      return;
-    }
+    // Block check in parallel — don't block resume verification
+    DeviceBindingService.isDeviceBlocked().then((blocked) {
+      if (blocked) {
+        deviceBlockedNotifier.value = true;
+        debugPrint('DeviceBlock: BLOCKED on resume');
+      }
+    }).catchError((_) {});
 
     // Always try to verify with the server, even during active offline claims.
     // This ensures admin revocations take effect even if the user claimed a day.
