@@ -301,17 +301,16 @@ function renderTable(clients) {
     let actions;
     const isUnsigned = c.isUnsigned === true || (c.email && c.email.startsWith('not_signed_in'));
     const isBlocked = c.blocked === true;
+    const blockBtn = isBlocked
+      ? `<button class="btn-unlock" onclick="toggleBlock('${c.email}', false)" style="font-size:10px; padding:4px 8px;">✅ Unblock</button>`
+      : `<button class="btn-revoke-small" onclick="toggleBlock('${c.email}', true)" style="font-size:10px; padding:4px 8px;">🚫 Block</button>`;
 
     if (isUnsigned) {
-      if (isBlocked) {
-        actions = `<button class="btn-unlock" onclick="toggleBlock('${c.email}', false)" style="font-size:10px; padding:4px 8px;">✅ Unblock</button>`;
-      } else {
-        actions = `<button class="btn-revoke-small" onclick="toggleBlock('${c.email}', true)" style="font-size:10px; padding:4px 8px;">🚫 Block</button>`;
-      }
+      actions = blockBtn;
     } else if (c._isPremium) {
-      actions = `<button class="btn-revoke-small" onclick="openRevokeModal('${c.email}')">Revoke</button>`;
+      actions = `<button class="btn-revoke-small" onclick="openRevokeModal('${c.email}')" style="font-size:10px; padding:4px 8px;">Revoke</button> ${blockBtn}`;
     } else {
-      actions = `<button class="btn-unlock" onclick="openUnlockModal('${c.email}')">Unlock</button>`;
+      actions = `<button class="btn-unlock" onclick="openUnlockModal('${c.email}')" style="font-size:10px; padding:4px 8px;">Unlock</button> ${blockBtn}`;
     }
 
     const device = c.deviceName || c.deviceModel || '—';
