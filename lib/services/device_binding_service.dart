@@ -236,14 +236,14 @@ class DeviceBindingService {
       }
 
       // ── DEVICE MISMATCH ──
-      // Import: only enforce for SUBSCRIBED users.
-      // Non-subscribed users get auto-rebound (nothing to protect).
-      // This prevents false blocks when SharedPreferences gets cleared
-      // (app update, clear cache, reinstall) which generates a new UUID.
-      final hasActiveSub = (await SharedPreferences.getInstance()).getBool('has_active_subscription') ?? false;
+      // Only enforce for users with active premium/subscription.
+      // Non-premium users get auto-rebound (nothing to protect).
+      // Check Firestore doc (NOT local SharedPreferences — it's empty on new devices!)
+      final isPremiumInFirestore = doc.data()!['manualPremium'] as bool? ?? false;
+      final isTrialInFirestore = doc.data()!['isTrialActive'] as bool? ?? false;
       
-      if (!hasActiveSub) {
-        // Not subscribed → auto-rebind silently (no subscription to share)
+      if (!isPremiumInFirestore && !isTrialInFirestore) {
+        // Not premium/trial → auto-rebind silently (no subscription to share)
         final details = await _getDeviceDetails(email, devId);
         details['boundAt'] = FieldValue.serverTimestamp();
         details['autoRebound'] = true;
@@ -253,7 +253,7 @@ class DeviceBindingService {
         await _cacheLocalBinding(email, devId);
         _isDeviceBound = true;
         _hasCheckedOnce = true;
-        debugPrint('DeviceBinding: AUTO-REBIND (no subscription) ✅ email=$email devId=$devId oldDev=$storedDeviceId');
+        debugPrint('DeviceBinding: AUTO-REBIND (no premium) ✅ email=$email devId=$devId oldDev=$storedDeviceId');
         return true;
       }
 
