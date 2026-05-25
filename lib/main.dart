@@ -78,19 +78,11 @@ Future<void> _initEphemeris() async {
 /// Notifier for device binding status — triggers UI rebuild when binding changes
 final ValueNotifier<bool> deviceBindingNotifier = ValueNotifier<bool>(true);
 
-/// Notifier for device block status — if admin blocks a device
-final ValueNotifier<bool> deviceBlockedNotifier = ValueNotifier<bool>(false);
-
 /// Check device binding BEFORE the app renders.
 /// Auth (signInSilently) already completed in Phase 1.
 /// This ensures the correct screen is shown on the very first frame.
 Future<void> _initAuthAndBinding() async {
   try {
-    // Run block check in parallel — don't delay binding check
-    DeviceBindingService.isDeviceBlocked().then((blocked) {
-      deviceBlockedNotifier.value = blocked;
-      if (blocked) debugPrint('DeviceBlock: BLOCKED by admin');
-    }).catchError((_) {}); // Ignore errors — fail open
 
     // Auth already done in Phase 1 — just do binding + trial sync
     if (GoogleAuthService.isSignedIn) {
@@ -197,13 +189,6 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
   }
 
   Future<void> _verifyAccessOnResume() async {
-    // Block check in parallel — don't block resume verification
-    DeviceBindingService.isDeviceBlocked().then((blocked) {
-      if (blocked) {
-        deviceBlockedNotifier.value = true;
-        debugPrint('DeviceBlock: BLOCKED on resume');
-      }
-    }).catchError((_) {});
 
     // Always try to verify with the server, even during active offline claims.
     // This ensures admin revocations take effect even if the user claimed a day.
@@ -249,12 +234,9 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
         return ValueListenableBuilder<bool>(
           valueListenable: deviceBindingNotifier,
           builder: (context, isBound, child) {
-            return ValueListenableBuilder<bool>(
-              valueListenable: deviceBlockedNotifier,
-              builder: (context, isBlocked, child) {
             return MaterialApp(
               navigatorKey: navigatorKey,
-              key: ValueKey('theme_${themeIndex}_bound_${isBound}_blocked_$isBlocked'),
+              key: ValueKey('theme_${themeIndex}_bound_${isBound}'),
               title: AppLocale.l('appName'),
               debugShowCheckedModeBanner: false,
               locale: const Locale('en', 'IN'),
@@ -375,9 +357,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   indicatorSize: TabBarIndicatorSize.tab,
                 ),
               ),
-              home: isBlocked && !kIsWeb
-                  ? const _DeviceBlockedScreen()
-                  : !GoogleAuthService.isSignedIn && !kIsWeb
+              home: !GoogleAuthService.isSignedIn && !kIsWeb
                   ? (SubscriptionService.lastOnlineCheck == null
                     ? const _FirstTimeSignInScreen()    // First-time: instant, no internet check
                     : const _OfflineVerifyScreen())      // Returning: check online/offline claim
@@ -387,8 +367,6 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                       ? const _InternetRequiredScreen()
                       : SubscriptionService.hasAccess ? const HomeScreen() : const SupportScreen(),
             );
-              },
-            );
           },
         );
       },
@@ -397,63 +375,6 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
 }
 
 // ============================================================
-// BLOCKED SCREENS
-// ============================================================
-
-/// Shown when admin has blocked this device via device_bindings
-class _DeviceBlockedScreen extends StatelessWidget {
-  const _DeviceBlockedScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBg,
-      body: SafeArea(
-        child: Center(child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.block, size: 80, color: Colors.red[400]),
-            const SizedBox(height: 24),
-            Text('Device Blocked', style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.w900, color: kText)),
-            const SizedBox(height: 8),
-            Text('ಈ ಸಾಧನವನ್ನು ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ', style: TextStyle(
-              fontSize: 16, color: kMuted)),
-            const SizedBox(height: 24),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.red.withOpacity(0.3)),
-              ),
-              child: Column(children: [
-                Text(
-                  'This device has been blocked by the administrator. '
-                  'Please contact support for assistance.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: kText, height: 1.6),
-                ),
-                const SizedBox(height: 16),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(Icons.phone, size: 16, color: kPurple2),
-                  const SizedBox(width: 6),
-                  Text('+91 8762629847', style: TextStyle(fontSize: 13, color: kText, fontWeight: FontWeight.w600)),
-                ]),
-                const SizedBox(height: 8),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(Icons.email, size: 16, color: kPurple2),
-                  const SizedBox(width: 6),
-                  Text('goureesh3690@gmail.com', style: TextStyle(fontSize: 13, color: kText, fontWeight: FontWeight.w600)),
-                ]),
-              ]),
-            ),
-          ]),
-        )),
-      ),
-    );
-  }
-}
 
 class _DeviceMismatchScreen extends StatefulWidget {
   const _DeviceMismatchScreen();
