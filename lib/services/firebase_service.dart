@@ -90,8 +90,8 @@ class FirebaseService {
             debugPrint('FirebaseService: Appointment processed and saved locally.');
 
             // Show an in-app push notification
-            if (navigatorKey.currentContext != null) {
-              ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+            if (scaffoldMessengerKey.currentState != null) {
+              scaffoldMessengerKey.currentState!.showSnackBar(
                 SnackBar(
                   content: Text('📅 ಹೊಸ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್: $clientName @ $startStr', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   backgroundColor: Colors.teal,

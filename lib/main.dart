@@ -150,7 +150,7 @@ Future<void> _writeSunriseForWidget() async {
   }
 }
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 class BharatheeyamApp extends StatefulWidget {
   const BharatheeyamApp({super.key});
@@ -214,16 +214,6 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
       }
     }
 
-    // If access is now revoked, force navigate to root gate
-    if (!SubscriptionService.hasAccess && !kIsWeb) {
-      final ctx = navigatorKey.currentContext;
-      if (ctx != null) {
-        Navigator.of(ctx).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const BharatheeyamApp()),
-          (_) => false,
-        );
-      }
-    }
   }
 
   @override
@@ -235,7 +225,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
           valueListenable: deviceBindingNotifier,
           builder: (context, isBound, child) {
             return MaterialApp(
-              navigatorKey: navigatorKey,
+              scaffoldMessengerKey: scaffoldMessengerKey,
               key: ValueKey('theme_${themeIndex}_bound_${isBound}'),
               title: AppLocale.l('appName'),
               debugShowCheckedModeBanner: false,
