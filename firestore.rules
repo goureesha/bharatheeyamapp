@@ -3,14 +3,21 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // Device bindings — authenticated user can read/write their own binding
-    match /device_bindings/{email} {
+    match /device_bindings/{docId} {
+      // Signed-in users: can read/write their own email doc
       allow read, write: if request.auth != null 
-                         && request.auth.token.email.lower() == email.lower();
+                         && request.auth.token.email.lower() == docId.lower();
+      // Any device: can read dev_ docs (for block check) and write new dev_ docs
+      allow read: if docId.matches('dev_.*');
+      allow create: if docId.matches('dev_.*');
+      allow update: if docId.matches('dev_.*')
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['lastSeen', 'deviceName', 'appVersion']);
     }
 
-    // Install tracking — any authenticated user can write their own device doc
+    // Install tracking — any device can track installs (even without auth)
     match /installs/{deviceId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if true;
     }
 
     // Testers collection — any authenticated user can read their own doc
@@ -18,6 +25,12 @@ service cloud.firestore {
       allow read: if request.auth != null 
                   && request.auth.token.email.lower() == email.lower();
       allow write: if false; // Admin-only via Firebase Console
+    }
+
+    // App config — any authenticated user can read global settings
+    match /app_config/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Admin-only
     }
 
     // User data backup
