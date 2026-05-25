@@ -236,29 +236,8 @@ class DeviceBindingService {
       }
 
       // ── DEVICE MISMATCH ──
-      // Only enforce for users with active premium/subscription.
-      // Non-premium users get auto-rebound (nothing to protect).
-      // Check Firestore doc (NOT local SharedPreferences — it's empty on new devices!)
-      final isPremiumInFirestore = doc.data()!['manualPremium'] as bool? ?? false;
-      final isTrialInFirestore = doc.data()!['isTrialActive'] as bool? ?? false;
-      
-      if (!isPremiumInFirestore && !isTrialInFirestore) {
-        // Not premium/trial → auto-rebind silently (no subscription to share)
-        final details = await _getDeviceDetails(email, devId);
-        details['boundAt'] = FieldValue.serverTimestamp();
-        details['autoRebound'] = true;
-        details['previousDeviceId'] = storedDeviceId;
-        details['bindEvent'] = 'auto_rebind_no_sub';
-        await docRef.set(details, SetOptions(merge: true));
-        await _cacheLocalBinding(email, devId);
-        _isDeviceBound = true;
-        _hasCheckedOnce = true;
-        debugPrint('DeviceBinding: AUTO-REBIND (no premium) ✅ email=$email devId=$devId oldDev=$storedDeviceId');
-        return true;
-      }
-
-      // SUBSCRIBED user on DIFFERENT device → BLOCK (must use Migrate Device button)
-
+      // Different device detected → BLOCK for ALL users
+      // User must tap "Migrate Device" button in settings to switch
       _isDeviceBound = false;
       _hasCheckedOnce = true;
       await _clearLocalBinding();
