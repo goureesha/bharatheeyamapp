@@ -818,17 +818,15 @@ class _FirstTimeSignInScreenState extends State<_FirstTimeSignInScreen> {
                       try {
                         await Future.wait([
                           SubscriptionService.recordOnlineCheck(),
-                          DeviceBindingService.checkBinding(),
+                          DeviceBindingService.checkBinding().then((bound) {
+                            deviceBindingNotifier.value = bound;
+                          }),
                           SubscriptionService.syncTrialWithFirestore(),
                           SubscriptionService.checkManualPremium(),
                         ]).timeout(const Duration(seconds: 5), onTimeout: () => []);
                       } catch (_) {}
-                      if (mounted) {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (_) => const HomeScreen()),
-                          (_) => false,
-                        );
-                      }
+                      // Let the MaterialApp gate decide what screen to show
+                      if (mounted) deviceBindingNotifier.notifyListeners();
                     } else if (mounted) {
                       setState(() => _signingIn = false);
                     }
