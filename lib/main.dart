@@ -815,18 +815,13 @@ class _FirstTimeSignInScreenState extends State<_FirstTimeSignInScreen> {
                   try {
                     final ok = await GoogleAuthService.signIn();
                     if (ok && mounted) {
-                      try {
-                        await Future.wait([
-                          SubscriptionService.recordOnlineCheck(),
-                          DeviceBindingService.checkBinding().then((bound) {
-                            deviceBindingNotifier.value = bound;
-                          }),
-                          SubscriptionService.syncTrialWithFirestore(),
-                          SubscriptionService.checkManualPremium(),
-                        ]).timeout(const Duration(seconds: 5), onTimeout: () => []);
-                      } catch (_) {}
-                      // Let the MaterialApp gate decide what screen to show
-                      if (mounted) deviceBindingNotifier.notifyListeners();
+                      // Binding check MUST complete — don't timeout
+                      final bound = await DeviceBindingService.checkBinding();
+                      deviceBindingNotifier.value = bound;
+                      // Other tasks run in background — don't block
+                      SubscriptionService.recordOnlineCheck();
+                      SubscriptionService.syncTrialWithFirestore();
+                      SubscriptionService.checkManualPremium();
                     } else if (mounted) {
                       setState(() => _signingIn = false);
                     }
@@ -929,18 +924,13 @@ class _GmailRequiredScreenState extends State<_GmailRequiredScreen> {
                       try {
                         final ok = await GoogleAuthService.signIn();
                         if (ok && mounted) {
-                          // Post-login tasks with 5s timeout
-                          try {
-                            await Future.wait([
-                              SubscriptionService.recordOnlineCheck(),
-                              DeviceBindingService.checkBinding().then((bound) {
-                                deviceBindingNotifier.value = bound;
-                              }),
-                              SubscriptionService.syncTrialWithFirestore(),
-                              SubscriptionService.checkManualPremium(),
-                            ]).timeout(const Duration(seconds: 5), onTimeout: () => []);
-                          } catch (_) {}
-                          if (mounted) deviceBindingNotifier.notifyListeners();
+                          // Binding check MUST complete — don't timeout
+                          final bound = await DeviceBindingService.checkBinding();
+                          deviceBindingNotifier.value = bound;
+                          // Other tasks run in background
+                          SubscriptionService.recordOnlineCheck();
+                          SubscriptionService.syncTrialWithFirestore();
+                          SubscriptionService.checkManualPremium();
                         } else if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Sign-in cancelled'), backgroundColor: Colors.orange),
