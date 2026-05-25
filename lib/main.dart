@@ -86,6 +86,14 @@ final ValueNotifier<bool> deviceBlockedNotifier = ValueNotifier<bool>(false);
 /// This ensures the correct screen is shown on the very first frame.
 Future<void> _initAuthAndBinding() async {
   try {
+    // Check if this device is blocked by admin (works for ALL users)
+    final blocked = await DeviceBindingService.isDeviceBlocked();
+    deviceBlockedNotifier.value = blocked;
+    if (blocked) {
+      debugPrint('DeviceBlock: device is BLOCKED by admin — stopping init');
+      return; // Don't proceed with binding/trial if blocked
+    }
+
     // Auth already done in Phase 1 — just do binding + trial sync
     if (GoogleAuthService.isSignedIn) {
       final bound = await DeviceBindingService.checkBinding();
@@ -95,13 +103,6 @@ Future<void> _initAuthAndBinding() async {
       await SubscriptionService.syncTrialWithFirestore();
       // Restore offline day count from server (prevents reset on reinstall)
       await OfflineAccessService.restoreFromServer();
-    } else {
-      // Not signed in — check if this device is blocked by admin
-      final blocked = await DeviceBindingService.isDeviceBlocked();
-      deviceBlockedNotifier.value = blocked;
-      if (blocked) {
-        debugPrint('DeviceBlock: unsigned device is BLOCKED by admin');
-      }
     }
   } catch (e) {
     debugPrint('Auth/Binding init error: $e');
@@ -198,6 +199,14 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
   }
 
   Future<void> _verifyAccessOnResume() async {
+    // Check device block first — if blocked, kick immediately
+    final blocked = await DeviceBindingService.isDeviceBlocked();
+    if (blocked) {
+      deviceBlockedNotifier.value = true;
+      debugPrint('DeviceBlock: BLOCKED on resume — kicking to block screen');
+      return;
+    }
+
     // Always try to verify with the server, even during active offline claims.
     // This ensures admin revocations take effect even if the user claimed a day.
     final serverReached = await SubscriptionService.checkManualPremium();

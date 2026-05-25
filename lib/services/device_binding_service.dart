@@ -542,7 +542,8 @@ class DeviceBindingService {
   }
 
   /// Check if this device is blocked by admin in device_bindings.
-  /// Returns true if device is blocked. Used to prevent unsigned users from using the app.
+  /// Checks BOTH device-level block (dev_{deviceId}) AND user-level block ({email}).
+  /// Returns true if either is blocked.
   static Future<bool> isDeviceBlocked() async {
     try {
       if (kIsWeb) return false;
@@ -553,19 +554,40 @@ class DeviceBindingService {
       final devId = await getDeviceId();
       final docId = 'dev_${devId.substring(0, devId.length > 16 ? 16 : devId.length)}';
 
-      final doc = await FirebaseFirestore.instance
+      // 1. Check device-level block (unsigned device doc)
+      final devDoc = await FirebaseFirestore.instance
           .collection(_firestoreCollection)
           .doc(docId)
           .get()
           .timeout(const Duration(seconds: 5));
 
-      if (!doc.exists || doc.data() == null) return false;
-
-      final blocked = doc.data()!['blocked'] as bool? ?? false;
-      if (blocked) {
-        debugPrint('DeviceBlock: BLOCKED ❌ docId=$docId');
+      if (devDoc.exists && devDoc.data() != null) {
+        final blocked = devDoc.data()!['blocked'] as bool? ?? false;
+        if (blocked) {
+          debugPrint('DeviceBlock: DEVICE BLOCKED ❌ docId=$docId');
+          return true;
+        }
       }
-      return blocked;
+
+      // 2. Check user-level block (email-keyed doc)
+      final email = GoogleAuthService.userEmail;
+      if (email != null) {
+        final emailDoc = await FirebaseFirestore.instance
+            .collection(_firestoreCollection)
+            .doc(email.toLowerCase())
+            .get()
+            .timeout(const Duration(seconds: 5));
+
+        if (emailDoc.exists && emailDoc.data() != null) {
+          final blocked = emailDoc.data()!['blocked'] as bool? ?? false;
+          if (blocked) {
+            debugPrint('DeviceBlock: USER BLOCKED ❌ email=$email');
+            return true;
+          }
+        }
+      }
+
+      return false;
     } catch (e) {
       debugPrint('DeviceBlock check error: $e');
       return false; // Fail open if can't reach server
