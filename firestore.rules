@@ -2,8 +2,16 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Device bindings — authenticated user can read/write their own binding
+    // Admin email — full access to all collections
+    function isAdmin() {
+      return request.auth != null 
+             && request.auth.token.email == 'goureesh3690@gmail.com';
+    }
+
+    // Device bindings
     match /device_bindings/{docId} {
+      // Admin: full access to all docs
+      allow read, write: if isAdmin();
       // Signed-in users: can read/write their own email doc
       allow read, write: if request.auth != null 
                          && request.auth.token.email.lower() == docId.lower();
@@ -15,22 +23,17 @@ service cloud.firestore {
                        .hasOnly(['lastSeen', 'deviceName', 'appVersion']);
     }
 
-    // Install tracking — any device can track installs (even without auth)
+    // Install tracking — any device can track installs
     match /installs/{deviceId} {
       allow read, write: if true;
     }
 
-    // Testers collection — any authenticated user can read their own doc
+    // Testers collection
     match /testers/{email} {
+      allow read: if isAdmin();
       allow read: if request.auth != null 
                   && request.auth.token.email.lower() == email.lower();
-      allow write: if false; // Admin-only via Firebase Console
-    }
-
-    // App config — any authenticated user can read global settings
-    match /app_config/{docId} {
-      allow read: if request.auth != null;
-      allow write: if false; // Admin-only
+      allow write: if false;
     }
 
     // User data backup
