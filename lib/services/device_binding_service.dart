@@ -559,7 +559,7 @@ class DeviceBindingService {
           .collection(_firestoreCollection)
           .doc(docId)
           .get()
-          .timeout(const Duration(seconds: 5));
+          .timeout(const Duration(seconds: 3));
 
       if (devDoc.exists && devDoc.data() != null) {
         final blocked = devDoc.data()!['blocked'] as bool? ?? false;
@@ -576,7 +576,7 @@ class DeviceBindingService {
             .collection(_firestoreCollection)
             .doc(email.toLowerCase())
             .get()
-            .timeout(const Duration(seconds: 5));
+            .timeout(const Duration(seconds: 3));
 
         if (emailDoc.exists && emailDoc.data() != null) {
           final blocked = emailDoc.data()!['blocked'] as bool? ?? false;

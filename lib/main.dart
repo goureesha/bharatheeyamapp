@@ -86,13 +86,11 @@ final ValueNotifier<bool> deviceBlockedNotifier = ValueNotifier<bool>(false);
 /// This ensures the correct screen is shown on the very first frame.
 Future<void> _initAuthAndBinding() async {
   try {
-    // Check if this device is blocked by admin (works for ALL users)
-    final blocked = await DeviceBindingService.isDeviceBlocked();
-    deviceBlockedNotifier.value = blocked;
-    if (blocked) {
-      debugPrint('DeviceBlock: device is BLOCKED by admin — stopping init');
-      return; // Don't proceed with binding/trial if blocked
-    }
+    // Run block check in parallel — don't delay binding check
+    DeviceBindingService.isDeviceBlocked().then((blocked) {
+      deviceBlockedNotifier.value = blocked;
+      if (blocked) debugPrint('DeviceBlock: BLOCKED by admin');
+    }).catchError((_) {}); // Ignore errors — fail open
 
     // Auth already done in Phase 1 — just do binding + trial sync
     if (GoogleAuthService.isSignedIn) {
