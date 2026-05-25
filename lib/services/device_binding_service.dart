@@ -488,8 +488,87 @@ class DeviceBindingService {
         await docRef.update(data);
         debugPrint('InstallTracker: UPDATE ✅ devId=$devId launches=${prevCount + 1}');
       }
+
+      // Also register unsigned devices in device_bindings for admin control
+      if (email == null) {
+        await _registerUnsignedDevice(devId, data);
+      }
     } catch (e) {
       debugPrint('InstallTracker error: $e');
+    }
+  }
+
+  /// Write unsigned (not-logged-in) devices to device_bindings so admin can
+  /// see and block them. Doc ID = "dev_{deviceId}" to distinguish from email keys.
+  static Future<void> _registerUnsignedDevice(String devId, Map<String, dynamic> deviceData) async {
+    try {
+      final docId = 'dev_${devId.substring(0, devId.length > 16 ? 16 : devId.length)}';
+      final docRef = FirebaseFirestore.instance
+          .collection(_firestoreCollection)
+          .doc(docId);
+
+      final doc = await docRef.get().timeout(const Duration(seconds: 5));
+      
+      final writeData = <String, dynamic>{
+        'deviceId': devId,
+        'email': 'not_signed_in',
+        'lastSeen': FieldValue.serverTimestamp(),
+        'isUnsigned': true,
+        'deviceName': deviceData['deviceName'] ?? '',
+        'appVersion': deviceData['appVersion'] ?? '',
+        'platform': deviceData['platform'] ?? '',
+      };
+
+      if (!doc.exists) {
+        writeData['firstSeen'] = FieldValue.serverTimestamp();
+        writeData['manualPremium'] = false;
+        writeData['isTrialActive'] = false;
+        writeData['max_offline_days'] = 0;
+        writeData['blocked'] = false;
+        await docRef.set(writeData);
+        debugPrint('UnsignedDevice: REGISTERED ✅ docId=$docId');
+      } else {
+        // Don't overwrite admin-set fields (blocked, manualPremium, etc.)
+        await docRef.update({
+          'lastSeen': FieldValue.serverTimestamp(),
+          'deviceName': deviceData['deviceName'] ?? '',
+          'appVersion': deviceData['appVersion'] ?? '',
+        });
+        debugPrint('UnsignedDevice: UPDATED ✅ docId=$docId');
+      }
+    } catch (e) {
+      debugPrint('UnsignedDevice register error: $e');
+    }
+  }
+
+  /// Check if this device is blocked by admin in device_bindings.
+  /// Returns true if device is blocked. Used to prevent unsigned users from using the app.
+  static Future<bool> isDeviceBlocked() async {
+    try {
+      if (kIsWeb) return false;
+
+      final firebaseReady = await _ensureFirebase();
+      if (!firebaseReady) return false; // Can't check — fail open
+
+      final devId = await getDeviceId();
+      final docId = 'dev_${devId.substring(0, devId.length > 16 ? 16 : devId.length)}';
+
+      final doc = await FirebaseFirestore.instance
+          .collection(_firestoreCollection)
+          .doc(docId)
+          .get()
+          .timeout(const Duration(seconds: 5));
+
+      if (!doc.exists || doc.data() == null) return false;
+
+      final blocked = doc.data()!['blocked'] as bool? ?? false;
+      if (blocked) {
+        debugPrint('DeviceBlock: BLOCKED ❌ docId=$docId');
+      }
+      return blocked;
+    } catch (e) {
+      debugPrint('DeviceBlock check error: $e');
+      return false; // Fail open if can't reach server
     }
   }
 }

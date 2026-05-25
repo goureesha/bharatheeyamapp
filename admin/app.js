@@ -266,7 +266,12 @@ function renderTable(clients) {
   tbody.innerHTML = clients.map((c, i) => {
     // Status badge
     let statusBadge;
-    if (c._isPremium && c._daysLeft === Infinity) {
+    const isUnsignedEntry = c.isUnsigned === true || (c.email && c.email.startsWith('not_signed_in'));
+    if (c.blocked === true) {
+      statusBadge = '<span class="badge badge-expired" style="background: rgba(239,68,68,0.15); color: #ef4444;">🚫 Blocked</span>';
+    } else if (isUnsignedEntry) {
+      statusBadge = '<span class="badge" style="background: rgba(245,158,11,0.15); color: #f59e0b;">⚠ Unsigned</span>';
+    } else if (c._isPremium && c._daysLeft === Infinity) {
       statusBadge = '<span class="badge badge-lifetime">Lifetime</span>';
     } else if (c._isPremium) {
       statusBadge = '<span class="badge badge-premium">Premium</span>';
@@ -294,7 +299,16 @@ function renderTable(clients) {
 
     // Actions
     let actions;
-    if (c._isPremium) {
+    const isUnsigned = c.isUnsigned === true || (c.email && c.email.startsWith('not_signed_in'));
+    const isBlocked = c.blocked === true;
+
+    if (isUnsigned) {
+      if (isBlocked) {
+        actions = `<button class="btn-unlock" onclick="toggleBlock('${c.email}', false)" style="font-size:10px; padding:4px 8px;">✅ Unblock</button>`;
+      } else {
+        actions = `<button class="btn-revoke-small" onclick="toggleBlock('${c.email}', true)" style="font-size:10px; padding:4px 8px;">🚫 Block</button>`;
+      }
+    } else if (c._isPremium) {
       actions = `<button class="btn-revoke-small" onclick="openRevokeModal('${c.email}')">Revoke</button>`;
     } else {
       actions = `<button class="btn-unlock" onclick="openUnlockModal('${c.email}')">Unlock</button>`;
@@ -307,9 +321,9 @@ function renderTable(clients) {
     const offlineColor = offlineDays >= offlineMax - 2 ? 'var(--red)' : offlineDays >= offlineMax / 2 ? 'var(--orange)' : 'var(--muted)';
 
     return `
-      <tr>
+      <tr style="${isUnsignedEntry ? 'background: rgba(245,158,11,0.04);' : ''}${c.blocked ? 'background: rgba(239,68,68,0.06);' : ''}">
         <td style="color: var(--muted)">${i + 1}</td>
-        <td style="font-weight: 600">${c.email}</td>
+        <td style="font-weight: 600; ${isUnsignedEntry ? 'font-size: 11px; font-family: monospace; color: var(--orange);' : ''}">${isUnsignedEntry ? '📱 ' + c.email : c.email}</td>
         <td style="color: var(--muted); font-size: 12px">${device}</td>
         <td>${statusBadge}</td>
         <td>${daysDisplay}</td>
@@ -507,6 +521,22 @@ async function confirmOfflineEdit() {
       offlineDaysUsed: newUsed,
     });
     closeModal();
+    loadClients();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+// ─── Block / Unblock Device ───
+
+async function toggleBlock(docId, block) {
+  const action = block ? 'BLOCK' : 'UNBLOCK';
+  if (!confirm(`Are you sure you want to ${action} this device?\n\nDoc: ${docId}`)) return;
+
+  try {
+    await db.collection('device_bindings').doc(docId).update({
+      blocked: block,
+    });
     loadClients();
   } catch (err) {
     alert('Error: ' + err.message);
