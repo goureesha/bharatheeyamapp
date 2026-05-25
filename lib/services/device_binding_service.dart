@@ -257,24 +257,7 @@ class DeviceBindingService {
         return true;
       }
 
-      // SUBSCRIBED user on DIFFERENT device → check one-time auto-migrate
-      final prefs = await SharedPreferences.getInstance();
-      final rebindVersion = prefs.getInt('bharatheeyam_rebind_version') ?? 0;
-      if (rebindVersion < 47) {
-        // One-time auto-migrate for this version
-        final details = await _getDeviceDetails(email, devId);
-        details['boundAt'] = FieldValue.serverTimestamp();
-        details['migratedAt'] = FieldValue.serverTimestamp();
-        details['autoMigrateVersion'] = 47;
-        details['bindEvent'] = 'auto_migrate_v47';
-        await docRef.set(details, SetOptions(merge: true));
-        await _cacheLocalBinding(email, devId);
-        await prefs.setInt('bharatheeyam_rebind_version', 47);
-        _isDeviceBound = true;
-        _hasCheckedOnce = true;
-        debugPrint('DeviceBinding: AUTO-MIGRATE v47 ✅ email=$email devId=$devId');
-        return true;
-      }
+      // SUBSCRIBED user on DIFFERENT device → BLOCK (must use Migrate Device button)
 
       _isDeviceBound = false;
       _hasCheckedOnce = true;
