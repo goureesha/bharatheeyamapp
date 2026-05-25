@@ -198,18 +198,6 @@ class DeviceBindingService {
         return true;
       }
 
-      // Always track this device login (for admin monitoring)
-      try {
-        final deviceName = (await DeviceInfoPlugin().androidInfo).model;
-        await docRef.set({
-          'knownDevices': FieldValue.arrayUnion([devId]),
-          'deviceLog_$devId': {
-            'deviceName': deviceName,
-            'lastSeen': FieldValue.serverTimestamp(),
-          },
-        }, SetOptions(merge: true));
-      } catch (_) {}
-
       final storedDeviceId = doc.data()!['deviceId'] as String?;
 
       if (storedDeviceId == null || storedDeviceId.isEmpty) {

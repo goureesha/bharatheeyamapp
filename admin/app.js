@@ -300,9 +300,6 @@ function renderTable(clients) {
 
     const device = c.deviceName || c.deviceModel || '—';
     const version = c.appVersion || '—';
-    const knownDevices = c.knownDevices || [];
-    const deviceCount = knownDevices.length;
-    const deviceCountColor = deviceCount > 1 ? 'var(--red)' : 'var(--muted)';
     const offlineDays = c._offlineDays;
     const offlineMax = c.max_offline_days || 10;
     const offlineColor = offlineDays >= offlineMax - 2 ? 'var(--red)' : offlineDays >= offlineMax / 2 ? 'var(--orange)' : 'var(--muted)';
@@ -312,7 +309,6 @@ function renderTable(clients) {
         <td style="color: var(--muted)">${i + 1}</td>
         <td style="font-weight: 600;">${c.email}</td>
         <td style="color: var(--muted); font-size: 12px">${device}</td>
-        <td style="font-weight: 700; color: ${deviceCountColor}; font-size: 13px;" title="${knownDevices.join('\n')}">${deviceCount || '—'}</td>
         <td>${statusBadge}</td>
         <td>${daysDisplay}</td>
         <td style="font-size: 12px;">
