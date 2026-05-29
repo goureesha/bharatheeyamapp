@@ -412,29 +412,11 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
         _kv(AppLocale.l('dashaLord'), '${trAll(pan.dashaLord)} ${AppLocale.l('dashaBalance')}: ${pan.dashaBalance}'),
       ])),
       const SizedBox(height: 8),
-      // Charts row
-      Row(children: [
-        Expanded(child: Column(children: [
-          Text(AppLocale.l('rashiKundali'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
-          const SizedBox(height: 4),
-          KundaliChart(result: r, varga: 1, isBhava: false, showSphutas: false),
-        ])),
-        const SizedBox(width: 8),
-        Expanded(child: Column(children: [
-          Text(AppLocale.l('navamshaKundali'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
-          const SizedBox(height: 4),
-          KundaliChart(result: r, varga: 9, isBhava: false, showSphutas: false),
-        ])),
-      ]),
-      const SizedBox(height: 8),
-      Center(child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.5,
-        child: Column(children: [
-          Text(AppLocale.l('bhavaKundali'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
-          const SizedBox(height: 4),
-          KundaliChart(result: r, varga: 1, isBhava: true, showSphutas: false),
-        ]),
-      )),
+      // Charts — horizontally swipeable
+      SizedBox(
+        height: MediaQuery.of(context).size.width * 0.75 + 30,
+        child: _ChartSlider(result: r),
+      ),
       const SizedBox(height: 12),
     ]);
   }
@@ -700,5 +682,61 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
         _buildResults(),
       ]),
     );
+  }
+}
+
+/// Horizontally swipeable chart slider with dot indicators
+class _ChartSlider extends StatefulWidget {
+  final KundaliResult result;
+  const _ChartSlider({required this.result});
+
+  @override
+  State<_ChartSlider> createState() => _ChartSliderState();
+}
+
+class _ChartSliderState extends State<_ChartSlider> {
+  int _page = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final labels = [
+      AppLocale.l('rashiKundali'),
+      AppLocale.l('navamshaKundali'),
+      AppLocale.l('bhavaKundali'),
+    ];
+    return Column(children: [
+      Expanded(
+        child: PageView(
+          onPageChanged: (i) => setState(() => _page = i),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: KundaliChart(result: widget.result, varga: 1, isBhava: false, showSphutas: false),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: KundaliChart(result: widget.result, varga: 9, isBhava: false, showSphutas: false),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: KundaliChart(result: widget.result, varga: 1, isBhava: true, showSphutas: false),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 6),
+      // Label + dots
+      Text(labels[_page], style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kPurple2)),
+      const SizedBox(height: 4),
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(3, (i) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 3),
+        width: _page == i ? 18 : 8,
+        height: 8,
+        decoration: BoxDecoration(
+          color: _page == i ? kPurple2 : kBorder,
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ))),
+    ]);
   }
 }
