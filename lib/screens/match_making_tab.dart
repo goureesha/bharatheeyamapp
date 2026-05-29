@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../constants/strings.dart';
+import '../constants/places.dart';
 import '../widgets/common.dart';
+import '../widgets/kundali_chart.dart';
+import '../widgets/dasha_widget.dart';
 import '../core/match_making.dart';
+import '../core/calculator.dart';
+import '../services/location_service.dart';
 
 class MatchMakingTab extends StatefulWidget {
   const MatchMakingTab({super.key});
@@ -11,222 +18,687 @@ class MatchMakingTab extends StatefulWidget {
 }
 
 class _MatchMakingTabState extends State<MatchMakingTab> {
-  int? _bNak;
-  int? _bRashi;
-  int? _gNak;
-  int? _gRashi;
+  // Bride input
+  final _bNameCtrl = TextEditingController();
+  final _bPlaceCtrl = TextEditingController();
+  final _bLatCtrl = TextEditingController(text: '14.98');
+  final _bLonCtrl = TextEditingController(text: '74.73');
+  final _bTzCtrl = TextEditingController(text: '+5.5');
+  DateTime _bDob = DateTime(2000, 1, 1);
+  int _bHour = 6, _bMinute = 0;
+  String _bAmpm = 'AM';
+  bool _bGeoLoading = false;
+  String _bGeoStatus = '';
 
-  Map<String, dynamic>? _result;
+  // Groom input
+  final _gNameCtrl = TextEditingController();
+  final _gPlaceCtrl = TextEditingController();
+  final _gLatCtrl = TextEditingController(text: '14.98');
+  final _gLonCtrl = TextEditingController(text: '74.73');
+  final _gTzCtrl = TextEditingController(text: '+5.5');
+  DateTime _gDob = DateTime(2000, 1, 1);
+  int _gHour = 6, _gMinute = 0;
+  String _gAmpm = 'AM';
+  bool _gGeoLoading = false;
+  String _gGeoStatus = '';
 
-  static const Map<int, List<int>> _rashiNakMap = {
-    0: [0, 1, 2],       // Mesha: Ashwini, Bharani, Krittika
-    1: [2, 3, 4],       // Vrishabha: Krittika, Rohini, Mrigashira
-    2: [4, 5, 6],       // Mithuna: Mrigashira, Ardra, Punarvasu
-    3: [6, 7, 8],       // Karka: Punarvasu, Pushya, Ashlesha
-    4: [9, 10, 11],     // Simha: Magha, Purva Phalguni, Uttara Phalguni
-    5: [11, 12, 13],    // Kanya: Uttara Phalguni, Hasta, Chitra
-    6: [13, 14, 15],    // Tula: Chitra, Swati, Vishakha
-    7: [15, 16, 17],    // Vrischika: Vishakha, Anuradha, Jyeshtha
-    8: [18, 19, 20],    // Dhanu: Mula, Purva Ashadha, Uttara Ashadha
-    9: [20, 21, 22],    // Makara: Uttara Ashadha, Shravana, Dhanishta
-    10: [22, 23, 24],   // Kumbha: Dhanishta, Shatabhisha, Purva Bhadrapada
-    11: [24, 25, 26],   // Meena: Purva Bhadrapada, Uttara Bhadrapada, Revati
-  };
+  bool _loading = false;
+  KundaliResult? _brideResult;
+  KundaliResult? _groomResult;
+  Map<String, dynamic>? _fullResult;
 
-  void _calculateMatch() {
-    if (_bNak == null || _bRashi == null || _gNak == null || _gRashi == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocale.l('selectAllDetails'))),
+  Future<void> _calculate() async {
+    setState(() => _loading = true);
+    await Future.delayed(const Duration(milliseconds: 50));
+    try {
+      final bLat = double.tryParse(_bLatCtrl.text) ?? 14.98;
+      final bLon = double.tryParse(_bLonCtrl.text) ?? 74.73;
+      final bTz = double.tryParse(_bTzCtrl.text) ?? 5.5;
+      int bH24 = _bHour + (_bAmpm == 'PM' && _bHour != 12 ? 12 : 0);
+      if (_bAmpm == 'AM' && _bHour == 12) bH24 = 0;
+
+      final gLat = double.tryParse(_gLatCtrl.text) ?? 14.98;
+      final gLon = double.tryParse(_gLonCtrl.text) ?? 74.73;
+      final gTz = double.tryParse(_gTzCtrl.text) ?? 5.5;
+      int gH24 = _gHour + (_gAmpm == 'PM' && _gHour != 12 ? 12 : 0);
+      if (_gAmpm == 'AM' && _gHour == 12) gH24 = 0;
+
+      final brideR = await AstroCalculator.calculate(
+        year: _bDob.year, month: _bDob.month, day: _bDob.day,
+        hourUtcOffset: bTz, hour24: bH24 + _bMinute / 60.0,
+        lat: bLat, lon: bLon, ayanamsaMode: 'lahiri', trueNode: true,
       );
-      return;
-    }
+      final groomR = await AstroCalculator.calculate(
+        year: _gDob.year, month: _gDob.month, day: _gDob.day,
+        hourUtcOffset: gTz, hour24: gH24 + _gMinute / 60.0,
+        lat: gLat, lon: gLon, ayanamsaMode: 'lahiri', trueNode: true,
+      );
 
-    setState(() {
-      _result = MatchMakingLogic.calculateCompatibility(_bRashi!, _bNak!, _gRashi!, _gNak!);
-    });
+      if (brideR == null || groomR == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocale.l('calcFailed')), backgroundColor: Colors.red),
+          );
+        }
+        setState(() => _loading = false);
+        return;
+      }
+
+      // Extract planet rashi indices
+      Map<String, int> extractRashis(KundaliResult r) {
+        final m = <String, int>{};
+        for (final e in r.planets.entries) {
+          m[e.key] = e.value.rashiIndex;
+        }
+        return m;
+      }
+
+      final bRashis = extractRashis(brideR);
+      final gRashis = extractRashis(groomR);
+      final bLagnaRashi = brideR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
+      final gLagnaRashi = groomR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
+      final bMoonRashi = brideR.planets['ಚಂದ್ರ']?.rashiIndex ?? 0;
+      final gMoonRashi = groomR.planets['ಚಂದ್ರ']?.rashiIndex ?? 0;
+      final bNakIdx = brideR.panchang.nakshatraIndex;
+      final gNakIdx = groomR.panchang.nakshatraIndex;
+
+      final fullResult = MatchMakingLogic.calculateFullCompatibility(
+        brideNakIdx: bNakIdx, brideMoonRashi: bMoonRashi, brideLagnaRashi: bLagnaRashi, bridePlanetRashis: bRashis,
+        groomNakIdx: gNakIdx, groomMoonRashi: gMoonRashi, groomLagnaRashi: gLagnaRashi, groomPlanetRashis: gRashis,
+      );
+
+      setState(() {
+        _brideResult = brideR;
+        _groomResult = groomR;
+        _fullResult = fullResult;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${AppLocale.l('calcFailed')}: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+    setState(() => _loading = false);
   }
 
-  Widget _buildDropdown(String label, int? value, List<String> allItems, List<int> allowedIndices, ValueChanged<int?> onChanged) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-        const SizedBox(height: 6),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: kBorder),
-            borderRadius: BorderRadius.circular(8),
-            color: kCard,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<int>(
-              isExpanded: true,
-              hint: Text(AppLocale.l('selectHint'), style: TextStyle(fontSize: 14)),
-              value: (allowedIndices.contains(value)) ? value : null,
-              items: allowedIndices.map((i) => DropdownMenuItem<int>(
-                value: i,
-                child: Text(allItems[i], style: TextStyle(fontSize: 14)),
-              )).toList(),
-              onChanged: onChanged,
-            ),
-          ),
-        ),
-      ],
+  // Geocode helper
+  Future<void> _geocode(String placeName, TextEditingController latCtrl, TextEditingController lonCtrl, TextEditingController tzCtrl, void Function(bool) setGeoLoading, void Function(String) setGeoStatus) async {
+    if (placeName.trim().isEmpty) return;
+    setGeoLoading(true);
+    setGeoStatus('');
+    try {
+      final q = Uri.encodeComponent(placeName.trim());
+      final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$q&format=json&limit=5');
+      final resp = await http.get(url, headers: {'User-Agent': 'BharatheeyamApp/1.0'}).timeout(const Duration(seconds: 10));
+      if (resp.statusCode == 200) {
+        final data = jsonDecode(resp.body) as List;
+        if (data.isEmpty) {
+          setGeoStatus(AppLocale.l('placeNotFound'));
+        } else if (data.length == 1) {
+          final lat = double.parse(data[0]['lat']);
+          final lon = double.parse(data[0]['lon']);
+          final displayName = data[0]['display_name'] as String;
+          final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+          setState(() {
+            latCtrl.text = lat.toStringAsFixed(4);
+            lonCtrl.text = lon.toStringAsFixed(4);
+            tzCtrl.text = '${autoTz >= 0 ? '+' : ''}$autoTz';
+          });
+          setGeoStatus('📍 $displayName');
+        } else {
+          if (mounted) _showPlaceDisambiguation(data, latCtrl, lonCtrl, tzCtrl, setGeoStatus);
+        }
+      }
+    } catch (_) {
+      setGeoStatus(AppLocale.l('networkError'));
+    }
+    setGeoLoading(false);
+  }
+
+  void _showPlaceDisambiguation(List<dynamic> results, TextEditingController latCtrl, TextEditingController lonCtrl, TextEditingController tzCtrl, void Function(String) setGeoStatus) {
+    showModalBottomSheet(
+      context: context, backgroundColor: kBg,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => SafeArea(child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Padding(padding: const EdgeInsets.all(16), child: Text(AppLocale.l('selectPlace'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: kPurple1))),
+        Flexible(child: ListView.separated(
+          shrinkWrap: true, itemCount: results.length,
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemBuilder: (_, i) {
+            final place = results[i];
+            final displayName = place['display_name'] ?? '';
+            return ListTile(
+              leading: CircleAvatar(backgroundColor: kPurple1.withOpacity(0.1), child: Icon(Icons.location_on, color: kPurple1, size: 20)),
+              title: Text(displayName, style: const TextStyle(fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final lat = double.parse(place['lat']);
+                final lon = double.parse(place['lon']);
+                final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+                setState(() {
+                  latCtrl.text = lat.toStringAsFixed(4);
+                  lonCtrl.text = lon.toStringAsFixed(4);
+                  tzCtrl.text = '${autoTz >= 0 ? '+' : ''}$autoTz';
+                });
+                setGeoStatus('📍 $displayName');
+              },
+            );
+          },
+        )),
+        const SizedBox(height: 16),
+      ])),
     );
   }
 
-  Widget _buildResultTable() {
-    if (_result == null) return const SizedBox.shrink();
+  Widget _buildPersonInput({
+    required String title,
+    required Color color,
+    required TextEditingController nameCtrl,
+    required TextEditingController placeCtrl,
+    required TextEditingController latCtrl,
+    required TextEditingController lonCtrl,
+    required TextEditingController tzCtrl,
+    required DateTime dob,
+    required int hour,
+    required int minute,
+    required String ampm,
+    required bool geoLoading,
+    required String geoStatus,
+    required void Function(DateTime) onDobChanged,
+    required void Function(int, int, String) onTimeChanged,
+    required void Function(bool) onGeoLoadingChanged,
+    required void Function(String) onGeoStatusChanged,
+  }) {
+    return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      SectionTitle(title, color: color),
+      const SizedBox(height: 10),
+      TextField(
+        controller: nameCtrl,
+        style: TextStyle(color: kText),
+        decoration: InputDecoration(labelText: AppLocale.l('name'), prefixIcon: Icon(Icons.person_outline, color: kMuted), isDense: true),
+      ),
+      const SizedBox(height: 10),
+      GestureDetector(
+        onTap: () async {
+          final picked = await showDatePicker(context: context, initialDate: dob, firstDate: DateTime(1800), lastDate: DateTime(2100),
+            builder: (ctx, child) => Theme(data: Theme.of(ctx).copyWith(colorScheme: ColorScheme.light(primary: color)), child: child!));
+          if (picked != null) onDobChanged(picked);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(10)),
+          child: Row(children: [
+            Icon(Icons.calendar_today, color: kMuted, size: 18),
+            const SizedBox(width: 8),
+            Text('${dob.day.toString().padLeft(2, "0")}-${dob.month.toString().padLeft(2, "0")}-${dob.year}', style: TextStyle(fontSize: 13, color: kText)),
+          ]),
+        ),
+      ),
+      const SizedBox(height: 10),
+      GestureDetector(
+        onTap: () async {
+          final picked = await showTimePicker(context: context,
+            initialTime: TimeOfDay(hour: ampm == 'PM' && hour != 12 ? hour + 12 : (ampm == 'AM' && hour == 12 ? 0 : hour), minute: minute),
+            builder: (ctx, child) => Theme(data: Theme.of(ctx).copyWith(colorScheme: ColorScheme.light(primary: color)), child: child!));
+          if (picked != null) {
+            final h24 = picked.hour;
+            onTimeChanged(h24 % 12 == 0 ? 12 : h24 % 12, picked.minute, h24 >= 12 ? 'PM' : 'AM');
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(10)),
+          child: Row(children: [
+            Icon(Icons.access_time, color: kMuted, size: 18),
+            const SizedBox(width: 8),
+            Text('${hour.toString().padLeft(2, "0")}:${minute.toString().padLeft(2, "0")} $ampm', style: TextStyle(fontSize: 13, color: kText)),
+          ]),
+        ),
+      ),
+      const SizedBox(height: 10),
+      Autocomplete<String>(
+        key: ValueKey(placeCtrl.text),
+        optionsBuilder: (TextEditingValue v) {
+          if (v.text.isEmpty) return offlinePlaces.keys.take(15);
+          return offlinePlaces.keys.where((n) => n.toLowerCase().contains(v.text.toLowerCase()));
+        },
+        fieldViewBuilder: (context, textCtrl, focusNode, onSubmit) {
+          if (textCtrl.text.isEmpty && placeCtrl.text.isNotEmpty) textCtrl.text = placeCtrl.text;
+          return TextField(
+            controller: textCtrl, focusNode: focusNode, style: TextStyle(color: kText),
+            decoration: InputDecoration(
+              labelText: AppLocale.l('searchPlace'), prefixIcon: const Icon(Icons.search), isDense: true,
+              suffixIcon: geoLoading
+                ? const Padding(padding: EdgeInsets.all(12), child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)))
+                : IconButton(icon: Icon(Icons.my_location, color: kTeal, size: 18), onPressed: () {
+                    placeCtrl.text = textCtrl.text;
+                    _geocode(textCtrl.text, latCtrl, lonCtrl, tzCtrl, (v) => setState(() => onGeoLoadingChanged(v)), (v) => setState(() => onGeoStatusChanged(v)));
+                  }),
+            ),
+            onSubmitted: (_) {
+              placeCtrl.text = textCtrl.text;
+              _geocode(textCtrl.text, latCtrl, lonCtrl, tzCtrl, (v) => setState(() => onGeoLoadingChanged(v)), (v) => setState(() => onGeoStatusChanged(v)));
+            },
+          );
+        },
+        onSelected: (String selection) async {
+          if (offlinePlaces.containsKey(selection)) {
+            final coords = offlinePlaces[selection]!;
+            final autoTz = await getTimezoneForPlace(selection, coords[0], coords[1]);
+            setState(() {
+              placeCtrl.text = selection;
+              latCtrl.text = coords[0].toStringAsFixed(4);
+              lonCtrl.text = coords[1].toStringAsFixed(4);
+              tzCtrl.text = '${autoTz >= 0 ? '+' : ''}$autoTz';
+            });
+          }
+        },
+        optionsViewBuilder: (context, onSelected, options) => Align(alignment: Alignment.topLeft, child: Material(elevation: 4.0, borderRadius: BorderRadius.circular(8),
+          child: ConstrainedBox(constraints: BoxConstraints(maxHeight: 200, maxWidth: MediaQuery.of(context).size.width - 64),
+            child: ListView.builder(padding: EdgeInsets.zero, itemCount: options.length, shrinkWrap: true,
+              itemBuilder: (context, i) {
+                final o = options.elementAt(i);
+                return ListTile(dense: true, leading: Icon(Icons.location_on, size: 16, color: color), title: Text(o, style: const TextStyle(fontSize: 12)), onTap: () => onSelected(o));
+              }),
+          ),
+        )),
+      ),
+      if (geoStatus.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 4), child: Text(geoStatus, style: TextStyle(fontSize: 11, color: kGreen))),
+      const SizedBox(height: 8),
+      Row(children: [
+        Expanded(flex: 4, child: TextField(controller: latCtrl, style: TextStyle(color: kText, fontSize: 12), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true), decoration: InputDecoration(labelText: AppLocale.l('lat'), isDense: true))),
+        const SizedBox(width: 6),
+        Expanded(flex: 4, child: TextField(controller: lonCtrl, style: TextStyle(color: kText, fontSize: 12), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true), decoration: InputDecoration(labelText: AppLocale.l('lon'), isDense: true))),
+        const SizedBox(width: 6),
+        Expanded(flex: 3, child: TextField(controller: tzCtrl, style: TextStyle(color: kText, fontSize: 12), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true), decoration: InputDecoration(labelText: AppLocale.l('tzOffset'), isDense: true))),
+      ]),
+    ]));
+  }
 
-    final total = _result!['total'] as double;
-    
-    // Verdict logic
+  Widget _sectionHeader(String title, IconData icon, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, bottom: 8),
+      child: Row(children: [
+        Icon(icon, color: color, size: 20),
+        const SizedBox(width: 8),
+        Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
+      ]),
+    );
+  }
+
+  Widget _doshaChip(String label, bool hasDosha, {String? detail}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: hasDosha ? Colors.red.shade50 : Colors.green.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: hasDosha ? Colors.red.shade200 : Colors.green.shade200),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(hasDosha ? Icons.warning_amber : Icons.check_circle, color: hasDosha ? Colors.red : Colors.green, size: 16),
+        const SizedBox(width: 4),
+        Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: hasDosha ? Colors.red.shade800 : Colors.green.shade800)),
+        if (detail != null) Text(' ($detail)', style: TextStyle(fontSize: 11, color: kMuted)),
+      ]),
+    );
+  }
+
+  Widget _tableRow2(List<String> cells, {bool header = false, Color? bg}) {
+    return Container(
+      decoration: BoxDecoration(color: bg, border: Border(bottom: BorderSide(color: kBorder))),
+      child: Row(children: cells.asMap().entries.map((e) => Expanded(
+        flex: e.key == 0 ? 2 : 1,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          child: Text(e.value, style: TextStyle(fontSize: 12, fontWeight: header ? FontWeight.w900 : FontWeight.w600, color: header ? kPurple2 : kText), textAlign: e.key == 0 ? TextAlign.left : TextAlign.center),
+        ),
+      )).toList()),
+    );
+  }
+
+  Widget _buildResults() {
+    if (_brideResult == null || _groomResult == null || _fullResult == null) return const SizedBox.shrink();
+    final br = _brideResult!;
+    final gr = _groomResult!;
+    final fr = _fullResult!;
+
+    final bName = _bNameCtrl.text.isNotEmpty ? _bNameCtrl.text : AppLocale.l('brideDetails');
+    final gName = _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : AppLocale.l('groomDetails');
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // ── INDIVIDUAL DETAILS ──
+      _sectionHeader('$gName — ${AppLocale.l('chart')}', Icons.male, kTeal),
+      _buildPersonSummary(gr, gName, _gDob, _gHour, _gMinute, _gAmpm, _gPlaceCtrl.text),
+      _sectionHeader('$bName — ${AppLocale.l('chart')}', Icons.female, kOrange),
+      _buildPersonSummary(br, bName, _bDob, _bHour, _bMinute, _bAmpm, _bPlaceCtrl.text),
+
+      // ── KUJA DOSHA ──
+      _sectionHeader(AppLocale.l('kujaDosha'), Icons.brightness_7, Colors.red.shade700),
+      _buildKujaDoshaSection(fr),
+
+      // ── PAPA DOSHA ──
+      _sectionHeader(AppLocale.l('papaDosha'), Icons.shield, Colors.deepOrange),
+      _buildPapaDoshaSection(fr),
+
+      // ── GRAHA MAITRI ──
+      _sectionHeader(AppLocale.l('grahaMaitriAmsha'), Icons.handshake, kPurple2),
+      _buildGrahaMaitriSection(fr),
+
+      // ── SHATHA ASHTAKA & DVIRDVADASHA ──
+      _sectionHeader('${AppLocale.l('shathaAshtaka')} & ${AppLocale.l('dvirdvadasha')}', Icons.compare_arrows, Colors.indigo),
+      _buildShathaAshtakaDvirdvadashaSection(fr),
+
+      // ── ASHTA KOOTA ──
+      _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
+      _buildAshtaKootaTable(fr['ashtaKoota']),
+
+      const SizedBox(height: 32),
+    ]);
+  }
+
+  Widget _buildPersonSummary(KundaliResult r, String name, DateTime dob, int hour, int minute, String ampm, String place) {
+    final pan = r.panchang;
+    final dateStr = '${dob.day.toString().padLeft(2, "0")}-${dob.month.toString().padLeft(2, "0")}-${dob.year}';
+    final timeStr = '${hour.toString().padLeft(2, "0")}:${minute.toString().padLeft(2, "0")} $ampm';
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _kv(AppLocale.l('nameLabel'), name),
+        _kv(AppLocale.l('placeLabel'), place),
+        _kv(AppLocale.l('dateLabel'), dateStr),
+        _kv(AppLocale.l('timeLabel'), timeStr),
+        _kv(AppLocale.l('chandraNakshatra'), '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} ${r.planets['ಚಂದ್ರ']?.pada ?? 1}'),
+        _kv(AppLocale.l('chandraRashiLabel'), trAll(pan.chandraRashi)),
+        _kv(AppLocale.l('dashaLord'), '${trAll(pan.dashaLord)} ${AppLocale.l('dashaBalance')}: ${pan.dashaBalance}'),
+      ])),
+      const SizedBox(height: 8),
+      // Charts row
+      Row(children: [
+        Expanded(child: Column(children: [
+          Text(AppLocale.l('rashiKundali'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
+          const SizedBox(height: 4),
+          KundaliChart(result: r, varga: 1, isBhava: false, showSphutas: false),
+        ])),
+        const SizedBox(width: 8),
+        Expanded(child: Column(children: [
+          Text(AppLocale.l('navamshaKundali'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
+          const SizedBox(height: 4),
+          KundaliChart(result: r, varga: 9, isBhava: false, showSphutas: false),
+        ])),
+      ]),
+      const SizedBox(height: 8),
+      Center(child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.5,
+        child: Column(children: [
+          Text(AppLocale.l('bhavaKundali'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
+          const SizedBox(height: 4),
+          KundaliChart(result: r, varga: 1, isBhava: true, showSphutas: false),
+        ]),
+      )),
+      const SizedBox(height: 12),
+    ]);
+  }
+
+  Widget _kv(String key, String val) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(children: [
+        Text('$key: ', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: kMuted)),
+        Flexible(child: Text(val, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: kText))),
+      ]),
+    );
+  }
+
+  Widget _buildKujaDoshaSection(Map<String, dynamic> fr) {
+    final bk = fr['brideKujaDosha'] as Map<String, dynamic>;
+    final gk = fr['groomKujaDosha'] as Map<String, dynamic>;
+    final bName = _bNameCtrl.text.isNotEmpty ? _bNameCtrl.text : AppLocale.l('brideDetails');
+    final gName = _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : AppLocale.l('groomDetails');
+
+    Widget doshaRow(String label, Map<String, dynamic> d) {
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: kText)),
+        const SizedBox(height: 6),
+        Wrap(spacing: 6, runSpacing: 6, children: [
+          _doshaChip(AppLocale.l('lagna'), d['fromLagna'] > 0, detail: d['fromLagna'] > 0 ? '${d['fromLagna']}' : null),
+          _doshaChip(AppLocale.l('chandraRashiLabel'), d['fromChandra'] > 0, detail: d['fromChandra'] > 0 ? '${d['fromChandra']}' : null),
+          _doshaChip(AppLocale.l('planetShukra'), d['fromShukra'] > 0, detail: d['fromShukra'] > 0 ? '${d['fromShukra']}' : null),
+        ]),
+        const SizedBox(height: 10),
+      ]);
+    }
+
+    final bothHave = bk['hasDosha'] == true && gk['hasDosha'] == true;
+    final neitherHas = bk['hasDosha'] == false && gk['hasDosha'] == false;
+    String verdict;
+    Color vColor;
+    if (bothHave || neitherHas) {
+      verdict = bothHave ? 'ಇಬ್ಬರಿಗೂ ಕುಜ ದೋಷ ✅' : 'ಇಬ್ಬರಿಗೂ ಕುಜ ದೋಷ ಇಲ್ಲ ✅';
+      vColor = Colors.green.shade700;
+    } else {
+      verdict = 'ಕುಜ ದೋಷ ಅಸಮಾನ ⚠️';
+      vColor = Colors.red.shade700;
+    }
+
+    return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      doshaRow(gName, gk),
+      const Divider(),
+      doshaRow(bName, bk),
+      const Divider(),
+      Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(color: vColor.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+        child: Row(children: [
+          Icon(bothHave || neitherHas ? Icons.check_circle : Icons.warning, color: vColor, size: 20),
+          const SizedBox(width: 8),
+          Flexible(child: Text(verdict, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: vColor))),
+        ]),
+      ),
+    ]));
+  }
+
+  Widget _buildPapaDoshaSection(Map<String, dynamic> fr) {
+    final bp = fr['bridePapaDosha'] as Map<String, dynamic>;
+    final gp = fr['groomPapaDosha'] as Map<String, dynamic>;
+    final ps = fr['papaSamya'] as Map<String, dynamic>;
+    final bName = _bNameCtrl.text.isNotEmpty ? _bNameCtrl.text : AppLocale.l('brideDetails');
+    final gName = _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : AppLocale.l('groomDetails');
+
+    return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _tableRow2([AppLocale.l('papaDosha'), gName, bName], header: true, bg: kPurple2.withOpacity(0.08)),
+      _tableRow2([AppLocale.l('lagna'), '${gp['fromLagna']}', '${bp['fromLagna']}']),
+      _tableRow2([AppLocale.l('chandraRashiLabel'), '${gp['fromChandra']}', '${bp['fromChandra']}']),
+      _tableRow2([AppLocale.l('planetShukra'), '${gp['fromShukra']}', '${bp['fromShukra']}']),
+      _tableRow2([AppLocale.l('totalGuna'), '${gp['total']}', '${bp['total']}'], bg: kPurple1.withOpacity(0.05)),
+      const SizedBox(height: 10),
+      Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: (ps['isSamya'] as bool) ? Colors.green.shade50 : Colors.red.shade50,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(children: [
+          Icon((ps['isSamya'] as bool) ? Icons.check_circle : Icons.warning, color: (ps['isSamya'] as bool) ? Colors.green : Colors.red, size: 20),
+          const SizedBox(width: 8),
+          Flexible(child: Text(
+            (ps['isSamya'] as bool) ? 'ಪಾಪ ಸಾಮ್ಯ ✅ (ವ್ಯತ್ಯಾಸ: ${ps['difference']})' : 'ಪಾಪ ಅಸಮಾನ ⚠️ (ವ್ಯತ್ಯಾಸ: ${ps['difference']})',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: (ps['isSamya'] as bool) ? Colors.green.shade800 : Colors.red.shade800),
+          )),
+        ]),
+      ),
+    ]));
+  }
+
+  Widget _buildGrahaMaitriSection(Map<String, dynamic> fr) {
+    final gm = fr['grahaMaitri'] as Map<String, dynamic>;
+    final planets = gm['planets'] as List<Map<String, dynamic>>;
+
+    Color panchadhaColor(String p) {
+      if (p == 'ಅತಿಮಿತ್ರ') return Colors.green.shade700;
+      if (p == 'ಮಿತ್ರ') return Colors.green;
+      if (p == 'ಸಮ') return Colors.orange;
+      if (p == 'ಶತ್ರು') return Colors.red;
+      return Colors.red.shade900;
+    }
+
+    return AppCard(padding: EdgeInsets.zero, child: Column(children: [
+      _tableRow2([AppLocale.l('hGraha'), AppLocale.l('brideDetails'), AppLocale.l('groomDetails'), 'ಫಲ'], header: true, bg: kPurple2.withOpacity(0.08)),
+      ...planets.map((p) => Container(
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder))),
+        child: Row(children: [
+          Expanded(flex: 2, child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: Text(trAll(p['planet']), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)))),
+          Expanded(child: Text(trAll(p['brideLordName']), textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: kMuted))),
+          Expanded(child: Text(trAll(p['groomLordName']), textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: kMuted))),
+          Expanded(child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+            decoration: BoxDecoration(color: panchadhaColor(p['panchadha']).withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+            child: Text(p['panchadha'], textAlign: TextAlign.center, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: panchadhaColor(p['panchadha']))),
+          )),
+        ]),
+      )),
+    ]));
+  }
+
+  Widget _buildShathaAshtakaDvirdvadashaSection(Map<String, dynamic> fr) {
+    final sa = fr['shathaAshtaka'] as Map<String, dynamic>;
+    final dv = fr['dvirdvadasha'] as Map<String, dynamic>;
+
+    Widget doshaCard(String title, Map<String, dynamic> d) {
+      return Expanded(child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: (d['hasDosha'] as bool) ? Colors.red.shade50 : Colors.green.shade50,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: (d['hasDosha'] as bool) ? Colors.red.shade200 : Colors.green.shade200),
+        ),
+        child: Column(children: [
+          Icon((d['hasDosha'] as bool) ? Icons.warning_amber : Icons.check_circle, color: (d['hasDosha'] as bool) ? Colors.red : Colors.green, size: 28),
+          const SizedBox(height: 6),
+          Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: kText)),
+          const SizedBox(height: 4),
+          Text((d['hasDosha'] as bool) ? 'ದೋಷ ಇದೆ' : 'ದೋಷ ಇಲ್ಲ',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: (d['hasDosha'] as bool) ? Colors.red.shade700 : Colors.green.shade700)),
+          const SizedBox(height: 2),
+          Text('(${d['brideFromGroom']}/${d['groomFromBride']})', style: TextStyle(fontSize: 10, color: kMuted)),
+        ]),
+      ));
+    }
+
+    return Row(children: [
+      doshaCard(AppLocale.l('shathaAshtaka'), sa),
+      const SizedBox(width: 10),
+      doshaCard(AppLocale.l('dvirdvadasha'), dv),
+    ]);
+  }
+
+  Widget _buildAshtaKootaTable(Map<String, dynamic> result) {
+    final total = result['total'] as double;
     String verdict;
     Color verdictColor;
-    if (total <= 18) {
-      verdict = AppLocale.l('matchPoor');
-      verdictColor = Colors.red.shade700;
-    } else if (total <= 25) {
-      verdict = AppLocale.l('matchMedium');
-      verdictColor = Colors.orange.shade700;
-    } else {
-      verdict = AppLocale.l('matchGood');
-      verdictColor = Colors.green.shade700;
-    }
+    if (total <= 18) { verdict = AppLocale.l('matchPoor'); verdictColor = Colors.red.shade700; }
+    else if (total <= 25) { verdict = AppLocale.l('matchMedium'); verdictColor = Colors.orange.shade700; }
+    else { verdict = AppLocale.l('matchGood'); verdictColor = Colors.green.shade700; }
 
     TableRow row(String name, double pts, int max) {
       return TableRow(
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder))),
         children: [
-          Padding(padding: const EdgeInsets.all(12), child: Text(name, style: TextStyle(fontWeight: FontWeight.w600))),
-          Padding(padding: const EdgeInsets.all(12), child: Text(pts.toStringAsFixed(1), textAlign: TextAlign.center)),
-          Padding(padding: const EdgeInsets.all(12), child: Text(max.toString(), textAlign: TextAlign.center, style: TextStyle(color: kMuted))),
+          Padding(padding: const EdgeInsets.all(10), child: Text(name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13))),
+          Padding(padding: const EdgeInsets.all(10), child: Text(pts.toStringAsFixed(1), textAlign: TextAlign.center, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
+          Padding(padding: const EdgeInsets.all(10), child: Text(max.toString(), textAlign: TextAlign.center, style: TextStyle(color: kMuted, fontSize: 13))),
         ],
       );
     }
 
-    return AppCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(AppLocale.l('matchResult'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1), textAlign: TextAlign.center),
-          const SizedBox(height: 16),
-          Table(
-            columnWidths: const {
-               0: FlexColumnWidth(2),
-               1: FlexColumnWidth(1),
-               2: FlexColumnWidth(1),
-            },
-            children: [
-              TableRow(
-                decoration: BoxDecoration(color: kPurple2.withOpacity(0.12), borderRadius: const BorderRadius.vertical(top: Radius.circular(8))),
-                children: [
-                  Padding(padding: EdgeInsets.all(12), child: Text(AppLocale.l('koota'), style: TextStyle(fontWeight: FontWeight.bold))),
-                  Padding(padding: EdgeInsets.all(12), child: Text(AppLocale.l('padeGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
-                  Padding(padding: EdgeInsets.all(12), child: Text(AppLocale.l('garishThaGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
-                ],
-              ),
-              row(AppLocale.l('varna'), _result!['varna'], 1),
-              row(AppLocale.l('vashya'), _result!['vashya'], 2),
-              row(AppLocale.l('tara'), _result!['tara'], 3),
-              row(AppLocale.l('yoni'), _result!['yoni'], 4),
-              row(AppLocale.l('grahaMaitri'), _result!['graha'], 5),
-              row(AppLocale.l('gana'), _result!['gana'], 6),
-              row(AppLocale.l('bhakoot'), _result!['bhakoot'], 7),
-              row(AppLocale.l('naadi'), _result!['nadi'], 8),
-              TableRow(
-                decoration: BoxDecoration(color: kPurple1.withOpacity(0.05)),
-                children: [
-                  Padding(padding: EdgeInsets.all(12), child: Text(AppLocale.l('totalGuna'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
-                  Padding(padding: const EdgeInsets.all(12), child: Text(total.toStringAsFixed(1), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: kPurple1))),
-                  Padding(padding: EdgeInsets.all(12), child: Text('36', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: kMuted))),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Container(
-             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-             decoration: BoxDecoration(
-               color: verdictColor.withOpacity(0.1),
-               borderRadius: BorderRadius.circular(8),
-               border: Border.all(color: verdictColor.withOpacity(0.3)),
-             ),
-             child: Column(
-               children: [
-                 Text('${AppLocale.l('result')}:', style: TextStyle(fontSize: 14, color: verdictColor, fontWeight: FontWeight.w600)),
-                 const SizedBox(height: 4),
-                 Text(
-                   verdict, 
-                   textAlign: TextAlign.center,
-                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: verdictColor)
-                 ),
-               ],
-             ),
-          ),
-        ],
+    return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Table(columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1)}, children: [
+        TableRow(
+          decoration: BoxDecoration(color: kPurple2.withOpacity(0.1), borderRadius: const BorderRadius.vertical(top: Radius.circular(8))),
+          children: [
+            Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('koota'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
+            Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('padeGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
+            Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('garishThaGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
+          ],
+        ),
+        row(AppLocale.l('varna'), result['varna'], 1),
+        row(AppLocale.l('vashya'), result['vashya'], 2),
+        row(AppLocale.l('tara'), result['tara'], 3),
+        row(AppLocale.l('yoni'), result['yoni'], 4),
+        row(AppLocale.l('grahaMaitri'), result['graha'], 5),
+        row(AppLocale.l('gana'), result['gana'], 6),
+        row(AppLocale.l('bhakoot'), result['bhakoot'], 7),
+        row(AppLocale.l('naadi'), result['nadi'], 8),
+        TableRow(
+          decoration: BoxDecoration(color: kPurple1.withOpacity(0.05)),
+          children: [
+            Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('totalGuna'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+            Padding(padding: const EdgeInsets.all(10), child: Text(total.toStringAsFixed(1), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: kPurple1))),
+            Padding(padding: const EdgeInsets.all(10), child: Text('36', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: kMuted))),
+          ],
+        ),
+      ]),
+      const SizedBox(height: 16),
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        decoration: BoxDecoration(color: verdictColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: verdictColor.withOpacity(0.3))),
+        child: Column(children: [
+          Text('${AppLocale.l('result')}:', style: TextStyle(fontSize: 13, color: verdictColor, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 4),
+          Text(verdict, textAlign: TextAlign.center, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: verdictColor)),
+        ]),
       ),
-    );
+    ]));
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          AppCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SectionTitle(AppLocale.l('brideDetails'), color: kOrange),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(child: _buildDropdown(AppLocale.l('rashiLabel'), _bRashi, appRashi, List.generate(12, (i) => i), (v) {
-                       setState(() { _bRashi = v; if (v != null && !_rashiNakMap[v]!.contains(_bNak)) _bNak = null; });
-                    })),
-                    const SizedBox(width: 16),
-                    Expanded(child: _buildDropdown(AppLocale.l('nakshatra'), _bNak, appNak, _bRashi != null ? _rashiNakMap[_bRashi]! : List.generate(27, (i) => i), (v) => setState(() => _bNak = v))),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Divider(),
-                const SizedBox(height: 8),
-                SectionTitle(AppLocale.l('groomDetails'), color: kTeal),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(child: _buildDropdown(AppLocale.l('rashiLabel'), _gRashi, appRashi, List.generate(12, (i) => i), (v) {
-                       setState(() { _gRashi = v; if (v != null && !_rashiNakMap[v]!.contains(_gNak)) _gNak = null; });
-                    })),
-                    const SizedBox(width: 16),
-                    Expanded(child: _buildDropdown(AppLocale.l('nakshatra'), _gNak, appNak, _gRashi != null ? _rashiNakMap[_gRashi]! : List.generate(27, (i) => i), (v) => setState(() => _gNak = v))),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _calculateMatch,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kPurple1,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 0,
-                    ),
-                    child: Text(AppLocale.l('checkMatch'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
+      child: Column(children: [
+        // Groom input
+        _buildPersonInput(
+          title: AppLocale.l('groomDetails'), color: kTeal,
+          nameCtrl: _gNameCtrl, placeCtrl: _gPlaceCtrl, latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
+          dob: _gDob, hour: _gHour, minute: _gMinute, ampm: _gAmpm,
+          geoLoading: _gGeoLoading, geoStatus: _gGeoStatus,
+          onDobChanged: (d) => setState(() => _gDob = d),
+          onTimeChanged: (h, m, a) => setState(() { _gHour = h; _gMinute = m; _gAmpm = a; }),
+          onGeoLoadingChanged: (v) => _gGeoLoading = v,
+          onGeoStatusChanged: (v) => _gGeoStatus = v,
+        ),
+        const SizedBox(height: 12),
+        // Bride input
+        _buildPersonInput(
+          title: AppLocale.l('brideDetails'), color: kOrange,
+          nameCtrl: _bNameCtrl, placeCtrl: _bPlaceCtrl, latCtrl: _bLatCtrl, lonCtrl: _bLonCtrl, tzCtrl: _bTzCtrl,
+          dob: _bDob, hour: _bHour, minute: _bMinute, ampm: _bAmpm,
+          geoLoading: _bGeoLoading, geoStatus: _bGeoStatus,
+          onDobChanged: (d) => setState(() => _bDob = d),
+          onTimeChanged: (h, m, a) => setState(() { _bHour = h; _bMinute = m; _bAmpm = a; }),
+          onGeoLoadingChanged: (v) => _bGeoLoading = v,
+          onGeoStatusChanged: (v) => _bGeoStatus = v,
+        ),
+        const SizedBox(height: 16),
+        // Calculate button
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: _loading ? null : _calculate,
+            icon: _loading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.calculate),
+            label: Text(_loading ? '${AppLocale.l('calcInProgress')}' : AppLocale.l('checkMatch'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kPurple1, foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 0,
             ),
           ),
-          _buildResultTable(),
-          const SizedBox(height: 32),
-        ],
-      ),
+        ),
+        const SizedBox(height: 8),
+        _buildResults(),
+      ]),
     );
   }
 }

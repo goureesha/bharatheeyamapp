@@ -1,19 +1,25 @@
-# Per-Person Tabs - Task List
+# Enhanced Guna Milan — Task List
 
-- [x] Add `_selectedPersonIndex` state + active person helpers
-- [x] Add person selector row above TabBar
-- [x] Update `_buildKundaliTab()` — single person
-- [x] Update `_buildSphutas()` — single person
-- [x] Update `_buildDashaTab()` — single person
-- [x] Update `_buildPanchangTab()` — single person
-- [x] Update `_buildBhavaTab()` — single person
-- [x] Update `_buildGrahaShadvargaTab()` — single person
-- [x] Update `_buildShadbalaTab()` — single person
-- [x] Update `_buildAshtakaTab()` — single person
-- [x] Update `_buildNotesTab()` — single person
-- [x] Update `_buildAroodhaTab()` — use active person
-- [x] Update `_buildJanmaPatrikeTab()` — use active person
-- [x] Update `_showPlanetDetail()` — use active person
-- [x] Safety: reset index on person remove
-- [x] Remove all `allPersons` references
-- [ ] Build and test
+## Component 1: Calculator Engine (match_making.dart)
+- [ ] Kuja Dosha calculator (from Lagna, Chandra, Shukra)
+- [ ] Papa Dosha calculator (papa count + samya)
+- [ ] Graha Maitri Amsha (Brihad Jataka naisargika table)
+- [ ] Shatha Ashtaka Dosha check
+- [ ] Dvirdvadasha Dosha check
+- [ ] `calculateFullCompatibility()` aggregator
+
+## Component 2: Enhanced UI (match_making_tab.dart)
+- [ ] Input section: Groom & Bride cards (name, date, time, place)
+- [ ] Calculate button → AstroCalculator for both
+- [ ] Individual details: mini charts + panchanga summary
+- [ ] Kuja Dosha display (side-by-side)
+- [ ] Papa Dosha display
+- [ ] Graha Maitri Amsha table
+- [ ] Shatha Ashtaka & Dvirdvadasha display
+- [ ] Ashta Koota (from calculated data)
+
+## Component 3: Localization
+- [ ] Add locale keys to all 5 languages
+
+## Verification
+- [ ] Commit and push

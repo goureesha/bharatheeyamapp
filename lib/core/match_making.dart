@@ -185,4 +185,203 @@ class MatchMakingLogic {
       'total': total,
     };
   }
+
+  /// Check Kuja Dosha from a reference point
+  /// Returns house number if Kuja is in dosha house, else 0
+  static int _kujaHouseFrom(int kujaRashi, int refRashi) {
+    final house = ((kujaRashi - refRashi + 12) % 12) + 1;
+    return const [1, 2, 4, 7, 8, 12].contains(house) ? house : 0;
+  }
+
+  /// Calculate Kuja Dosha for a person
+  /// planetRashis: map of Kannada planet name -> rashi index (0-11)
+  /// Returns: {fromLagna: int (house or 0), fromChandra: int, fromShukra: int, hasDosha: bool}
+  static Map<String, dynamic> calculateKujaDosha(Map<String, int> planetRashis, int lagnaRashi) {
+    final kujaRashi = planetRashis['ಕುಜ'] ?? 0;
+    final chandraRashi = planetRashis['ಚಂದ್ರ'] ?? 0;
+    final shukraRashi = planetRashis['ಶುಕ್ರ'] ?? 0;
+    final fromLagna = _kujaHouseFrom(kujaRashi, lagnaRashi);
+    final fromChandra = _kujaHouseFrom(kujaRashi, chandraRashi);
+    final fromShukra = _kujaHouseFrom(kujaRashi, shukraRashi);
+    return {
+      'fromLagna': fromLagna,
+      'fromChandra': fromChandra,
+      'fromShukra': fromShukra,
+      'hasDosha': fromLagna > 0 || fromChandra > 0 || fromShukra > 0,
+    };
+  }
+
+  static const List<String> _papaGrahas = ['ರವಿ', 'ಕುಜ', 'ಶನಿ', 'ರಾಹು', 'ಕೇತು'];
+
+  /// Count papa grahas in dosha houses from a reference rashi
+  static int _countPapaInDoshaHouses(Map<String, int> planetRashis, int refRashi) {
+    int count = 0;
+    for (final graha in _papaGrahas) {
+      final gRashi = planetRashis[graha];
+      if (gRashi == null) continue;
+      final house = ((gRashi - refRashi + 12) % 12) + 1;
+      if (const [1, 2, 4, 7, 8, 12].contains(house)) count++;
+    }
+    return count;
+  }
+
+  /// Calculate Papa Dosha for a person
+  static Map<String, dynamic> calculatePapaDosha(Map<String, int> planetRashis, int lagnaRashi) {
+    final chandraRashi = planetRashis['ಚಂದ್ರ'] ?? 0;
+    final shukraRashi = planetRashis['ಶುಕ್ರ'] ?? 0;
+    final fromLagna = _countPapaInDoshaHouses(planetRashis, lagnaRashi);
+    final fromChandra = _countPapaInDoshaHouses(planetRashis, chandraRashi);
+    final fromShukra = _countPapaInDoshaHouses(planetRashis, shukraRashi);
+    return {
+      'fromLagna': fromLagna,
+      'fromChandra': fromChandra,
+      'fromShukra': fromShukra,
+      'total': fromLagna + fromChandra + fromShukra,
+    };
+  }
+
+  /// Check Papa Samya (balance) between bride and groom
+  static Map<String, dynamic> checkPapaSamya(
+    Map<String, dynamic> bridePapa,
+    Map<String, dynamic> groomPapa,
+  ) {
+    final bTotal = bridePapa['total'] as int;
+    final gTotal = groomPapa['total'] as int;
+    final diff = (bTotal - gTotal).abs();
+    return {
+      'bridePapaTotal': bTotal,
+      'groomPapaTotal': gTotal,
+      'difference': diff,
+      'isSamya': diff <= 1,
+    };
+  }
+
+  /// Naisargika (Natural) Maitri table per Brihad Jataka
+  /// 0=Sun, 1=Moon, 2=Mars, 3=Mercury, 4=Jupiter, 5=Venus, 6=Saturn
+  /// Values: 1=Mitra, 0=Sama, -1=Shatru
+  static const List<List<int>> _naisargikaMaitri = [
+    // Sun
+    [ 0,  1,  1, -1,  1, -1, -1],
+    // Moon
+    [ 1,  0, -1,  1,  1, -1, -1],
+    // Mars
+    [ 1,  1,  0, -1,  1, -1, -1],
+    // Mercury
+    [ 1, -1, -1,  0, -1,  1,  1],
+    // Jupiter
+    [ 1,  1,  1, -1,  0, -1, -1],
+    // Venus
+    [-1, -1,  0,  1, -1,  0,  1],
+    // Saturn
+    [-1, -1, -1,  1, -1,  1,  0],
+  ];
+
+  /// Get planet lord index (0-6) for a rashi (0-11)
+  static int getRashiLord(int rashi) {
+    const lords = [2, 5, 3, 1, 0, 3, 5, 2, 4, 6, 6, 4];
+    return lords[rashi];
+  }
+
+  /// Planet names for lord indices
+  static const List<String> lordNames = ['ರವಿ', 'ಚಂದ್ರ', 'ಕುಜ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ'];
+
+  /// Get Naisargika Maitri relationship string
+  static String getNaisargikaMaitriLabel(int planet1Lord, int planet2Lord) {
+    final val = _naisargikaMaitri[planet1Lord][planet2Lord];
+    if (val == 1) return 'ಮಿತ್ರ';
+    if (val == -1) return 'ಶತ್ರು';
+    return 'ಸಮ';
+  }
+
+  /// Calculate Graha Maitri comparison between two charts
+  /// brideRashis/groomRashis: map of Kannada planet name -> rashi index (0-11)
+  static Map<String, dynamic> calculateGrahaMaitriComparison(
+    Map<String, int> brideRashis,
+    Map<String, int> groomRashis,
+  ) {
+    final results = <Map<String, dynamic>>[];
+    const planets = ['ರವಿ', 'ಚಂದ್ರ', 'ಕುಜ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ'];
+    const lordIdx = {'ರವಿ': 0, 'ಚಂದ್ರ': 1, 'ಕುಜ': 2, 'ಬುಧ': 3, 'ಗುರು': 4, 'ಶುಕ್ರ': 5, 'ಶನಿ': 6};
+
+    for (final planet in planets) {
+      final bRashi = brideRashis[planet] ?? 0;
+      final gRashi = groomRashis[planet] ?? 0;
+      final bLord = getRashiLord(bRashi);
+      final gLord = getRashiLord(gRashi);
+      final bToG = _naisargikaMaitri[bLord][gLord];
+      final gToB = _naisargikaMaitri[gLord][bLord];
+      final combined = bToG + gToB;
+      String panchadha;
+      if (combined >= 2) panchadha = 'ಅತಿಮಿತ್ರ';
+      else if (combined == 1) panchadha = 'ಮಿತ್ರ';
+      else if (combined == 0) panchadha = 'ಸಮ';
+      else if (combined == -1) panchadha = 'ಶತ್ರು';
+      else panchadha = 'ಅತಿಶತ್ರು';
+
+      results.add({
+        'planet': planet,
+        'brideRashi': bRashi,
+        'groomRashi': gRashi,
+        'brideLord': bLord,
+        'groomLord': gLord,
+        'brideLordName': lordNames[bLord],
+        'groomLordName': lordNames[gLord],
+        'brideToGroom': bToG,
+        'groomToBride': gToB,
+        'panchadha': panchadha,
+      });
+    }
+    return {'planets': results};
+  }
+
+  /// Check Shatha Ashtaka Dosha (6/8 relationship between Moon signs)
+  static Map<String, dynamic> checkShathaAshtaka(int brideMoonRashi, int groomMoonRashi) {
+    final brideFromGroom = ((brideMoonRashi - groomMoonRashi + 12) % 12) + 1;
+    final groomFromBride = ((groomMoonRashi - brideMoonRashi + 12) % 12) + 1;
+    final is6or8 = const [6, 8].contains(brideFromGroom) || const [6, 8].contains(groomFromBride);
+    return {
+      'hasDosha': is6or8,
+      'brideFromGroom': brideFromGroom,
+      'groomFromBride': groomFromBride,
+    };
+  }
+
+  /// Check Dvirdvadasha Dosha (2/12 relationship between Moon signs)
+  static Map<String, dynamic> checkDvirdvadasha(int brideMoonRashi, int groomMoonRashi) {
+    final brideFromGroom = ((brideMoonRashi - groomMoonRashi + 12) % 12) + 1;
+    final groomFromBride = ((groomMoonRashi - brideMoonRashi + 12) % 12) + 1;
+    final is2or12 = const [2, 12].contains(brideFromGroom) || const [2, 12].contains(groomFromBride);
+    return {
+      'hasDosha': is2or12,
+      'brideFromGroom': brideFromGroom,
+      'groomFromBride': groomFromBride,
+    };
+  }
+
+  /// Full compatibility analysis using KundaliResult data
+  static Map<String, dynamic> calculateFullCompatibility({
+    required int brideNakIdx,
+    required int brideMoonRashi,
+    required int brideLagnaRashi,
+    required Map<String, int> bridePlanetRashis,
+    required int groomNakIdx,
+    required int groomMoonRashi,
+    required int groomLagnaRashi,
+    required Map<String, int> groomPlanetRashis,
+  }) {
+    return {
+      'ashtaKoota': calculateCompatibility(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
+      'brideKujaDosha': calculateKujaDosha(bridePlanetRashis, brideLagnaRashi),
+      'groomKujaDosha': calculateKujaDosha(groomPlanetRashis, groomLagnaRashi),
+      'bridePapaDosha': calculatePapaDosha(bridePlanetRashis, brideLagnaRashi),
+      'groomPapaDosha': calculatePapaDosha(groomPlanetRashis, groomLagnaRashi),
+      'papaSamya': checkPapaSamya(
+        calculatePapaDosha(bridePlanetRashis, brideLagnaRashi),
+        calculatePapaDosha(groomPlanetRashis, groomLagnaRashi),
+      ),
+      'grahaMaitri': calculateGrahaMaitriComparison(bridePlanetRashis, groomPlanetRashis),
+      'shathaAshtaka': checkShathaAshtaka(brideMoonRashi, groomMoonRashi),
+      'dvirdvadasha': checkDvirdvadasha(brideMoonRashi, groomMoonRashi),
+    };
+  }
 }
