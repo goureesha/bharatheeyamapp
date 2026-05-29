@@ -1,265 +1,361 @@
-# Bharatiyam Gratha Sudha — ಭಾರತೀಯಂ ಗ್ರಂಥ ಸುಧಾ
+# Firebase Backend + Admin Panel for Bharatiyam Gratha Sudha
 
-A digital library app for Indian spiritual/religious texts with Sanskrit shlokas, Kannada transliteration, and Kannada explanations.
+Build a full Firebase-powered backend with a web admin panel to manage content, premium subscriptions, and client analytics — all without rebuilding the APK.
 
-## Approach: Two-Phase Delivery
+## System Architecture
 
-### Phase 1 — Web Prototype (Immediate)
-Build a beautiful, fully functional **HTML/CSS/JS web app** in the workspace so you can immediately test all features in the browser — no Flutter SDK setup needed. This serves as:
-- A live feature testbed
-- A design reference for the Flutter app
-- A standalone web version you can host
+```mermaid
+graph TB
+    subgraph "Admin Side"
+        A["🖥️ Web Admin Panel<br>HTML/JS + Firebase SDK"]
+        A --> B["🔐 Admin Auth<br>Firebase Authentication"]
+    end
+    
+    subgraph "Firebase Cloud"
+        C["🗄️ Cloud Firestore<br>Content Database"]
+        D["🔑 Firebase Auth<br>User Accounts"]
+        E["📊 Firebase Analytics<br>Client Monitoring"]
+        F["⚙️ Remote Config<br>Feature Flags"]
+    end
+    
+    subgraph "Client Side"
+        G["📱 Flutter App<br>Android"]
+    end
+    
+    A --> C
+    G --> C
+    G --> D
+    G --> E
+    G --> F
+    
+    style A fill:#4285F4,color:#fff
+    style C fill:#FF9800,color:#fff
+    style D fill:#4CAF50,color:#fff
+    style E fill:#9C27B0,color:#fff
+    style G fill:#E8722A,color:#fff
+```
 
-### Phase 2 — Flutter Android App (After approval)
-Build the production **Flutter app** targeting Android + Web, with GitHub Actions CI/CD for building APKs.
+---
 
-> [!IMPORTANT]
-> **Why this two-phase approach?** Setting up Flutter, Dart SDK, and Android SDK takes time and requires specific environment setup. By building the web prototype first, you can immediately see and test every feature, give feedback on design/UX, and provide the actual book texts — all before we invest in Flutter scaffolding.
+## Phased Approach
+
+We'll implement this in **4 phases**, each delivering a working feature:
+
+| Phase | What | Priority |
+|-------|------|----------|
+| **Phase 1** | Firebase setup + Firestore content DB | 🔴 Now |
+| **Phase 2** | Web admin panel to add/edit content | 🔴 Now |
+| **Phase 3** | Premium/free tier + lock/unlock system | 🟡 Next |
+| **Phase 4** | User auth + client monitoring | 🟡 Next |
+
+---
+
+## Phase 1: Firebase Setup + Firestore Database
+
+### Firestore Schema
+
+```mermaid
+erDiagram
+    CATEGORIES ||--o{ BOOKS : contains
+    BOOKS ||--o{ CHAPTERS : has
+    CHAPTERS ||--o{ SHLOKAS : has
+    USERS ||--o{ BOOKMARKS : saves
+    
+    CATEGORIES {
+        string id PK
+        string title
+        string titleEn
+        string icon
+        string description
+        array subcategories
+    }
+    
+    BOOKS {
+        string id PK
+        string title
+        string titleSanskrit
+        string titleEn
+        string category
+        string subcategory
+        array godRelated
+        string description
+        boolean isPremium
+        int order
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    CHAPTERS {
+        string id PK
+        string bookId FK
+        int number
+        string title
+        string titleSanskrit
+        string titleEn
+        int order
+    }
+    
+    SHLOKAS {
+        string id PK
+        string chapterId FK
+        string bookId FK
+        string number
+        string sanskrit
+        string kannada
+        string meaning
+        string explanation
+        boolean isPremium
+        int order
+    }
+    
+    USERS {
+        string uid PK
+        string email
+        string displayName
+        string tier
+        timestamp premiumExpiry
+        timestamp createdAt
+        timestamp lastActive
+    }
+```
+
+### Files to Create/Modify
+
+#### [NEW] `admin/index.html` — Admin panel entry point
+#### [NEW] `admin/css/admin.css` — Admin panel styles
+#### [NEW] `admin/js/firebase-config.js` — Firebase configuration
+#### [NEW] `admin/js/admin.js` — Admin panel logic
+#### [NEW] `admin/js/content-editor.js` — Content editing logic
+
+#### [NEW] `firebase/firestore.rules` — Security rules
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Anyone can read non-premium content
+    match /categories/{doc} { allow read: if true; }
+    match /books/{doc} { allow read: if true; }
+    match /chapters/{doc} { allow read: if true; }
+    match /shlokas/{doc} {
+      allow read: if !resource.data.isPremium || isAuthenticated();
+    }
+    
+    // Only admins can write
+    match /{document=**} {
+      allow write: if isAdmin();
+    }
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return request.auth != null 
+        && request.auth.token.admin == true;
+    }
+  }
+}
+```
+
+#### [NEW] `firebase/firebase.json` — Firebase project config
+#### [NEW] `firebase/firestore.indexes.json` — Firestore indexes
+
+---
+
+### Flutter App Changes (Phase 1)
+
+#### [MODIFY] [pubspec.yaml](file:///d:/bharatheeyam%20books/pubspec.yaml)
+Add Firebase dependencies:
+```yaml
+dependencies:
+  firebase_core: ^3.8.1
+  cloud_firestore: ^5.6.0
+  firebase_auth: ^5.4.1
+  firebase_analytics: ^11.4.1
+  firebase_remote_config: ^5.3.1
+```
+
+#### [NEW] `lib/services/firebase_service.dart`
+Singleton service for Firebase initialization and Firestore operations:
+- `init()` — initialize Firebase
+- `fetchCategories()` → from Firestore
+- `fetchBooks(category, subcategory)` → from Firestore
+- `fetchChapters(bookId)` → from Firestore  
+- `fetchShlokas(chapterId)` → from Firestore
+- `searchContent(query)` → full-text search
+- Local caching with `shared_preferences` for offline support
+
+#### [MODIFY] [content_data.dart](file:///d:/bharatheeyam%20books/lib/data/content_data.dart)
+- Keep as **bundled fallback** content for first launch / offline
+- Add `uploadToFirestore()` method to seed Firestore with existing data
+
+#### [MODIFY] [shloka.dart](file:///d:/bharatheeyam%20books/lib/models/shloka.dart)
+- Add `isPremium` field to `Book` and `Shloka`
+- Add `order` field for custom sorting
+- Add `fromFirestore()` factory constructors
+- Add `toFirestore()` methods
+
+#### [NEW] `android/app/google-services.json`
+Firebase configuration file (generated from Firebase Console)
+
+#### [MODIFY] [build.gradle (app)](file:///d:/bharatheeyam%20books/android/app/build.gradle)
+Add Google Services plugin:
+```gradle
+plugins {
+    id "com.google.gms.google-services"
+}
+```
+
+#### [MODIFY] [build.gradle (root)](file:///d:/bharatheeyam%20books/android/build.gradle)
+Add classpath for Google Services
+
+#### [MODIFY] [settings.gradle](file:///d:/bharatheeyam%20books/android/settings.gradle)
+Add Google Services plugin version
+
+---
+
+## Phase 2: Web Admin Panel
+
+A beautiful, responsive web interface for managing all content.
+
+### Admin Panel Features
+
+```
+┌─────────────────────────────────────────────────┐
+│  🛕 Bharatiyam Admin Panel                      │
+├─────────┬───────────────────────────────────────┤
+│         │                                       │
+│ 📊 Dashboard                                    │
+│         │  Total Books: 8                       │
+│ 📚 Books│  Total Shlokas: 45                    │
+│         │  Active Users: --                     │
+│ ➕ Add  │  Premium Users: --                    │
+│   New   │                                       │
+│         ├───────────────────────────────────────┤
+│ 👥 Users│  Recent Books                         │
+│         │  ┌─────────────────────────────────┐  │
+│ 📈 Stats│  │ 🕉️ Shiva Panchakshari │ Edit ✏️│  │
+│         │  │ 🕉️ Lingashtakam       │ Edit ✏️│  │
+│ ⚙️ Config│ │ 🕉️ Bilvashtakam       │ Edit ✏️│  │
+│         │  └─────────────────────────────────┘  │
+└─────────┴───────────────────────────────────────┘
+```
+
+### Key Admin Features
+
+| Feature | Description |
+|---------|-------------|
+| **📚 Browse Books** | List all books with filters (category, god, premium status) |
+| **➕ Add Book** | Form with: title (Kannada/Sanskrit/English), category, subcategory, premium toggle |
+| **📝 Edit Book** | Modify any book's metadata |
+| **➕ Add Chapter** | Add chapters to a book |
+| **➕ Add Shloka** | Rich form for sanskrit, kannada transliteration, meaning, explanation |
+| **🔒 Premium Toggle** | Mark any book/shloka as premium with one click |
+| **📋 Bulk Import** | Paste multiple shlokas at once (CSV or structured text) |
+| **👀 Preview** | Live preview of how content looks in the app |
+| **🔄 Seed Data** | One-click upload of existing bundled content to Firestore |
+
+### Admin Panel Tech Stack
+- **Pure HTML/CSS/JS** — no framework needed, simple to host
+- **Firebase JS SDK** — direct Firestore access
+- **Firebase Hosting** — free, deployed at `https://bharatiyam-admin.web.app`
+- **Admin Auth** — email/password login, protected by Firebase Auth custom claims
+
+---
+
+## Phase 3: Premium/Free Tier System (Future)
+
+### Content Locking Model
+
+```mermaid
+graph LR
+    subgraph "Free Content 🆓"
+        A["First 2 shlokas<br>of each book"]
+        B["Selected complete<br>stotras"]
+        C["All categories<br>& browsing"]
+    end
+    
+    subgraph "Premium Content 🔒"
+        D["Full stotras<br>all shlokas"]
+        E["Exclusive<br>rare texts"]
+        F["Ad-free<br>experience"]
+    end
+    
+    G["🔑 Premium Key"] --> D
+    G --> E
+    G --> F
+```
+
+### Implementation
+- `isPremium` flag on `Book` and `Shloka` documents
+- Free users see a lock icon and "Upgrade to Premium" prompt
+- Premium unlocked via Firebase Auth custom claims
+- Admin panel has toggle to mark content as free/premium
+- Firebase Remote Config for dynamic feature flags
+
+---
+
+## Phase 4: User Auth + Client Monitoring (Future)
+
+### Firebase Analytics Events
+| Event | When |
+|-------|------|
+| `app_open` | App launched |
+| `book_viewed` | User opens a book |
+| `shloka_read` | User reads a shloka |
+| `bookmark_added` | User saves a shloka |
+| `search_performed` | User searches |
+| `premium_prompt_shown` | Lock screen shown |
+| `premium_purchased` | User upgrades |
+
+### User Authentication Flow
+```
+Guest Mode → Browse free content → Hit premium lock
+    → Sign up (email/Google) → Purchase premium → Unlock all
+```
 
 ---
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Content Needed**: You mentioned you'll provide the book texts. I need at least one sample text (a few shlokas with Sanskrit, Kannada, and meaning) to build the prototype with real content. For now, I'll use placeholder Sanskrit shlokas to demonstrate the layout.
+> **Firebase Project Setup Required**: Before I can write the code, you need to create a Firebase project:
+> 1. Go to [Firebase Console](https://console.firebase.google.com/)
+> 2. Create a new project named **"Bharatiyam Gratha Sudha"**
+> 3. Enable **Firestore Database** (start in test mode)
+> 4. Enable **Authentication** → Email/Password provider
+> 5. Enable **Analytics**
+> 6. Add an **Android app** with package name `com.bharatiyam.granthasudha`
+> 7. Download `google-services.json` and place it at `d:\bharatheeyam books\android\app\google-services.json`
+> 8. Add a **Web app** → copy the Firebase config (apiKey, projectId, etc.)
+>
+> Share the **web app Firebase config** with me and confirm `google-services.json` is placed, and I'll build everything.
 
 > [!WARNING]
-> **App Name Confirmation**: The app name "ಭಾರತೀಯಂ ಗ್ರಂಥ ಸುಧಾ" (Bharatiyam Gratha Sudha) — is this the final name? This will be used in the app title, splash screen, and Play Store listing.
+> **Firestore Security**: We'll start in test mode for development, but before going to production, the security rules must be locked down to prevent unauthorized writes.
 
 ## Open Questions
 
-1. **Categories**: You mentioned "different subject related sections" and "god related sections". Can you list the specific categories? For example:
-   - **Subject sections**: Vedas, Upanishads, Bhagavad Gita, Ramayana, Mahabharata, Puranas?
-   - **God sections**: Shiva, Vishnu, Devi, Ganesha, Hanuman, Surya?
-   - **Stotra section**: Vishnu Sahasranama, Lalita Sahasranama, Shiva Tandava Stotram?
+> [!IMPORTANT]
+> **Admin access**: Who should have admin access to the content panel? Just you, or multiple people? This determines whether we use a simple password or role-based access.
 
-2. **Offline support**: Should the app work fully offline (all texts bundled in the app) or download content from a server?
-
-3. **Audio**: Do you want audio recitation of shlokas in future versions?
-
-4. **Theme**: Do you prefer a traditional/spiritual aesthetic (saffron, gold, temple motifs) or a modern minimalist design?
-
----
-
-## Architecture & Design
-
-### Content Data Model
-
-Each book is structured as:
-```
-Book
-├── title (Sanskrit + Kannada)
-├── category (subject / god / stotra)
-├── chapters[]
-│   ├── title
-│   └── shlokas[]
-│       ├── id (unique)
-│       ├── number
-│       ├── sanskrit_text (Devanagari)
-│       ├── kannada_text (Kannada script)
-│       ├── meaning_kannada (explanation)
-│       └── metadata (chapter, verse number)
-```
-
-Content stored as **JSON files** — easy to edit, version control in GitHub, and load dynamically.
-
-### App Sections
-
-```mermaid
-graph TD
-    A[🏠 Home] --> B[📚 Library]
-    A --> C[🙏 Gods]
-    A --> D[📿 Stotras]
-    A --> E[💾 Saved / Bookmarks]
-    A --> F[⚙️ Settings]
-    
-    B --> B1[Vedas]
-    B --> B2[Upanishads]
-    B --> B3[Bhagavad Gita]
-    B --> B4[Other Texts]
-    
-    C --> C1[Shiva]
-    C --> C2[Vishnu]
-    C --> C3[Devi]
-    C --> C4[Ganesha]
-    
-    D --> D1[Vishnu Sahasranama]
-    D --> D2[Shiva Stotras]
-    D --> D3[Devi Stotras]
-```
-
-### Shloka Display Layout
-
-Each shloka card will show three layers:
-
-| Layer | Script | Purpose |
-|-------|--------|---------|
-| **1. Original** | Sanskrit (Devanagari) | `ॐ भूर्भुवः स्वः` — shown in a decorative Sanskrit font |
-| **2. Kannada** | Kannada script | `ಓಂ ಭೂರ್ಭುವಃ ಸ್ವಃ` — transliteration in Kannada |
-| **3. Meaning** | Kannada | Detailed meaning and explanation in Kannada |
-
-Each card has a **bookmark/save button** (heart icon) that persists to local storage.
-
-### UI Theme — Spiritual Premium
-
-- **Color palette**: Deep saffron (#FF6F00), temple gold (#FFD700), sacred maroon (#800020), warm cream (#FFF8E7)
-- **Dark mode**: Deep indigo (#1A1A2E) with gold accents
-- **Fonts**: Noto Sans Devanagari (Sanskrit), Noto Sans Kannada (Kannada), Inter (UI)
-- **Decorative elements**: Subtle mandala patterns, lotus borders, Om watermarks
-- **Animations**: Smooth page transitions, card reveal animations, gentle glow effects on sacred text
-
----
-
-## Phase 1: Web Prototype — Proposed Changes
-
-### File Structure
-```
-d:\bharatheeyam books\
-├── web/
-│   ├── index.html          ← Main app shell
-│   ├── css/
-│   │   └── styles.css      ← Complete design system
-│   ├── js/
-│   │   ├── app.js          ← Main app logic & routing
-│   │   ├── data.js         ← Book/shloka content (JSON)
-│   │   └── storage.js      ← Bookmark persistence (localStorage)
-│   └── assets/
-│       └── images/         ← Generated decorative images
-├── data/
-│   └── books/              ← JSON content files (shared with Flutter later)
-│       ├── bhagavad_gita.json
-│       └── ...
-```
-
-### [NEW] [index.html](file:///d:/bharatheeyam%20books/web/index.html)
-- Single-page app shell with navigation
-- Responsive layout (mobile-first, works on desktop too)
-- Google Fonts loading (Noto Sans Devanagari, Noto Sans Kannada)
-- SEO meta tags
-
-### [NEW] [styles.css](file:///d:/bharatheeyam%20books/web/css/styles.css)
-- Complete design system with CSS custom properties
-- Spiritual premium theme (saffron, gold, dark mode)
-- Shloka card styling with Sanskrit/Kannada typography
-- Mandala decorative patterns via CSS
-- Smooth transitions and micro-animations
-- Responsive breakpoints
-
-### [NEW] [app.js](file:///d:/bharatheeyam%20books/web/js/app.js)
-- Client-side routing (hash-based)
-- Section rendering (Library, Gods, Stotras, Saved)
-- Shloka card rendering with 3-layer layout
-- Search functionality
-- Theme toggling (light/dark)
-
-### [NEW] [data.js](file:///d:/bharatheeyam%20books/web/js/data.js)
-- Sample content: Bhagavad Gita Chapter 1 (first few shlokas)
-- Sample Stotras: Gayatri Mantra, Vishnu Sahasranama opening
-- Structured as JS objects matching the data model above
-
-### [NEW] [storage.js](file:///d:/bharatheeyam%20books/web/js/storage.js)
-- LocalStorage-based bookmark system
-- Save/unsave shlokas by ID
-- Retrieve all bookmarked shlokas
-- Export bookmarks as JSON
-
----
-
-## Phase 2: Flutter App (After Phase 1 approval)
-
-### Technology Choices
-
-| Choice | Decision | Rationale |
-|--------|----------|-----------|
-| **Framework** | Flutter | Single codebase for Android + Web; excellent Indic script rendering |
-| **Language** | Dart | Required by Flutter |
-| **State Management** | Provider | Simple, sufficient for this app's complexity |
-| **Local Storage** | Hive | Fast, lightweight NoSQL — perfect for bookmarks |
-| **Content Storage** | JSON assets | Easy to update, version-controllable |
-| **Fonts** | Noto Sans Devanagari + Noto Sans Kannada | Best open-source Indic fonts |
-| **CI/CD** | GitHub Actions | Auto-build APK on push |
-
-### Flutter Project Structure
-```
-d:\bharatheeyam books\bharatiyam_app\
-├── lib/
-│   ├── main.dart
-│   ├── models/
-│   │   ├── book.dart
-│   │   ├── shloka.dart
-│   │   └── category.dart
-│   ├── screens/
-│   │   ├── home_screen.dart
-│   │   ├── library_screen.dart
-│   │   ├── god_section_screen.dart
-│   │   ├── stotra_screen.dart
-│   │   ├── reader_screen.dart
-│   │   ├── saved_screen.dart
-│   │   └── settings_screen.dart
-│   ├── widgets/
-│   │   ├── shloka_card.dart
-│   │   ├── book_tile.dart
-│   │   ├── category_grid.dart
-│   │   └── nav_bar.dart
-│   ├── providers/
-│   │   ├── book_provider.dart
-│   │   └── bookmark_provider.dart
-│   ├── services/
-│   │   ├── content_service.dart
-│   │   └── storage_service.dart
-│   └── theme/
-│       └── app_theme.dart
-├── assets/
-│   ├── fonts/
-│   ├── data/          ← Reuse JSON from Phase 1
-│   └── images/
-├── .github/
-│   └── workflows/
-│       └── build.yml  ← GitHub Actions: build APK
-├── pubspec.yaml
-└── README.md
-```
-
-### GitHub Actions CI/CD
-```yaml
-# .github/workflows/build.yml
-# Triggers on push to main
-# Steps: Checkout → Setup Flutter → Build APK → Upload artifact
-```
+> [!NOTE]
+> **Hosting for admin panel**: The admin panel can be hosted free on Firebase Hosting (`bharatiyam-admin.web.app`). Should I set this up, or would you prefer to host it elsewhere?
 
 ---
 
 ## Verification Plan
 
-### Phase 1 (Web Prototype)
-- Open `index.html` in browser — verify all sections render
-- Test Sanskrit and Kannada text rendering
-- Test bookmark save/load (refresh page, bookmarks persist)
-- Test dark mode toggle
-- Test responsive layout (resize browser)
-- Verify navigation between all sections
+### Phase 1 Verification
+- Seed existing content to Firestore → verify all books/shlokas appear
+- Open app → verify it loads content from Firestore
+- Turn off internet → verify app works with cached/bundled content
 
-### Phase 2 (Flutter App)
-- `flutter run -d chrome` — verify web build
-- `flutter build apk` — verify Android APK builds
-- GitHub Actions — verify CI pipeline produces APK artifact
-- Test on Android emulator/device
-- Test Indic font rendering on both platforms
+### Phase 2 Verification
+- Log into admin panel → add a new stotra
+- Open app → verify new stotra appears without app update
+- Edit a shloka in admin → verify change reflects in app
 
----
-
-## Summary: What I'll Build Now (Phase 1)
-
-Upon your approval, I will immediately build the **web prototype** with:
-
-1. ✨ Stunning spiritual-themed UI with saffron/gold palette
-2. 📚 Library section with categorized books
-3. 🙏 God-related sections
-4. 📿 Stotra section
-5. 📖 Beautiful shloka cards (Sanskrit → Kannada → Meaning)
-6. 💾 Bookmark/save system
-7. 🌙 Dark mode
-8. 🔍 Search functionality
-9. 📱 Mobile-responsive design
-
-You can test everything in your browser immediately!
+### Phase 3-4 Verification
+- Mark a book as premium → verify lock appears for free users
+- Create a premium account → verify content unlocks
+- Check Firebase Analytics dashboard → verify events are tracked

@@ -1,6 +1,6 @@
 {
-  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary": "Plan to remove Google login from app startup and move it to Kundali (on Calculate click) and Taranukoola (on first open). Remove all internet checks. Optimize startup speed.",
-  "updatedAt": "2026-05-21T09:28:02.372580Z",
-  "requestFeedback": true
+  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary":  "Plan to add person-selector tabs above the existing 11-tab bar in the Kundali dashboard. Each person gets their own independent view instead of all persons being stacked vertically. Covers UI layout change, state management, and updates to 9 tab builder methods.",
+  "updatedAt":  "2026-05-29T11:39:13.224438700Z",
+  "requestFeedback":  true
 }

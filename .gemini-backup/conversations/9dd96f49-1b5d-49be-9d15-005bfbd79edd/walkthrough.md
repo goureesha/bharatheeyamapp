@@ -1,74 +1,56 @@
-# Bharatiyam Gratha Sudha — Walkthrough
+# Firebase Backend + Admin Panel — Walkthrough
 
-## What Was Built
+## Overview
+Added Firebase Firestore as the backend content database and created a web admin panel for managing stotras, books, and shlokas without rebuilding the APK.
 
-### 🌐 Web Prototype (5 files)
-Fully functional browser app at [web/index.html](file:///d:/bharatheeyam%20books/web/index.html):
-- [styles.css](file:///d:/bharatheeyam%20books/web/css/styles.css) — Spiritual premium design system (saffron/gold/maroon, dark mode, mandala patterns)
-- [data.js](file:///d:/bharatheeyam%20books/web/js/data.js) — All sample content (17 shlokas across 6 books)
-- [storage.js](file:///d:/bharatheeyam%20books/web/js/storage.js) — LocalStorage bookmark persistence
-- [app.js](file:///d:/bharatheeyam%20books/web/js/app.js) — SPA routing, search, theme toggle, font sizing
-- [index.html](file:///d:/bharatheeyam%20books/web/index.html) — App shell with top/bottom navigation
+## Architecture
 
-### 📱 Flutter App (10 Dart files)
-- [main.dart](file:///d:/bharatheeyam%20books/lib/main.dart) — Entry point with Provider setup
-- [shloka.dart](file:///d:/bharatheeyam%20books/lib/models/shloka.dart) — Data models (Shloka, Book, Chapter, Category)
-- [content_data.dart](file:///d:/bharatheeyam%20books/lib/data/content_data.dart) — All content + search/filter helpers
-- [bookmark_service.dart](file:///d:/bharatheeyam%20books/lib/services/bookmark_service.dart) — SharedPreferences persistence
-- [app_theme.dart](file:///d:/bharatheeyam%20books/lib/theme/app_theme.dart) — Light/dark themes with Indic font helpers
-- [home_screen.dart](file:///d:/bharatheeyam%20books/lib/screens/home_screen.dart) — All screens (Home, Sections, Books, Reader, Saved, Settings)
-- [shloka_card.dart](file:///d:/bharatheeyam%20books/lib/widgets/shloka_card.dart) — 4-layer shloka display widget
-- [category_card.dart](file:///d:/bharatheeyam%20books/lib/widgets/category_card.dart) — Category grid card
-- [book_card.dart](file:///d:/bharatheeyam%20books/lib/widgets/book_card.dart) — Book list card
-
-### 🤖 Android Project (12 files)
-- AndroidManifest.xml, build.gradle, settings.gradle, gradle configs
-- MainActivity.kt, styles, launch backgrounds
-
-### ⚙️ CI/CD & Scripts (4 files)
-- [build.yml](file:///d:/bharatheeyam%20books/.github/workflows/build.yml) — GitHub Actions: Flutter setup → Build APK → Upload artifact → Backup conversation
-- [push_with_backup.ps1](file:///d:/bharatheeyam%20books/scripts/push_with_backup.ps1) — Backs up conversation transcript before every push
-- [.gitignore](file:///d:/bharatheeyam%20books/.gitignore) — Flutter-standard ignores
-- [README.md](file:///d:/bharatheeyam%20books/README.md) — Project documentation
-
----
-
-## 🚀 Next Steps: Push to GitHub
-
-### 1. Create a GitHub repository
-Go to https://github.com/new and create a new repository named `bharatiyam-gratha-sudha` (or any name you prefer).
-
-### 2. Push from your terminal
-```powershell
-cd "d:\bharatheeyam books"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/bharatiyam-gratha-sudha.git
-git push -u origin main
+```mermaid
+graph LR
+    A["🖥️ Admin Panel<br>admin/index.html"] -->|CRUD| B["🔥 Cloud Firestore"]
+    C["📱 Flutter App"] -->|Read| B
+    C -->|Fallback| D["📦 Bundled Data<br>content_data.dart"]
+    B -->|Offline cache| C
 ```
 
-### 3. After push — GitHub Actions will:
-- ✅ Build the APK automatically
-- ✅ Upload APK as a downloadable artifact
-- ✅ Back up conversation logs
+## Files Created
 
-### 4. Download the APK
-Go to your repo → **Actions** tab → Click the latest workflow run → Download **bharatiyam-gratha-sudha-apk** artifact.
+### Firebase Infrastructure
+| File | Purpose |
+|------|---------|
+| [firebase.json](file:///d:/bharatheeyam%20books/firebase.json) | Firebase project config — hosts admin panel, links Firestore rules |
+| [.firebaserc](file:///d:/bharatheeyam%20books/.firebaserc) | Links to `bharatiyam-grantha-sudha` project |
+| [firestore.rules](file:///d:/bharatheeyam%20books/firestore.rules) | Security rules — free content public, premium requires auth, writes require admin |
+| [firestore.indexes.json](file:///d:/bharatheeyam%20books/firestore.indexes.json) | Firestore indexes (empty, auto-created as needed) |
 
-### 5. Future pushes with backup
-```powershell
-.\scripts\push_with_backup.ps1 "added new shlokas"
-```
+### Admin Panel
+| File | Purpose |
+|------|---------|
+| [admin/index.html](file:///d:/bharatheeyam%20books/admin/index.html) | Single-page admin app — login, dashboard, CRUD forms, seed data |
+| [admin/css/styles.css](file:///d:/bharatheeyam%20books/admin/css/styles.css) | Premium dark theme with saffron/gold accents, responsive design |
+| [admin/js/app.js](file:///d:/bharatheeyam%20books/admin/js/app.js) | All logic — Firebase Auth, Firestore CRUD, seed data with all 9 books |
 
----
+### Flutter Changes
+| File | Change |
+|------|--------|
+| [pubspec.yaml](file:///d:/bharatheeyam%20books/pubspec.yaml) | Added firebase_core, cloud_firestore, firebase_auth, firebase_analytics, connectivity_plus |
+| [android/settings.gradle](file:///d:/bharatheeyam%20books/android/settings.gradle) | Added Google Services plugin v4.4.2 |
+| [android/app/build.gradle](file:///d:/bharatheeyam%20books/android/app/build.gradle) | Applied com.google.gms.google-services plugin |
+| [lib/models/shloka.dart](file:///d:/bharatheeyam%20books/lib/models/shloka.dart) | Added `isPremium`, `order` fields + `fromFirestore()`/`toFirestore()` to all models |
+| [lib/services/firebase_service.dart](file:///d:/bharatheeyam%20books/lib/services/firebase_service.dart) | New — Firestore content service with offline caching and bundled fallback |
+| [lib/main.dart](file:///d:/bharatheeyam%20books/lib/main.dart) | Firebase initialization + MultiProvider for FirebaseService |
 
-## 📚 Sample Content Included
+## Key Design Decisions
 
-| Book | Shlokas | Category |
-|------|---------|----------|
-| Bhagavad Gita (Ch 1, 2, 12) | 7 | Library |
-| Gayatri Mantra | 1 | Stotra |
-| Shiva Tandava Stotram | 2 | Stotra |
-| Vishnu Sahasranama | 2 | Stotra |
-| Hanuman Chalisa | 3 | Stotra |
-| Ishavasya Upanishad | 2 | Library |
-| **Total** | **17** | |
+1. **Offline-first**: App always works with bundled `content_data.dart`. Firestore is an enhancement, not a dependency.
+2. **Flat Firestore collections**: Books, chapters, and shlokas are separate collections linked by IDs (not nested subcollections) for simpler querying.
+3. **Admin panel as static HTML**: No build tools needed. Uses Firebase compat SDK from CDN. Can be hosted free on Firebase Hosting.
+4. **Seed data embedded**: All 9 existing books with 41 shlokas are embedded in `app.js` for one-click Firestore seeding.
+
+## Remaining User Steps
+
+1. **Firebase Login**: Run `firebase login` in your terminal
+2. **Deploy**: Run `firebase deploy` to publish admin panel + rules
+3. **Create Admin User**: Firebase Console → Authentication → Add User (email + password)
+4. **Seed Data**: Open admin panel → Login → Click "Seed Data" button
+5. **Verify**: Open Flutter app → should load content from Firestore

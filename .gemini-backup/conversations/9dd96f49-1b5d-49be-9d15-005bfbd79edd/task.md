@@ -1,34 +1,50 @@
-# Bharatiyam Gratha Sudha — Build Progress
+# Firebase Backend + Admin Panel — Task Tracker
 
-## Phase 1: Web Prototype ✅
-- [x] Content data (data.js) with sample shlokas
-- [x] Bookmark storage system (storage.js)
-- [x] CSS design system (styles.css)
-- [x] HTML app shell (index.html)
-- [x] App logic & routing (app.js)
+## Phase 1: Firebase Setup + Firestore
 
-## Phase 2: Flutter App ✅
-- [x] Data models (shloka.dart)
-- [x] Content data (content_data.dart)
-- [x] App theme (app_theme.dart)
-- [x] Bookmark service (bookmark_service.dart)
-- [x] Main entry point (main.dart)
-- [x] Home screen with bottom nav
-- [x] Section/Book/Reader screens
-- [x] Shloka card widget
-- [x] Category & Book card widgets
-- [x] Settings page
+### Firebase Infrastructure
+- [x] Create `firestore.rules` — security rules
+- [x] Create `firebase.json` — project config + `.firebaserc`
+- [x] Create `firestore.indexes.json` — indexes file
 
-## Phase 3: Android & CI/CD ✅
-- [x] Android project files (manifest, gradle, etc.)
-- [x] GitHub Actions workflow (build.yml)
-- [x] Conversation backup script
-- [x] Push with backup script
-- [x] .gitignore
-- [x] README.md
+### Flutter Firebase Integration
+- [x] Update `pubspec.yaml` — add Firebase dependencies
+- [x] Update `android/settings.gradle` — add Google Services plugin v4.4.2
+- [x] Update `android/app/build.gradle` — apply Google Services plugin
+- [x] Update `lib/models/shloka.dart` — add `isPremium`, `order`, `fromFirestore()`, `toFirestore()`
+- [x] Create `lib/services/firebase_service.dart` — Firestore CRUD + caching + offline fallback
+- [x] Update `lib/main.dart` — initialize Firebase + MultiProvider
+- [x] Confirm `google-services.json` is placed ✅
 
-## Git ✅
-- [x] Repository initialized
-- [x] Initial commit (33 files, 5006 lines)
-- [x] Conversation backup included
-- [ ] Push to GitHub (needs user to create repo)
+### GitHub Actions
+- [x] Build workflow already configured — push triggered new build
+
+## Phase 2: Web Admin Panel
+
+### Admin Panel Files
+- [x] Create `admin/index.html` — main admin SPA
+- [x] Create `admin/css/styles.css` — premium dark theme
+- [x] Create `admin/js/app.js` — admin panel logic (auth, CRUD, routing, seed data)
+
+### Admin Features (all built into app.js)
+- [x] Admin login screen (Firebase Auth)
+- [x] Dashboard with stats (books, chapters, shlokas, categories counts)
+- [x] Book list with filters
+- [x] Add/Edit book form (Kannada, Sanskrit, English titles, category, subcategory, god tags, premium toggle)
+- [x] Add/Edit chapter form (modal)
+- [x] Add/Edit shloka form (Sanskrit, Kannada, meaning, explanation textareas, premium toggle)
+- [x] Premium toggle on books/shlokas
+- [x] Seed existing data to Firestore (all 9 books, 12 chapters, 41 shlokas)
+
+## User Actions Required
+- [ ] Run `firebase login` in terminal (interactive — opens browser)
+- [ ] Run `firebase deploy` to deploy admin panel + Firestore rules
+- [ ] Create admin user in Firebase Console → Authentication → Add User
+- [ ] Log into admin panel and click "Seed Data" to populate Firestore
+
+## Verification
+- [ ] Admin panel loads and authenticates
+- [ ] Seed data populates Firestore
+- [ ] Can add new stotra from admin panel
+- [ ] Flutter app builds with Firebase
+- [ ] App loads content from Firestore

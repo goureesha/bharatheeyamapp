@@ -1,8 +1,19 @@
-# Task: Move Login from Startup to Kundali/Taranukoola
+# Per-Person Tabs - Task List
 
-- [x] 1. Simplify main gate — always go to HomeScreen (unless device mismatch)
-- [x] 2. Restore internet checks + device binding on resume
-- [x] 3. Optimize startup — defer FCM when not signed in
-- [x] 4. Add login check to Kundali Calculate button
-- [x] 5. Add login check to Taranukoola section
-- [x] 6. Push and verify build
+- [x] Add `_selectedPersonIndex` state + active person helpers
+- [x] Add person selector row above TabBar
+- [x] Update `_buildKundaliTab()` — single person
+- [x] Update `_buildSphutas()` — single person
+- [x] Update `_buildDashaTab()` — single person
+- [x] Update `_buildPanchangTab()` — single person
+- [x] Update `_buildBhavaTab()` — single person
+- [x] Update `_buildGrahaShadvargaTab()` — single person
+- [x] Update `_buildShadbalaTab()` — single person
+- [x] Update `_buildAshtakaTab()` — single person
+- [x] Update `_buildNotesTab()` — single person
+- [x] Update `_buildAroodhaTab()` — use active person
+- [x] Update `_buildJanmaPatrikeTab()` — use active person
+- [x] Update `_showPlanetDetail()` — use active person
+- [x] Safety: reset index on person remove
+- [x] Remove all `allPersons` references
+- [ ] Build and test

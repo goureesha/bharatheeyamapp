@@ -1,99 +1,86 @@
-# Move Google Login from Startup to Kundali & Taranukoola
+# Per-Person Tabs in Kundali Dashboard
 
-Remove the login gate at app startup. Users open the app and land directly on HomeScreen. Google login is triggered only when needed — inside specific sections.
+## Problem
+When multiple persons are added, every tab (Kundali, Sphuta, Dasha, etc.) shows **all persons' data stacked vertically**. Users have to scroll through one person's data to find the next.
+
+## Proposed Change
+Add a **person selector row** above the existing 11-tab bar. Each person gets their own independent view of all 11 tabs.
+
+### UI Layout (Before → After)
+
+**Before:**
+```
+[Kundali] [Sphuta] [Aroodha] [Dasha] ...
+┌─────────────────────────┐
+│ Person 1 charts         │
+│ ─────────────────────── │
+│ Person 2 charts         │
+│ ─────────────────────── │
+│ Person 3 charts         │
+└─────────────────────────┘
+```
+
+**After:**
+```
+[👤 Ravi ✕] [👤 Priya ✕] [👤 Suresh ✕]  [+ Add]
+[Kundali] [Sphuta] [Aroodha] [Dasha] ...
+┌─────────────────────────┐
+│ Only selected person's  │
+│ charts/data             │
+└─────────────────────────┘
+```
 
 ## Proposed Changes
 
-### 1. Main Gate — Remove Login & Internet Checks
+### [MODIFY] [dashboard_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/dashboard_screen.dart)
 
-#### [MODIFY] [main.dart](file:///d:/bharatheeyamapp%20sample/lib/main.dart)
+#### 1. Add `_selectedPersonIndex` state (line ~123)
+- New state: `int _selectedPersonIndex = 0;`
+- `0` = primary person, `1+` = extra persons
 
-**Current gate flow** (line 382-388):
+#### 2. Add person selector row (above TabBar, line ~1429)
+- Horizontal scrollable row of chips/buttons
+- Primary person always first (non-removable)
+- Extra persons show with ✕ remove button
+- `[+ Add]` button at the end (moves the existing person_add icon here)
+- Tapping a chip sets `_selectedPersonIndex`
+
+#### 3. Update ALL tab builders to use selected person only
+Instead of building `allPersons` list and iterating, each tab builder will use a single person based on `_selectedPersonIndex`:
+
+```dart
+// Helper to get current person's data
+KundaliResult get _activeResult => _selectedPersonIndex == 0 
+    ? _primaryResult 
+    : _extraPersons[_selectedPersonIndex - 1].result;
+String get _activeName => _selectedPersonIndex == 0 
+    ? _primaryName 
+    : _extraPersons[_selectedPersonIndex - 1].name;
+// ... etc for dob, hour, minute, ampm, lat, lon, place
 ```
-Not signed in → _OfflineVerifyScreen → _GmailRequiredScreen
-Wrong device → _DeviceMismatchScreen
-Needs internet → _InternetRequiredScreen  
-Has access → HomeScreen
-No access → SupportScreen
-```
 
-**New gate flow:**
-```
-Always → HomeScreen
-```
+**Tabs to update (9 tabs):**
+- `_buildKundaliTab()` (L1468) — remove allPersons loop, show single person
+- `_buildSphutas()` (L1621) — remove allPersons loop
+- `_buildDashaTab()` (L2166) — remove allPersons loop
+- `_buildPanchangTab()` (L2202) — remove allPersons loop
+- `_buildBhavaTab()` (L2417) — remove allPersons loop
+- `_buildGrahaShadvargaTab()` (L2580) — remove allPersons loop
+- `_buildShadbalaTab()` (L2766) — remove allPersons loop
+- `_buildAshtakaTab()` (L2736) — remove allPersons loop
+- `_buildNotesTab()` (L3049) — remove allPersons loop
 
-Changes:
-- Remove `_OfflineVerifyScreen`, `_InternetRequiredScreen` from the gate
-- Keep `_GmailRequiredScreen` as a reusable widget (called from Kundali/Taranukoola)
-- Remove `_verifyAccessOnResume()` internet checks
-- Remove `needsInternetVerification` checks
-- Keep device binding check but make it non-blocking
+**Tabs unchanged (2 tabs):**
+- `_buildAroodhaTab()` — already single person
+- `_buildJanmaPatrikeTab()` — already single person (will use active person)
 
----
-
-### 2. Kundali Section — Login on Calculate
-
-#### [MODIFY] [input_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/input_screen.dart)
-
-In `_calculate()` method (line 311):
-- Before doing the calculation, check `GoogleAuthService.isSignedIn`
-- If NOT signed in → show Google sign-in popup
-- If sign-in succeeds → continue with calculation
-- If sign-in fails/cancelled → show error, don't calculate
-
----
-
-### 3. Taranukoola Section — Login on First Open
-
-#### [MODIFY] [taranukoola_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/taranukoola_screen.dart)
-
-In `initState()` or `build()`:
-- Check `GoogleAuthService.isSignedIn`
-- If NOT signed in → show login overlay/page
-- If signed in → show normal Taranukoola content
-- Once logged in, screen rebuilds and shows content
-
----
-
-### 4. Remove Internet Checks
-
-#### [MODIFY] [subscription_service.dart](file:///d:/bharatheeyamapp%20sample/lib/services/subscription_service.dart)
-
-- Remove `needsInternetVerification` getter (or make it always return `false`)
-- Simplify `hasAccess` — remove internet check dependency
-
-#### [MODIFY] [network_service.dart](file:///d:/bharatheeyamapp%20sample/lib/services/network_service.dart)
-
-- Keep the file but it won't be called from any gate flow
-
----
-
-### 5. Optimize Startup (Fix Hanging)
-
-#### [MODIFY] [main.dart](file:///d:/bharatheeyamapp%20sample/lib/main.dart)
-
-- Move FCM `NotificationService.init()` to after user signs in (not at startup)
-- Don't call `_initAuthAndBinding()` at startup if not signed in — defer it
-- Remove `FirebaseMessaging.onBackgroundMessage` from startup if user never signed in
-
----
-
-## Summary
-
-| Screen | Before | After |
-|---|---|---|
-| App opens | Login gate → Gmail required | **HomeScreen directly** |
-| Kundali → Calculate | Calculates immediately | **Login if not signed in → then calculate** |
-| Taranukoola → Open | Opens immediately | **Login if not signed in → then show content** |
-| Internet check | Multiple checks, blocks user | **No checks at all** |
-| Startup speed | Slow (FCM + Firestore + ping) | **Fast (skip all if not signed in)** |
+#### 4. Safety: auto-reset index when person is removed
+When a person is removed and `_selectedPersonIndex` is out of bounds, reset to 0.
 
 ## Verification Plan
 
-### Manual Verification
-- Install APK → app opens to HomeScreen immediately (no login)
-- Go to Kundali → fill inputs → click Calculate → login popup appears
-- After login → calculation proceeds
-- Go to Taranukoola → login page appears (if not logged in)
-- After login → Taranukoola shows content
-- Close and reopen app → no login prompts anywhere
+### Manual
+- Add 2-3 persons → verify each person's tab shows only their data
+- Switch between persons → verify tabs update correctly
+- Remove a person → verify selection resets properly
+- Single person (no extras) → verify no person selector shows (or shows just the one name)
