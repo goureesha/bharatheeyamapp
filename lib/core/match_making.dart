@@ -293,45 +293,52 @@ class MatchMakingLogic {
     return 'ಸಮ';
   }
 
-  /// Calculate Graha Maitri comparison between two charts
-  /// brideRashis/groomRashis: map of Kannada planet name -> rashi index (0-11)
-  static Map<String, dynamic> calculateGrahaMaitriComparison(
-    Map<String, int> brideRashis,
-    Map<String, int> groomRashis,
-  ) {
-    final results = <Map<String, dynamic>>[];
-    const planets = ['ರವಿ', 'ಚಂದ್ರ', 'ಕುಜ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ'];
-    const lordIdx = {'ರವಿ': 0, 'ಚಂದ್ರ': 1, 'ಕುಜ': 2, 'ಬುಧ': 3, 'ಗುರು': 4, 'ಶುಕ್ರ': 5, 'ಶನಿ': 6};
-
-    for (final planet in planets) {
-      final bRashi = brideRashis[planet] ?? 0;
-      final gRashi = groomRashis[planet] ?? 0;
+  /// Calculate Graha Maitri (Natural only) for Lagna/Chandra from Rashi and Navamsha
+  static Map<String, dynamic> calculateGrahaMaitriComparison({
+    required int brideLagnaRashi,
+    required int brideMoonRashi,
+    required int brideNavLagnaRashi,
+    required int brideNavMoonRashi,
+    required int groomLagnaRashi,
+    required int groomMoonRashi,
+    required int groomNavLagnaRashi,
+    required int groomNavMoonRashi,
+  }) {
+    Map<String, dynamic> _check(String label, int bRashi, int gRashi) {
       final bLord = getRashiLord(bRashi);
       final gLord = getRashiLord(gRashi);
-      final bToG = _naisargikaMaitri[bLord][gLord];
-      final gToB = _naisargikaMaitri[gLord][bLord];
-      final combined = bToG + gToB;
-      String panchadha;
-      if (combined >= 2) panchadha = 'ಅತಿಮಿತ್ರ';
-      else if (combined == 1) panchadha = 'ಮಿತ್ರ';
-      else if (combined == 0) panchadha = 'ಸಮ';
-      else if (combined == -1) panchadha = 'ಶತ್ರು';
-      else panchadha = 'ಅತಿಶತ್ರು';
-
-      results.add({
-        'planet': planet,
-        'brideRashi': bRashi,
-        'groomRashi': gRashi,
+      final relation = _naisargikaMaitri[bLord][gLord];
+      String maitri;
+      if (relation == 1) maitri = 'ಮಿತ್ರ';
+      else if (relation == -1) maitri = 'ಶತ್ರು';
+      else maitri = 'ಸಮ';
+      return {
+        'label': label,
         'brideLord': bLord,
         'groomLord': gLord,
         'brideLordName': lordNames[bLord],
         'groomLordName': lordNames[gLord],
-        'brideToGroom': bToG,
-        'groomToBride': gToB,
-        'panchadha': panchadha,
-      });
+        'relation': relation,
+        'maitri': maitri,
+      };
     }
-    return {'planets': results};
+
+    return {
+      'rows': [
+        _check('ಲಗ್ನಾಧಿಪತಿ', brideLagnaRashi, groomLagnaRashi),
+        _check('ಚಂದ್ರ ರಾಶ್ಯಾಧಿಪತಿ', brideMoonRashi, groomMoonRashi),
+        _check('ನವಾಂಶ ಲಗ್ನಾಧಿಪತಿ', brideNavLagnaRashi, groomNavLagnaRashi),
+        _check('ನವಾಂಶ ಚಂದ್ರಾಧಿಪತಿ', brideNavMoonRashi, groomNavMoonRashi),
+      ],
+    };
+  }
+
+  /// Compute Navamsha rashi index from sidereal longitude
+  static int navamshaRashi(double deg) {
+    final block = (deg / 30).floor() % 4;
+    final start = [0, 9, 6, 3][block];
+    final steps = ((deg % 30) / 3.33333).floor();
+    return (start + steps) % 12;
   }
 
   /// Check Shatha Ashtaka Dosha (6/8 relationship between Moon signs)
@@ -364,10 +371,14 @@ class MatchMakingLogic {
     required int brideMoonRashi,
     required int brideLagnaRashi,
     required Map<String, int> bridePlanetRashis,
+    required int brideNavLagnaRashi,
+    required int brideNavMoonRashi,
     required int groomNakIdx,
     required int groomMoonRashi,
     required int groomLagnaRashi,
     required Map<String, int> groomPlanetRashis,
+    required int groomNavLagnaRashi,
+    required int groomNavMoonRashi,
   }) {
     return {
       'ashtaKoota': calculateCompatibility(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
@@ -379,7 +390,12 @@ class MatchMakingLogic {
         calculatePapaDosha(bridePlanetRashis, brideLagnaRashi),
         calculatePapaDosha(groomPlanetRashis, groomLagnaRashi),
       ),
-      'grahaMaitri': calculateGrahaMaitriComparison(bridePlanetRashis, groomPlanetRashis),
+      'grahaMaitri': calculateGrahaMaitriComparison(
+        brideLagnaRashi: brideLagnaRashi, brideMoonRashi: brideMoonRashi,
+        brideNavLagnaRashi: brideNavLagnaRashi, brideNavMoonRashi: brideNavMoonRashi,
+        groomLagnaRashi: groomLagnaRashi, groomMoonRashi: groomMoonRashi,
+        groomNavLagnaRashi: groomNavLagnaRashi, groomNavMoonRashi: groomNavMoonRashi,
+      ),
       'shathaAshtaka': checkShathaAshtaka(brideMoonRashi, groomMoonRashi),
       'dvirdvadasha': checkDvirdvadasha(brideMoonRashi, groomMoonRashi),
     };

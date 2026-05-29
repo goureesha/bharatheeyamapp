@@ -102,9 +102,17 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
       final bNakIdx = brideR.panchang.nakshatraIndex;
       final gNakIdx = groomR.panchang.nakshatraIndex;
 
+      // Navamsha rashis
+      final bNavLagna = MatchMakingLogic.navamshaRashi(brideR.planets['ಲಗ್ನ']?.longitude ?? 0);
+      final bNavMoon = MatchMakingLogic.navamshaRashi(brideR.planets['ಚಂದ್ರ']?.longitude ?? 0);
+      final gNavLagna = MatchMakingLogic.navamshaRashi(groomR.planets['ಲಗ್ನ']?.longitude ?? 0);
+      final gNavMoon = MatchMakingLogic.navamshaRashi(groomR.planets['ಚಂದ್ರ']?.longitude ?? 0);
+
       final fullResult = MatchMakingLogic.calculateFullCompatibility(
         brideNakIdx: bNakIdx, brideMoonRashi: bMoonRashi, brideLagnaRashi: bLagnaRashi, bridePlanetRashis: bRashis,
+        brideNavLagnaRashi: bNavLagna, brideNavMoonRashi: bNavMoon,
         groomNakIdx: gNakIdx, groomMoonRashi: gMoonRashi, groomLagnaRashi: gLagnaRashi, groomPlanetRashis: gRashis,
+        groomNavLagnaRashi: gNavLagna, groomNavMoonRashi: gNavMoon,
       );
 
       setState(() {
@@ -513,30 +521,31 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
 
   Widget _buildGrahaMaitriSection(Map<String, dynamic> fr) {
     final gm = fr['grahaMaitri'] as Map<String, dynamic>;
-    final planets = gm['planets'] as List<Map<String, dynamic>>;
+    final rows = gm['rows'] as List<Map<String, dynamic>>;
 
-    Color panchadhaColor(String p) {
-      if (p == 'ಅತಿಮಿತ್ರ') return Colors.green.shade700;
-      if (p == 'ಮಿತ್ರ') return Colors.green;
-      if (p == 'ಸಮ') return Colors.orange;
-      if (p == 'ಶತ್ರು') return Colors.red;
-      return Colors.red.shade900;
+    Color maitriColor(String m) {
+      if (m == 'ಮಿತ್ರ') return Colors.green;
+      if (m == 'ಶತ್ರು') return Colors.red;
+      return Colors.orange;
     }
 
+    final bName = _bNameCtrl.text.isNotEmpty ? _bNameCtrl.text : AppLocale.l('brideDetails');
+    final gName = _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : AppLocale.l('groomDetails');
+
     return AppCard(padding: EdgeInsets.zero, child: Column(children: [
-      _tableRow2([AppLocale.l('hGraha'), AppLocale.l('brideDetails'), AppLocale.l('groomDetails'), 'ಫಲ'], header: true, bg: kPurple2.withOpacity(0.08)),
-      ...planets.map((p) => Container(
+      _tableRow2(['', bName, gName, 'ಫಲ'], header: true, bg: kPurple2.withOpacity(0.08)),
+      ...rows.map((r) => Container(
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder))),
         child: Row(children: [
-          Expanded(flex: 2, child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Text(trAll(p['planet']), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)))),
-          Expanded(child: Text(trAll(p['brideLordName']), textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: kMuted))),
-          Expanded(child: Text(trAll(p['groomLordName']), textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: kMuted))),
+          Expanded(flex: 2, child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+            child: Text(trAll(r['label']), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)))),
+          Expanded(child: Text(trAll(r['brideLordName']), textAlign: TextAlign.center, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kMuted))),
+          Expanded(child: Text(trAll(r['groomLordName']), textAlign: TextAlign.center, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kMuted))),
           Expanded(child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
-            decoration: BoxDecoration(color: panchadhaColor(p['panchadha']).withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
-            child: Text(p['panchadha'], textAlign: TextAlign.center, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: panchadhaColor(p['panchadha']))),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            decoration: BoxDecoration(color: maitriColor(r['maitri']).withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+            child: Text(trAll(r['maitri']), textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: maitriColor(r['maitri']))),
           )),
         ]),
       )),
