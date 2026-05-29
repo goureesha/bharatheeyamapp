@@ -2216,6 +2216,42 @@ class _DashboardScreenState extends State<DashboardScreen>
           final dateStr = '${dob.day.toString().padLeft(2,"0")}-${dob.month.toString().padLeft(2,"0")}-${dob.year}';
           final timeStr = '${person["hour"]}:${(person["minute"] as int).toString().padLeft(2,"0")} ${person["ampm"]}';
 
+          // Calculate age
+          final now = DateTime.now();
+          int ageYears = now.year - dob.year;
+          int ageMonths = now.month - dob.month;
+          int ageDays = now.day - dob.day;
+          if (ageDays < 0) {
+            ageMonths--;
+            final prevMonth = DateTime(now.year, now.month, 0);
+            ageDays += prevMonth.day;
+          }
+          if (ageMonths < 0) {
+            ageYears--;
+            ageMonths += 12;
+          }
+          final ageStr = '$ageYears ${AppLocale.l('yearShort')} $ageMonths ${AppLocale.l('monthShort')} $ageDays ${AppLocale.l('dayShort')}';
+
+          // Find current Dasha and Bhukti from existing r.dashas
+          String currentDasha = '';
+          String dashaEnd = '';
+          String currentBhukti = '';
+          String bhuktiEnd = '';
+          for (final md in r.dashas) {
+            if (now.isAfter(md.start) && now.isBefore(md.end)) {
+              currentDasha = trAll(md.lord);
+              dashaEnd = '${md.end.day.toString().padLeft(2,"0")}-${md.end.month.toString().padLeft(2,"0")}-${md.end.year}';
+              for (final ad in md.antardashas) {
+                if (now.isAfter(ad.start) && now.isBefore(ad.end)) {
+                  currentBhukti = trAll(ad.lord);
+                  bhuktiEnd = '${ad.end.day.toString().padLeft(2,"0")}-${ad.end.month.toString().padLeft(2,"0")}-${ad.end.year}';
+                  break;
+                }
+              }
+              break;
+            }
+          }
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -2229,6 +2265,15 @@ class _DashboardScreenState extends State<DashboardScreen>
                 _kv(AppLocale.l('placeLabel'), person['place'] as String),
                 _kv(AppLocale.l('dateLabel'), dateStr),
                 _kv(AppLocale.l('timeLabel'), timeStr),
+                _kv(AppLocale.l('dashaLord'), '${trAll(pan.dashaLord)}  ${AppLocale.l('dashaBalance')}: ${_trDashaBalance(pan.dashaBalance)}'),
+                const Divider(height: 16),
+                _kv(AppLocale.l('ageLabel'), ageStr),
+                if (currentDasha.isNotEmpty) ...[
+                  const Divider(height: 16),
+                  _kv('${AppLocale.l('dasha')}', '$currentDasha  (${AppLocale.l('end')}: $dashaEnd)'),
+                  if (currentBhukti.isNotEmpty)
+                    _kv(AppLocale.l('bhuktiLabel'), '$currentBhukti  (${AppLocale.l('end')}: $bhuktiEnd)'),
+                ],
               ])),
               const SizedBox(height: 8),
               AppCard(
