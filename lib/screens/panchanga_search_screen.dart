@@ -87,15 +87,17 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
     final fromH24 = _fromTime.hour + _fromTime.minute / 60.0;
     final toH24 = _toTime.hour + _toTime.minute / 60.0;
     final midH24 = (fromH24 + toH24) / 2.0;
+    bool enteredMasa = false; // track if we've entered the selected masa
 
     for (int i = 0; i < totalDays; i++) {
       if (!mounted) break;
 
       final date = now.add(Duration(days: i));
 
-      // Update progress every 5 days to avoid too many rebuilds
-      if (i % 5 == 0) {
+      // Yield to UI every 10 days to keep it responsive
+      if (i % 10 == 0) {
         setState(() => _scanProgress = i);
+        await Future.delayed(Duration.zero);
       }
 
       try {
@@ -111,30 +113,44 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
         final noonP = noonResult.panchang;
 
         // Hard filter: Chandra Masa
+        bool masaMatch = true;
         if (_selectedChandraMasa != null) {
-          if (noonP.chandraMasaRaw != _chandraMasaNames[_selectedChandraMasa!]) continue;
+          if (noonP.chandraMasaRaw != _chandraMasaNames[_selectedChandraMasa!]) {
+            masaMatch = false;
+          }
+        }
+        if (_selectedSouraMasa != null) {
+          if (noonP.souraMasa != _souraMasaNames[_selectedSouraMasa!]) {
+            masaMatch = false;
+          }
         }
 
-        // Hard filter: Soura Masa
-        if (_selectedSouraMasa != null) {
-          if (noonP.souraMasa != _souraMasaNames[_selectedSouraMasa!]) continue;
+        // Smart early exit: if we already found results inside the masa
+        // and now we've left it, stop scanning
+        if (!masaMatch) {
+          if (enteredMasa && found.isNotEmpty) break;
+          continue;
         }
+        enteredMasa = true;
 
         // Hard filter: Tithi must match at noon
         if (_absoluteTithiIndex != null) {
           if (noonP.tithiIndex != _absoluteTithiIndex) continue;
         }
 
-        // Step 2: Re-calculate at user's selected time to check availability
-        final timeResult = await AstroCalculator.calculate(
-          year: date.year, month: date.month, day: date.day,
-          hourUtcOffset: tz, hour24: midH24,
-          lat: lat, lon: lon,
-          ayanamsaMode: 'lahiri', trueNode: true,
-        );
-
-        final p = timeResult?.panchang ?? noonP;
-        final bool tithiNotAvailable = (_absoluteTithiIndex != null && p.tithiIndex != _absoluteTithiIndex);
+        // Step 2: Only re-calc at user time if it differs from noon
+        PanchangData p = noonP;
+        bool tithiNotAvailable = false;
+        if ((midH24 - 12.0).abs() > 0.5) {
+          final timeResult = await AstroCalculator.calculate(
+            year: date.year, month: date.month, day: date.day,
+            hourUtcOffset: tz, hour24: midH24,
+            lat: lat, lon: lon,
+            ayanamsaMode: 'lahiri', trueNode: true,
+          );
+          if (timeResult != null) p = timeResult.panchang;
+          tithiNotAvailable = (_absoluteTithiIndex != null && p.tithiIndex != _absoluteTithiIndex);
+        }
 
         found.add(_SearchResult(
           date: date,
