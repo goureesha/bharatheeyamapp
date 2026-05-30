@@ -43,8 +43,8 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
   int? _selectedSouraMasa;   // index into _souraMasaNames, null = any
   int? _selectedPaksha;      // 0 = Shukla, 1 = Krishna, null = any
   int? _selectedTithiInPaksha; // 0-14 within the selected paksha
-  DateTime _fromDate = DateTime.now();
-  DateTime _toDate = DateTime.now().add(const Duration(days: 180));
+  TimeOfDay _fromTime = const TimeOfDay(hour: 6, minute: 0);
+  TimeOfDay _toTime = const TimeOfDay(hour: 18, minute: 0);
 
   // Results
   List<_SearchResult> _results = [];
@@ -78,26 +78,32 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
     final lat = LocationService.lat;
     final lon = LocationService.lon;
     final tz = LocationService.tzOffset;
-    final totalDays = _toDate.difference(_fromDate).inDays + 1;
+    final now = DateTime.now();
+    final totalDays = 365;
 
     setState(() => _scanTotal = totalDays);
 
     final List<_SearchResult> found = [];
+    final fromH24 = _fromTime.hour + _fromTime.minute / 60.0;
+    final toH24 = _toTime.hour + _toTime.minute / 60.0;
 
     for (int i = 0; i < totalDays; i++) {
       if (!mounted) break;
 
-      final date = _fromDate.add(Duration(days: i));
+      final date = now.add(Duration(days: i));
 
       // Update progress every 5 days to avoid too many rebuilds
       if (i % 5 == 0) {
         setState(() => _scanProgress = i);
       }
 
+      // Compute panchanga at the midpoint of the time range
+      final midH24 = (fromH24 + toH24) / 2.0;
+
       try {
         final result = await AstroCalculator.calculate(
           year: date.year, month: date.month, day: date.day,
-          hourUtcOffset: tz, hour24: 12.0, // noon for stable results
+          hourUtcOffset: tz, hour24: midH24,
           lat: lat, lon: lon,
           ayanamsaMode: 'lahiri', trueNode: true,
         );
@@ -152,24 +158,27 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
     }
   }
 
-  Future<void> _pickDate(bool isFrom) async {
-    final picked = await showDatePicker(
+  Future<void> _pickTime(bool isFrom) async {
+    final picked = await showTimePicker(
       context: context,
-      initialDate: isFrom ? _fromDate : _toDate,
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
+      initialTime: isFrom ? _fromTime : _toTime,
     );
     if (picked != null && mounted) {
       setState(() {
         if (isFrom) {
-          _fromDate = picked;
-          if (_toDate.isBefore(_fromDate)) _toDate = _fromDate.add(const Duration(days: 30));
+          _fromTime = picked;
         } else {
-          _toDate = picked;
-          if (_fromDate.isAfter(_toDate)) _fromDate = _toDate.subtract(const Duration(days: 30));
+          _toTime = picked;
         }
       });
     }
+  }
+
+  String _formatTime(TimeOfDay t) {
+    final h = t.hourOfPeriod == 0 ? 12 : t.hourOfPeriod;
+    final m = t.minute.toString().padLeft(2, '0');
+    final p = t.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$h:$m $p';
   }
 
   String _formatDate(DateTime d) {
@@ -247,14 +256,14 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
                     const SizedBox(height: 12),
                   ],
 
-                  // Date Range
+                  // Time Range
                   Row(children: [
-                    Expanded(child: _buildDateButton(AppLocale.l('fromDate'), _fromDate, () => _pickDate(true))),
+                    Expanded(child: _buildTimeButton(AppLocale.l('fromDate'), _fromTime, () => _pickTime(true))),
                     const SizedBox(width: 12),
-                    Expanded(child: _buildDateButton(AppLocale.l('toDate'), _toDate, () => _pickDate(false))),
+                    Expanded(child: _buildTimeButton(AppLocale.l('toDate'), _toTime, () => _pickTime(false))),
                   ]),
                   const SizedBox(height: 6),
-                  Text('${_toDate.difference(_fromDate).inDays + 1} days range', style: TextStyle(fontSize: 11, color: kMuted)),
+                  Text('Scanning 1 year from today', style: TextStyle(fontSize: 11, color: kMuted)),
                   const SizedBox(height: 16),
 
                   // Search Button
@@ -349,7 +358,7 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
     ]);
   }
 
-  Widget _buildDateButton(String label, DateTime date, VoidCallback onTap) {
+  Widget _buildTimeButton(String label, TimeOfDay time, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -362,9 +371,9 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
           Text(label, style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Row(children: [
-            Icon(Icons.calendar_today, size: 14, color: kPurple2),
+            Icon(Icons.access_time, size: 14, color: kPurple2),
             const SizedBox(width: 6),
-            Text(_formatDate(date), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+            Text(_formatTime(time), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
           ]),
         ]),
       ),
