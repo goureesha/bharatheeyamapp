@@ -350,13 +350,13 @@ function closeModal() {
 async function confirmUnlock() {
   if (!currentUnlockEmail) return;
 
-  const days = parseInt(document.getElementById('unlockDuration').value);
+  const days = parseFloat(document.getElementById('unlockDuration').value);
   const updateData = { manualPremium: true };
 
   if (days > 0) {
     const expiry = new Date();
-    expiry.setDate(expiry.getDate() + days);
-    expiry.setHours(23, 59, 59, 0);
+    expiry.setTime(expiry.getTime() + days * 24 * 60 * 60 * 1000);
+    if (days >= 1) expiry.setHours(23, 59, 59, 0);
     updateData.manualPremiumExpiry = firebase.firestore.Timestamp.fromDate(expiry);
   }
   // If days === 0, lifetime — no expiry field
