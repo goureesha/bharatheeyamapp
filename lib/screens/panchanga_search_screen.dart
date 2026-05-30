@@ -86,6 +86,7 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
     final List<_SearchResult> found = [];
     final fromH24 = _fromTime.hour + _fromTime.minute / 60.0;
     final toH24 = _toTime.hour + _toTime.minute / 60.0;
+    final midH24 = (fromH24 + toH24) / 2.0;
 
     for (int i = 0; i < totalDays; i++) {
       if (!mounted) break;
@@ -97,37 +98,43 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
         setState(() => _scanProgress = i);
       }
 
-      // Compute panchanga at the midpoint of the time range
-      final midH24 = (fromH24 + toH24) / 2.0;
-
       try {
-        final result = await AstroCalculator.calculate(
+        // Step 1: Calculate at NOON to find if tithi/masa matches this day
+        final noonResult = await AstroCalculator.calculate(
+          year: date.year, month: date.month, day: date.day,
+          hourUtcOffset: tz, hour24: 12.0,
+          lat: lat, lon: lon,
+          ayanamsaMode: 'lahiri', trueNode: true,
+        );
+        if (noonResult == null) continue;
+
+        final noonP = noonResult.panchang;
+
+        // Hard filter: Chandra Masa
+        if (_selectedChandraMasa != null) {
+          if (noonP.chandraMasaRaw != _chandraMasaNames[_selectedChandraMasa!]) continue;
+        }
+
+        // Hard filter: Soura Masa
+        if (_selectedSouraMasa != null) {
+          if (noonP.souraMasa != _souraMasaNames[_selectedSouraMasa!]) continue;
+        }
+
+        // Hard filter: Tithi must match at noon
+        if (_absoluteTithiIndex != null) {
+          if (noonP.tithiIndex != _absoluteTithiIndex) continue;
+        }
+
+        // Step 2: Re-calculate at user's selected time to check availability
+        final timeResult = await AstroCalculator.calculate(
           year: date.year, month: date.month, day: date.day,
           hourUtcOffset: tz, hour24: midH24,
           lat: lat, lon: lon,
           ayanamsaMode: 'lahiri', trueNode: true,
         );
-        if (result == null) continue;
 
-        final p = result.panchang;
-
-        // Check Chandra Masa
-        if (_selectedChandraMasa != null) {
-          if (p.chandraMasaRaw != _chandraMasaNames[_selectedChandraMasa!]) continue;
-        }
-
-        // Check Soura Masa
-        if (_selectedSouraMasa != null) {
-          if (p.souraMasa != _souraMasaNames[_selectedSouraMasa!]) continue;
-        }
-
-        // Soft check Tithi — don't skip, just flag
-        bool tithiNotAvailable = false;
-        if (_absoluteTithiIndex != null) {
-          if (p.tithiIndex != _absoluteTithiIndex) {
-            tithiNotAvailable = true;
-          }
-        }
+        final p = timeResult?.panchang ?? noonP;
+        final bool tithiNotAvailable = (_absoluteTithiIndex != null && p.tithiIndex != _absoluteTithiIndex);
 
         found.add(_SearchResult(
           date: date,
