@@ -5,6 +5,7 @@ import '../services/google_auth_service.dart';
 import '../services/calendar_service.dart';
 import 'input_screen.dart';
 import 'panchanga_screen.dart';
+import 'panchanga_search_screen.dart';
 import 'taranukoola_screen.dart';
 import 'match_making_tab.dart';
 
@@ -25,6 +26,9 @@ class HomeScreen extends StatelessWidget {
       }),
       _Section(AppLocale.l('panchanga'), 'Panchanga', Icons.calendar_month, kPurple2, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const PanchangaScreen()));
+      }),
+      _Section(AppLocale.l('panchangaSearch'), 'Panchanga Search', Icons.search, Color(0xFF2980B9), () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const PanchangaSearchScreen()));
       }),
       _Section(AppLocale.l('taranukoola'), 'Taranukoola', Icons.stars_rounded, kGreen, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const TaranukoolaScreen()));

@@ -1,6 +1,6 @@
 {
   "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Detailed plan for the enhanced Guna Milan section with full birth-data input, kundali calculation, Kuja/Papa Dosha, Graha Maitri (Brihad Jataka), Shatha Ashtaka, Dvirdvadasha Dosha, and integrated Ashta Koota.",
-  "updatedAt":  "2026-05-29T13:22:30.145124100Z",
+  "summary":  "Plan to add a Panchanga Search section to the app. Users select Chandra Masa, Soura Masa, Paksha, Tithi, and date range. The app scans each day using AstroCalculator, matches criteria, and displays full panchanga details (tithi, vara, nakshatra, karana, yoga with end times) for matching dates.",
+  "updatedAt":  "2026-05-30T11:54:59.692210100Z",
   "requestFeedback":  true
 }

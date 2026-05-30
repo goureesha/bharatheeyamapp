@@ -1,156 +1,72 @@
-# Enhanced Guna Milan — Full Compatibility Analysis
+# Panchanga Filter / Search Feature
 
-Complete overhaul of the Match Making section: from manual Rashi/Nakshatra dropdowns to full birth-data input with kundali calculation, dosha analysis, and detailed compatibility scoring.
+Add a new main section to the app that lets users search for dates matching specific panchanga criteria and displays full panchanga details for matching dates.
 
-## Current State
+## User Review Required
 
-The existing Guna Milan ([match_making_tab.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/match_making_tab.dart)) only has:
-- 4 dropdowns (bride rashi/nak, groom rashi/nak)
-- Ashta Koota calculation ([match_making.dart](file:///d:/bharatheeyamapp%20sample/lib/core/match_making.dart)) — works, keep it
-- No birth data input, no kundali calculation, no dosha analysis
+> [!IMPORTANT]
+> This feature involves iterating through a date range and computing panchanga for each day. A 1-year range means ~365 calculations. Each takes ~50-100ms, so a full year scan may take 20-40 seconds. We should limit the range to something reasonable (e.g., max 1 year) and show a progress indicator.
 
 ## Open Questions
 
 > [!IMPORTANT]
-> **Graha Maitri (Brihad Jataka):** The current Graha Maitri in Ashta Koota uses Rashi Lords and a friendship matrix. The Brihad Jataka-based Graha Maitri compares the **Navamsha Rashi lords** of each planet to determine Mitra/Shatru/Sama relationships. Should we:
-> - **Option A:** Replace the existing Ashta Koota Graha Maitri with Brihad Jataka method?
-> - **Option B:** Keep the Ashta Koota Graha Maitri as-is, and add a **separate "Graha Maitri Amsha" section** below showing Brihad Jataka-style analysis for all 7 planets?
-> I recommend **Option B** to keep Ashta Koota standard while adding the detailed analysis separately.
-
-> [!IMPORTANT]
-> **Papa Dosha calculation:** Papa grahas are traditionally Surya, Kuja, Shani, Rahu (and waning Chandra, weak Budha). Should Ketu also be included as a papa graha? Classical texts vary on this.
-
-> [!IMPORTANT]
-> **Kuja Dosha from Shukra:** You mentioned calculating Kuja Dosha from 3 points — Lagna, Chandra, and **Shukra**. Classical texts typically use Lagna, Chandra, and **Shukra** (Venus) as reference houses. Confirming this is correct?
-
----
+> 1. Should the date range default to "today → 1 year from now" or should the user always pick from/to dates?
+> 2. Should all filters be required, or can the user search with just one filter (e.g., only Tithi)?
+> 3. Should the place (lat/lon) be taken from the app's current saved location, or should the user input a place?
 
 ## Proposed Changes
 
-### Component 1: Compatibility Calculator Engine
+### Home Screen Navigation
 
-#### [MODIFY] [match_making.dart](file:///d:/bharatheeyamapp%20sample/lib/core/match_making.dart)
-
-Keep existing Ashta Koota logic, add new calculation methods:
-
-**Kuja Dosha Calculator:**
-- Check if Kuja (Mars) is placed in houses 1, 2, 4, 7, 8, 12 from:
-  - Lagna (Ascendant)
-  - Chandra (Moon sign)
-  - Shukra (Venus sign)
-- If Kuja is in any of these houses from any of the 3 reference points → Kuja Dosha present
-- Return detailed breakdown: which houses from which reference point
-
-**Papa Dosha Calculator:**
-- Count papa grahas (Surya, Kuja, Shani, Rahu + waning Chandra) in houses 1, 2, 4, 7, 8, 12 from:
-  - Lagna
-  - Chandra  
-  - Shukra
-- Compare bride's papa count vs groom's papa count (Papa Samya)
-- If difference ≤ 1 → balanced (acceptable)
-
-**Graha Maitri Amsha (Brihad Jataka):**
-- For each of the 7 planets (Sun through Saturn), determine:
-  - Natural friendship (Naisargika Maitri) based on Brihad Jataka fixed table
-  - Temporary friendship (Tatkalika Maitri) based on angular distance
-  - Combined (Panchadha Maitri): Mitra+Mitra=Atimitra, Mitra+Shatru=Sama, etc.
-- Compare bride's and groom's planet friendship relationships
-
-**Shatha Ashtaka Dosha:**
-- Check if groom's Moon is in the 6th from bride's Moon (or vice versa) — this is Shatha Ashtaka
-- Return boolean + details
-
-**Dvirdvadasha Dosha:**
-- Check if groom's Moon is in the 2nd or 12th from bride's Moon (or vice versa)
-- Return boolean + details
-
-**New method signature:**
-```dart
-static Map<String, dynamic> calculateFullCompatibility({
-  required KundaliResult brideResult,
-  required KundaliResult groomResult,
-});
-```
-
-Returns a map with:
-- `ashtaKoota`: existing 8 koota scores + total
-- `kujaDosha`: `{bride: {lagna: bool, chandra: bool, shukra: bool}, groom: {...}}`
-- `papaDosha`: `{bride: {lagnaCount: int, ...}, groom: {...}, samya: bool}`
-- `grahaMaitri`: planet-wise comparison table
-- `shathaAshtaka`: `{present: bool, details: String}`
-- `dvirdvadasha`: `{present: bool, details: String}`
+#### [MODIFY] [home_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/home_screen.dart)
+- Add a new `_Section` card: "ಪಂಚಾಂಗ ಶೋಧನೆ" / "Panchanga Search" with `Icons.search` icon
+- Place it after Panchanga and before Taranukoola
 
 ---
 
-### Component 2: Enhanced Match Making Screen
+### New Screen
 
-#### [MODIFY] [match_making_tab.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/match_making_tab.dart)
+#### [NEW] [panchanga_search_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/panchanga_search_screen.dart)
 
-Complete rewrite of the UI:
+**Filter inputs (dropdowns):**
+- **Chandra Masa** — optional, 12 options from `knChandraMasa` list
+- **Soura Masa** — optional, 12 options from `knSouraMasa` list  
+- **Paksha** — required, 2 options: ಶುಕ್ಲ (Shukla) / ಕೃಷ್ಣ (Krishna)
+- **Tithi** — required, 15 options per paksha (Pratipada to Chaturdashi + Purnima/Amavasya)
+- **Date Range** — from/to date pickers (default: today → 6 months)
 
-**Step 1 — Input Section:**
-- Two input cards: **Groom** (left/top) and **Bride** (right/bottom)
-- Each card has: Name, Date picker, Time picker, Place autocomplete
-- Reuse the same place search pattern from [input_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/input_screen.dart)
-- "Calculate" button at bottom → calls `AstroCalculator.calculate()` for both → stores both `KundaliResult` objects
+**Search logic:**
+1. Loop through each day in the date range
+2. Call `AstroCalculator.calculate()` at sunrise time (using saved lat/lon/tz from `LocationService`)
+3. Compare `PanchangData.tithiIndex`, `chandraMasaRaw`, `souraMasa` against selected filters
+4. Collect matching dates
 
-**Step 2 — Results Display (tabs or scrollable sections):**
+**Result display (for each match):**
+- Date and Vara (day)
+- Tithi with end time
+- Nakshatra with end time
+- Karana with end time
+- Yoga with end time
+- Chandra Masa + Soura Masa
 
-1. **Individual Details** (for each person):
-   - Mini Rashi Kundali chart (reuse existing `KundaliChart` widget)
-   - Mini Navamsha Kundali chart
-   - Mini Bhava Kundali chart
-   - Panchanga summary (name, place, date, time, nakshatra, rashi, dasha lord/balance)
-
-2. **Kuja Dosha Section:**
-   - Side-by-side display: Bride vs Groom
-   - From Lagna: ✅/❌ with house position
-   - From Chandra: ✅/❌ with house position
-   - From Shukra: ✅/❌ with house position
-   - Verdict: Both have / Neither / Mismatch
-
-3. **Papa Dosha Section:**
-   - Papa count from Lagna, Chandra, Shukra for each
-   - Papa Samya verdict (balanced or not)
-
-4. **Graha Maitri Amsha (Brihad Jataka):**
-   - Table showing each planet's Naisargika + Tatkalika + Panchadha relationship
-   - Comparison between bride and groom
-
-5. **Shatha Ashtaka & Dvirdvadasha:**
-   - Simple present/absent indicators with explanation
-
-6. **Ashta Koota (existing, enhanced):**
-   - Use nakshatra and rashi from calculated panchanga (not manual dropdowns)
-   - Same 8-koota table with scores
-   - Total and verdict
+**UI design:**
+- Material card-based results list
+- Loading spinner with progress text ("Scanning day 45/180...")
+- Empty state if no matches found
+- Results styled consistently with existing panchanga display
 
 ---
 
-### Component 3: Localization
+### Localization
 
 #### [MODIFY] [common.dart](file:///d:/bharatheeyamapp%20sample/lib/widgets/common.dart)
-
-Add new locale keys for all 5 languages:
-- `kujaDosha`, `papaDosha`, `papaSamya`, `grahaMaitriAmsha`
-- `shathaAshtaka`, `dvirdvadasha`
-- `fromLagna`, `fromChandra`, `fromShukra`
-- `doshaPresent`, `doshaAbsent`, `balanced`, `imbalanced`
-- `groomLabel`, `brideLabel`
-- `calculateMatch`, `individualDetails`, `comparisonDetails`
-- `naisargikaMaitri`, `tatkalikaMaitri`, `panchadhaMaitri`
-- `atimitra`, `mitra`, `sama`, `shatru`, `atishatru`
-
----
+- Add locale keys: `panchangaSearch`, `searchBtn`, `fromDate`, `toDate`, `pakshaLabel`, `scanning`, `noResults`, `resultsFound`
 
 ## Verification Plan
 
-### Manual Verification
-- Test with known birth data pairs where Kuja Dosha is present/absent
-- Verify Ashta Koota scores match the existing dropdown-based calculation
-- Cross-check Brihad Jataka friendship tables with published references
-- Test all 5 language translations
-
 ### Automated Tests
-- Verify `calculateFullCompatibility()` returns correct structure
-- Test edge cases: same person matched with self, extreme date ranges
+- Verify the app builds: `flutter build apk --debug`
+
+### Manual Verification
+- Test searching for known dates (e.g., next Ekadashi)
+- Verify results match existing Panchanga screen output for those dates
