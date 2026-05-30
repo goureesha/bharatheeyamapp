@@ -341,27 +341,37 @@ class MatchMakingLogic {
     return (start + steps) % 12;
   }
 
-  /// Check Shatha Ashtaka Dosha (6/8 relationship between Moon signs)
-  static Map<String, dynamic> checkShathaAshtaka(int brideMoonRashi, int groomMoonRashi) {
-    final brideFromGroom = ((brideMoonRashi - groomMoonRashi + 12) % 12) + 1;
-    final groomFromBride = ((groomMoonRashi - brideMoonRashi + 12) % 12) + 1;
-    final is6or8 = const [6, 8].contains(brideFromGroom) || const [6, 8].contains(groomFromBride);
+  /// Helper: check if two rashis are in a given house relationship
+  static Map<String, dynamic> _checkHouseRelation(int brideRashi, int groomRashi, List<int> doshaHouses) {
+    final brideFromGroom = ((brideRashi - groomRashi + 12) % 12) + 1;
+    final groomFromBride = ((groomRashi - brideRashi + 12) % 12) + 1;
+    final hasDosha = doshaHouses.contains(brideFromGroom) || doshaHouses.contains(groomFromBride);
     return {
-      'hasDosha': is6or8,
+      'hasDosha': hasDosha,
       'brideFromGroom': brideFromGroom,
       'groomFromBride': groomFromBride,
     };
   }
 
-  /// Check Dvirdvadasha Dosha (2/12 relationship between Moon signs)
-  static Map<String, dynamic> checkDvirdvadasha(int brideMoonRashi, int groomMoonRashi) {
-    final brideFromGroom = ((brideMoonRashi - groomMoonRashi + 12) % 12) + 1;
-    final groomFromBride = ((groomMoonRashi - brideMoonRashi + 12) % 12) + 1;
-    final is2or12 = const [2, 12].contains(brideFromGroom) || const [2, 12].contains(groomFromBride);
+  /// Check Shatha Ashtaka Dosha (6/8 relationship) from Chandra and Lagna
+  static Map<String, dynamic> checkShathaAshtaka(int brideMoonRashi, int groomMoonRashi, int brideLagnaRashi, int groomLagnaRashi) {
+    final fromChandra = _checkHouseRelation(brideMoonRashi, groomMoonRashi, const [6, 8]);
+    final fromLagna = _checkHouseRelation(brideLagnaRashi, groomLagnaRashi, const [6, 8]);
     return {
-      'hasDosha': is2or12,
-      'brideFromGroom': brideFromGroom,
-      'groomFromBride': groomFromBride,
+      'fromChandra': fromChandra,
+      'fromLagna': fromLagna,
+      'hasDosha': fromChandra['hasDosha'] || fromLagna['hasDosha'],
+    };
+  }
+
+  /// Check Dvirdvadasha Dosha (2/12 relationship) from Chandra and Lagna
+  static Map<String, dynamic> checkDvirdvadasha(int brideMoonRashi, int groomMoonRashi, int brideLagnaRashi, int groomLagnaRashi) {
+    final fromChandra = _checkHouseRelation(brideMoonRashi, groomMoonRashi, const [2, 12]);
+    final fromLagna = _checkHouseRelation(brideLagnaRashi, groomLagnaRashi, const [2, 12]);
+    return {
+      'fromChandra': fromChandra,
+      'fromLagna': fromLagna,
+      'hasDosha': fromChandra['hasDosha'] || fromLagna['hasDosha'],
     };
   }
 
@@ -396,8 +406,8 @@ class MatchMakingLogic {
         groomLagnaRashi: groomLagnaRashi, groomMoonRashi: groomMoonRashi,
         groomNavLagnaRashi: groomNavLagnaRashi, groomNavMoonRashi: groomNavMoonRashi,
       ),
-      'shathaAshtaka': checkShathaAshtaka(brideMoonRashi, groomMoonRashi),
-      'dvirdvadasha': checkDvirdvadasha(brideMoonRashi, groomMoonRashi),
+      'shathaAshtaka': checkShathaAshtaka(brideMoonRashi, groomMoonRashi, brideLagnaRashi, groomLagnaRashi),
+      'dvirdvadasha': checkDvirdvadasha(brideMoonRashi, groomMoonRashi, brideLagnaRashi, groomLagnaRashi),
     };
   }
 }

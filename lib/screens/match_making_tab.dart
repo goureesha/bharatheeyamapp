@@ -556,23 +556,38 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
     final sa = fr['shathaAshtaka'] as Map<String, dynamic>;
     final dv = fr['dvirdvadasha'] as Map<String, dynamic>;
 
+    Widget subRow(String label, Map<String, dynamic> d) {
+      final has = d['hasDosha'] as bool;
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(children: [
+          Icon(has ? Icons.close : Icons.check, color: has ? Colors.red : Colors.green, size: 14),
+          const SizedBox(width: 4),
+          Text('$label: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kMuted)),
+          Text(has ? 'ದೋಷ ಇದೆ' : 'ದೋಷ ಇಲ್ಲ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: has ? Colors.red.shade700 : Colors.green.shade700)),
+          Text(' (${d['brideFromGroom']}/${d['groomFromBride']})', style: TextStyle(fontSize: 10, color: kMuted)),
+        ]),
+      );
+    }
+
     Widget doshaCard(String title, Map<String, dynamic> d) {
+      final has = d['hasDosha'] as bool;
+      final fromChandra = d['fromChandra'] as Map<String, dynamic>;
+      final fromLagna = d['fromLagna'] as Map<String, dynamic>;
       return Expanded(child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: (d['hasDosha'] as bool) ? Colors.red.shade50 : Colors.green.shade50,
+          color: has ? Colors.red.shade50 : Colors.green.shade50,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: (d['hasDosha'] as bool) ? Colors.red.shade200 : Colors.green.shade200),
+          border: Border.all(color: has ? Colors.red.shade200 : Colors.green.shade200),
         ),
-        child: Column(children: [
-          Icon((d['hasDosha'] as bool) ? Icons.warning_amber : Icons.check_circle, color: (d['hasDosha'] as bool) ? Colors.red : Colors.green, size: 28),
-          const SizedBox(height: 6),
-          Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: kText)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Center(child: Icon(has ? Icons.warning_amber : Icons.check_circle, color: has ? Colors.red : Colors.green, size: 24)),
           const SizedBox(height: 4),
-          Text((d['hasDosha'] as bool) ? 'ದೋಷ ಇದೆ' : 'ದೋಷ ಇಲ್ಲ',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: (d['hasDosha'] as bool) ? Colors.red.shade700 : Colors.green.shade700)),
-          const SizedBox(height: 2),
-          Text('(${d['brideFromGroom']}/${d['groomFromBride']})', style: TextStyle(fontSize: 10, color: kMuted)),
+          Center(child: Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: kText))),
+          const SizedBox(height: 6),
+          subRow(AppLocale.l('chandraRashiLabel'), fromChandra),
+          subRow(AppLocale.l('lagna'), fromLagna),
         ]),
       ));
     }
