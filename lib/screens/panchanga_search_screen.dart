@@ -121,9 +121,12 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
           if (p.souraMasa != _souraMasaNames[_selectedSouraMasa!]) continue;
         }
 
-        // Check Tithi
+        // Soft check Tithi — don't skip, just flag
+        bool tithiNotAvailable = false;
         if (_absoluteTithiIndex != null) {
-          if (p.tithiIndex != _absoluteTithiIndex) continue;
+          if (p.tithiIndex != _absoluteTithiIndex) {
+            tithiNotAvailable = true;
+          }
         }
 
         found.add(_SearchResult(
@@ -145,6 +148,7 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
           souraMasa: p.souraMasa,
           sunrise: p.sunrise,
           sunset: p.sunset,
+          tithiNotAvailable: tithiNotAvailable,
         ));
       } catch (_) {}
     }
@@ -409,6 +413,27 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
         ]),
         const SizedBox(height: 10),
 
+        // Tithi not available warning
+        if (r.tithiNotAvailable) ...[    
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            ),
+            child: Row(children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 18),
+              const SizedBox(width: 8),
+              Expanded(child: Text(
+                AppLocale.l('tithiNotAvail'),
+                style: TextStyle(fontSize: 11, color: Colors.orange.shade800, fontWeight: FontWeight.w600),
+              )),
+            ]),
+          ),
+          const SizedBox(height: 10),
+        ],
+
         // Panchanga details table
         _detailRow(AppLocale.l('tithiLabel'), r.tithi, r.tithiEndTime, r.tithiEndsNextDay),
         _detailRow(AppLocale.l('nakshatraLabel'), r.nakshatra, r.nakEndTime, r.nakEndsNextDay),
@@ -466,6 +491,7 @@ class _SearchResult {
   final String karana, karanaEndTime, yoga, yogaEndTime;
   final bool tithiEndsNextDay, nakEndsNextDay, karanaEndsNextDay, yogaEndsNextDay;
   final String chandraMasa, souraMasa, sunrise, sunset;
+  final bool tithiNotAvailable;
 
   _SearchResult({
     required this.date, required this.vara,
@@ -475,5 +501,6 @@ class _SearchResult {
     required this.yoga, required this.yogaEndTime, required this.yogaEndsNextDay,
     required this.chandraMasa, required this.souraMasa,
     required this.sunrise, required this.sunset,
+    this.tithiNotAvailable = false,
   });
 }

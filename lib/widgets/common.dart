@@ -610,7 +610,7 @@ class AppLocale {
       'daysLeft': 'ದಿನ ಉಳಿದಿದೆ', 'claimOfflineDay': 'ಆಫ್‌ಲೈನ್ ದಿನ ಕ್ಲೈಮ್ ಮಾಡಿ',
       'claimFailed': 'ಕ್ಲೈಮ್ ವಿಫಲವಾಗಿದೆ', 'offlineDaysExhausted': 'ನಿಮ್ಮ 10 ಆಫ್‌ಲೈನ್ ದಿನಗಳು ಮುಗಿದಿವೆ. ಇಂಟರ್ನೆಟ್ಗೆ ಸಂಪರ್ಕಿಸಿ ಅಥವಾ ಸಪೋರ್ಟ್ ಸಂಪರ್ಕಿಸಿ.',
       'contactSupport': 'ಸಪೋರ್ಟ್ ಸಂಪರ್ಕಿಸಿ', 'retryConnection': 'ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ',
-      'panchangaSearch': 'ಪಂಚಾಂಗ ಶೋಧನೆ', 'filterTitle': 'ಶೋಧನೆ ಫಿಲ್ಟರ್', 'chandraMasaLabel': 'ಚಂದ್ರ ಮಾಸ', 'souraMasaLabel': 'ಸೌರ ಮಾಸ', 'pakshaLabel': 'ಪಕ್ಷ', 'tithiLabel': 'ತಿಥಿ', 'nakshatraLabel': 'ನಕ್ಷತ್ರ', 'yogaLabel': 'ಯೋಗ', 'karanaLabel': 'ಕರಣ', 'fromDate': 'ಇಂದಿನಿಂದ', 'toDate': 'ವರೆಗೆ', 'searchBtn': 'ಹುಡುಕಿ', 'scanning': 'ಹುಡುಕುತ್ತಿದೆ...', 'noResults': 'ಯಾವುದೇ ಫಲಿತಾಂಶ ಸಿಗಲಿಲ್ಲ', 'resultsFound': 'ಫಲಿತಾಂಶಗಳು ಸಿಕ್ಕಿವೆ', 'selectFilter': 'ಕನಿಷ್ಠ ಒಂದು ಫಿಲ್ಟರ್ ಆಯ್ಕೆ ಮಾಡಿ', 'anyOption': 'ಯಾವುದಾದರೂ',
+      'panchangaSearch': 'ಪಂಚಾಂಗ ಶೋಧನೆ', 'filterTitle': 'ಶೋಧನೆ ಫಿಲ್ಟರ್', 'chandraMasaLabel': 'ಚಂದ್ರ ಮಾಸ', 'souraMasaLabel': 'ಸೌರ ಮಾಸ', 'pakshaLabel': 'ಪಕ್ಷ', 'tithiLabel': 'ತಿಥಿ', 'nakshatraLabel': 'ನಕ್ಷತ್ರ', 'yogaLabel': 'ಯೋಗ', 'karanaLabel': 'ಕರಣ', 'fromDate': 'ಇಂದಿನಿಂದ', 'toDate': 'ವರೆಗೆ', 'searchBtn': 'ಹುಡುಕಿ', 'scanning': 'ಹುಡುಕುತ್ತಿದೆ...', 'noResults': 'ಯಾವುದೇ ಫಲಿತಾಂಶ ಸಿಗಲಿಲ್ಲ', 'resultsFound': 'ಫಲಿತಾಂಶಗಳು ಸಿಕ್ಕಿವೆ', 'selectFilter': 'ಕನಿಷ್ಠ ಒಂದು ಫಿಲ್ಟರ್ ಆಯ್ಕೆ ಮಾಡಿ', 'anyOption': 'ಯಾವುದಾದರೂ', 'tithiNotAvail': 'ಆಯ್ಕೆ ಮಾಡಿದ ತಿಥಿ ಈ ಸಮಯದಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ, ಆದರೆ ಇತರ ಪಂಚಾಂಗ ವಿವರಗಳು ಲಭ್ಯವಿದೆ',
 },
     'hi': {
 
@@ -1092,7 +1092,7 @@ class AppLocale {
       'daysLeft': 'दिन शेष', 'claimOfflineDay': 'ऑલાઇન दिन क्लेम करें',
       'claimFailed': 'क्लेम विफल', 'offlineDaysExhausted': 'आपके 10 ऑલાઇન दिन समाप्त हो गए हैं। कृपया इंटरनेट से कनेक्ट करें या सपोर्ट से संपर्क करें.',
       'contactSupport': 'सपोर्ट से संपर्क करें', 'retryConnection': 'पुनः प्रयास करें',
-      'panchangaSearch': 'पंचांग खोज', 'filterTitle': 'खोज फ़िल्टर', 'chandraMasaLabel': 'चंद्र मास', 'souraMasaLabel': 'सौर मास', 'pakshaLabel': 'पक्ष', 'tithiLabel': 'तिथि', 'nakshatraLabel': 'नक्षत्र', 'yogaLabel': 'योग', 'karanaLabel': 'करण', 'fromDate': 'से', 'toDate': 'तक', 'searchBtn': 'खोजें', 'scanning': 'खोज रहा है...', 'noResults': 'कोई परिणाम नहीं', 'resultsFound': 'परिणाम मिले', 'selectFilter': 'कम से कम एक फ़िल्टर चुनें', 'anyOption': 'कोई भी',
+      'panchangaSearch': 'पंचांग खोज', 'filterTitle': 'खोज फ़िल्टर', 'chandraMasaLabel': 'चंद्र मास', 'souraMasaLabel': 'सौर मास', 'pakshaLabel': 'पक्ष', 'tithiLabel': 'तिथि', 'nakshatraLabel': 'नक्षत्र', 'yogaLabel': 'योग', 'karanaLabel': 'करण', 'fromDate': 'से', 'toDate': 'तक', 'searchBtn': 'खोजें', 'scanning': 'खोज रहा है...', 'noResults': 'कोई परिणाम नहीं', 'resultsFound': 'परिणाम मिले', 'selectFilter': 'कम से कम एक फ़िल्टर चुनें', 'anyOption': 'ಕೋಈ ಭೀ', 'tithiNotAvail': 'चुनी हुई तिथि इस समय उपलब्ध नहीं है, लेकिन अन्य पंचांग विवरण उपलब्ध हैं',
 },
     'ta': {
 
@@ -1570,7 +1570,7 @@ class AppLocale {
       'daysLeft': 'நாட்கள் மீதம்', 'claimOfflineDay': 'ஆஃப்லைன் நாள் கோருங்கள்',
       'claimFailed': 'கோரிக்கை தோல்வி', 'offlineDaysExhausted': 'உங்கள் 10 ஆஃப்லைன் நாட்கள் முடிந்தது. இணையத்தில் இணையவும் அல்லது ஆதரவை தொடர்பு கொள்ளவும்.',
       'contactSupport': 'ஆதரவை தொடர்பு கொள்ளவும்', 'retryConnection': 'மீண்டும் முயற்சிக்கவும்',
-      'panchangaSearch': 'பஞ்சாங்க தேடல்', 'filterTitle': 'தேடல் வடிகட்டி', 'chandraMasaLabel': 'சந்திர மாதம்', 'souraMasaLabel': 'சூரிய மாதம்', 'pakshaLabel': 'பக்ஷம்', 'tithiLabel': 'திதி', 'nakshatraLabel': 'நக்ஷத்திரம்', 'yogaLabel': 'யோகம்', 'karanaLabel': 'கரணம்', 'fromDate': 'தொடக்கம்', 'toDate': 'முடிவு', 'searchBtn': 'தேடு', 'scanning': 'தேடுகிறது...', 'noResults': 'முடிவுகள் இல்லை', 'resultsFound': 'முடிவுகள் கிடைத்தன', 'selectFilter': 'குறைந்தது ஒரு வடிகட்டியை தேர்ந்தெடுக்கவும்', 'anyOption': 'எதுவும்',
+      'panchangaSearch': 'பஞ்சாங்க தேடல்', 'filterTitle': 'தேடல் வடிகட்டி', 'chandraMasaLabel': 'சந்திர மாதம்', 'souraMasaLabel': 'சூரிய மாதம்', 'pakshaLabel': 'பக்ஷம்', 'tithiLabel': 'திதி', 'nakshatraLabel': 'நக்ஷத்திரம்', 'yogaLabel': 'யோகம்', 'karanaLabel': 'கரணம்', 'fromDate': 'தொடக்கம்', 'toDate': 'முடிவு', 'searchBtn': 'தேடு', 'scanning': 'தேடுகிறது...', 'noResults': 'முடிவுகள் இல்லை', 'resultsFound': 'முடிவுகள் கிடைத்தன', 'selectFilter': 'குறைந்தது ஒரு வடிகட்டியை தேர்ந்தெடுக்கவும்', 'anyOption': 'எதுவும்', 'tithiNotAvail': 'தேர்ந்தெடுக்கப்பட்ட திதி இந்த நேரத்தில் கிடைக்கவில்லை, ஆனால் மற்ற பஞ்சாங்க விவரங்கள் கிடைக்கின்றன',
 },
     'te': {
 
@@ -2048,7 +2048,7 @@ class AppLocale {
       'daysLeft': 'రోజులు మిగిలినవి', 'claimOfflineDay': 'ఆఫ్‌లైన్ రోజు క్లైమ్ చేయండి',
       'claimFailed': 'క్లైమ్ విఫలమైనది', 'offlineDaysExhausted': 'మీ 10 ఆఫ్‌లైన్ రోజులు అయిపోయాయి. ఇంటర్నెట్కు కనెక్ట్ చేయండి లేదా సపోర్ట్ని సంప్రదించండి.',
       'contactSupport': 'సపోర్ట్ని సంప్రదించండి', 'retryConnection': 'మళ్ళీ ప్రయత్నించండి',
-      'panchangaSearch': 'పంచాంగ శోధన', 'filterTitle': 'శోధన ఫిల్టర్', 'chandraMasaLabel': 'చంద్ర మాసం', 'souraMasaLabel': 'సౌర మాసం', 'pakshaLabel': 'పక్షం', 'tithiLabel': 'తిథి', 'nakshatraLabel': 'నక్షత్రం', 'yogaLabel': 'యోగం', 'karanaLabel': 'కరణం', 'fromDate': 'నుండి', 'toDate': 'వరకు', 'searchBtn': 'వెతుకు', 'scanning': 'వెతుకుతోంది...', 'noResults': 'ఫలితాలు లేవు', 'resultsFound': 'ఫలితాలు దొరికాయి', 'selectFilter': 'కనీసం ఒక ఫిల్టర్ ఎంచుకోండి', 'anyOption': 'ఏదైనా',
+      'panchangaSearch': 'పంచాంగ శోధన', 'filterTitle': 'శోధన ఫిల్టర్', 'chandraMasaLabel': 'చంద్ర మాసం', 'souraMasaLabel': 'సౌర మాసం', 'pakshaLabel': 'పక్షం', 'tithiLabel': 'తిథి', 'nakshatraLabel': 'నక్షత్రం', 'yogaLabel': 'యోగం', 'karanaLabel': 'కరణం', 'fromDate': 'నుండి', 'toDate': 'వరకు', 'searchBtn': 'వెతుకు', 'scanning': 'వెతుకుతోంది...', 'noResults': 'ఫలితాలు లేవు', 'resultsFound': 'ఫలితాలు దొరికాయి', 'selectFilter': 'కనీసం ఒక ఫిల్టర్ ఎంచుకోండి', 'anyOption': 'ఏదైనా', 'tithiNotAvail': 'ఎంచుకున్న తిథి ఈ సమయంలో అందుబాటులో లేదు, కానీ ఇతర పంచాంగ వివరాలు అందుబాటులో ఉన్నాయి',
 },
     'ml': {
 
@@ -2526,7 +2526,7 @@ class AppLocale {
       'daysLeft': 'ദിവസങ്ങൾ ബാക്കി', 'claimOfflineDay': 'ഓഫ്‌ലൈൻ ദിവസം ക്ലൈം ചെയ്യുക',
       'claimFailed': 'ക്ലൈം പരാജയപ്പെട്ടു', 'offlineDaysExhausted': 'നിങ്ങളുടെ 10 ഓഫ്‌ലൈൻ ദിവസങ്ങൾ തീർന്നു. ഇന്റർനെറ്റിൽ കണക്ട് ചെയ്യുക അല്ലെങ്കിൽ സപ്പോർട്ടുമായി ബന്ധപ്പെടുക.',
       'contactSupport': 'സപ്പോർട്ടുമായി ബന്ധപ്പെടുക', 'retryConnection': 'വീണ്ടും ശ്രമിക്കുക',
-      'panchangaSearch': 'പഞ്ചാംഗ തിരച്ചിൽ', 'filterTitle': 'തിരച്ചിൽ ഫിൽട്ടർ', 'chandraMasaLabel': 'ചന്ദ്ര മാസം', 'souraMasaLabel': 'സൗര മാസം', 'pakshaLabel': 'പക്ഷം', 'tithiLabel': 'തിഥി', 'nakshatraLabel': 'നക്ഷത്രം', 'yogaLabel': 'യോഗം', 'karanaLabel': 'കരണം', 'fromDate': 'മുതൽ', 'toDate': 'വരെ', 'searchBtn': 'തിരയുക', 'scanning': 'തിരയുന്നു...', 'noResults': 'ഫലങ്ങൾ ഇല്ല', 'resultsFound': 'ഫലങ്ങൾ കണ്ടെത്തി', 'selectFilter': 'ഒരു ഫിൽട്ടറെങ്കിലും തിരഞ്ഞെടുക്കുക', 'anyOption': 'ഏതെങ്കിലും',
+      'panchangaSearch': 'പഞ്ചാംഗ തിരച്ചിൽ', 'filterTitle': 'തിരച്ചിൽ ഫിൽട്ടർ', 'chandraMasaLabel': 'ചന്ദ്ര മാസം', 'souraMasaLabel': 'സൗര മാസം', 'pakshaLabel': 'പക്ഷം', 'tithiLabel': 'തിഥി', 'nakshatraLabel': 'നക്ഷത്രം', 'yogaLabel': 'യോഗം', 'karanaLabel': 'കരണം', 'fromDate': 'മുതൽ', 'toDate': 'വരെ', 'searchBtn': 'തിരയുക', 'scanning': 'തിരയുന്നു...', 'noResults': 'ഫലങ്ങൾ ഇല്ല', 'resultsFound': 'ഫലങ്ങൾ കണ്ടെത്തി', 'selectFilter': 'ഒരു ഫിൽട്ടറെങ്കിലും തിരഞ്ഞെടുക്കുക', 'anyOption': 'ഏതെങ്കിലും', 'tithiNotAvail': 'തിരഞ്ഞെടുത്ത തിഥി ഈ സമയത്ത് ലഭ്യമല്ല, എന്നാൽ മറ്റ് പഞ്ചാംഗ വിവരങ്ങൾ ലഭ്യമാണ്',
 },
   };
 
