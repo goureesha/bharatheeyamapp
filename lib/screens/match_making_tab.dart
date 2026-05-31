@@ -10,6 +10,7 @@ import '../core/match_making.dart';
 import '../core/calculator.dart';
 import '../services/location_service.dart';
 import '../services/storage_service.dart';
+import '../services/client_service.dart';
 
 class MatchMakingTab extends StatefulWidget {
   const MatchMakingTab({super.key});
@@ -313,6 +314,79 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
     });
   }
 
+  /// Save a person's data as a profile with Client sync
+  Future<void> _savePersonProfile({
+    required TextEditingController nameCtrl,
+    required TextEditingController placeCtrl,
+    required TextEditingController latCtrl,
+    required TextEditingController lonCtrl,
+    required TextEditingController tzCtrl,
+    required DateTime dob,
+    required int hour,
+    required int minute,
+    required String ampm,
+  }) async {
+    String name = nameCtrl.text.trim();
+    if (name.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocale.l('enterName')), backgroundColor: Colors.orange),
+        );
+      }
+      return;
+    }
+
+    final lat = double.tryParse(latCtrl.text) ?? 14.98;
+    final lon = double.tryParse(lonCtrl.text) ?? 74.73;
+    final tz = double.tryParse(tzCtrl.text) ?? 5.5;
+    final dateStr = '${dob.year}-${dob.month.toString().padLeft(2, '0')}-${dob.day.toString().padLeft(2, '0')}';
+
+    // Resolve or create Client
+    await ClientService.loadAll();
+    final resolvedClient = await ClientService.getOrCreateClient(name: name, phone: 'No Phone');
+    String? cId = resolvedClient?.clientId;
+
+    final p = Profile(
+      name: name,
+      date: dateStr,
+      hour: hour, minute: minute, ampm: ampm,
+      lat: lat, lon: lon, tzOffset: tz,
+      place: placeCtrl.text,
+      clientId: cId,
+    );
+
+    // Sync as FamilyMember
+    if (cId != null && cId.isNotEmpty) {
+      final member = FamilyMember(
+        clientId: cId,
+        memberName: name,
+        relation: 'Self',
+        dob: dateStr,
+        birthTime: '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $ampm',
+        birthPlace: placeCtrl.text,
+        lat: lat, lon: lon,
+        notes: '',
+      );
+      final members = ClientService.getMembersForClient(cId);
+      if (!members.any((m) => m.memberName == name)) {
+        await ClientService.addFamilyMember(member);
+      } else {
+        await ClientService.updateFamilyMember(member);
+      }
+    }
+
+    await StorageService.save(p);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${AppLocale.l('savedSuccess')} - $name'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
   Widget _buildPersonInput({
     required String title,
     required Color color,
@@ -332,17 +406,29 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
     required void Function(bool) onGeoLoadingChanged,
     required void Function(String) onGeoStatusChanged,
     required VoidCallback onLoadSaved,
+    required VoidCallback onSave,
   }) {
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
         Expanded(child: SectionTitle(title, color: color)),
         TextButton.icon(
           onPressed: onLoadSaved,
-          icon: Icon(Icons.folder_open, size: 16, color: color),
-          label: Text(AppLocale.l('loadSaved'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+          icon: Icon(Icons.folder_open, size: 14, color: color),
+          label: Text(AppLocale.l('loadSaved'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color)),
           style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             backgroundColor: color.withOpacity(0.08),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+        const SizedBox(width: 4),
+        TextButton.icon(
+          onPressed: onSave,
+          icon: Icon(Icons.save, size: 14, color: Colors.green),
+          label: Text(AppLocale.l('saveBtn'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.green)),
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            backgroundColor: Colors.green.withOpacity(0.08),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
@@ -807,6 +893,11 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
             onTimeChanged: (h, m, a) => setState(() { _gHour = h; _gMinute = m; _gAmpm = a; }),
             onGeoStatusChanged: (v) => setState(() => _gGeoStatus = v),
           ),
+          onSave: () => _savePersonProfile(
+            nameCtrl: _gNameCtrl, placeCtrl: _gPlaceCtrl,
+            latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
+            dob: _gDob, hour: _gHour, minute: _gMinute, ampm: _gAmpm,
+          ),
         ),
         const SizedBox(height: 12),
         // Bride input
@@ -825,6 +916,11 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
             onDobChanged: (d) => setState(() => _bDob = d),
             onTimeChanged: (h, m, a) => setState(() { _bHour = h; _bMinute = m; _bAmpm = a; }),
             onGeoStatusChanged: (v) => setState(() => _bGeoStatus = v),
+          ),
+          onSave: () => _savePersonProfile(
+            nameCtrl: _bNameCtrl, placeCtrl: _bPlaceCtrl,
+            latCtrl: _bLatCtrl, lonCtrl: _bLonCtrl, tzCtrl: _bTzCtrl,
+            dob: _bDob, hour: _bHour, minute: _bMinute, ampm: _bAmpm,
           ),
         ),
         const SizedBox(height: 16),
