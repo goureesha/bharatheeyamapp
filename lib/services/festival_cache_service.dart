@@ -65,6 +65,9 @@ class FestivalCacheService {
     debugPrint('FestivalCache: Done. ${_cache.length} festival days for $year');
   }
 
+  // Cancellation: bumped each time loadMonth is called so stale computations abort
+  static int _loadMonthToken = 0;
+
   /// Load a specific month (for quick partial loading when swiping calendar)
   static Future<void> loadMonth(int year, int month) async {
     // Skip if we're already computing to prevent overlapping work
@@ -83,18 +86,33 @@ class FestivalCacheService {
     if (allCached) return;
 
     _isLoading = true;
+    final myToken = ++_loadMonthToken; // Cancel stale computations
     bool anyNew = false;
     
+    // Initialize ephemeris ONCE before the loop
+    try {
+      await Ephemeris.initSweph();
+    } catch (_) {
+      _isLoading = false;
+      return;
+    }
+
     for (int day = 1; day <= daysInMonth; day++) {
+      // Abort if a newer loadMonth was called (user swiped again)
+      if (myToken != _loadMonthToken) {
+        _isLoading = false;
+        return;
+      }
+
       final dateKey = DateTime(year, month, day);
       if (_cache.containsKey(dateKey)) continue;
 
-      // Yield to UI thread EVERY day to keep animations smooth
-      await Future.delayed(Duration.zero);
+      // Yield to UI thread every 3 days to keep animations smooth
+      if (day % 3 == 0) {
+        await Future.delayed(const Duration(milliseconds: 1));
+      }
 
       try {
-        // Compute sunrise + 5 minutes for correct Vedic day
-        await Ephemeris.initSweph();
         final srSs = Ephemeris.findSunriseSetForDate(year, month, day, _lat, _lon, tzOffset: _tzOffset);
         final srFrac = ((srSs[0] + 0.5 + (_tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
         final h24 = (srFrac * 24.0) + (5.0 / 60.0);
@@ -109,13 +127,8 @@ class FestivalCacheService {
         );
         if (res != null) {
           final events = EventCalculator.getEventsForPanchang(res.panchang);
-          if (events.isNotEmpty) {
-            _cache[dateKey] = events;
-            anyNew = true;
-          } else {
-            // Mark empty days as cached too (empty list) to avoid recomputation
-            _cache[dateKey] = [];
-          }
+          _cache[dateKey] = events; // Cache even empty lists to avoid recomputation
+          if (events.isNotEmpty) anyNew = true;
         }
       } catch (_) {}
     }

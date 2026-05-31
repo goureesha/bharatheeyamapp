@@ -338,9 +338,9 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
                           },
                           onPageChanged: (focusedDay) {
                             _focusedDay = focusedDay;
-                            // Debounce: wait 300ms after swipe stops before computing
+                            // Debounce: wait 500ms after swipe stops before computing
                             _monthDebounce?.cancel();
-                            _monthDebounce = Timer(const Duration(milliseconds: 300), () {
+                            _monthDebounce = Timer(const Duration(milliseconds: 500), () {
                               FestivalCacheService.loadMonth(focusedDay.year, focusedDay.month).then((_) {
                                 if (mounted) setState(() {});
                               });
