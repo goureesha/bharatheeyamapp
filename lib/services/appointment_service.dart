@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'google_auth_service.dart';
 import 'client_service.dart';
 import '../widgets/common.dart';
 
@@ -463,59 +462,7 @@ class AppointmentService {
     return buf.toString();
   }
 
-  /// Generate a booking page URL with available slots encoded in the hash
-  static String generateBookingPageUrl({
-    required DateTime fromDate,
-    required DateTime toDate,
-    required int fromHour,
-    required int fromMinute,
-    required int toHour,
-    required int toMinute,
-    String phone = '',
-  }) {
-    final customFromMin = fromHour * 60 + fromMinute;
-    final customToMin = toHour * 60 + toMinute;
 
-    final slotsMap = <String, List<String>>{};
-    int slotDuration = 60;
-    DateTime current = fromDate;
-    while (!current.isAfter(toDate)) {
-      final allSlots = getAvailableSlotsForDate(current);
-      final filtered = allSlots.where((s) {
-        final parts = s.split(':');
-        final slotMin = int.parse(parts[0]) * 60 + int.parse(parts[1]);
-        return slotMin >= customFromMin && slotMin < customToMin;
-      }).toList();
-
-      if (filtered.isNotEmpty) {
-        final dateKey = '${current.year}-${current.month.toString().padLeft(2, '0')}-${current.day.toString().padLeft(2, '0')}';
-        slotsMap[dateKey] = filtered;
-        final daySlot = _availableSlots.firstWhere(
-          (s) => s.dayOfWeek == current.weekday,
-          orElse: () => AvailableSlot(dayOfWeek: 1, startTime: '09:00', endTime: '17:00', slotMinutes: 60),
-        );
-        slotDuration = daySlot.slotMinutes;
-      }
-      current = current.add(const Duration(days: 1));
-    }
-
-    final email = GoogleAuthService.userEmail ?? '';
-    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9+]'), '');
-
-    final jsonStr = '{"slots":${_slotsToJson(slotsMap)},"email":"$email","phone":"$cleanPhone","slotMin":$slotDuration}';
-    final encoded = Uri.encodeComponent(jsonStr);
-
-    return 'https://goureesha.github.io/bharatheeyamapp/booking.html#$encoded';
-  }
-
-  /// Simple JSON serialization for slots map
-  static String _slotsToJson(Map<String, List<String>> slots) {
-    final entries = slots.entries.map((e) {
-      final times = e.value.map((t) => '"$t"').join(',');
-      return '"${e.key}":[$times]';
-    }).join(',');
-    return '{$entries}';
-  }
 
   /// Clear all cached data
   static void clearCache() {

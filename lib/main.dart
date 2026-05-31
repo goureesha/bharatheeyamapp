@@ -102,9 +102,8 @@ Future<void> _initAuthAndBinding() async {
 /// Non-critical startup tasks that run AFTER the app is visible
 Future<void> _deferredInit() async {
   // Firebase is already initialized in main() before the parallel block.
-  // Start the appointment listener and cloud sync now that auth is complete.
   if (GoogleAuthService.isSignedIn) {
-    FirebaseService.listenForAppointments();
+    // (booking listener removed)
   }
 
   // Track every device install/launch

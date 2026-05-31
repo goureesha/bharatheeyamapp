@@ -1254,36 +1254,6 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
                     ),
                   ),
 
-                  const SizedBox(height: 10),
-
-                  // CREATE BOOKING LINK FOR CLIENTS
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      icon: Icon(Icons.link, color: kTeal),
-                      label: Text(AppLocale.l('bookingLink'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: kTeal)),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: kTeal),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                        final bookingUrl = AppointmentService.generateBookingPageUrl(
-                          fromDate: fromDate, toDate: toDate,
-                          fromHour: fromTime.hour, fromMinute: fromTime.minute,
-                          toHour: toTime.hour, toMinute: toTime.minute,
-                          phone: phoneCtrl.text,
-                        );
-                        final msg = '${AppLocale.l('bookingMsgNamaskara')}\n\n'
-                            '${AppLocale.l('bookingMsgBody')}\n'
-                            '$bookingUrl\n\n'
-                            '${AppLocale.l('bookingMsgSign')}';
-                        final encoded = Uri.encodeComponent(msg);
-                        launchUrl(Uri.parse('https://wa.me/?text=$encoded'), mode: LaunchMode.externalApplication);
-                      },
-                    ),
-                  ),
                 ],
               ),
             ),
