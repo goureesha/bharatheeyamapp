@@ -9,6 +9,7 @@ import '../widgets/dasha_widget.dart';
 import '../core/match_making.dart';
 import '../core/calculator.dart';
 import '../services/location_service.dart';
+import '../services/storage_service.dart';
 
 class MatchMakingTab extends StatefulWidget {
   const MatchMakingTab({super.key});
@@ -199,6 +200,119 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
     );
   }
 
+  /// Show bottom sheet to pick a saved kundali profile
+  void _showProfilePicker({
+    required TextEditingController nameCtrl,
+    required TextEditingController placeCtrl,
+    required TextEditingController latCtrl,
+    required TextEditingController lonCtrl,
+    required TextEditingController tzCtrl,
+    required void Function(DateTime) onDobChanged,
+    required void Function(int, int, String) onTimeChanged,
+    required void Function(String) onGeoStatusChanged,
+  }) async {
+    final profiles = await StorageService.loadAll();
+    if (profiles.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocale.l('noSavedProfiles')), backgroundColor: Colors.orange),
+        );
+      }
+      return;
+    }
+
+    if (!mounted) return;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: kBg,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(children: [
+                Icon(Icons.person_search, color: kPurple1, size: 24),
+                const SizedBox(width: 8),
+                Text(AppLocale.l('selectSavedKundali'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kPurple1)),
+              ]),
+            ),
+            const Divider(height: 1),
+            Flexible(
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: profiles.length,
+                separatorBuilder: (_, __) => Divider(height: 1, color: kBorder),
+                itemBuilder: (_, i) {
+                  final name = profiles.keys.elementAt(i);
+                  final p = profiles[name]!;
+                  final dateStr = p.date;
+                  final timeStr = '${p.hour.toString().padLeft(2, "0")}:${p.minute.toString().padLeft(2, "0")} ${p.ampm}';
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: kPurple1.withOpacity(0.1),
+                      child: Icon(Icons.person, color: kPurple1, size: 20),
+                    ),
+                    title: Text(name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kText)),
+                    subtitle: Text('$dateStr  $timeStr  ${p.place}', style: TextStyle(fontSize: 11, color: kMuted)),
+                    trailing: Icon(Icons.arrow_forward_ios, size: 14, color: kMuted),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _loadProfileIntoFields(
+                        profile: p, profileName: name,
+                        nameCtrl: nameCtrl, placeCtrl: placeCtrl,
+                        latCtrl: latCtrl, lonCtrl: lonCtrl, tzCtrl: tzCtrl,
+                        onDobChanged: onDobChanged, onTimeChanged: onTimeChanged,
+                        onGeoStatusChanged: onGeoStatusChanged,
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  void _loadProfileIntoFields({
+    required Profile profile,
+    required String profileName,
+    required TextEditingController nameCtrl,
+    required TextEditingController placeCtrl,
+    required TextEditingController latCtrl,
+    required TextEditingController lonCtrl,
+    required TextEditingController tzCtrl,
+    required void Function(DateTime) onDobChanged,
+    required void Function(int, int, String) onTimeChanged,
+    required void Function(String) onGeoStatusChanged,
+  }) {
+    setState(() {
+      nameCtrl.text = profileName;
+      placeCtrl.text = profile.place;
+      latCtrl.text = profile.lat.toStringAsFixed(4);
+      lonCtrl.text = profile.lon.toStringAsFixed(4);
+      final tz = profile.tzOffset;
+      tzCtrl.text = '${tz >= 0 ? '+' : ''}$tz';
+
+      // Parse date
+      final parts = profile.date.split('-');
+      if (parts.length == 3) {
+        final y = int.tryParse(parts[0]) ?? 2000;
+        final m = int.tryParse(parts[1]) ?? 1;
+        final d = int.tryParse(parts[2]) ?? 1;
+        onDobChanged(DateTime(y, m, d));
+      }
+
+      onTimeChanged(profile.hour, profile.minute, profile.ampm);
+      onGeoStatusChanged('📍 ${profile.place}');
+    });
+  }
+
   Widget _buildPersonInput({
     required String title,
     required Color color,
@@ -217,9 +331,22 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
     required void Function(int, int, String) onTimeChanged,
     required void Function(bool) onGeoLoadingChanged,
     required void Function(String) onGeoStatusChanged,
+    required VoidCallback onLoadSaved,
   }) {
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      SectionTitle(title, color: color),
+      Row(children: [
+        Expanded(child: SectionTitle(title, color: color)),
+        TextButton.icon(
+          onPressed: onLoadSaved,
+          icon: Icon(Icons.folder_open, size: 16, color: color),
+          label: Text(AppLocale.l('loadSaved'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            backgroundColor: color.withOpacity(0.08),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+      ]),
       const SizedBox(height: 10),
       TextField(
         controller: nameCtrl,
@@ -673,6 +800,13 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
           onTimeChanged: (h, m, a) => setState(() { _gHour = h; _gMinute = m; _gAmpm = a; }),
           onGeoLoadingChanged: (v) => _gGeoLoading = v,
           onGeoStatusChanged: (v) => _gGeoStatus = v,
+          onLoadSaved: () => _showProfilePicker(
+            nameCtrl: _gNameCtrl, placeCtrl: _gPlaceCtrl,
+            latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
+            onDobChanged: (d) => setState(() => _gDob = d),
+            onTimeChanged: (h, m, a) => setState(() { _gHour = h; _gMinute = m; _gAmpm = a; }),
+            onGeoStatusChanged: (v) => setState(() => _gGeoStatus = v),
+          ),
         ),
         const SizedBox(height: 12),
         // Bride input
@@ -685,6 +819,13 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
           onTimeChanged: (h, m, a) => setState(() { _bHour = h; _bMinute = m; _bAmpm = a; }),
           onGeoLoadingChanged: (v) => _bGeoLoading = v,
           onGeoStatusChanged: (v) => _bGeoStatus = v,
+          onLoadSaved: () => _showProfilePicker(
+            nameCtrl: _bNameCtrl, placeCtrl: _bPlaceCtrl,
+            latCtrl: _bLatCtrl, lonCtrl: _bLonCtrl, tzCtrl: _bTzCtrl,
+            onDobChanged: (d) => setState(() => _bDob = d),
+            onTimeChanged: (h, m, a) => setState(() { _bHour = h; _bMinute = m; _bAmpm = a; }),
+            onGeoStatusChanged: (v) => setState(() => _bGeoStatus = v),
+          ),
         ),
         const SizedBox(height: 16),
         // Calculate button
