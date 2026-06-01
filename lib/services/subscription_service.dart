@@ -32,12 +32,8 @@ class SubscriptionService {
   /// True if the user has access (manual premium OR trial active OR active offline claim)
   static bool get hasAccess {
     if (kIsWeb) return true;
-    // If the user has an active offline day claim, grant access regardless of internet
     if (OfflineAccessService.hasActiveClaim) return true;
-    // Must connect to internet every 24 hours — no exceptions
-    if (needsInternetVerification) return false;
     if (manualPremium) {
-      // Even offline, check local expiry date — lock out immediately when expired
       if (manualPremiumExpiry != null &&
           manualPremiumExpiry!.isBefore(TrustedTimeService.now())) {
         manualPremium = false;

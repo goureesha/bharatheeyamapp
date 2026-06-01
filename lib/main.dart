@@ -348,13 +348,11 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
               ),
               home: !GoogleAuthService.isSignedIn && !kIsWeb
                   ? (SubscriptionService.lastOnlineCheck == null
-                    ? const _FirstTimeSignInScreen()    // First-time: instant, no internet check
-                    : const _OfflineVerifyScreen())      // Returning: check online/offline claim
+                    ? const _FirstTimeSignInScreen()
+                    : const _OfflineVerifyScreen())
                   : !isBound
                     ? const _DeviceMismatchScreen()
-                    : SubscriptionService.needsInternetVerification && !OfflineAccessService.hasActiveClaim
-                      ? const _InternetRequiredScreen()
-                      : SubscriptionService.hasAccess ? const HomeScreen() : const SupportScreen(),
+                    : SubscriptionService.hasAccess ? const HomeScreen() : const SupportScreen(),
             );
           },
         );
