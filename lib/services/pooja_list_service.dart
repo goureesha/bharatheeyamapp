@@ -27,12 +27,16 @@ class PoojaItem {
 class PoojaList {
   String id;
   String name;
+  String purohitName;
+  String purohitPhone;
   List<PoojaItem> items;
   DateTime createdAt;
 
   PoojaList({
     required this.id,
     required this.name,
+    this.purohitName = '',
+    this.purohitPhone = '',
     List<PoojaItem>? items,
     DateTime? createdAt,
   })  : items = items ?? [],
@@ -41,6 +45,8 @@ class PoojaList {
   Map<String, dynamic> toJson() => {
     'id': id,
     'n': name,
+    'pn': purohitName,
+    'pp': purohitPhone,
     'items': items.map((i) => i.toJson()).toList(),
     'ts': createdAt.millisecondsSinceEpoch,
   };
@@ -48,6 +54,8 @@ class PoojaList {
   factory PoojaList.fromJson(Map<String, dynamic> j) => PoojaList(
     id: j['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
     name: j['n'] ?? '',
+    purohitName: j['pn'] ?? '',
+    purohitPhone: j['pp'] ?? '',
     items: (j['items'] as List?)?.map((i) => PoojaItem.fromJson(i as Map<String, dynamic>)).toList() ?? [],
     createdAt: j['ts'] != null ? DateTime.fromMillisecondsSinceEpoch(j['ts']) : DateTime.now(),
   );

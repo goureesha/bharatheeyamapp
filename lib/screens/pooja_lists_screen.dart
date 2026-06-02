@@ -493,6 +493,48 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
     );
   }
 
+  void _editPurohitInfo() {
+    final nameCtrl = TextEditingController(text: _list.purohitName);
+    final phoneCtrl = TextEditingController(text: _list.purohitPhone);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: kCard,
+        title: Text('Purohit Details', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameCtrl, autofocus: true, style: TextStyle(color: kText),
+              decoration: _inputDeco('Purohit name'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: phoneCtrl, style: TextStyle(color: kText),
+              keyboardType: TextInputType.phone,
+              decoration: _inputDeco('Mobile number'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: kMuted))),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              setState(() {
+                _list.purohitName = nameCtrl.text.trim();
+                _list.purohitPhone = phoneCtrl.text.trim();
+              });
+              _saveList();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: kOrange, foregroundColor: Colors.white),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _saveList() async {
     await PoojaListService.updateList(_list);
   }
@@ -501,6 +543,10 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
   String _formatListText() {
     final buf = StringBuffer();
     buf.writeln('📋 ${_list.name}');
+    if (_list.purohitName.isNotEmpty || _list.purohitPhone.isNotEmpty) {
+      buf.writeln('👤 Purohit: ${_list.purohitName}');
+      if (_list.purohitPhone.isNotEmpty) buf.writeln('📞 ${_list.purohitPhone}');
+    }
     buf.writeln('${'─' * 30}');
     for (int i = 0; i < _list.items.length; i++) {
       final item = _list.items[i];
@@ -549,6 +595,10 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                 pw.SizedBox(height: 6),
                 pw.Text('${_list.checkedCount} / ${_list.items.length} items completed',
                   style: pw.TextStyle(fontSize: 12, color: PdfColors.grey700)),
+                if (_list.purohitName.isNotEmpty || _list.purohitPhone.isNotEmpty) ...[                  pw.SizedBox(height: 8),
+                  pw.Text('Purohit: ${_list.purohitName}${_list.purohitPhone.isNotEmpty ? '  |  Phone: ${_list.purohitPhone}' : ''}',
+                    style: pw.TextStyle(fontSize: 12, color: PdfColors.blue800)),
+                ],
                 pw.SizedBox(height: 20),
                 pw.Divider(thickness: 1, color: PdfColors.grey400),
                 pw.SizedBox(height: 10),
@@ -756,6 +806,51 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                 ),
               ]),
             ),
+          // Purohit info
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            color: kCard,
+            child: Row(
+              children: [
+                Icon(Icons.person, color: kPurple2, size: 22),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: _editPurohitInfo,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _list.purohitName.isNotEmpty ? _list.purohitName : 'Add Purohit Name',
+                          style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w700,
+                            color: _list.purohitName.isNotEmpty ? kText : kMuted,
+                          ),
+                        ),
+                        if (_list.purohitPhone.isNotEmpty)
+                          Text(_list.purohitPhone, style: TextStyle(fontSize: 13, color: kMuted)),
+                      ],
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.edit_outlined, color: kPurple2, size: 20),
+                  onPressed: _editPurohitInfo,
+                  tooltip: 'Edit Purohit',
+                  visualDensity: VisualDensity.compact,
+                ),
+                if (_list.purohitPhone.isNotEmpty)
+                  IconButton(
+                    icon: Icon(Icons.phone, color: kGreen, size: 20),
+                    onPressed: () => launchUrl(Uri.parse('tel:${_list.purohitPhone}')),
+                    tooltip: 'Call Purohit',
+                    visualDensity: VisualDensity.compact,
+                  ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: Color(0xFF2a2a3a)),
 
           // Items list
           Expanded(
