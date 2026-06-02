@@ -5,7 +5,7 @@ import '../core/calculator.dart';
 import '../core/ephemeris.dart';
 import 'location_service.dart';
 
-/// Pre-computes and caches full PanchangData for 10 years.
+/// Pre-computes and caches full PanchangData for 4 years (current ± 2).
 ///
 /// On first launch: computes all days with a progress callback, saves to SharedPreferences.
 /// On subsequent launches: loads instantly from cache.
@@ -44,8 +44,8 @@ class PanchangaCacheService {
       if (ver != _version) return false;
 
       final now = DateTime.now();
-      final startYear = now.year - 5;
-      final endYear = now.year + 5;
+      final startYear = now.year - 2;
+      final endYear = now.year + 2;
       bool anyLoaded = false;
 
       for (int year = startYear; year <= endYear; year++) {
@@ -73,7 +73,7 @@ class PanchangaCacheService {
     }
   }
 
-  /// Pre-compute PanchangData for 10 years (current ± 5)
+  /// Pre-compute PanchangData for 4 years (current ± 2)
   /// [onProgress] callback receives (completedDays, totalDays, currentYearLabel)
   static Future<void> precompute({
     void Function(int completed, int total, String label)? onProgress,
@@ -82,8 +82,8 @@ class PanchangaCacheService {
     _isComputing = true;
 
     final now = DateTime.now();
-    final startYear = now.year - 5;
-    final endYear = now.year + 5;
+    final startYear = now.year - 2;
+    final endYear = now.year + 2;
 
     // Count total days
     int totalDays = 0;
