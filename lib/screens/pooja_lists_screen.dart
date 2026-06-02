@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -5,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:screenshot/screenshot.dart';
 import '../widgets/common.dart';
 import '../services/pooja_list_service.dart';
 
@@ -574,90 +576,127 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
     }
   }
 
-  /// Export list as PDF using native print/save dialog
+  /// Export list as PDF using screenshot-based approach (same as janma patrike)
   void _exportPdf() async {
     try {
-      // Load Kannada font for PDF rendering
-      final fontData = await rootBundle.load('assets/fonts/NotoSansKannada-Regular.ttf');
-      final boldFontData = await rootBundle.load('assets/fonts/NotoSansKannada-Bold.ttf');
-      final ttf = pw.Font.ttf(fontData);
-      final ttfBold = pw.Font.ttf(boldFontData);
+      final controller = ScreenshotController();
 
-      final pdf = pw.Document();
+      // Build the Flutter widget for the PDF page
+      final pageWidget = Directionality(
+        textDirection: TextDirection.ltr,
+        child: MediaQuery(
+          data: const MediaQueryData(),
+          child: Theme(
+            data: ThemeData(fontFamily: 'NotoSansKannada'),
+            child: DefaultTextStyle(
+              style: const TextStyle(color: Colors.black, fontSize: 13, fontFamily: 'NotoSansKannada'),
+              child: Material(
+                color: Colors.white,
+                child: Container(
+                  width: 793,
+                  padding: const EdgeInsets.all(40),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Title
+                      Text(_list.name, style: const TextStyle(
+                        fontSize: 26, fontWeight: FontWeight.w900,
+                        color: Color(0xFF4A148C),
+                      )),
+                      const SizedBox(height: 6),
+                      Text('${_list.checkedCount} / ${_list.items.length} items completed',
+                        style: const TextStyle(fontSize: 13, color: Color(0xFF757575))),
+                      if (_list.purohitName.isNotEmpty || _list.purohitPhone.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text('Purohit: ${_list.purohitName}${_list.purohitPhone.isNotEmpty ? '  |  Phone: ${_list.purohitPhone}' : ''}',
+                          style: const TextStyle(fontSize: 13, color: Color(0xFF1565C0))),
+                      ],
+                      const SizedBox(height: 20),
+                      const Divider(thickness: 1, color: Color(0xFFBDBDBD)),
+                      const SizedBox(height: 10),
+                      // Table
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: const Color(0xFFE0E0E0)),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Column(
+                          children: [
+                            // Header
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFF3E5F5),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(6), topRight: Radius.circular(6),
+                                ),
+                              ),
+                              child: Row(children: [
+                                SizedBox(width: 40, child: Text('#', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
+                                SizedBox(width: 35, child: Text('\u2713', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
+                                Expanded(flex: 3, child: Text('Item', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
+                                Expanded(flex: 2, child: Text('Quantity', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
+                              ]),
+                            ),
+                            // Rows
+                            ...List.generate(_list.items.length, (i) {
+                              final item = _list.items[i];
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: item.checked ? const Color(0xFFE8F5E9) : Colors.white,
+                                  border: const Border(top: BorderSide(color: Color(0xFFE0E0E0), width: 0.5)),
+                                ),
+                                child: Row(children: [
+                                  SizedBox(width: 40, child: Text('${i + 1}', style: const TextStyle(fontSize: 13, color: Color(0xFF757575)))),
+                                  SizedBox(width: 35, child: Text(item.checked ? '\u2714' : '', style: const TextStyle(fontSize: 13, color: Color(0xFF2E7D32)))),
+                                  Expanded(flex: 3, child: Text(item.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600))),
+                                  Expanded(flex: 2, child: Text(item.quantity, style: const TextStyle(fontSize: 13, color: Color(0xFF757575)))),
+                                ]),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Divider(thickness: 0.5, color: Color(0xFFE0E0E0)),
+                      const SizedBox(height: 8),
+                      const Text('Generated by Bharatheeyam App',
+                        style: TextStyle(fontSize: 11, color: Color(0xFF9E9E9E))),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
 
-      pdf.addPage(
+      // Capture widget as image
+      final Uint8List imageBytes = await controller.captureFromWidget(
+        pageWidget,
+        pixelRatio: 3.0,
+        delay: const Duration(milliseconds: 100),
+      );
+
+      // Build PDF with the captured image
+      final doc = pw.Document();
+      doc.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.all(40),
+          margin: pw.EdgeInsets.zero,
           build: (pw.Context context) {
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                // Title
-                pw.Text(_list.name, style: pw.TextStyle(
-                  font: ttfBold, fontSize: 24, fontWeight: pw.FontWeight.bold,
-                  color: PdfColor.fromHex('#4A148C'),
-                )),
-                pw.SizedBox(height: 6),
-                pw.Text('${_list.checkedCount} / ${_list.items.length} items completed',
-                  style: pw.TextStyle(font: ttf, fontSize: 12, color: PdfColors.grey700)),
-                if (_list.purohitName.isNotEmpty || _list.purohitPhone.isNotEmpty) ...[
-                  pw.SizedBox(height: 8),
-                  pw.Text('Purohit: ${_list.purohitName}${_list.purohitPhone.isNotEmpty ? '  |  Phone: ${_list.purohitPhone}' : ''}',
-                    style: pw.TextStyle(font: ttf, fontSize: 12, color: PdfColors.blue800)),
-                ],
-                pw.SizedBox(height: 20),
-                pw.Divider(thickness: 1, color: PdfColors.grey400),
-                pw.SizedBox(height: 10),
-                // Items table
-                pw.Table(
-                  border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
-                  columnWidths: {
-                    0: const pw.FixedColumnWidth(35),
-                    1: const pw.FixedColumnWidth(30),
-                    2: const pw.FlexColumnWidth(3),
-                    3: const pw.FlexColumnWidth(1.5),
-                  },
-                  children: [
-                    // Header row
-                    pw.TableRow(
-                      decoration: pw.BoxDecoration(color: PdfColor.fromHex('#F3E5F5')),
-                      children: [
-                        _pdfCell('#', ttfBold, bold: true),
-                        _pdfCell('\u2713', ttfBold, bold: true),
-                        _pdfCell('Item', ttfBold, bold: true),
-                        _pdfCell('Quantity', ttfBold, bold: true),
-                      ],
-                    ),
-                    // Data rows
-                    for (int i = 0; i < _list.items.length; i++)
-                      pw.TableRow(
-                        decoration: pw.BoxDecoration(
-                          color: _list.items[i].checked ? PdfColors.green50 : PdfColors.white,
-                        ),
-                        children: [
-                          _pdfCell('${i + 1}', ttf),
-                          _pdfCell(_list.items[i].checked ? '\u2714' : '', ttf),
-                          _pdfCell(_list.items[i].name, ttf),
-                          _pdfCell(_list.items[i].quantity, ttf),
-                        ],
-                      ),
-                  ],
-                ),
-                pw.SizedBox(height: 20),
-                pw.Divider(thickness: 0.5, color: PdfColors.grey300),
-                pw.SizedBox(height: 8),
-                pw.Text('Generated by Bharatheeyam App',
-                  style: pw.TextStyle(font: ttf, fontSize: 10, color: PdfColors.grey500)),
-              ],
+            return pw.FullPage(
+              ignoreMargins: true,
+              child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.contain),
             );
           },
         ),
       );
 
-      // Use Printing.layoutPdf for native print/save dialog
       await Printing.layoutPdf(
-        onLayout: (format) async => pdf.save(),
+        onLayout: (PdfPageFormat format) async => doc.save(),
         name: '${_list.name}_list.pdf',
       );
     } catch (e) {
@@ -667,17 +706,6 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
         );
       }
     }
-  }
-
-  pw.Widget _pdfCell(String text, pw.Font font, {bool bold = false}) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-      child: pw.Text(text, style: pw.TextStyle(
-        font: font,
-        fontSize: 11,
-        fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
-      )),
-    );
   }
 
   InputDecoration _inputDeco(String hint) => InputDecoration(
