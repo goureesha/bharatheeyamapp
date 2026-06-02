@@ -674,15 +674,12 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('PDF saved to Downloads: $fileName'),
+              content: Text('✅ PDF saved to Downloads: $fileName'),
               backgroundColor: kGreen,
-              duration: const Duration(seconds: 3),
+              duration: const Duration(seconds: 4),
             ),
           );
         }
-
-        // Also open share sheet so user can send it
-        await Share.shareXFiles([XFile(file.path)], text: '${_list.name} - Pooja List');
       }
     } catch (e) {
       if (mounted) {
@@ -745,6 +742,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
               if (val == 'uncheck') _uncheckAll();
               if (val == 'share') _shareList();
               if (val == 'pdf') _exportPdf();
+              if (val == 'view') _viewPlainList();
             },
             itemBuilder: (_) => [
               PopupMenuItem(value: 'share', child: Row(children: [
@@ -753,7 +751,11 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
               ])),
               PopupMenuItem(value: 'pdf', child: Row(children: [
                 Icon(Icons.picture_as_pdf, color: Colors.red, size: 20), const SizedBox(width: 10),
-                Text('Export PDF', style: TextStyle(color: kText)),
+                Text('Download PDF', style: TextStyle(color: kText)),
+              ])),
+              PopupMenuItem(value: 'view', child: Row(children: [
+                Icon(Icons.view_list, color: Color(0xFF2980B9), size: 20), const SizedBox(width: 10),
+                Text('View Plain List', style: TextStyle(color: kText)),
               ])),
               const PopupMenuDivider(),
               PopupMenuItem(value: 'add_defaults', child: Row(children: [
@@ -958,6 +960,125 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
         onPressed: _addItem,
         backgroundColor: kOrange,
         child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
+
+  void _viewPlainList() {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (_) => _PlainListViewPage(list: _list),
+    ));
+  }
+}
+
+// ─── Plain List View Page ───
+
+class _PlainListViewPage extends StatelessWidget {
+  final PoojaList list;
+  const _PlainListViewPage({required this.list});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: kBg,
+      appBar: AppBar(
+        backgroundColor: kCard,
+        title: Text(list.name, style: TextStyle(color: kText, fontSize: 18, fontWeight: FontWeight.w800)),
+        iconTheme: IconThemeData(color: kText),
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Purohit info
+            if (list.purohitName.isNotEmpty || list.purohitPhone.isNotEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: kCard,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: kBorder),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.person, color: kPurple2, size: 22),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (list.purohitName.isNotEmpty)
+                          Text('Purohit: ${list.purohitName}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: kText)),
+                        if (list.purohitPhone.isNotEmpty)
+                          Text(list.purohitPhone, style: TextStyle(fontSize: 14, color: kMuted)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+            // Items table
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: kCard,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: kBorder),
+              ),
+              child: Column(
+                children: [
+                  // Header
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: kOrange.withOpacity(0.1),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(14),
+                        topRight: Radius.circular(14),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(width: 35, child: Text('#', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kOrange))),
+                        Expanded(flex: 3, child: Text('Item', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kOrange))),
+                        Expanded(flex: 2, child: Text('Quantity', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kOrange))),
+                      ],
+                    ),
+                  ),
+                  // Rows
+                  ...List.generate(list.items.length, (i) {
+                    final item = list.items[i];
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        border: Border(top: BorderSide(color: kBorder, width: 0.5)),
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 35, child: Text('${i + 1}', style: TextStyle(fontSize: 14, color: kMuted, fontWeight: FontWeight.w600))),
+                          Expanded(flex: 3, child: Text(item.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: kText))),
+                          Expanded(flex: 2, child: Text(item.quantity, style: TextStyle(fontSize: 14, color: kMuted))),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+
+            // Summary
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Text(
+                'Total: ${list.items.length} items',
+                style: TextStyle(fontSize: 14, color: kMuted, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
