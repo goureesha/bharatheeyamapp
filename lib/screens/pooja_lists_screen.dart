@@ -601,13 +601,37 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       final bytes = await pdf.save();
 
       if (kIsWeb) {
-        // Web: use share
         await Share.share(_formatListText(), subject: _list.name);
       } else {
-        final dir = await getTemporaryDirectory();
-        final fileName = '${_list.name.replaceAll(RegExp(r'[^a-zA-Z0-9\u0C80-\u0CFF ]'), '')}_list.pdf';
-        final file = File('${dir.path}/$fileName');
+        // Save to Downloads folder
+        final safeName = _list.name.replaceAll(RegExp(r'[^\w\s]'), '').trim();
+        final fileName = '${safeName}_list.pdf';
+
+        // Try Downloads folder first, fallback to app directory
+        Directory? saveDir;
+        if (Platform.isAndroid) {
+          saveDir = Directory('/storage/emulated/0/Download');
+          if (!await saveDir.exists()) {
+            saveDir = await getApplicationDocumentsDirectory();
+          }
+        } else {
+          saveDir = await getApplicationDocumentsDirectory();
+        }
+
+        final file = File('${saveDir.path}/$fileName');
         await file.writeAsBytes(bytes);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('PDF saved to Downloads: $fileName'),
+              backgroundColor: kGreen,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+
+        // Also open share sheet so user can send it
         await Share.shareXFiles([XFile(file.path)], text: '${_list.name} - Pooja List');
       }
     } catch (e) {
