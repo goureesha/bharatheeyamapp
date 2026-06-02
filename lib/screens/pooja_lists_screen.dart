@@ -11,21 +11,21 @@ import '../services/pooja_list_service.dart';
 
 /// Default items added to every new pooja list
 const List<Map<String, String>> _defaultPoojaItems = [
-  {'n': 'ಅಕ್ಕಿ (Rice)', 'q': '1 kg'},
-  {'n': 'ತುಪ್ಪ (Ghee)', 'q': '250 ml'},
-  {'n': 'ತೆಂಗಿನಕಾಯಿ (Coconut)', 'q': '2'},
-  {'n': 'ಬಾಳೆಹಣ್ಣು (Banana)', 'q': '1 dozen'},
-  {'n': 'ಹೂವು (Flowers)', 'q': ''},
-  {'n': 'ಊದುಬತ್ತಿ (Incense sticks)', 'q': '1 packet'},
-  {'n': 'ಕರ್ಪೂರ (Camphor)', 'q': '1 packet'},
-  {'n': 'ಅರಿಶಿನ (Turmeric)', 'q': '50 gm'},
-  {'n': 'ಕುಂಕುಮ (Kumkum)', 'q': '1 packet'},
-  {'n': 'ವೀಳ್ಯದೆಲೆ (Betel leaves)', 'q': '10'},
-  {'n': 'ಅಡಿಕೆ (Arecanut)', 'q': '10'},
-  {'n': 'ಬೆಲ್ಲ (Jaggery)', 'q': '250 gm'},
-  {'n': 'ಎಣ್ಣೆ (Oil)', 'q': '100 ml'},
-  {'n': 'ಬತ್ತಿ (Wicks)', 'q': '1 packet'},
-  {'n': 'ಗಂಧ (Sandalwood paste)', 'q': ''},
+  {'n': 'ಅಕ್ಕಿ', 'q': '1 kg'},
+  {'n': 'ತುಪ್ಪ', 'q': '250 ml'},
+  {'n': 'ತೆಂಗಿನಕಾಯಿ', 'q': '2'},
+  {'n': 'ಬಾಳೆಹಣ್ಣು', 'q': '1 dozen'},
+  {'n': 'ಹೂವು', 'q': ''},
+  {'n': 'ಊದುಬತ್ತಿ', 'q': '1 packet'},
+  {'n': 'ಕರ್ಪೂರ', 'q': '1 packet'},
+  {'n': 'ಅರಿಶಿನ', 'q': '50 gm'},
+  {'n': 'ಕುಂಕುಮ', 'q': '1 packet'},
+  {'n': 'ವೀಳ್ಯದೆಲೆ', 'q': '10'},
+  {'n': 'ಅಡಿಕೆ', 'q': '10'},
+  {'n': 'ಬೆಲ್ಲ', 'q': '250 gm'},
+  {'n': 'ಎಣ್ಣೆ', 'q': '100 ml'},
+  {'n': 'ಬತ್ತಿ', 'q': '1 packet'},
+  {'n': 'ಗಂಧ', 'q': ''},
 ];
 
 List<PoojaItem> _createDefaultItems() {
@@ -651,7 +651,13 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       final bytes = await pdf.save();
 
       if (kIsWeb) {
-        await Share.share(_formatListText(), subject: _list.name);
+        // Web doesn't support file download - show message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('PDF download is available on mobile app only'), backgroundColor: Colors.orange),
+          );
+        }
+        return;
       } else {
         // Save to Downloads folder
         final safeName = _list.name.replaceAll(RegExp(r'[^\w\s]'), '').trim();
