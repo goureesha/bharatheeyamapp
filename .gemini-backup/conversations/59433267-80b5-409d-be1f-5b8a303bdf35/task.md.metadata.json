@@ -1,6 +1,6 @@
 {
   "artifactType":  "ARTIFACT_TYPE_TASK",
-  "summary":  "Task checklist for implementing the Panchanga Search feature.",
-  "updatedAt":  "2026-05-30T11:55:59.508221600Z",
+  "summary":  "Task list for pre-computing 10 years of panchanga data on first launch.",
+  "updatedAt":  "2026-06-02T13:37:02.239112900Z",
   "version":  "2"
 }

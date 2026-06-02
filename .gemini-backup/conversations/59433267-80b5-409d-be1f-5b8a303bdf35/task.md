@@ -1,6 +1,8 @@
-# Panchanga Search — Tasks
+# Panchanga Pre-computation Task
 
-- `[/]` Create `panchanga_search_screen.dart` with filter UI and search logic
-- `[ ]` Add locale keys to `common.dart`
-- `[ ]` Add section card to `home_screen.dart`
-- `[ ]` Commit and push
+- `[ ]` Add `toJson()` / `fromJson()` to PanchangData in calculator.dart
+- `[ ]` Create `panchanga_cache_service.dart` — compute + cache + retrieve
+- `[ ]` Modify `main.dart` — show loading dialog on first launch
+- `[ ]` Modify `panchanga_screen.dart` — use cache first, fallback to live
+- `[ ]` Remove event calculation from panchanga flow
+- `[ ]` Git commit & push

@@ -143,6 +143,54 @@ class PanchangData {
     this.yogaShesha = '',
     this.yogaParama = '',
   });
+
+  /// Serialize to JSON map for persistent caching
+  Map<String, dynamic> toJson() => {
+    'v': vara, 't': tithi, 'n': nakshatra, 'y': yoga, 'k': karana,
+    'cr': chandraRashi, 'ug': udayadiGhati, 'gg': gataGhati,
+    'pg': paramaGhati, 'sh': shesha, 'db': dashaBalance, 'dl': dashaLord,
+    'ni': nakshatraIndex, 'np': nakPercent, 'sr': sunrise, 'ss': sunset,
+    'ti': tithiIndex, 'cmr': chandraMasaRaw,
+    'sn': suryaNakshatra, 'sp': suryaPada, 'sm': souraMasa,
+    'sgd': souraMasaGataDina, 'cm': chandraMasa, 'sv': samvatsara,
+    'vp': vishaPraghati, 'ap': amrutaPraghati,
+    'tet': tithiEndTime, 'tend': tithiEndsNextDay,
+    'ket': karanaEndTime, 'kend': karanaEndsNextDay,
+    'yet': yogaEndTime, 'yend': yogaEndsNextDay,
+    'net': nakEndTime, 'nend': nakEndsNextDay,
+    'dm': divamana, 'rm': ratrimana, 'ru': rutu, 'ag': agniVasa, 'ay': ayana,
+    'tg': tithiGata, 'ts': tithiShesha, 'tp': tithiParama,
+    'kg': karanaGata, 'ks': karanaShesha, 'kp': karanaParama,
+    'yg': yogaGata, 'ys': yogaShesha, 'yp': yogaParama,
+  };
+
+  /// Deserialize from JSON map
+  factory PanchangData.fromJson(Map<String, dynamic> j) => PanchangData(
+    vara: j['v'] ?? '', tithi: j['t'] ?? '', nakshatra: j['n'] ?? '',
+    yoga: j['y'] ?? '', karana: j['k'] ?? '', chandraRashi: j['cr'] ?? '',
+    udayadiGhati: j['ug'] ?? '', gataGhati: j['gg'] ?? '',
+    paramaGhati: j['pg'] ?? '', shesha: j['sh'] ?? '',
+    dashaBalance: j['db'] ?? '', dashaLord: j['dl'] ?? '',
+    nakshatraIndex: j['ni'] ?? 0, nakPercent: (j['np'] ?? 0.0).toDouble(),
+    sunrise: j['sr'] ?? '', sunset: j['ss'] ?? '',
+    tithiIndex: j['ti'] ?? 0, chandraMasaRaw: j['cmr'] ?? '',
+    suryaNakshatra: j['sn'] ?? '', suryaPada: j['sp'] ?? '',
+    souraMasa: j['sm'] ?? '', souraMasaGataDina: j['sgd'] ?? '',
+    chandraMasa: j['cm'] ?? '', samvatsara: j['sv'] ?? '',
+    vishaPraghati: j['vp'] ?? '', amrutaPraghati: j['ap'] ?? '',
+    tithiEndTime: j['tet'] ?? '', tithiEndsNextDay: j['tend'] ?? false,
+    karanaEndTime: j['ket'] ?? '', karanaEndsNextDay: j['kend'] ?? false,
+    yogaEndTime: j['yet'] ?? '', yogaEndsNextDay: j['yend'] ?? false,
+    nakEndTime: j['net'] ?? '', nakEndsNextDay: j['nend'] ?? false,
+    divamana: j['dm'] ?? '', ratrimana: j['rm'] ?? '',
+    rutu: j['ru'] ?? '', agniVasa: j['ag'] ?? '', ayana: j['ay'] ?? '',
+    tithiGata: j['tg'] ?? '', tithiShesha: j['ts'] ?? '',
+    tithiParama: j['tp'] ?? '',
+    karanaGata: j['kg'] ?? '', karanaShesha: j['ks'] ?? '',
+    karanaParama: j['kp'] ?? '',
+    yogaGata: j['yg'] ?? '', yogaShesha: j['ys'] ?? '',
+    yogaParama: j['yp'] ?? '',
+  );
 }
 
 class DashaEntry {

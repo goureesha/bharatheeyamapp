@@ -1,11 +1,9 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import '../widgets/common.dart';
 import '../constants/strings.dart';
 import '../core/calculator.dart';
 import '../core/ephemeris.dart';
-import '../core/events.dart';
-import '../services/festival_cache_service.dart';
+import '../services/panchanga_cache_service.dart';
 import '../services/location_service.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -31,12 +29,10 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
   DateTime _focusedDay = DateTime.now();
 
   // Events for current selected day
-  List<AstroEvent> _currentEvents = [];
+  List<dynamic> _currentEvents = [];
 
 
 
-  // Debounce timer for month-change swipe
-  Timer? _monthDebounce;
 
   @override
   void initState() {
@@ -46,37 +42,37 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
 
   @override
   void dispose() {
-    _monthDebounce?.cancel();
     super.dispose();
   }
 
   Future<void> _initLoad() async {
     await _calcPanchang();
-    // If cache not loaded yet for this year, load the current month quickly
-    if (!FestivalCacheService.isLoaded) {
-      await FestivalCacheService.loadMonth(_focusedDay.year, _focusedDay.month);
-      if (mounted) setState(() {});
-    }
-  }
-
-  List<AstroEvent> _getEventsForDay(DateTime day) {
-    return FestivalCacheService.getEventsForDate(day);
   }
 
   Future<void> _calcPanchang() async {
     setState(() => _loading = true);
 
     try {
-      // Compute actual sunrise for the selected date — vara starts at sunrise
+      // Try cached data first (instant — no lag)
+      final cached = PanchangaCacheService.getPanchang(_selectedDate);
+      if (cached != null && mounted) {
+        setState(() {
+          _panchang = cached;
+          _currentEvents = [];
+          _loading = false;
+        });
+        return;
+      }
+
+      // Cache miss — fall back to live computation
       await Ephemeris.initSweph();
       final srSs = Ephemeris.findSunriseSetForDate(
         _selectedDate.year, _selectedDate.month, _selectedDate.day,
         _lat, _lon, tzOffset: LocationService.tzOffset,
       );
-      // Convert sunrise JD to local hour (decimal) + tiny buffer for float safety
       final srJd = srSs[0];
       final srLocalFrac = ((srJd + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
-      final hour24 = (srLocalFrac * 24.0) + (1.0 / 60.0); // sunrise + 1 min
+      final hour24 = (srLocalFrac * 24.0) + (1.0 / 60.0);
 
       final result = await AstroCalculator.calculate(
         year: _selectedDate.year, month: _selectedDate.month, day: _selectedDate.day,
@@ -88,13 +84,9 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
       );
 
       if (result != null && mounted) {
-        final events = FestivalCacheService.getEventsForDate(_selectedDate);
-        // If cache miss, compute from panchang
-        final finalEvents = events.isNotEmpty ? events : EventCalculator.getEventsForPanchang(result.panchang);
-
         setState(() {
           _panchang = result.panchang;
-          _currentEvents = finalEvents;
+          _currentEvents = [];
           _loading = false;
         });
       } else {
@@ -320,7 +312,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
                           borderRadius: BorderRadius.circular(12),
                           color: kBg,
                         ),
-                        child: TableCalendar<AstroEvent>(
+                        child: TableCalendar(
                           firstDay: DateTime.utc(1800, 1, 1),
                           lastDay: DateTime.utc(2100, 12, 31),
                           focusedDay: _focusedDay,
@@ -338,13 +330,6 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
                           },
                           onPageChanged: (focusedDay) {
                             _focusedDay = focusedDay;
-                            // Debounce: wait 500ms after swipe stops before computing
-                            _monthDebounce?.cancel();
-                            _monthDebounce = Timer(const Duration(milliseconds: 500), () {
-                              FestivalCacheService.loadMonth(focusedDay.year, focusedDay.month).then((_) {
-                                if (mounted) setState(() {});
-                              });
-                            });
                           },
                           calendarStyle: CalendarStyle(
                             todayDecoration: BoxDecoration(
