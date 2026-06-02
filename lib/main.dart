@@ -14,7 +14,7 @@ import 'services/firebase_service.dart';
 import 'services/offline_access_service.dart';
 import 'services/network_service.dart';
 
-import 'services/panchanga_cache_service.dart';
+import 'services/festival_cache_service.dart';
 import 'services/location_service.dart';
 import 'services/tester_service.dart';
 import 'package:flutter/foundation.dart';
@@ -109,94 +109,13 @@ Future<void> _deferredInit() async {
   // Track every device install/launch
   DeviceBindingService.trackInstall();
 
-  // Panchanga pre-computation (10 years)
-  // Try loading from disk first (instant on subsequent launches)
-  final alreadyCached = await PanchangaCacheService.loadFromDisk();
-  if (!alreadyCached) {
-    // First launch — loading dialog handles EVERYTHING:
-    // kundali data and 10 years panchanga
-    _showPanchangaComputeDialog();
-  } else {
-    // Subsequent launches — run these normally (data already cached)
-    _writeSunriseForWidget();
-  }
-}
+  // Pre-load festival events lazily (non-blocking)
+  FestivalCacheService.loadYear(DateTime.now().year);
 
-/// Show a loading dialog and pre-compute all data (kundali + 10 years panchanga)
-void _showPanchangaComputeDialog() {
-  final ctx = navigatorKey.currentContext;
-  if (ctx == null) return;
-
-  final progressNotifier = ValueNotifier<String>('ಕುಂಡಲಿ ಡೇಟಾ ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ...\nPreparing kundali data...');
-
-  showDialog(
-    context: ctx,
-    barrierDismissible: false,
-    builder: (dialogCtx) {
-      return PopScope(
-        canPop: false,
-        child: Dialog(
-          backgroundColor: kCard,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset('assets/images/logo.png', width: 56, height: 56),
-                const SizedBox(height: 16),
-                Text('ಲೆಕ್ಕಾಚಾರ', style: TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.w800, color: kPurple2)),
-                const SizedBox(height: 4),
-                Text('Calculation', style: TextStyle(
-                  fontSize: 13, color: kMuted)),
-                const SizedBox(height: 20),
-                CircularProgressIndicator(color: kOrange),
-                const SizedBox(height: 16),
-                ValueListenableBuilder<String>(
-                  valueListenable: progressNotifier,
-                  builder: (_, text, __) => Text(text,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: kText, height: 1.5)),
-                ),
-                const SizedBox(height: 8),
-                Text('ಇದು ಮೊದಲ ಬಾರಿ ಮಾತ್ರ — ದಯವಿಟ್ಟು ಕಾಯಿರಿ',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 11, color: kMuted)),
-                Text('One-time setup — please wait',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 11, color: kMuted)),
-              ],
-            ),
-          ),
-        ),
-      );
-    },
-  );
-
-  // Run all heavy computations in sequence
-  _runAllComputations(progressNotifier).then((_) {
-    progressNotifier.dispose();
-    if (ctx.mounted) {
-      Navigator.of(ctx, rootNavigator: true).pop();
-    }
-  });
-}
-
-/// Run kundali data + panchanga pre-computation together
-Future<void> _runAllComputations(ValueNotifier<String> progress) async {
-  // Step 1: Calculate today's kundali data (sunrise for widget)
-  progress.value = 'ಕುಂಡಲಿ ಡೇಟಾ ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ...\nPreparing kundali data...';
-  await Future.delayed(Duration.zero);
-  await _writeSunriseForWidget();
-
-  // Step 2: Pre-compute 10 years panchanga
-  await PanchangaCacheService.precompute(
-    onProgress: (completed, total, label) {
-      final pct = (completed / total * 100).toInt();
-      progress.value = 'ಪಂಚಾಂಗ ಲೆಕ್ಕಾಚಾರ — $label ವರ್ಷ\nPanchanga — Year $label\n$pct% ($completed / $total ದಿನಗಳು)';
-    },
-  );
+  // Write sunrise data for the native Android home screen widget.
+  // This ensures the Ghati Clock widget has valid sunrise_hour24 even
+  // if the user has never opened the Vedic Clock screen.
+  _writeSunriseForWidget();
 }
 
 /// Calculate today's sunrise and save to SharedPreferences for native widget
@@ -231,7 +150,6 @@ Future<void> _writeSunriseForWidget() async {
 }
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class BharatheeyamApp extends StatefulWidget {
   const BharatheeyamApp({super.key});
@@ -306,7 +224,6 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
           valueListenable: deviceBindingNotifier,
           builder: (context, isBound, child) {
             return MaterialApp(
-              navigatorKey: navigatorKey,
               scaffoldMessengerKey: scaffoldMessengerKey,
               key: ValueKey('theme_${themeIndex}_bound_${isBound}'),
               title: AppLocale.l('appName'),
