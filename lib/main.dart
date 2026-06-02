@@ -14,7 +14,7 @@ import 'services/firebase_service.dart';
 import 'services/offline_access_service.dart';
 import 'services/network_service.dart';
 
-import 'services/festival_cache_service.dart';
+
 import 'services/location_service.dart';
 import 'services/tester_service.dart';
 import 'package:flutter/foundation.dart';
@@ -109,12 +109,7 @@ Future<void> _deferredInit() async {
   // Track every device install/launch
   DeviceBindingService.trackInstall();
 
-  // Pre-load festival events lazily (non-blocking)
-  FestivalCacheService.loadYear(DateTime.now().year);
-
   // Write sunrise data for the native Android home screen widget.
-  // This ensures the Ghati Clock widget has valid sunrise_hour24 even
-  // if the user has never opened the Vedic Clock screen.
   _writeSunriseForWidget();
 }
 

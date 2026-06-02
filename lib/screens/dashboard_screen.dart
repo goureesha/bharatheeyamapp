@@ -215,14 +215,10 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Force full repaint on resume — fixes blank kundali charts on Android
-    // Incrementing _resumeKey changes the KeyedSubtree key, which forces
-    // Flutter to discard and recreate the entire widget subtree, ensuring
-    // all Text widgets and chart canvases are properly repainted after the
-    // Skia rendering surface is restored.
+    // Lightweight repaint on resume — fixes blank charts without destroying widget tree
     if (state == AppLifecycleState.resumed && mounted) {
       Future.delayed(const Duration(milliseconds: 100), () {
-        if (mounted) setState(() => _resumeKey++);
+        if (mounted) setState(() {});
       });
     }
   }
@@ -1172,6 +1168,8 @@ class _DashboardScreenState extends State<DashboardScreen>
   /// Load all group members from saved profiles and calculate their kundalis
   Future<void> _loadGroupMembers() async {
     final profiles = await StorageService.loadAll();
+    final newEntries = <_PersonEntry>[];
+
     for (final memberName in widget.initialGroupMembers) {
       // Skip if already loaded or if it's the primary person
       if (memberName == widget.name) continue;
@@ -1192,18 +1190,21 @@ class _DashboardScreenState extends State<DashboardScreen>
           hourUtcOffset: p.tzOffset, hour24: localHour,
           lat: p.lat, lon: p.lon, ayanamsaMode: 'lahiri', trueNode: true,
         );
-        if (result != null && mounted) {
-          setState(() {
-            _extraPersons.add(_PersonEntry(
-              name: p.name, result: result, dob: dob,
-              hour: p.hour, minute: p.minute, ampm: p.ampm,
-              lat: p.lat, lon: p.lon, place: p.place, notes: p.notes,
-            ));
-          });
+        if (result != null) {
+          newEntries.add(_PersonEntry(
+            name: p.name, result: result, dob: dob,
+            hour: p.hour, minute: p.minute, ampm: p.ampm,
+            lat: p.lat, lon: p.lon, place: p.place, notes: p.notes,
+          ));
         }
       } catch (e) {
         debugPrint('Failed to load group member $memberName: $e');
       }
+    }
+
+    // Single setState for all members — avoids N full screen rebuilds
+    if (newEntries.isNotEmpty && mounted) {
+      setState(() => _extraPersons.addAll(newEntries));
     }
   }
 
