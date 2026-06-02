@@ -605,7 +605,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                         color: Color(0xFF4A148C),
                       )),
                       const SizedBox(height: 6),
-                      Text('${_list.checkedCount} / ${_list.items.length} items completed',
+                      Text('${_list.items.length} items',
                         style: const TextStyle(fontSize: 13, color: Color(0xFF757575))),
                       if (_list.purohitName.isNotEmpty || _list.purohitPhone.isNotEmpty) ...[
                         const SizedBox(height: 8),
@@ -615,7 +615,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                       const SizedBox(height: 20),
                       const Divider(thickness: 1, color: Color(0xFFBDBDBD)),
                       const SizedBox(height: 10),
-                      // Table
+                      // Table — no checkbox column in PDF
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(color: const Color(0xFFE0E0E0)),
@@ -634,7 +634,6 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                               ),
                               child: Row(children: [
                                 SizedBox(width: 40, child: Text('#', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
-                                SizedBox(width: 35, child: Text('\u2713', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
                                 Expanded(flex: 3, child: Text('Item', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
                                 Expanded(flex: 2, child: Text('Quantity', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
                               ]),
@@ -645,12 +644,11 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                               return Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: item.checked ? const Color(0xFFE8F5E9) : Colors.white,
+                                  color: i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFA),
                                   border: const Border(top: BorderSide(color: Color(0xFFE0E0E0), width: 0.5)),
                                 ),
                                 child: Row(children: [
                                   SizedBox(width: 40, child: Text('${i + 1}', style: const TextStyle(fontSize: 13, color: Color(0xFF757575)))),
-                                  SizedBox(width: 35, child: Text(item.checked ? '\u2714' : '', style: const TextStyle(fontSize: 13, color: Color(0xFF2E7D32)))),
                                   Expanded(flex: 3, child: Text(item.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600))),
                                   Expanded(flex: 2, child: Text(item.quantity, style: const TextStyle(fontSize: 13, color: Color(0xFF757575)))),
                                 ]),
@@ -680,7 +678,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
         delay: const Duration(milliseconds: 100),
       );
 
-      // Build PDF with the captured image
+      // Build PDF with the captured image — aligned to top (no big gap)
       final doc = pw.Document();
       doc.addPage(
         pw.Page(
@@ -689,7 +687,10 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
           build: (pw.Context context) {
             return pw.FullPage(
               ignoreMargins: true,
-              child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.contain),
+              child: pw.Align(
+                alignment: pw.Alignment.topCenter,
+                child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.fitWidth),
+              ),
             );
           },
         ),
