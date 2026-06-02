@@ -14,7 +14,6 @@ import 'services/firebase_service.dart';
 import 'services/offline_access_service.dart';
 import 'services/network_service.dart';
 
-import 'services/festival_cache_service.dart';
 import 'services/panchanga_cache_service.dart';
 import 'services/location_service.dart';
 import 'services/tester_service.dart';
@@ -115,11 +114,10 @@ Future<void> _deferredInit() async {
   final alreadyCached = await PanchangaCacheService.loadFromDisk();
   if (!alreadyCached) {
     // First launch — loading dialog handles EVERYTHING:
-    // kundali data, festival events, and 10 years panchanga
+    // kundali data and 10 years panchanga
     _showPanchangaComputeDialog();
   } else {
     // Subsequent launches — run these normally (data already cached)
-    FestivalCacheService.loadYear(DateTime.now().year);
     _writeSunriseForWidget();
   }
 }
@@ -192,12 +190,7 @@ Future<void> _runAllComputations(ValueNotifier<String> progress) async {
   await Future.delayed(Duration.zero);
   await _writeSunriseForWidget();
 
-  // Step 2: Pre-load festival events for current year
-  progress.value = 'ಹಬ್ಬಗಳ ಡೇಟಾ ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...\nLoading festival data...';
-  await Future.delayed(Duration.zero);
-  await FestivalCacheService.loadYear(DateTime.now().year);
-
-  // Step 3: Pre-compute 10 years panchanga
+  // Step 2: Pre-compute 10 years panchanga
   await PanchangaCacheService.precompute(
     onProgress: (completed, total, label) {
       final pct = (completed / total * 100).toInt();
