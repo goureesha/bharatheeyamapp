@@ -1,11 +1,9 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
+import 'package:printing/printing.dart';
 import '../widgets/common.dart';
 import '../services/pooja_list_service.dart';
 
@@ -575,7 +573,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
     }
   }
 
-  /// Export list as PDF
+  /// Export list as PDF using native print/save dialog
   void _exportPdf() async {
     try {
       final pdf = pw.Document();
@@ -591,11 +589,13 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                 // Title
                 pw.Text(_list.name, style: pw.TextStyle(
                   fontSize: 24, fontWeight: pw.FontWeight.bold,
+                  color: PdfColor.fromHex('#4A148C'),
                 )),
                 pw.SizedBox(height: 6),
                 pw.Text('${_list.checkedCount} / ${_list.items.length} items completed',
                   style: pw.TextStyle(fontSize: 12, color: PdfColors.grey700)),
-                if (_list.purohitName.isNotEmpty || _list.purohitPhone.isNotEmpty) ...[                  pw.SizedBox(height: 8),
+                if (_list.purohitName.isNotEmpty || _list.purohitPhone.isNotEmpty) ...[
+                  pw.SizedBox(height: 8),
                   pw.Text('Purohit: ${_list.purohitName}${_list.purohitPhone.isNotEmpty ? '  |  Phone: ${_list.purohitPhone}' : ''}',
                     style: pw.TextStyle(fontSize: 12, color: PdfColors.blue800)),
                 ],
@@ -614,10 +614,10 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                   children: [
                     // Header row
                     pw.TableRow(
-                      decoration: const pw.BoxDecoration(color: PdfColors.grey200),
+                      decoration: pw.BoxDecoration(color: PdfColor.fromHex('#F3E5F5')),
                       children: [
                         _pdfCell('#', bold: true),
-                        _pdfCell('✓', bold: true),
+                        _pdfCell('\u2713', bold: true),
                         _pdfCell('Item', bold: true),
                         _pdfCell('Quantity', bold: true),
                       ],
@@ -630,7 +630,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                         ),
                         children: [
                           _pdfCell('${i + 1}'),
-                          _pdfCell(_list.items[i].checked ? '✔' : ''),
+                          _pdfCell(_list.items[i].checked ? '\u2714' : ''),
                           _pdfCell(_list.items[i].name),
                           _pdfCell(_list.items[i].quantity),
                         ],
@@ -648,45 +648,11 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
         ),
       );
 
-      final bytes = await pdf.save();
-
-      if (kIsWeb) {
-        // Web doesn't support file download - show message
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('PDF download is available on mobile app only'), backgroundColor: Colors.orange),
-          );
-        }
-        return;
-      } else {
-        // Save to Downloads folder
-        final safeName = _list.name.replaceAll(RegExp(r'[^\w\s]'), '').trim();
-        final fileName = '${safeName}_list.pdf';
-
-        // Try Downloads folder first, fallback to app directory
-        Directory? saveDir;
-        if (Platform.isAndroid) {
-          saveDir = Directory('/storage/emulated/0/Download');
-          if (!await saveDir.exists()) {
-            saveDir = await getApplicationDocumentsDirectory();
-          }
-        } else {
-          saveDir = await getApplicationDocumentsDirectory();
-        }
-
-        final file = File('${saveDir.path}/$fileName');
-        await file.writeAsBytes(bytes);
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('✅ PDF saved to Downloads: $fileName'),
-              backgroundColor: kGreen,
-              duration: const Duration(seconds: 4),
-            ),
-          );
-        }
-      }
+      // Use Printing.layoutPdf for native print/save dialog
+      await Printing.layoutPdf(
+        onLayout: (format) async => pdf.save(),
+        name: '${_list.name}_list.pdf',
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
