@@ -13,6 +13,7 @@ import 'planets_screen.dart';
 import 'settings_screen.dart';
 import 'vedic_clock_screen.dart';
 import 'appointment_screen.dart';
+import 'pooja_lists_screen.dart';
 import '../services/tester_service.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -45,6 +46,9 @@ class HomeScreen extends StatelessWidget {
       }),
       _Section(AppLocale.l('appointment'), 'Appointments', Icons.event_note, kTeal, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const AppointmentScreen()));
+      }),
+      _Section('ಪೂಜಾ ಪಟ್ಟಿ', 'Pooja Lists', Icons.list_alt_rounded, Color(0xFF8E44AD), () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const PoojaListsScreen()));
       }),
 
       _Section(AppLocale.l('settings'), 'Settings', Icons.settings, kMuted, () {
