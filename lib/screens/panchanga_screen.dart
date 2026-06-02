@@ -29,6 +29,9 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
 
   List<dynamic> _currentEvents = [];
 
+  // In-memory session cache — computed dates are instant on revisit
+  static final Map<String, PanchangData> _panchangCache = {};
+
   @override
   void initState() {
     super.initState();
@@ -44,7 +47,21 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
     await _calcPanchang();
   }
 
+  String _cacheKey(DateTime d) => '${d.year}-${d.month}-${d.day}';
+
   Future<void> _calcPanchang() async {
+    // Check in-memory cache first (instant — no lag)
+    final key = _cacheKey(_selectedDate);
+    final cached = _panchangCache[key];
+    if (cached != null) {
+      setState(() {
+        _panchang = cached;
+        _currentEvents = [];
+        _loading = false;
+      });
+      return;
+    }
+
     setState(() => _loading = true);
 
     try {
@@ -67,16 +84,51 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
       );
 
       if (result != null && mounted) {
+        // Store in cache for instant revisit
+        _panchangCache[key] = result.panchang;
         setState(() {
           _panchang = result.panchang;
           _currentEvents = [];
           _loading = false;
         });
+        // Pre-compute nearby dates in background (no lag on next tap)
+        _precomputeNearbyDates();
       } else {
         if (mounted) setState(() => _loading = false);
       }
     } catch (e) {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  /// Pre-compute ±3 days around selected date in background
+  /// So when user taps nearby dates, they load instantly
+  void _precomputeNearbyDates() async {
+    for (int offset in [-3, -2, -1, 1, 2, 3]) {
+      final d = _selectedDate.add(Duration(days: offset));
+      final key = _cacheKey(d);
+      if (_panchangCache.containsKey(key)) continue;
+
+      try {
+        final srSs = Ephemeris.findSunriseSetForDate(
+          d.year, d.month, d.day, _lat, _lon,
+          tzOffset: LocationService.tzOffset,
+        );
+        final srFrac = ((srSs[0] + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
+        final h24 = (srFrac * 24.0) + (1.0 / 60.0);
+
+        final result = await AstroCalculator.calculate(
+          year: d.year, month: d.month, day: d.day,
+          hourUtcOffset: LocationService.tzOffset,
+          hour24: h24, lat: _lat, lon: _lon,
+          ayanamsaMode: 'lahiri', trueNode: true,
+        );
+        if (result != null) {
+          _panchangCache[key] = result.panchang;
+        }
+      } catch (_) {}
+      // Yield to UI between each background computation
+      await Future.delayed(Duration.zero);
     }
   }
 
