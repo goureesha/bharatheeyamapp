@@ -110,27 +110,26 @@ Future<void> _deferredInit() async {
   // Track every device install/launch
   DeviceBindingService.trackInstall();
 
-  // Pre-load festival events lazily (non-blocking)
-  FestivalCacheService.loadYear(DateTime.now().year);
-
-  // Write sunrise data for the native Android home screen widget.
-  _writeSunriseForWidget();
-
   // Panchanga pre-computation (10 years)
   // Try loading from disk first (instant on subsequent launches)
   final alreadyCached = await PanchangaCacheService.loadFromDisk();
   if (!alreadyCached) {
-    // First launch — show loading dialog and compute
+    // First launch — loading dialog handles EVERYTHING:
+    // kundali data, festival events, and 10 years panchanga
     _showPanchangaComputeDialog();
+  } else {
+    // Subsequent launches — run these normally (data already cached)
+    FestivalCacheService.loadYear(DateTime.now().year);
+    _writeSunriseForWidget();
   }
 }
 
-/// Show a loading dialog and pre-compute 10 years of panchanga data
+/// Show a loading dialog and pre-compute all data (kundali + 10 years panchanga)
 void _showPanchangaComputeDialog() {
   final ctx = navigatorKey.currentContext;
   if (ctx == null) return;
 
-  final progressNotifier = ValueNotifier<String>('ಲೆಕ್ಕಾಚಾರ ಮಾಡಲಾಗುತ್ತಿದೆ...\nCalculating...');
+  final progressNotifier = ValueNotifier<String>('ಕುಂಡಲಿ ಡೇಟಾ ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ...\nPreparing kundali data...');
 
   showDialog(
     context: ctx,
@@ -148,10 +147,10 @@ void _showPanchangaComputeDialog() {
               children: [
                 Image.asset('assets/images/logo.png', width: 56, height: 56),
                 const SizedBox(height: 16),
-                Text('ಪಂಚಾಂಗ ಲೆಕ್ಕಾಚಾರ', style: TextStyle(
+                Text('ಲೆಕ್ಕಾಚಾರ', style: TextStyle(
                   fontSize: 18, fontWeight: FontWeight.w800, color: kPurple2)),
                 const SizedBox(height: 4),
-                Text('Panchanga Calculation', style: TextStyle(
+                Text('Calculation', style: TextStyle(
                   fontSize: 13, color: kMuted)),
                 const SizedBox(height: 20),
                 CircularProgressIndicator(color: kOrange),
@@ -177,18 +176,34 @@ void _showPanchangaComputeDialog() {
     },
   );
 
-  // Start computation
-  PanchangaCacheService.precompute(
-    onProgress: (completed, total, label) {
-      final pct = (completed / total * 100).toInt();
-      progressNotifier.value = '$label ವರ್ಷ / Year $label\n$pct% ($completed / $total ದಿನಗಳು)';
-    },
-  ).then((_) {
+  // Run all heavy computations in sequence
+  _runAllComputations(progressNotifier).then((_) {
     progressNotifier.dispose();
     if (ctx.mounted) {
       Navigator.of(ctx, rootNavigator: true).pop();
     }
   });
+}
+
+/// Run kundali data + panchanga pre-computation together
+Future<void> _runAllComputations(ValueNotifier<String> progress) async {
+  // Step 1: Calculate today's kundali data (sunrise for widget)
+  progress.value = 'ಕುಂಡಲಿ ಡೇಟಾ ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ...\nPreparing kundali data...';
+  await Future.delayed(Duration.zero);
+  await _writeSunriseForWidget();
+
+  // Step 2: Pre-load festival events for current year
+  progress.value = 'ಹಬ್ಬಗಳ ಡೇಟಾ ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...\nLoading festival data...';
+  await Future.delayed(Duration.zero);
+  await FestivalCacheService.loadYear(DateTime.now().year);
+
+  // Step 3: Pre-compute 10 years panchanga
+  await PanchangaCacheService.precompute(
+    onProgress: (completed, total, label) {
+      final pct = (completed / total * 100).toInt();
+      progress.value = 'ಪಂಚಾಂಗ ಲೆಕ್ಕಾಚಾರ — $label ವರ್ಷ\nPanchanga — Year $label\n$pct% ($completed / $total ದಿನಗಳು)';
+    },
+  );
 }
 
 /// Calculate today's sunrise and save to SharedPreferences for native widget
