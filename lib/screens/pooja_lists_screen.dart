@@ -231,8 +231,6 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
                   itemBuilder: (context, index) {
                     final list = _lists[index];
                     final total = list.items.length;
-                    final checked = list.checkedCount;
-                    final progress = total > 0 ? checked / total : 0.0;
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
@@ -267,20 +265,9 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
                                       Text(list.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: kText)),
                                       const SizedBox(height: 4),
                                       Text(
-                                        total == 0 ? 'No items' : '$checked / $total items',
+                                        total == 0 ? 'No items' : '$total items',
                                         style: TextStyle(fontSize: 13, color: kMuted),
                                       ),
-                                      if (total > 0) ...[
-                                        const SizedBox(height: 6),
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(4),
-                                          child: LinearProgressIndicator(
-                                            value: progress, minHeight: 4,
-                                            backgroundColor: kBorder,
-                                            valueColor: AlwaysStoppedAnimation(progress >= 1.0 ? kGreen : kOrange),
-                                          ),
-                                        ),
-                                      ],
                                     ],
                                   ),
                                 ),
@@ -624,7 +611,6 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final total = _list.items.length;
-    final checked = _list.checkedCount;
 
     return Scaffold(
       backgroundColor: kBg,
@@ -647,7 +633,6 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
             onSelected: (val) {
               if (val == 'add_defaults') _addDefaultItems();
               if (val == 'remove_defaults') _removeDefaultItems();
-              if (val == 'uncheck') _uncheckAll();
               if (val == 'share') _shareList();
               if (val == 'pdf') _exportPdf();
               if (val == 'view') _viewPlainList();
@@ -658,9 +643,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
               PopupMenuItem(value: 'view', child: Row(children: [Icon(Icons.view_list, color: Color(0xFF2980B9), size: 20), const SizedBox(width: 10), Text('View Plain List', style: TextStyle(color: kText))])),
               const PopupMenuDivider(),
               PopupMenuItem(value: 'add_defaults', child: Row(children: [Icon(Icons.playlist_add, color: kPurple2, size: 20), const SizedBox(width: 10), Text('Add Default Items', style: TextStyle(color: kText))])),
-              PopupMenuItem(value: 'remove_defaults', child: Row(children: [Icon(Icons.playlist_remove, color: kMuted, size: 20), const SizedBox(width: 10), Text('Remove Default Items', style: TextStyle(color: kText))])),
-              if (checked > 0)
-                PopupMenuItem(value: 'uncheck', child: Row(children: [Icon(Icons.replay, color: kMuted, size: 20), const SizedBox(width: 10), Text('Uncheck All', style: TextStyle(color: kText))])),
+              PopupMenuItem(value: 'remove_defaults', child: Row(children: [Icon(Icons.playlist_remove, color: kMuted, size: 20), const SizedBox(width: 10), Text('Remove Default Items', style: TextStyle(color: kText))])),
             ],
           ),
         ],
@@ -772,28 +755,13 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
           ),
           const Divider(height: 1, color: Color(0xFF2a2a3a)),
 
-          // Progress bar
+          // Item count
           if (total > 0)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               color: kCard,
-              child: Row(children: [
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('$checked / $total items', style: TextStyle(fontSize: 13, color: kMuted, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 6),
-                  ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(
-                    value: total > 0 ? checked / total : 0, minHeight: 4,
-                    backgroundColor: kBorder, valueColor: AlwaysStoppedAnimation(checked == total ? kGreen : kOrange),
-                  )),
-                ])),
-                if (checked == total && total > 0) ...[
-                  const SizedBox(width: 10),
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: kGreen.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-                    child: Text('✓', style: TextStyle(fontSize: 14, color: kGreen, fontWeight: FontWeight.w700))),
-                ],
-              ]),
+              child: Text('$total items', style: TextStyle(fontSize: 13, color: kMuted, fontWeight: FontWeight.w600)),
             ),
 
           // Purohit info
@@ -837,36 +805,22 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                       final item = _list.items[index];
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 6),
-                        child: GestureDetector(
-                          onTap: () => _toggleItem(index),
-                          child: Container(
+                        child: Container(
                             decoration: BoxDecoration(
                               color: kCard, borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: item.checked ? kGreen.withOpacity(0.4) : kBorder),
+                              border: Border.all(color: kBorder),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                               child: Row(children: [
-                                // Checkbox
-                                GestureDetector(
-                                  onTap: () => _toggleItem(index),
-                                  child: Container(
-                                    width: 28, height: 28,
-                                    decoration: BoxDecoration(
-                                      color: item.checked ? kGreen : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: item.checked ? kGreen : kMuted, width: 2),
-                                    ),
-                                    child: item.checked ? const Icon(Icons.check, size: 18, color: Colors.white) : null,
-                                  ),
-                                ),
-                                const SizedBox(width: 14),
+                                // Serial number
+                                Text('${index + 1}.', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kMuted)),
+                                const SizedBox(width: 12),
                                 // Name & quantity
                                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                  Text(item.name, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
-                                    color: item.checked ? kMuted : kText, decoration: item.checked ? TextDecoration.lineThrough : null)),
+                                  Text(item.name, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: kText)),
                                   if (item.quantity.isNotEmpty)
-                                    Text(item.quantity, style: TextStyle(fontSize: 13, color: kMuted, decoration: item.checked ? TextDecoration.lineThrough : null)),
+                                    Text(item.quantity, style: TextStyle(fontSize: 13, color: kMuted)),
                                 ])),
                                 // Edit
                                 IconButton(icon: Icon(Icons.edit_outlined, color: kPurple2, size: 20), onPressed: () => _editItem(index), tooltip: 'Edit', visualDensity: VisualDensity.compact),
@@ -875,7 +829,6 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                               ]),
                             ),
                           ),
-                        ),
                       );
                     },
                   ),
