@@ -330,6 +330,26 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
   late PoojaList _list;
   final _nameCtrl = TextEditingController();
   final _qtyCtrl = TextEditingController();
+  final _customNameCtrl = TextEditingController();
+
+  // Dropdown state
+  String? _selectedItem;
+  String? _selectedQty;
+  bool _isCustomItem = false;
+
+  // Default item names for dropdown
+  static final List<String> _dropdownItems = [
+    ..._defaultPoojaItems.map((m) => m['n']!),
+    '── ಕಸ್ಟಮ್ ಐಟಂ ──',
+  ];
+
+  // Common quantity options for dropdown
+  static const List<String> _qtyOptions = [
+    '1', '2', '3', '5', '10',
+    '50 gm', '100 gm', '250 gm', '500 gm', '1 kg',
+    '100 ml', '250 ml', '500 ml', '1 L',
+    '1 packet', '1 dozen', '1 bundle',
+  ];
 
   @override
   void initState() {
@@ -337,82 +357,59 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
     _list = widget.list;
   }
 
-  void _addItem() {
-    _nameCtrl.clear();
-    _qtyCtrl.clear();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: kCard,
-        title: Text('Add Item', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameCtrl, autofocus: true, style: TextStyle(color: kText),
-              decoration: _inputDeco('Item name'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _qtyCtrl, style: TextStyle(color: kText),
-              decoration: _inputDeco('Quantity (optional)'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: kMuted))),
-          ElevatedButton(
-            onPressed: () {
-              final name = _nameCtrl.text.trim();
-              if (name.isEmpty) return;
-              Navigator.pop(ctx);
-              setState(() {
-                _list.items.add(PoojaItem(name: name, quantity: _qtyCtrl.text.trim()));
-              });
-              _saveList();
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: kOrange, foregroundColor: Colors.white),
-            child: const Text('Add'),
-          ),
-        ],
-      ),
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _qtyCtrl.dispose();
+    _customNameCtrl.dispose();
+    super.dispose();
+  }
+
+  void _addItemFromDropdown() {
+    final itemName = _isCustomItem ? _customNameCtrl.text.trim() : _selectedItem;
+    if (itemName == null || itemName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('ಐಟಂ ಆಯ್ಕೆ ಮಾಡಿ'), backgroundColor: Colors.orange),
+      );
+      return;
+    }
+    final qty = _selectedQty ?? '';
+    setState(() {
+      _list.items.add(PoojaItem(name: itemName, quantity: qty));
+      _selectedItem = null;
+      _selectedQty = null;
+      _isCustomItem = false;
+      _customNameCtrl.clear();
+    });
+    _saveList();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$itemName ಸೇರಿಸಲಾಗಿದೆ'), backgroundColor: kGreen, duration: Duration(seconds: 1)),
     );
   }
 
   void _addDefaultItems() {
     final defaults = _createDefaultItems();
-    // Only add items that don't already exist (by name)
     final existingNames = _list.items.map((i) => i.name).toSet();
     final toAdd = defaults.where((d) => !existingNames.contains(d.name)).toList();
-
     if (toAdd.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('All default items already exist'), backgroundColor: kMuted),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('All default items already exist'), backgroundColor: kMuted));
       return;
     }
-
     setState(() => _list.items.addAll(toAdd));
     _saveList();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Added ${toAdd.length} default items'), backgroundColor: kGreen),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added ${toAdd.length} default items'), backgroundColor: kGreen));
   }
 
   void _removeDefaultItems() {
     final defaultNames = _defaultPoojaItems.map((m) => m['n']!).toSet();
     final before = _list.items.length;
-    setState(() {
-      _list.items.removeWhere((i) => defaultNames.contains(i.name));
-    });
+    setState(() => _list.items.removeWhere((i) => defaultNames.contains(i.name)));
     final removed = before - _list.items.length;
     _saveList();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(removed > 0 ? 'Removed $removed default items' : 'No default items to remove'),
-        backgroundColor: removed > 0 ? Colors.red : kMuted,
-      ),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(removed > 0 ? 'Removed $removed default items' : 'No default items to remove'),
+      backgroundColor: removed > 0 ? Colors.red : kMuted,
+    ));
   }
 
   void _editItem(int index) {
@@ -424,14 +421,11 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: kCard,
         title: Text('Edit Item', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: _nameCtrl, autofocus: true, style: TextStyle(color: kText), decoration: _inputDeco('Item name')),
-            const SizedBox(height: 12),
-            TextField(controller: _qtyCtrl, style: TextStyle(color: kText), decoration: _inputDeco('Quantity (optional)')),
-          ],
-        ),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          TextField(controller: _nameCtrl, autofocus: true, style: TextStyle(color: kText), decoration: _inputDeco('Item name')),
+          const SizedBox(height: 12),
+          TextField(controller: _qtyCtrl, style: TextStyle(color: kText), decoration: _inputDeco('Quantity')),
+        ]),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: kMuted))),
           ElevatedButton(
@@ -472,10 +466,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: kCard,
         title: Text('Rename List', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
-        content: TextField(
-          controller: ctrl, autofocus: true, style: TextStyle(color: kText),
-          decoration: _inputDeco('List name'),
-        ),
+        content: TextField(controller: ctrl, autofocus: true, style: TextStyle(color: kText), decoration: _inputDeco('List name')),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: kMuted))),
           ElevatedButton(
@@ -502,30 +493,17 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: kCard,
         title: Text('Purohit Details', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameCtrl, autofocus: true, style: TextStyle(color: kText),
-              decoration: _inputDeco('Purohit name'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: phoneCtrl, style: TextStyle(color: kText),
-              keyboardType: TextInputType.phone,
-              decoration: _inputDeco('Mobile number'),
-            ),
-          ],
-        ),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          TextField(controller: nameCtrl, autofocus: true, style: TextStyle(color: kText), decoration: _inputDeco('Purohit name')),
+          const SizedBox(height: 12),
+          TextField(controller: phoneCtrl, style: TextStyle(color: kText), keyboardType: TextInputType.phone, decoration: _inputDeco('Mobile number')),
+        ]),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: kMuted))),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
-              setState(() {
-                _list.purohitName = nameCtrl.text.trim();
-                _list.purohitPhone = phoneCtrl.text.trim();
-              });
+              setState(() { _list.purohitName = nameCtrl.text.trim(); _list.purohitPhone = phoneCtrl.text.trim(); });
               _saveList();
             },
             style: ElevatedButton.styleFrom(backgroundColor: kOrange, foregroundColor: Colors.white),
@@ -536,11 +514,8 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
     );
   }
 
-  Future<void> _saveList() async {
-    await PoojaListService.updateList(_list);
-  }
+  Future<void> _saveList() async { await PoojaListService.updateList(_list); }
 
-  /// Format list as readable text
   String _formatListText() {
     final buf = StringBuffer();
     buf.writeln('📋 ${_list.name}');
@@ -556,162 +531,90 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       buf.writeln('$check ${i + 1}. ${item.name}$qty');
     }
     buf.writeln('${'─' * 30}');
-    final total = _list.items.length;
-    final done = _list.checkedCount;
-    buf.writeln('📊 $done / $total items done');
+    buf.writeln('📊 ${_list.checkedCount} / ${_list.items.length} items done');
     buf.writeln('\n— Bharatheeyam App');
     return buf.toString();
   }
 
-  /// Share list via WhatsApp or any app
   void _shareList() async {
     final text = _formatListText();
-    // Try WhatsApp first
     final waUrl = Uri.parse('whatsapp://send?text=${Uri.encodeComponent(text)}');
-    if (await canLaunchUrl(waUrl)) {
-      await launchUrl(waUrl);
-    } else {
-      // Fallback to system share sheet
-      await Share.share(text, subject: _list.name);
-    }
+    if (await canLaunchUrl(waUrl)) { await launchUrl(waUrl); }
+    else { await Share.share(text, subject: _list.name); }
   }
 
-  /// Export list as PDF using screenshot-based approach (same as janma patrike)
   void _exportPdf() async {
     try {
       final controller = ScreenshotController();
-
-      // Build the Flutter widget for the PDF page
       final pageWidget = Directionality(
         textDirection: TextDirection.ltr,
-        child: MediaQuery(
-          data: const MediaQueryData(),
-          child: Theme(
-            data: ThemeData(fontFamily: 'NotoSansKannada'),
-            child: DefaultTextStyle(
-              style: const TextStyle(color: Colors.black, fontSize: 13, fontFamily: 'NotoSansKannada'),
-              child: Material(
-                color: Colors.white,
-                child: Container(
-                  width: 793,
-                  padding: const EdgeInsets.all(40),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Title
-                      Text(_list.name, style: const TextStyle(
-                        fontSize: 26, fontWeight: FontWeight.w900,
-                        color: Color(0xFF4A148C),
-                      )),
-                      const SizedBox(height: 6),
-                      Text('${_list.items.length} items',
-                        style: const TextStyle(fontSize: 13, color: Color(0xFF757575))),
-                      if (_list.purohitName.isNotEmpty || _list.purohitPhone.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Text('Purohit: ${_list.purohitName}${_list.purohitPhone.isNotEmpty ? '  |  Phone: ${_list.purohitPhone}' : ''}',
-                          style: const TextStyle(fontSize: 13, color: Color(0xFF1565C0))),
-                      ],
-                      const SizedBox(height: 20),
-                      const Divider(thickness: 1, color: Color(0xFFBDBDBD)),
-                      const SizedBox(height: 10),
-                      // Table — no checkbox column in PDF
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFE0E0E0)),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Column(
-                          children: [
-                            // Header
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFF3E5F5),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(6), topRight: Radius.circular(6),
-                                ),
-                              ),
-                              child: Row(children: [
-                                SizedBox(width: 40, child: Text('#', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
-                                Expanded(flex: 3, child: Text('Item', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
-                                Expanded(flex: 2, child: Text('Quantity', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
-                              ]),
-                            ),
-                            // Rows
-                            ...List.generate(_list.items.length, (i) {
-                              final item = _list.items[i];
-                              return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFA),
-                                  border: const Border(top: BorderSide(color: Color(0xFFE0E0E0), width: 0.5)),
-                                ),
-                                child: Row(children: [
-                                  SizedBox(width: 40, child: Text('${i + 1}', style: const TextStyle(fontSize: 13, color: Color(0xFF757575)))),
-                                  Expanded(flex: 3, child: Text(item.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600))),
-                                  Expanded(flex: 2, child: Text(item.quantity, style: const TextStyle(fontSize: 13, color: Color(0xFF757575)))),
-                                ]),
-                              );
-                            }),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      const Divider(thickness: 0.5, color: Color(0xFFE0E0E0)),
-                      const SizedBox(height: 8),
-                      const Text('Generated by Bharatheeyam App',
-                        style: TextStyle(fontSize: 11, color: Color(0xFF9E9E9E))),
-                    ],
-                  ),
+        child: MediaQuery(data: const MediaQueryData(), child: Theme(
+          data: ThemeData(fontFamily: 'NotoSansKannada'),
+          child: DefaultTextStyle(
+            style: const TextStyle(color: Colors.black, fontSize: 13, fontFamily: 'NotoSansKannada'),
+            child: Material(color: Colors.white, child: Container(width: 793, padding: const EdgeInsets.all(40),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                Text(_list.name, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFF4A148C))),
+                const SizedBox(height: 6),
+                Text('${_list.items.length} items', style: const TextStyle(fontSize: 13, color: Color(0xFF757575))),
+                if (_list.purohitName.isNotEmpty || _list.purohitPhone.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text('Purohit: ${_list.purohitName}${_list.purohitPhone.isNotEmpty ? '  |  Phone: ${_list.purohitPhone}' : ''}',
+                    style: const TextStyle(fontSize: 13, color: Color(0xFF1565C0))),
+                ],
+                const SizedBox(height: 20),
+                const Divider(thickness: 1, color: Color(0xFFBDBDBD)),
+                const SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(border: Border.all(color: const Color(0xFFE0E0E0)), borderRadius: BorderRadius.circular(6)),
+                  child: Column(children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: const BoxDecoration(color: Color(0xFFF3E5F5), borderRadius: BorderRadius.only(topLeft: Radius.circular(6), topRight: Radius.circular(6))),
+                      child: Row(children: [
+                        SizedBox(width: 40, child: Text('#', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
+                        Expanded(flex: 3, child: Text('Item', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
+                        Expanded(flex: 2, child: Text('Quantity', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13))),
+                      ]),
+                    ),
+                    ...List.generate(_list.items.length, (i) {
+                      final item = _list.items[i];
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(color: i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFA),
+                          border: const Border(top: BorderSide(color: Color(0xFFE0E0E0), width: 0.5))),
+                        child: Row(children: [
+                          SizedBox(width: 40, child: Text('${i + 1}', style: const TextStyle(fontSize: 13, color: Color(0xFF757575)))),
+                          Expanded(flex: 3, child: Text(item.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600))),
+                          Expanded(flex: 2, child: Text(item.quantity, style: const TextStyle(fontSize: 13, color: Color(0xFF757575)))),
+                        ]),
+                      );
+                    }),
+                  ]),
                 ),
-              ),
-            ),
+                const SizedBox(height: 20),
+                const Divider(thickness: 0.5, color: Color(0xFFE0E0E0)),
+                const SizedBox(height: 8),
+                const Text('Generated by Bharatheeyam App', style: TextStyle(fontSize: 11, color: Color(0xFF9E9E9E))),
+              ]),
+            )),
           ),
-        ),
+        )),
       );
-
-      // Capture widget as image
-      final Uint8List imageBytes = await controller.captureFromWidget(
-        pageWidget,
-        pixelRatio: 3.0,
-        delay: const Duration(milliseconds: 100),
-      );
-
-      // Build PDF with the captured image — aligned to top (no big gap)
+      final Uint8List imageBytes = await controller.captureFromWidget(pageWidget, pixelRatio: 3.0, delay: const Duration(milliseconds: 100));
       final doc = pw.Document();
-      doc.addPage(
-        pw.Page(
-          pageFormat: PdfPageFormat.a4,
-          margin: pw.EdgeInsets.zero,
-          build: (pw.Context context) {
-            return pw.FullPage(
-              ignoreMargins: true,
-              child: pw.Align(
-                alignment: pw.Alignment.topCenter,
-                child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.fitWidth),
-              ),
-            );
-          },
-        ),
-      );
-
-      await Printing.layoutPdf(
-        onLayout: (PdfPageFormat format) async => doc.save(),
-        name: '${_list.name}_list.pdf',
-      );
+      doc.addPage(pw.Page(pageFormat: PdfPageFormat.a4, margin: pw.EdgeInsets.zero, build: (pw.Context context) {
+        return pw.FullPage(ignoreMargins: true, child: pw.Align(alignment: pw.Alignment.topCenter,
+          child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.fitWidth)));
+      }));
+      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => doc.save(), name: '${_list.name}_list.pdf');
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('PDF export failed: $e'), backgroundColor: Colors.red),
-        );
-      }
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF export failed: $e'), backgroundColor: Colors.red));
     }
   }
 
   InputDecoration _inputDeco(String hint) => InputDecoration(
-    hintText: hint,
-    hintStyle: TextStyle(color: kMuted),
+    hintText: hint, hintStyle: TextStyle(color: kMuted),
     filled: true, fillColor: kBg,
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kBorder)),
     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kBorder)),
@@ -729,19 +632,15 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
         backgroundColor: kCard,
         title: GestureDetector(
           onTap: _renameList,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(child: Text(_list.name, style: TextStyle(color: kText, fontSize: 18, fontWeight: FontWeight.w800), overflow: TextOverflow.ellipsis)),
-              const SizedBox(width: 6),
-              Icon(Icons.edit, size: 16, color: kMuted),
-            ],
-          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Flexible(child: Text(_list.name, style: TextStyle(color: kText, fontSize: 18, fontWeight: FontWeight.w800), overflow: TextOverflow.ellipsis)),
+            const SizedBox(width: 6),
+            Icon(Icons.edit, size: 16, color: kMuted),
+          ]),
         ),
         iconTheme: IconThemeData(color: kText),
         elevation: 0,
         actions: [
-          // Default items menu
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert, color: kMuted),
             color: kCard,
@@ -754,208 +653,226 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
               if (val == 'view') _viewPlainList();
             },
             itemBuilder: (_) => [
-              PopupMenuItem(value: 'share', child: Row(children: [
-                Icon(Icons.share, color: kGreen, size: 20), const SizedBox(width: 10),
-                Text('Share via WhatsApp', style: TextStyle(color: kText)),
-              ])),
-              PopupMenuItem(value: 'pdf', child: Row(children: [
-                Icon(Icons.picture_as_pdf, color: Colors.red, size: 20), const SizedBox(width: 10),
-                Text('Download PDF', style: TextStyle(color: kText)),
-              ])),
-              PopupMenuItem(value: 'view', child: Row(children: [
-                Icon(Icons.view_list, color: Color(0xFF2980B9), size: 20), const SizedBox(width: 10),
-                Text('View Plain List', style: TextStyle(color: kText)),
-              ])),
+              PopupMenuItem(value: 'share', child: Row(children: [Icon(Icons.share, color: kGreen, size: 20), const SizedBox(width: 10), Text('Share via WhatsApp', style: TextStyle(color: kText))])),
+              PopupMenuItem(value: 'pdf', child: Row(children: [Icon(Icons.picture_as_pdf, color: Colors.red, size: 20), const SizedBox(width: 10), Text('Download PDF', style: TextStyle(color: kText))])),
+              PopupMenuItem(value: 'view', child: Row(children: [Icon(Icons.view_list, color: Color(0xFF2980B9), size: 20), const SizedBox(width: 10), Text('View Plain List', style: TextStyle(color: kText))])),
               const PopupMenuDivider(),
-              PopupMenuItem(value: 'add_defaults', child: Row(children: [
-                Icon(Icons.playlist_add, color: kPurple2, size: 20), const SizedBox(width: 10),
-                Text('Add Default Items', style: TextStyle(color: kText)),
-              ])),
-              PopupMenuItem(value: 'remove_defaults', child: Row(children: [
-                Icon(Icons.playlist_remove, color: kMuted, size: 20), const SizedBox(width: 10),
-                Text('Remove Default Items', style: TextStyle(color: kText)),
-              ])),
+              PopupMenuItem(value: 'add_defaults', child: Row(children: [Icon(Icons.playlist_add, color: kPurple2, size: 20), const SizedBox(width: 10), Text('Add Default Items', style: TextStyle(color: kText))])),
+              PopupMenuItem(value: 'remove_defaults', child: Row(children: [Icon(Icons.playlist_remove, color: kMuted, size: 20), const SizedBox(width: 10), Text('Remove Default Items', style: TextStyle(color: kText))])),
               if (checked > 0)
-                PopupMenuItem(value: 'uncheck', child: Row(children: [
-                  Icon(Icons.replay, color: kMuted, size: 20), const SizedBox(width: 10),
-                  Text('Uncheck All', style: TextStyle(color: kText)),
-                ])),
+                PopupMenuItem(value: 'uncheck', child: Row(children: [Icon(Icons.replay, color: kMuted, size: 20), const SizedBox(width: 10), Text('Uncheck All', style: TextStyle(color: kText))])),
             ],
           ),
-          IconButton(icon: Icon(Icons.add, color: kOrange), onPressed: _addItem, tooltip: 'Add Item'),
         ],
       ),
       body: Column(
         children: [
-          // Progress header
+          // ─── Add Item Section (Dropdowns + Add Button) ───
+          Container(
+            padding: const EdgeInsets.all(14),
+            color: kCard,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('ಐಟಂ ಸೇರಿಸಿ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kOrange)),
+                const SizedBox(height: 10),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Item dropdown or custom text field
+                    Expanded(
+                      flex: 3,
+                      child: _isCustomItem
+                        ? TextField(
+                            controller: _customNameCtrl,
+                            autofocus: true,
+                            style: TextStyle(color: kText, fontSize: 14),
+                            decoration: InputDecoration(
+                              hintText: 'ಐಟಂ ಹೆಸರು ಟೈಪ್ ಮಾಡಿ...',
+                              hintStyle: TextStyle(color: kMuted, fontSize: 13),
+                              filled: true, fillColor: kBg,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kBorder)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kBorder)),
+                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kOrange, width: 2)),
+                              suffixIcon: IconButton(
+                                icon: Icon(Icons.close, size: 18, color: kMuted),
+                                onPressed: () => setState(() { _isCustomItem = false; _customNameCtrl.clear(); }),
+                              ),
+                            ),
+                          )
+                        : Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: kBorder)),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                isExpanded: true,
+                                value: _selectedItem,
+                                hint: Text('ಐಟಂ ಆಯ್ಕೆ ಮಾಡಿ', style: TextStyle(color: kMuted, fontSize: 13)),
+                                dropdownColor: kCard,
+                                style: TextStyle(color: kText, fontSize: 14),
+                                icon: Icon(Icons.arrow_drop_down, color: kOrange),
+                                items: _dropdownItems.map((item) {
+                                  final isCustom = item == '── ಕಸ್ಟಮ್ ಐಟಂ ──';
+                                  return DropdownMenuItem(value: item, child: Text(item, style: TextStyle(
+                                    color: isCustom ? kOrange : kText,
+                                    fontWeight: isCustom ? FontWeight.w800 : FontWeight.w500, fontSize: 14,
+                                  )));
+                                }).toList(),
+                                onChanged: (val) {
+                                  if (val == '── ಕಸ್ಟಮ್ ಐಟಂ ──') {
+                                    setState(() { _isCustomItem = true; _selectedItem = null; });
+                                  } else {
+                                    setState(() => _selectedItem = val);
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Quantity dropdown
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: kBorder)),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            isExpanded: true,
+                            value: _selectedQty,
+                            hint: Text('ಪ್ರಮಾಣ', style: TextStyle(color: kMuted, fontSize: 13)),
+                            dropdownColor: kCard,
+                            style: TextStyle(color: kText, fontSize: 14),
+                            icon: Icon(Icons.arrow_drop_down, color: kOrange),
+                            items: _qtyOptions.map((q) => DropdownMenuItem(value: q, child: Text(q, style: TextStyle(color: kText, fontSize: 14)))).toList(),
+                            onChanged: (val) => setState(() => _selectedQty = val),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Add button
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: _addItemFromDropdown,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kOrange, foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), elevation: 0,
+                        ),
+                        child: const Icon(Icons.add, size: 24),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: Color(0xFF2a2a3a)),
+
+          // Progress bar
           if (total > 0)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               color: kCard,
-              child: Column(children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('$checked of $total items', style: TextStyle(fontSize: 14, color: kMuted, fontWeight: FontWeight.w600)),
-                    if (checked == total)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: kGreen.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-                        child: Text('Complete ✓', style: TextStyle(fontSize: 12, color: kGreen, fontWeight: FontWeight.w700)),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: total > 0 ? checked / total : 0, minHeight: 5,
-                    backgroundColor: kBorder,
-                    valueColor: AlwaysStoppedAnimation(checked == total ? kGreen : kOrange),
-                  ),
-                ),
+              child: Row(children: [
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('$checked / $total items', style: TextStyle(fontSize: 13, color: kMuted, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 6),
+                  ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(
+                    value: total > 0 ? checked / total : 0, minHeight: 4,
+                    backgroundColor: kBorder, valueColor: AlwaysStoppedAnimation(checked == total ? kGreen : kOrange),
+                  )),
+                ])),
+                if (checked == total && total > 0) ...[
+                  const SizedBox(width: 10),
+                  Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(color: kGreen.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                    child: Text('✓', style: TextStyle(fontSize: 14, color: kGreen, fontWeight: FontWeight.w700))),
+                ],
               ]),
             ),
+
           // Purohit info
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             color: kCard,
-            child: Row(
-              children: [
-                Icon(Icons.person, color: kPurple2, size: 22),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: _editPurohitInfo,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _list.purohitName.isNotEmpty ? _list.purohitName : 'Add Purohit Name',
-                          style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w700,
-                            color: _list.purohitName.isNotEmpty ? kText : kMuted,
-                          ),
-                        ),
-                        if (_list.purohitPhone.isNotEmpty)
-                          Text(_list.purohitPhone, style: TextStyle(fontSize: 13, color: kMuted)),
-                      ],
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.edit_outlined, color: kPurple2, size: 20),
-                  onPressed: _editPurohitInfo,
-                  tooltip: 'Edit Purohit',
-                  visualDensity: VisualDensity.compact,
-                ),
-                if (_list.purohitPhone.isNotEmpty)
-                  IconButton(
-                    icon: Icon(Icons.phone, color: kGreen, size: 20),
-                    onPressed: () => launchUrl(Uri.parse('tel:${_list.purohitPhone}')),
-                    tooltip: 'Call Purohit',
-                    visualDensity: VisualDensity.compact,
-                  ),
-              ],
-            ),
+            child: Row(children: [
+              Icon(Icons.person, color: kPurple2, size: 22),
+              const SizedBox(width: 10),
+              Expanded(child: GestureDetector(
+                onTap: _editPurohitInfo,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(_list.purohitName.isNotEmpty ? _list.purohitName : 'Add Purohit Name',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _list.purohitName.isNotEmpty ? kText : kMuted)),
+                  if (_list.purohitPhone.isNotEmpty)
+                    Text(_list.purohitPhone, style: TextStyle(fontSize: 13, color: kMuted)),
+                ]),
+              )),
+              IconButton(icon: Icon(Icons.edit_outlined, color: kPurple2, size: 20), onPressed: _editPurohitInfo, tooltip: 'Edit Purohit', visualDensity: VisualDensity.compact),
+              if (_list.purohitPhone.isNotEmpty)
+                IconButton(icon: Icon(Icons.phone, color: kGreen, size: 20), onPressed: () => launchUrl(Uri.parse('tel:${_list.purohitPhone}')), tooltip: 'Call Purohit', visualDensity: VisualDensity.compact),
+            ]),
           ),
           const Divider(height: 1, color: Color(0xFF2a2a3a)),
 
           // Items list
           Expanded(
             child: _list.items.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.playlist_add, size: 64, color: kMuted.withOpacity(0.3)),
-                        const SizedBox(height: 12),
-                        Text('No items yet', style: TextStyle(fontSize: 16, color: kMuted, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: _addDefaultItems,
-                          icon: const Icon(Icons.playlist_add, size: 20),
-                          label: const Text('Add Default Items'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kGreen, foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text('or tap + to add custom items', style: TextStyle(fontSize: 13, color: kMuted)),
-                      ],
-                    ),
-                  )
+                ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(Icons.playlist_add, size: 64, color: kMuted.withOpacity(0.3)),
+                    const SizedBox(height: 12),
+                    Text('ಯಾವುದೇ ಐಟಂಗಳಿಲ್ಲ', style: TextStyle(fontSize: 16, color: kMuted, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 6),
+                    Text('ಮೇಲಿನ ಡ್ರಾಪ್‌ಡೌನ್ ಬಳಸಿ ಸೇರಿಸಿ', style: TextStyle(fontSize: 13, color: kMuted)),
+                  ]))
                 : ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     itemCount: _list.items.length,
                     itemBuilder: (context, index) {
                       final item = _list.items[index];
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.only(bottom: 6),
                         child: GestureDetector(
                           onTap: () => _toggleItem(index),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: kCard,
-                              borderRadius: BorderRadius.circular(14),
+                              color: kCard, borderRadius: BorderRadius.circular(14),
                               border: Border.all(color: item.checked ? kGreen.withOpacity(0.4) : kBorder),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                              child: Row(
-                                children: [
-                                  // Checkbox
-                                  GestureDetector(
-                                    onTap: () => _toggleItem(index),
-                                    child: Container(
-                                      width: 28, height: 28,
-                                      decoration: BoxDecoration(
-                                        color: item.checked ? kGreen : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: item.checked ? kGreen : kMuted, width: 2),
-                                      ),
-                                      child: item.checked ? const Icon(Icons.check, size: 18, color: Colors.white) : null,
+                              child: Row(children: [
+                                // Checkbox
+                                GestureDetector(
+                                  onTap: () => _toggleItem(index),
+                                  child: Container(
+                                    width: 28, height: 28,
+                                    decoration: BoxDecoration(
+                                      color: item.checked ? kGreen : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: item.checked ? kGreen : kMuted, width: 2),
                                     ),
+                                    child: item.checked ? const Icon(Icons.check, size: 18, color: Colors.white) : null,
                                   ),
-                                  const SizedBox(width: 14),
-                                  // Name & quantity
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(item.name, style: TextStyle(
-                                          fontSize: 15, fontWeight: FontWeight.w700,
-                                          color: item.checked ? kMuted : kText,
-                                          decoration: item.checked ? TextDecoration.lineThrough : null,
-                                        )),
-                                        if (item.quantity.isNotEmpty)
-                                          Text(item.quantity, style: TextStyle(
-                                            fontSize: 13, color: kMuted,
-                                            decoration: item.checked ? TextDecoration.lineThrough : null,
-                                          )),
-                                      ],
-                                    ),
-                                  ),
-                                  // Edit button
-                                  IconButton(
-                                    icon: Icon(Icons.edit_outlined, color: kPurple2, size: 20),
-                                    onPressed: () => _editItem(index),
-                                    tooltip: 'Edit',
-                                    visualDensity: VisualDensity.compact,
-                                  ),
-                                  // Delete button
-                                  IconButton(
-                                    icon: Icon(Icons.delete_outline, color: Colors.red.withOpacity(0.7), size: 20),
-                                    onPressed: () => _deleteItem(index),
-                                    tooltip: 'Delete',
-                                    visualDensity: VisualDensity.compact,
-                                  ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(width: 14),
+                                // Name & quantity
+                                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                  Text(item.name, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
+                                    color: item.checked ? kMuted : kText, decoration: item.checked ? TextDecoration.lineThrough : null)),
+                                  if (item.quantity.isNotEmpty)
+                                    Text(item.quantity, style: TextStyle(fontSize: 13, color: kMuted, decoration: item.checked ? TextDecoration.lineThrough : null)),
+                                ])),
+                                // Edit
+                                IconButton(icon: Icon(Icons.edit_outlined, color: kPurple2, size: 20), onPressed: () => _editItem(index), tooltip: 'Edit', visualDensity: VisualDensity.compact),
+                                // Delete
+                                IconButton(icon: Icon(Icons.delete_outline, color: Colors.red.withOpacity(0.7), size: 20), onPressed: () => _deleteItem(index), tooltip: 'Delete', visualDensity: VisualDensity.compact),
+                              ]),
                             ),
                           ),
                         ),
@@ -965,20 +882,14 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addItem,
-        backgroundColor: kOrange,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
     );
   }
 
   void _viewPlainList() {
-    Navigator.push(context, MaterialPageRoute(
-      builder: (_) => _PlainListViewPage(list: _list),
-    ));
+    Navigator.push(context, MaterialPageRoute(builder: (_) => _PlainListViewPage(list: _list)));
   }
 }
+
 
 // ─── Plain List View Page ───
 
