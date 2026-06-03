@@ -54,7 +54,7 @@ jobs:
 
       - name: Build AAB (Play Store)
         run: |
-          flutter build appbundle --release --verbose 2>&1 | tee build_output.txt || true
+          flutter build appbundle --release --obfuscate --split-debug-info=build/debug-info --verbose 2>&1 | tee build_output.txt || true
           # Check if AAB was produced
           if [ ! -f build/app/outputs/bundle/release/app-release.aab ]; then
             echo "::error::DART ERRORS: $(grep -E 'lib/.*\.dart.*Error|Compiler message|Target kernel_snapshot failed' build_output.txt | head -10 | tr '\n' ' ')"
@@ -72,7 +72,7 @@ jobs:
           retention-days: 1
 
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --release --obfuscate --split-debug-info=build/debug-info
 
       - name: Upload APK
         if: success()
