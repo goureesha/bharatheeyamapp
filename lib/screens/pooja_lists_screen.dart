@@ -541,15 +541,32 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
             style: const TextStyle(color: Colors.black, fontSize: 13, fontFamily: 'NotoSansKannada'),
             child: Material(color: Colors.white, child: Container(width: 793, padding: const EdgeInsets.all(40),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                Text(_list.name, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFF4A148C))),
-                const SizedBox(height: 6),
-                Text('${_list.items.length} items', style: const TextStyle(fontSize: 13, color: Color(0xFF757575))),
-                if (_list.purohitName.isNotEmpty || _list.purohitPhone.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text('Purohit: ${_list.purohitName}${_list.purohitPhone.isNotEmpty ? '  |  Phone: ${_list.purohitPhone}' : ''}',
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF1565C0))),
-                ],
-                const SizedBox(height: 20),
+                // Pooja Name - large and prominent
+                Center(child: Text(_list.name, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Color(0xFF4A148C)))),
+                const SizedBox(height: 4),
+                Center(child: Text('${_list.items.length} items', style: const TextStyle(fontSize: 13, color: Color(0xFF757575)))),
+                const SizedBox(height: 14),
+                // Purohit details - always shown
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3E5F5),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    if (_list.purohitName.isNotEmpty)
+                      Text('ಪುರೋಹಿತರು: ${_list.purohitName}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF4A148C))),
+                    if (_list.purohitPhone.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text('📞 ${_list.purohitPhone}', style: const TextStyle(fontSize: 13, color: Color(0xFF1565C0))),
+                      ),
+                    if (_list.purohitName.isEmpty && _list.purohitPhone.isEmpty)
+                      Text('ಪೂಜಾ ಸಾಮಗ್ರಿ ಪಟ್ಟಿ', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF4A148C))),
+                  ]),
+                ),
+                const SizedBox(height: 16),
                 const Divider(thickness: 1, color: Color(0xFFBDBDBD)),
                 const SizedBox(height: 10),
                 Container(
