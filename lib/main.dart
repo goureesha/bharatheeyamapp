@@ -920,11 +920,14 @@ class _FirstTimeSignInScreenState extends State<_FirstTimeSignInScreen> {
                     if (ok && mounted) {
                       // Binding check MUST complete — don't timeout
                       final bound = await DeviceBindingService.checkBinding();
+                      // Subscription check MUST complete before UI rebuild
+                      // so hasAccess is correct (trial/premium state resolved)
+                      await SubscriptionService.checkManualPremium();
+                      await SubscriptionService.recordOnlineCheck();
+                      // Now trigger UI rebuild with correct state
                       deviceBindingNotifier.value = bound;
-                      // Other tasks run in background — don't block
-                      SubscriptionService.recordOnlineCheck();
+                      // These can run in background
                       SubscriptionService.syncTrialWithFirestore();
-                      SubscriptionService.checkManualPremium();
                     } else if (mounted) {
                       setState(() => _signingIn = false);
                     }
@@ -1029,11 +1032,13 @@ class _GmailRequiredScreenState extends State<_GmailRequiredScreen> {
                         if (ok && mounted) {
                           // Binding check MUST complete — don't timeout
                           final bound = await DeviceBindingService.checkBinding();
+                          // Subscription check MUST complete before UI rebuild
+                          await SubscriptionService.checkManualPremium();
+                          await SubscriptionService.recordOnlineCheck();
+                          // Now trigger UI rebuild with correct state
                           deviceBindingNotifier.value = bound;
-                          // Other tasks run in background
-                          SubscriptionService.recordOnlineCheck();
+                          // Background tasks
                           SubscriptionService.syncTrialWithFirestore();
-                          SubscriptionService.checkManualPremium();
                         } else if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Sign-in cancelled'), backgroundColor: Colors.orange),
