@@ -2207,7 +2207,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     ];
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       child: Column(
         children: allPersons.map((person) {
           final r = person['result'] as KundaliResult;
@@ -3449,14 +3449,14 @@ class _DashboardScreenState extends State<DashboardScreen>
       child: Row(
         children: cols.asMap().entries.map((e) => Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
             child: Text(e.value,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: (e.key == 0 && bold0) ? FontWeight.w700 : FontWeight.normal,
                 color: kText,
               ),
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ),
