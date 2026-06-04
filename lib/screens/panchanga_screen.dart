@@ -300,6 +300,92 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
     return result;
   }
 
+  // ─── Check if a day has Agni on Prithvi from cache ───
+  bool _isPrithviDay(DateTime day) {
+    final key = _cacheKey(day);
+    final cached = _panchangCache[key];
+    if (cached == null) return false;
+    final agni = cached.agniVasa;
+    return agni.contains('ಭೂಮಿ') || agni.contains('भूमि') || agni.contains('பூமி') || agni.contains('భూమి') || agni.contains('ഭൂമി') || agni.contains('Bhumi');
+  }
+
+  // ─── Calendar cell with green dot for Prithvi days ───
+  Widget _buildCalendarCell(DateTime day, bool isToday, bool isSelected) {
+    final isPrithvi = _isPrithviDay(day);
+    return Container(
+      margin: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: isSelected ? kPurple2 : isToday ? kPurple2.withOpacity(0.3) : null,
+        shape: BoxShape.circle,
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Center(child: Text(
+            '${day.day}',
+            style: TextStyle(
+              color: isSelected ? Colors.white : isToday ? Colors.white : kText,
+              fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.normal,
+            ),
+          )),
+          if (isPrithvi)
+            Positioned(
+              bottom: 4,
+              child: Container(
+                width: 6, height: 6,
+                decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Agni Vasa Card ───
+  Widget _buildAgniVasaCard() {
+    if (_panchang == null) return const SizedBox();
+    final agni = _panchang!.agniVasa;
+    final isPrithvi = agni.contains('ಭೂಮಿ') || agni.contains('भूमि') || agni.contains('பூமி') || agni.contains('భూమి') || agni.contains('ഭൂമി') || agni.contains('Bhumi');
+    final color = isPrithvi ? Colors.green : Colors.red;
+    final icon = isPrithvi ? Icons.check_circle : Icons.cancel;
+
+    return AppCard(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(Icons.local_fire_department, color: kOrange, size: 22),
+          const SizedBox(width: 8),
+          Text(AppLocale.l('agniVasa') + ' / Agni Vasa', style: TextStyle(
+            fontWeight: FontWeight.w900, fontSize: 14, color: kOrange)),
+        ]),
+        const SizedBox(height: 6),
+        Text(AppLocale.l('agniVasaDesc'), style: TextStyle(color: kMuted, fontSize: 11)),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withOpacity(0.3)),
+          ),
+          child: Row(children: [
+            Icon(icon, color: color, size: 28),
+            const SizedBox(width: 12),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(trAll(agni), style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.w900, color: color)),
+              const SizedBox(height: 2),
+              Text(
+                isPrithvi ? 'Agni on Earth — Auspicious' : agni.contains('ಆಕಾಶ') || agni.contains('आकाश') ? 'Agni in Sky — Inauspicious' : 'Agni in Netherworld — Inauspicious',
+                style: TextStyle(fontSize: 12, color: kMuted),
+              ),
+            ])),
+          ]),
+        ),
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateStr = '${_selectedDate.day.toString().padLeft(2,'0')}-${_selectedDate.month.toString().padLeft(2,'0')}-${_selectedDate.year}';
@@ -385,6 +471,11 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
                             weekdayStyle: TextStyle(color: kText, fontWeight: FontWeight.bold),
                             weekendStyle: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
                           ),
+                          calendarBuilders: CalendarBuilders(
+                            defaultBuilder: (context, day, focusedDay) => _buildCalendarCell(day, false, false),
+                            todayBuilder: (context, day, focusedDay) => _buildCalendarCell(day, true, false),
+                            selectedBuilder: (context, day, focusedDay) => _buildCalendarCell(day, false, true),
+                          ),
                         ),
                       ),
                     ]),
@@ -458,6 +549,9 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
                         _tableRow([AppLocale.l('amrutaPraghati'), _panchang!.amrutaPraghati]),
                       ]),
                     ),
+
+                    // ═══ ಅಗ್ನಿವಾಸ — Agni Vasa ═══
+                    _buildAgniVasaCard(),
 
                     // ═══ Hora (Day) ═══
                     _buildHoraCard(true),
