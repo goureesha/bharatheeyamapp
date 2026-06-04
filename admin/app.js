@@ -24,6 +24,7 @@ let allClients = [];
 let currentUnlockEmail = null;
 let currentRevokeEmail = null;
 let currentOfflineEmail = null;
+let currentBlockEmail = null;
 
 // ─── Auth ───
 
@@ -70,6 +71,8 @@ async function loadClients() {
         _lastSeenStr: formatTimestamp(data.lastSeen),
         _lastSeenDate: data.lastSeen ? data.lastSeen.toDate() : null,
         _offlineDays: data.offlineDaysUsed || 0,
+        _isBlocked: data.blocked === true,
+        _blockedReason: data.blockedReason || '',
       });
     });
 
@@ -149,6 +152,9 @@ function updateStats() {
   animateNumber('premiumClients', premium);
   animateNumber('trialClients', trial);
   animateNumber('expiringClients', expiring7);
+
+  const blocked = allClients.filter(c => c._isBlocked).length;
+  animateNumber('blockedClients', blocked);
 }
 
 function animateNumber(id, target) {
@@ -238,6 +244,9 @@ function filterClients() {
     case 'expiring30':
       filtered = filtered.filter(c => c._isPremium && c._daysLeft > 0 && c._daysLeft <= 30);
       break;
+    case 'blocked':
+      filtered = filtered.filter(c => c._isBlocked);
+      break;
   }
 
   // Apply search
@@ -266,7 +275,9 @@ function renderTable(clients) {
   tbody.innerHTML = clients.map((c, i) => {
     // Status badge
     let statusBadge;
-    if (c._isPremium && c._daysLeft === Infinity) {
+    if (c._isBlocked) {
+      statusBadge = '<span class="badge badge-expired" style="background: rgba(220,38,38,0.15); color: #dc2626;">🚫 Blocked</span>';
+    } else if (c._isPremium && c._daysLeft === Infinity) {
       statusBadge = '<span class="badge badge-lifetime">Lifetime</span>';
     } else if (c._isPremium) {
       statusBadge = '<span class="badge badge-premium">Premium</span>';
@@ -292,10 +303,14 @@ function renderTable(clients) {
       daysDisplay = '<span class="days-left" style="color: var(--muted)">—</span>';
     }
 
-    if (c._isPremium) {
+    if (c._isBlocked) {
+      actions = `<button class="btn-unlock" onclick="confirmUnblock('${c.email}')" style="font-size:10px; padding:4px 8px; background:#10b981;">Unblock</button>`;
+    } else if (c._isPremium) {
       actions = `<button class="btn-revoke-small" onclick="openRevokeModal('${c.email}')" style="font-size:10px; padding:4px 8px;">Revoke</button>`;
+      actions += ` <button class="btn-revoke-small" onclick="openBlockModal('${c.email}')" style="font-size:10px; padding:4px 8px; background:#dc2626;">Block</button>`;
     } else {
       actions = `<button class="btn-unlock" onclick="openUnlockModal('${c.email}')" style="font-size:10px; padding:4px 8px;">Unlock</button>`;
+      actions += ` <button class="btn-revoke-small" onclick="openBlockModal('${c.email}')" style="font-size:10px; padding:4px 8px; background:#dc2626;">Block</button>`;
     }
 
     const device = c.deviceName || c.deviceModel || '—';
@@ -342,9 +357,11 @@ function closeModal() {
   document.getElementById('unlockModal').classList.add('hidden');
   document.getElementById('revokeModal').classList.add('hidden');
   document.getElementById('offlineModal').classList.add('hidden');
+  document.getElementById('blockModal').classList.add('hidden');
   currentUnlockEmail = null;
   currentRevokeEmail = null;
   currentOfflineEmail = null;
+  currentBlockEmail = null;
 }
 
 async function confirmUnlock() {
@@ -511,3 +528,42 @@ async function confirmOfflineEdit() {
   }
 }
 
+// ─── Block / Unblock ───
+
+function openBlockModal(email) {
+  currentBlockEmail = email;
+  document.getElementById('blockEmail').textContent = email;
+  document.getElementById('blockReason').value = '';
+  document.getElementById('blockModal').classList.remove('hidden');
+}
+
+async function confirmBlock() {
+  if (!currentBlockEmail) return;
+
+  const reason = document.getElementById('blockReason').value.trim() || 'Blocked by admin';
+
+  try {
+    await db.collection('device_bindings').doc(currentBlockEmail).update({
+      blocked: true,
+      blockedReason: reason,
+    });
+    closeModal();
+    loadClients();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+async function confirmUnblock(email) {
+  if (!confirm('Unblock ' + email + '?')) return;
+
+  try {
+    await db.collection('device_bindings').doc(email).update({
+      blocked: false,
+      blockedReason: firebase.firestore.FieldValue.delete(),
+    });
+    loadClients();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}

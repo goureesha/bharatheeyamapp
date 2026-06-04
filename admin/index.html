@@ -74,6 +74,15 @@
           <span class="stat-label">Expiring in 7 Days</span>
         </div>
       </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #dc2626, #991b1b);">
+          <svg width="24" height="24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value" id="blockedClients">—</span>
+          <span class="stat-label">Blocked</span>
+        </div>
+      </div>
     </div>
 
     <!-- Expiry Timeline -->
@@ -94,6 +103,7 @@
         <option value="expired">Expired / Free</option>
         <option value="expiring7">Expiring in 7 Days</option>
         <option value="expiring30">Expiring in 30 Days</option>
+        <option value="blocked">Blocked</option>
       </select>
       <button class="btn-refresh" onclick="refreshData()">↻ Refresh</button>
       <button class="btn-refresh" onclick="loadInstalls()" style="background: #334155;">📱 Installs</button>
@@ -190,6 +200,23 @@
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal()">Cancel</button>
         <button class="btn-revoke" onclick="confirmRevoke()">Revoke Access</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Block Modal -->
+  <div id="blockModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>🚫 Block User</h2>
+      <p id="blockEmail" class="modal-email"></p>
+      <div class="modal-field">
+        <label>Reason (shown to user)</label>
+        <input type="text" id="blockReason" placeholder="e.g. Payment pending, Violation, etc." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-size:14px;">
+      </div>
+      <p style="color: #ef4444; margin-top: 8px; font-size: 13px;">⚠ This will immediately block the user from accessing the app.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-revoke" onclick="confirmBlock()">Block User</button>
       </div>
     </div>
   </div>
