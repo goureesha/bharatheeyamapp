@@ -67915,7 +67915,7 @@ J(a){var s=this,r=null,q=$.cF(),p=$.bn(),o=A.e("Pooja Lists",r,r,r,r,A.m(r,r,$.Y
 o=A.kw(A.a([A.dq(r,r,r,A.a6(B.aa6,B.ak,r,r),r,r,m,r,r,r,"New List",r)],l),p,r,r,0,r,new A.df(r,r,r,r,r,n,r,r,r),r,o)
 if(s.e)p=B.hI
 else if(J.fP(s.d)){p=$.a3()
-l=A.cG(A.a4(A.a([A.a6(B.D1,A.E(B.f.W(76.5),p.k()>>>16&255,p.k()>>>8&255,p.k()&255),r,80),B.aY,A.e("No pooja lists yet",r,r,r,r,A.m(r,r,$.a3(),r,r,r,r,r,r,r,r,18,r,r,B.S,r,r,!0,r,r,r,r,r,r,r,r),r,r,r),B.aK,A.e("Tap + to create your first list",r,r,r,r,A.m(r,r,$.a3(),r,r,r,r,r,r,r,r,14,r,r,r,r,r,!0,r,r,r,r,r,r,r,r),r,r,r),B.b7,A.ih(B.D5,B.bwf,m,A.dQ(r,r,B.ak,r,r,r,r,r,r,B.G,r,r,B.C0,r,new A.cm(A.a9(12),B.L),r,r,r,r))],l),B.x,B.q,B.aC,B.E),r,r)
+l=A.cG(A.a4(A.a([A.a6(B.D1,A.E(B.f.W(76.5),p.k()>>>16&255,p.k()>>>8&255,p.k()&255),r,80),B.aY,A.e("No pooja lists yet",r,r,r,r,A.m(r,r,$.a3(),r,r,r,r,r,r,r,r,18,r,r,B.S,r,r,!0,r,r,r,r,r,r,r,r),r,r,r),B.aK,A.e("Tap + to create your first list",r,r,r,r,A.m(r,r,$.a3(),r,r,r,r,r,r,r,r,14,r,r,r,r,r,!0,r,r,r,r,r,r,r,r),r,r,r),B.b7,A.ih(B.D5,B.bwg,m,A.dQ(r,r,B.ak,r,r,r,r,r,r,B.G,r,r,B.C0,r,new A.cm(A.a9(12),B.L),r,r,r,r))],l),B.x,B.q,B.aC,B.E),r,r)
 p=l}else p=A.je(new A.b5y(s),J.bj(s.d),B.b8,B.am,!1)
 return A.hV(o,q,p,J.jI(s.d)?A.bnk(B.ak,B.abP,r,B.Ad,r,!1,m):r)}}
 A.b5o.prototype={
@@ -69023,7 +69023,7 @@ var $async$$0=A.A(function(a,b){if(a===1)return A.w(b,r)
 while(true)switch(s){case 0:s=2
 return A.l(A.WZ(),$async$$0)
 case 2:p=b
-if(q.a.c!=null&&p)q.b.T(t.J).f.cb(B.bql)
+if(q.a.c!=null&&p)q.b.T(t.J).f.cb(B.bqk)
 return A.x(null,r)}})
 return A.y($async$$0,r)},
 $S:2}
@@ -69248,7 +69248,7 @@ o.push(new A.aV(1/0,h,A.a0A(new A.b8S(e),A.tA(),s),h))
 o.push(B.ai)
 o.push(new A.aV(1/0,h,A.a0A(new A.b8T(e),A.tA(),s),h))
 if(!f){f=$.ak()
-B.n.L(o,A.a([B.ai,new A.aV(1/0,h,A.yz(B.D3,B.bwd,new A.b8U(this,a),A.Ml(h,h,h,h,h,h,h,h,h,f,h,h,B.d_,h,new A.cm(A.a9(12),B.L),new A.av(f,1,B.T,-1),h,h,h,h)),h)],l))}return A.hV(h,g,A.k3(!0,A.cG(A.dD(new A.mx(A.a4(o,B.x,B.cF,B.v,B.E),600,h),h,B.O,B.C1,h,h,B.am),h,h),B.af,!0),h)}}
+B.n.L(o,A.a([B.ai,new A.aV(1/0,h,A.yz(B.D3,B.bwe,new A.b8U(this,a),A.Ml(h,h,h,h,h,h,h,h,h,f,h,h,B.d_,h,new A.cm(A.a9(12),B.L),new A.av(f,1,B.T,-1),h,h,h,h)),h)],l))}return A.hV(h,g,A.k3(!0,A.cG(A.dD(new A.mx(A.a4(o,B.x,B.cF,B.v,B.E),600,h),h,B.O,B.C1,h,h,B.am),h,h),B.af,!0),h)}}
 A.b8K.prototype={
 $0(){return this.a.d=!0},
 $S:0}
@@ -69269,12 +69269,12 @@ return A.ih(B.abw,B.bwn,new A.b8Q(this.a,r,a),A.dQ(s,s,$.ak(),s,s,s,s,s,s,B.G,s,
 $S:554}
 A.b8Q.prototype={
 $0(){A.tv(new A.oG("Gmail: "+this.a+"\nDevice ID: "+this.b))
-this.c.T(t.J).f.cb(B.bqk)},
+this.c.T(t.J).f.cb(B.bql)},
 $S:0}
 A.b8T.prototype={
 $2(a,b){var s=null,r=b.b
 if(r==null)r=""
-return A.yz(B.abM,B.bwc,new A.b8P(this.a,r),A.Ml(s,s,s,s,s,s,s,s,s,B.bK,s,s,B.d_,s,new A.cm(A.a9(12),B.L),new A.av(B.bK,1,B.T,-1),s,s,s,s))},
+return A.yz(B.abM,B.bwd,new A.b8P(this.a,r),A.Ml(s,s,s,s,s,s,s,s,s,B.bK,s,s,B.d_,s,new A.cm(A.a9(12),B.L),new A.av(B.bK,1,B.T,-1),s,s,s,s))},
 $S:556}
 A.b8P.prototype={
 $0(){var s=0,r=A.z(t.H),q=this,p,o
@@ -162635,16 +162635,16 @@ B.bqf=new A.pl(3,"hide")
 B.bDP=new A.pl(4,"remove")
 B.ZU=new A.pl(5,"timeout")
 B.bqg=new A.EE(null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.bwe=new A.fz("Developer Backdoor: Granthaalaya Unlocked!",null,null,null,null,null,null,null,null,null,null)
-B.bqh=new A.lO(B.bwe,B.a0,null,null,null,null,null,null,null,null,null,null,null,B.an,null,null,null,B.K,null)
+B.bwf=new A.fz("Developer Backdoor: Granthaalaya Unlocked!",null,null,null,null,null,null,null,null,null,null)
+B.bqh=new A.lO(B.bwf,B.a0,null,null,null,null,null,null,null,null,null,null,null,B.an,null,null,null,B.K,null)
 B.bwm=new A.fz("\u2705 Access restored!",null,null,null,null,null,null,null,null,null,null)
 B.bqi=new A.lO(B.bwm,B.a0,null,null,null,null,null,null,null,null,null,null,null,B.an,null,null,null,B.K,null)
 B.bwk=new A.fz("No active access found",null,null,null,null,null,null,null,null,null,null)
 B.bqj=new A.lO(B.bwk,B.bi,null,null,null,null,null,null,null,null,null,null,null,B.an,null,null,null,B.K,null)
+B.bwc=new A.fz("Backup saved to Downloads folder.",null,null,null,null,null,null,null,null,null,null)
+B.bqk=new A.lO(B.bwc,B.a0,null,null,null,null,null,null,null,null,null,null,null,B.an,null,null,null,B.K,null)
 B.bwa=new A.fz("Details copied!",null,null,null,null,null,null,null,null,null,null)
-B.bqk=new A.lO(B.bwa,B.a0,null,null,null,null,null,null,null,null,null,null,null,B.an,null,null,null,B.K,null)
-B.bwg=new A.fz("Choose app to save backup file.",null,null,null,null,null,null,null,null,null,null)
-B.bql=new A.lO(B.bwg,null,null,null,null,null,null,null,null,null,null,null,null,B.an,null,null,null,B.K,null)
+B.bql=new A.lO(B.bwa,B.a0,null,null,null,null,null,null,null,null,null,null,null,B.an,null,null,null,B.K,null)
 B.bwl=new A.fz("Spreadsheet & Notes exported!",null,null,null,null,null,null,null,null,null,null)
 B.bqm=new A.lO(B.bwl,B.a0,null,null,null,null,null,null,null,null,null,null,null,B.an,null,null,null,B.K,null)
 B.bwh=new A.fz("Export failed.",null,null,null,null,null,null,null,null,null,null)
@@ -163073,10 +163073,10 @@ B.bw8=new A.hr(B.btQ,B.bsO,B.btR,B.bum,B.bso,B.bsw,B.bt7,B.buc,B.btk,B.buR,B.brQ
 B.brI=new A.F(!0,B.G,null,null,null,null,16,B.a_,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.bw9=new A.fz("View Source Code",null,B.brI,null,null,null,null,null,null,null,null)
 B.bwb=new A.fz("Delete",null,null,null,null,null,null,null,null,null,null)
-B.bwc=new A.fz("Contact Support",null,B.mo,null,null,null,null,null,null,null,null)
-B.bwd=new A.fz("Re-check Access",null,B.mo,null,null,null,null,null,null,null,null)
+B.bwd=new A.fz("Contact Support",null,B.mo,null,null,null,null,null,null,null,null)
+B.bwe=new A.fz("Re-check Access",null,B.mo,null,null,null,null,null,null,null,null)
 B.rv=new A.fz("Save",null,null,null,null,null,null,null,null,null,null)
-B.bwf=new A.fz("Create List",null,null,null,null,null,null,null,null,null,null)
+B.bwg=new A.fz("Create List",null,null,null,null,null,null,null,null,null,null)
 B.bwi=new A.fz("Retry / \u0cae\u0ca4\u0ccd\u0ca4\u0cc6 \u0caa\u0ccd\u0cb0\u0caf\u0ca4\u0ccd\u0ca8\u0cbf\u0cb8\u0cbf",null,B.mo,null,null,null,null,null,null,null,null)
 B.bwj=new A.fz("Create",null,null,null,null,null,null,null,null,null,null)
 B.bwn=new A.fz("Copy My Details",null,B.mo,null,null,null,null,null,null,null,null)
