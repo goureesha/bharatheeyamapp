@@ -193,6 +193,9 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
     // Always try to verify with the server, even during active offline claims.
     // This ensures admin revocations take effect even if the user claimed a day.
     final serverReached = await SubscriptionService.checkManualPremium();
+    // Also check device-level block (installs collection)
+    await DeviceBindingService.checkDeviceBlock();
+
     if (GoogleAuthService.isSignedIn) {
       final bound = await DeviceBindingService.checkBinding();
       deviceBindingNotifier.value = bound;
@@ -212,6 +215,19 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
         await OfflineAccessService.clearActiveClaim();
         debugPrint('🔒 Server revoked access — offline claim invalidated');
       }
+    }
+
+    // Force UI rebuild if access was revoked or user was blocked.
+    // This kicks the user out of HomeScreen to SupportScreen/BlockedScreen.
+    if (!SubscriptionService.hasAccess ||
+        SubscriptionService.isBlocked ||
+        DeviceBindingService.isDeviceBlocked) {
+      // Force rebuild by toggling value — ValueNotifier only notifies on change
+      final current = deviceBindingNotifier.value;
+      deviceBindingNotifier.value = !current;
+      await Future.delayed(const Duration(milliseconds: 50));
+      deviceBindingNotifier.value = current;
+      debugPrint('🔒 Access revoked on resume — forcing UI rebuild');
     }
 
   }
