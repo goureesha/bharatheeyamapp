@@ -19,12 +19,14 @@ class TaranukoolaScreen extends StatefulWidget {
 class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
   bool _isTwoPersonMode = false;
   bool _excludeNakshatras = false;
+  bool _includeAgniVasa = false;
   int? _janmaNakshatraIdx1;
   int? _janmaNakshatraIdx2;
   
   DateTime _focusedDay = DateTime.utc(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   DateTime? _selectedDay;
   Map<DateTime, int> _dailyNakshatraCache = {};
+  Map<DateTime, bool> _dailyAgniVasaCache = {};
   KundaliResult? _selectedDayResult;
   bool _isLoadingPanchang = false;
   bool _showTaraCharts = false;
@@ -79,6 +81,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       setState(() {
         _isTwoPersonMode = prefs.getBool('dashboard_tara_two_person') ?? false;
         _excludeNakshatras = prefs.getBool('tara_exclude_nakshatras') ?? false;
+        _includeAgniVasa = prefs.getBool('tara_include_agnivasa') ?? false;
         _janmaNakshatraIdx1 = prefs.getInt('dashboard_janma_nakshatra');
         _janmaNakshatraIdx2 = prefs.getInt('dashboard_janma_nakshatra2');
       });
@@ -89,6 +92,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('dashboard_tara_two_person', _isTwoPersonMode);
     await prefs.setBool('tara_exclude_nakshatras', _excludeNakshatras);
+    await prefs.setBool('tara_include_agnivasa', _includeAgniVasa);
     if (_janmaNakshatraIdx1 != null) await prefs.setInt('dashboard_janma_nakshatra', _janmaNakshatraIdx1!);
     if (_janmaNakshatraIdx2 != null) await prefs.setInt('dashboard_janma_nakshatra2', _janmaNakshatraIdx2!);
   }
@@ -111,6 +115,39 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     return (moonLon / (360.0 / 27.0)).floor() % 27;
   }
 
+  /// Compute Agnivasa for a date: true = Prithvi (Earth, Shubha)
+  bool _computeAgniVasaForDate(DateTime date) {
+    DateTime normalized = DateTime(date.year, date.month, date.day);
+    if (_dailyAgniVasaCache.containsKey(normalized)) {
+      return _dailyAgniVasaCache[normalized]!;
+    }
+    try {
+      final srSs = Ephemeris.findSunriseSetForDate(
+        normalized.year, normalized.month, normalized.day,
+        LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
+      );
+      final srJd = srSs[0];
+      final jd = srJd + (1.0 / 1440.0);
+      // Tithi at sunrise
+      Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+      final moonPos = Sweph.swe_calc_ut(jd, HeavenlyBody.SE_MOON, SwephFlag.SEFLG_SWIEPH | SwephFlag.SEFLG_SIDEREAL);
+      final sunPos = Sweph.swe_calc_ut(jd, HeavenlyBody.SE_SUN, SwephFlag.SEFLG_SWIEPH | SwephFlag.SEFLG_SIDEREAL);
+      final tithiIdx = (((moonPos.longitude - sunPos.longitude + 360) % 360) / 12).floor().clamp(0, 29);
+      // Weekday at sunrise: Sun=0..Sat=6
+      // Vedic vara from panchanga sunrise
+      int pyWeekday = normalized.weekday - 1; // Mon=0..Sun=6
+      int wIdx = (pyWeekday + 1) % 7; // Sun=0..Sat=6
+      // Check if birth JD is before sunrise — if so, use previous day's vara
+      // For daily calendar, we use the date's own vara (sunrise-based)
+      final agniVal = (tithiIdx + wIdx) % 4;
+      final isPrithvi = (agniVal == 0 || agniVal == 3);
+      _dailyAgniVasaCache[normalized] = isPrithvi;
+      return isPrithvi;
+    } catch (_) {
+      return true; // Default to good if calculation fails
+    }
+  }
+
   int _getNakshatraForDate(DateTime date) {
     DateTime normalized = DateTime(date.year, date.month, date.day);
     if (!_dailyNakshatraCache.containsKey(normalized)) {
@@ -129,11 +166,12 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
     return (taraIdx == 1 || taraIdx == 3 || taraIdx == 5 || taraIdx == 7 || taraIdx == 8);
   }
 
-  /// Check if a day is good, considering nakshatra exclusion
-  bool _isDayGood(int dinaIdx, int janmaIdx) {
+  /// Check if a day is good, considering nakshatra exclusion and Agnivasa
+  bool _isDayGood(int dinaIdx, int janmaIdx, {DateTime? date}) {
     int tara = (dinaIdx - janmaIdx + 27) % 27 % 9;
     if (!_isGoodTara(tara)) return false;
     if (_excludeNakshatras && _excludedNakIndices.contains(dinaIdx)) return false;
+    if (_includeAgniVasa && date != null && !_computeAgniVasaForDate(date)) return false;
     return true;
   }
 
@@ -143,7 +181,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
 
     int dinaIdx = _getNakshatraForDate(date);
     
-    bool isGood1 = _isDayGood(dinaIdx, _janmaNakshatraIdx1!);
+    bool isGood1 = _isDayGood(dinaIdx, _janmaNakshatraIdx1!, date: date);
 
     if (!_isTwoPersonMode) {
       Color dotColor = isGood1 ? Colors.green : Colors.red;
@@ -155,7 +193,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
         ),
       );
     } else {
-      bool isGood2 = _isDayGood(dinaIdx, _janmaNakshatraIdx2!);
+      bool isGood2 = _isDayGood(dinaIdx, _janmaNakshatraIdx2!, date: date);
       
       Color dotColor;
       if (isGood1 && isGood2) {
@@ -364,6 +402,45 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                       ),
                     ],
 
+                    const SizedBox(height: 8),
+
+                    // Agnivasa toggle
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: _includeAgniVasa ? Colors.green.withOpacity(0.1) : kBorder.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: _includeAgniVasa ? Colors.green : kBorder),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.local_fire_department,
+                            size: 20,
+                            color: _includeAgniVasa ? Colors.green.shade700 : kMuted,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              AppLocale.l('agniVasa') + ' / Agni Vasa',
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: _includeAgniVasa ? Colors.green.shade700 : kMuted),
+                            ),
+                          ),
+                          Switch(
+                            value: _includeAgniVasa,
+                            activeColor: Colors.green,
+                            onChanged: (val) {
+                              setState(() {
+                                _includeAgniVasa = val;
+                                _dailyAgniVasaCache.clear();
+                                _saveSettings();
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
                     const SizedBox(height: 16),
                     Text(_isTwoPersonMode ? AppLocale.l('person1BirthNak') : AppLocale.l('yourBirthNak'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kText)),
                     const SizedBox(height: 8),
@@ -523,8 +600,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                         builder: (context) {
                           int dinaIdx = _getNakshatraForDate(_selectedDay!);
                           int tara1 = (dinaIdx - _janmaNakshatraIdx1! + 27) % 27 % 9;
-                          bool isGood1 = _isDayGood(dinaIdx, _janmaNakshatraIdx1!);
+                          bool isGood1 = _isDayGood(dinaIdx, _janmaNakshatraIdx1!, date: _selectedDay!);
                           bool isExcluded = _excludeNakshatras && _excludedNakIndices.contains(dinaIdx);
+                          bool isPrithvi = _includeAgniVasa ? _computeAgniVasaForDate(_selectedDay!) : true;
                           
                           if (!_isTwoPersonMode) {
                               // If excluded, always show RED
@@ -552,12 +630,31 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                                     ],
                                     const SizedBox(height: 8),
                                     Text(_taras[tara1], style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: textColor), textAlign: TextAlign.center),
+                                    if (_includeAgniVasa) ...[
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: isPrithvi ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: isPrithvi ? Colors.green : Colors.red),
+                                        ),
+                                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                          Icon(Icons.local_fire_department, size: 16, color: isPrithvi ? Colors.green : Colors.red),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            isPrithvi ? '${AppLocale.l('agniVasa')}: ${AppLocale.l('bhumiShubha')}' : '${AppLocale.l('agniVasa')}: ${AppLocale.l('patalaAshubha')}',
+                                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: isPrithvi ? Colors.green.shade700 : Colors.red.shade700),
+                                          ),
+                                        ]),
+                                      ),
+                                    ],
                                   ],
                                 ),
                               );
                           } else {
                               int tara2 = (dinaIdx - _janmaNakshatraIdx2! + 27) % 27 % 9;
-                              bool isGood2 = _isDayGood(dinaIdx, _janmaNakshatraIdx2!);
+                              bool isGood2 = _isDayGood(dinaIdx, _janmaNakshatraIdx2!, date: _selectedDay!);
                               
                               // If excluded, always show RED
                               Color bgColor = isExcluded ? Colors.red.shade50 : ((isGood1 && isGood2) ? Colors.green.shade50 : (!isGood1 && !isGood2) ? Colors.red.shade50 : Colors.orange.shade50);
@@ -599,7 +696,26 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
                                           ]
                                         )),
                                       ],
-                                    )
+                                    ),
+                                    if (_includeAgniVasa) ...[
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: isPrithvi ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: isPrithvi ? Colors.green : Colors.red),
+                                        ),
+                                        child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
+                                          Icon(Icons.local_fire_department, size: 16, color: isPrithvi ? Colors.green : Colors.red),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            isPrithvi ? '${AppLocale.l('agniVasa')}: ${AppLocale.l('bhumiShubha')}' : '${AppLocale.l('agniVasa')}: ${AppLocale.l('patalaAshubha')}',
+                                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: isPrithvi ? Colors.green.shade700 : Colors.red.shade700),
+                                          ),
+                                        ]),
+                                      ),
+                                    ],
                                   ],
                                 ),
                               );
