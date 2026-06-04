@@ -1,6 +1,6 @@
 {
   "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Plan to pre-compute 10 years of PanchangData (no events) on first launch with a loading dialog. Cached data makes month switching instant in the panchang screen.",
-  "updatedAt":  "2026-06-02T13:36:42.321622800Z",
+  "summary":  "Implementation plan for admin-controlled block/unblock mechanism that prevents app hangs. Uses existing device_bindings Firestore document, piggybacks on checkManualPremium() with 8s timeout, caches status locally, defaults to not-blocked if offline. Modifies subscription_service.dart, main.dart, and unlock_user.py.",
+  "updatedAt":  "2026-06-04T11:16:09.864175600Z",
   "requestFeedback":  true
 }

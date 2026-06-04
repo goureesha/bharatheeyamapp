@@ -341,7 +341,9 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   indicatorSize: TabBarIndicatorSize.tab,
                 ),
               ),
-              home: !GoogleAuthService.isSignedIn && !kIsWeb
+              home: SubscriptionService.isBlocked
+                  ? const _BlockedScreen()
+                  : !GoogleAuthService.isSignedIn && !kIsWeb
                   ? (SubscriptionService.lastOnlineCheck == null
                     ? const _FirstTimeSignInScreen()
                     : const _OfflineVerifyScreen())
@@ -352,6 +354,116 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
           },
         );
       },
+    );
+  }
+}
+
+// ============================================================
+// BLOCKED SCREEN — shown when admin blocks a user
+// ============================================================
+
+class _BlockedScreen extends StatefulWidget {
+  const _BlockedScreen();
+  @override
+  State<_BlockedScreen> createState() => _BlockedScreenState();
+}
+
+class _BlockedScreenState extends State<_BlockedScreen> {
+  bool _checking = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final reason = SubscriptionService.blockedReason;
+    return Scaffold(
+      backgroundColor: kBg,
+      body: SafeArea(
+        child: Center(child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Image.asset('assets/images/logo.png', width: 80, height: 80),
+            const SizedBox(height: 16),
+            Text(AppLocale.l('appName'), style: TextStyle(
+              fontSize: 26, fontWeight: FontWeight.w900, color: kOrange, letterSpacing: 1.5)),
+            const SizedBox(height: 32),
+            Icon(Icons.block, color: Colors.red[400], size: 72),
+            const SizedBox(height: 20),
+            Text('Account Blocked', style: TextStyle(
+              fontSize: 22, fontWeight: FontWeight.w800, color: Colors.red[700])),
+            const SizedBox(height: 8),
+            Text('ಖಾತೆ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ', style: TextStyle(
+              fontSize: 16, color: Colors.red[400])),
+            const SizedBox(height: 24),
+            if (reason.isNotEmpty) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.red.withOpacity(0.3)),
+                ),
+                child: Row(children: [
+                  Icon(Icons.info_outline, color: Colors.red[400], size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(reason, style: TextStyle(
+                    fontSize: 14, color: kText, height: 1.5))),
+                ]),
+              ),
+              const SizedBox(height: 24),
+            ],
+            Text(
+              'Your account has been blocked by the administrator. Please contact support for assistance.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: kMuted, height: 1.6),
+            ),
+            const SizedBox(height: 32),
+            if (_checking)
+              CircularProgressIndicator(color: kPurple2)
+            else
+              SizedBox(width: double.infinity, child: ElevatedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry / ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPurple2, foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+                onPressed: () async {
+                  setState(() => _checking = true);
+                  try {
+                    await SubscriptionService.checkManualPremium();
+                  } catch (_) {}
+                  if (mounted) {
+                    if (!SubscriptionService.isBlocked) {
+                      // Unblocked! Rebuild the app
+                      deviceBindingNotifier.value = deviceBindingNotifier.value;
+                    } else {
+                      setState(() => _checking = false);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Account is still blocked'), backgroundColor: Colors.red),
+                      );
+                    }
+                  }
+                },
+              )),
+            const SizedBox(height: 24),
+            Divider(color: kBorder),
+            const SizedBox(height: 12),
+            Text('Contact Support', style: TextStyle(fontSize: 14, color: kMuted, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(Icons.phone, size: 14, color: kPurple2),
+              const SizedBox(width: 4),
+              Text('+91 8762629847', style: TextStyle(fontSize: 12, color: kText)),
+            ]),
+            const SizedBox(height: 4),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(Icons.email, size: 14, color: kPurple2),
+              const SizedBox(width: 4),
+              Text('goureesh3690@gmail.com', style: TextStyle(fontSize: 12, color: kText)),
+            ]),
+          ]),
+        )),
+      ),
     );
   }
 }

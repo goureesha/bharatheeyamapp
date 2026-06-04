@@ -12,6 +12,8 @@ class SubscriptionService {
   static const String _subStatusKey = 'has_active_subscription';
   static const String _trialStartKey = 'trial_start_timestamp';
   static const String _lastOnlineCheckKey = 'last_online_check_timestamp';
+  static const String _blockedKey = 'user_blocked';
+  static const String _blockedReasonKey = 'user_blocked_reason';
 
   // ── Constants ──
   static const int _trialMinutes = 30;
@@ -24,6 +26,8 @@ class SubscriptionService {
   static DateTime? manualPremiumExpiry;
   static DateTime? trialStartDate;
   static DateTime? lastOnlineCheck;
+  static bool isBlocked = false;
+  static String blockedReason = '';
 
   // ════════════════════════════════════════════════
   // COMPUTED PROPERTIES FOR UI
@@ -31,6 +35,7 @@ class SubscriptionService {
 
   /// True if the user has access (manual premium OR trial active OR active offline claim)
   static bool get hasAccess {
+    if (isBlocked) return false;
     if (kIsWeb) return true;
     if (OfflineAccessService.hasActiveClaim) return true;
     if (manualPremium) {
@@ -146,6 +151,10 @@ class SubscriptionService {
 
     if (kIsWeb) return;
 
+    // Load cached blocked status (fail-open default: not blocked)
+    isBlocked = prefs.getBool(_blockedKey) ?? false;
+    blockedReason = prefs.getString(_blockedReasonKey) ?? '';
+
     // ── CRITICAL: Check Firestore on EVERY app open ──
     // Do NOT load cached subscription status first — always check server.
     // This ensures admin revocations take effect immediately on next app open.
@@ -251,6 +260,19 @@ class SubscriptionService {
       await recordOnlineCheck();
 
       final data = doc.data()!;
+
+      // ── Block check (same document, no extra network call) ──
+      final blockedFlag = data['blocked'] == true;
+      final reason = data['blockedReason'] as String? ?? '';
+      isBlocked = blockedFlag;
+      blockedReason = reason;
+      final prefs2 = await SharedPreferences.getInstance();
+      await prefs2.setBool(_blockedKey, blockedFlag);
+      await prefs2.setString(_blockedReasonKey, reason);
+      if (blockedFlag) {
+        debugPrint('🚫 User BLOCKED: $reason');
+      }
+
       final isPremium = data['manualPremium'] == true;
 
       if (isPremium) {
