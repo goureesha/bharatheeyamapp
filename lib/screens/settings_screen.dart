@@ -597,7 +597,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     final ok = await BackupService.exportData();
                                     if (mounted && ok) {
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Choose app to save backup file.'))
+                                        const SnackBar(content: Text('Backup saved to Downloads folder.'), backgroundColor: Colors.green)
                                       );
                                     }
                                   },
