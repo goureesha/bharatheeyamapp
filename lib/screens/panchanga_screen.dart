@@ -5,6 +5,7 @@ import '../core/calculator.dart';
 import '../core/ephemeris.dart';
 import '../services/location_service.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:sweph/sweph.dart';
 
 
 class PanchangaScreen extends StatefulWidget {
@@ -300,13 +301,33 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
     return result;
   }
 
-  // ─── Check if a day has Agni on Prithvi from cache ───
+  // ─── Agnivasa cache (independent of panchang cache) ───
+  final Map<String, bool> _agniVasaCache = {};
+
+  // ─── Check if a day has Agni on Prithvi ───
   bool _isPrithviDay(DateTime day) {
     final key = _cacheKey(day);
-    final cached = _panchangCache[key];
-    if (cached == null) return false;
-    final agni = cached.agniVasa;
-    return agni.contains('ಭೂಮಿ') || agni.contains('भूमि') || agni.contains('பூமி') || agni.contains('భూమి') || agni.contains('ഭൂമി') || agni.contains('Bhumi');
+    if (_agniVasaCache.containsKey(key)) return _agniVasaCache[key]!;
+    try {
+      final srSs = Ephemeris.findSunriseSetForDate(
+        day.year, day.month, day.day,
+        LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
+      );
+      final srJd = srSs[0];
+      final jd = srJd + (1.0 / 1440.0);
+      Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+      final moonPos = Sweph.swe_calc_ut(jd, HeavenlyBody.SE_MOON, SwephFlag.SEFLG_SWIEPH | SwephFlag.SEFLG_SIDEREAL);
+      final sunPos = Sweph.swe_calc_ut(jd, HeavenlyBody.SE_SUN, SwephFlag.SEFLG_SWIEPH | SwephFlag.SEFLG_SIDEREAL);
+      final tithiIdx = (((moonPos.longitude - sunPos.longitude + 360) % 360) / 12).floor().clamp(0, 29);
+      int pyWeekday = day.weekday - 1; // Mon=0..Sun=6
+      int wIdx = (pyWeekday + 1) % 7; // Sun=0..Sat=6
+      final agniVal = (tithiIdx + wIdx) % 4;
+      final isPrithvi = (agniVal == 0 || agniVal == 3);
+      _agniVasaCache[key] = isPrithvi;
+      return isPrithvi;
+    } catch (_) {
+      return false;
+    }
   }
 
   // ─── Calendar cell with green dot for Prithvi days ───
