@@ -30,6 +30,8 @@ class DeviceBindingService {
   static String? _deviceId;
   static bool _isDeviceBound = false; // FAIL-CLOSED: default to blocked until verified
   static bool _hasCheckedOnce = false;
+  static bool isDeviceBlocked = false;
+  static String deviceBlockedReason = '';
 
   static bool get isDeviceBound => _isDeviceBound;
   static bool get hasCheckedOnce => _hasCheckedOnce;
@@ -455,5 +457,45 @@ class DeviceBindingService {
       debugPrint('InstallTracker error: $e');
     }
   }
+
+  /// Check if this device is blocked via installs/{deviceId}
+  /// Called during deferred init. Has its own timeout. Fail-OPEN.
+  static Future<void> checkDeviceBlock() async {
+    try {
+      if (kIsWeb) return;
+
+      // Load cached value first
+      final prefs = await SharedPreferences.getInstance();
+      isDeviceBlocked = prefs.getBool('device_blocked') ?? false;
+      deviceBlockedReason = prefs.getString('device_blocked_reason') ?? '';
+
+      final firebaseReady = await _ensureFirebase();
+      if (!firebaseReady) return; // use cached
+
+      final devId = await getDeviceId();
+      final doc = await FirebaseFirestore.instance
+          .collection('installs')
+          .doc(devId)
+          .get()
+          .timeout(const Duration(seconds: 5));
+
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data()!;
+        final blocked = data['blocked'] == true;
+        final reason = data['blockedReason'] as String? ?? '';
+        isDeviceBlocked = blocked;
+        deviceBlockedReason = reason;
+        await prefs.setBool('device_blocked', blocked);
+        await prefs.setString('device_blocked_reason', reason);
+        if (blocked) {
+          debugPrint('🚫 DEVICE BLOCKED: $devId reason=$reason');
+        }
+      }
+    } catch (e) {
+      debugPrint('DeviceBlock check error: $e');
+      // Fail-open: use cached value
+    }
+  }
+
 
 }

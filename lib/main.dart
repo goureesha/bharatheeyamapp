@@ -63,6 +63,12 @@ Future<void> main() async {
     await _initAuthAndBinding();
     TesterService.init();
     _deferredInit();
+    // Check device-level block (installs collection) — runs AFTER trackInstall
+    await DeviceBindingService.checkDeviceBlock();
+    // Trigger UI rebuild if device is blocked
+    if (DeviceBindingService.isDeviceBlocked) {
+      deviceBindingNotifier.value = deviceBindingNotifier.value;
+    }
   });
 }
 
@@ -341,8 +347,8 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   indicatorSize: TabBarIndicatorSize.tab,
                 ),
               ),
-              home: SubscriptionService.isBlocked
-                  ? const _BlockedScreen()
+              home: (SubscriptionService.isBlocked || DeviceBindingService.isDeviceBlocked)
+                  ? _BlockedScreen()
                   : !GoogleAuthService.isSignedIn && !kIsWeb
                   ? (SubscriptionService.lastOnlineCheck == null
                     ? const _FirstTimeSignInScreen()
@@ -373,7 +379,9 @@ class _BlockedScreenState extends State<_BlockedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final reason = SubscriptionService.blockedReason;
+    final reason = SubscriptionService.isBlocked
+        ? SubscriptionService.blockedReason
+        : DeviceBindingService.deviceBlockedReason;
     return Scaffold(
       backgroundColor: kBg,
       body: SafeArea(
@@ -431,9 +439,10 @@ class _BlockedScreenState extends State<_BlockedScreen> {
                   setState(() => _checking = true);
                   try {
                     await SubscriptionService.checkManualPremium();
+                    await DeviceBindingService.checkDeviceBlock();
                   } catch (_) {}
                   if (mounted) {
-                    if (!SubscriptionService.isBlocked) {
+                    if (!SubscriptionService.isBlocked && !DeviceBindingService.isDeviceBlocked) {
                       // Unblocked! Rebuild the app
                       deviceBindingNotifier.value = deviceBindingNotifier.value;
                     } else {

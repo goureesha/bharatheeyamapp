@@ -418,7 +418,7 @@ async function loadInstalls() {
   const section = document.getElementById('installsSection');
   const tbody = document.getElementById('installsTableBody');
   section.classList.remove('hidden');
-  tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Loading installs...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="10" class="empty-state">Loading installs...</td></tr>';
 
   try {
     const snapshot = await db.collection('installs').get();
@@ -435,6 +435,8 @@ async function loadInstalls() {
         launchCount: data.launchCount || 0,
         firstInstall: data.firstInstall ? data.firstInstall.toDate() : null,
         lastLaunch: data.lastLaunch ? data.lastLaunch.toDate() : null,
+        isBlocked: data.blocked === true,
+        blockedReason: data.blockedReason || '',
       });
     });
 
@@ -446,7 +448,7 @@ async function loadInstalls() {
     const sorted = [...notSignedIn, ...signedIn];
 
     if (sorted.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No installs found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No installs found</td></tr>';
       return;
     }
 
@@ -464,28 +466,37 @@ async function loadInstalls() {
         : '—';
       const shortId = inst.deviceId.length > 12 ? inst.deviceId.substring(0, 12) + '…' : inst.deviceId;
       const isUnsigned = inst.email === 'not_signed_in' || inst.email === '—';
-      const rowBg = isUnsigned ? 'background: rgba(239,68,68,0.06);' : '';
+      const rowBg = inst.isBlocked ? 'background: rgba(220,38,38,0.1);' : isUnsigned ? 'background: rgba(239,68,68,0.06);' : '';
       const emailDisplay = isUnsigned
         ? '<span class="badge badge-expired" style="font-size: 10px;">⚠ No Login</span>'
         : `<span style="font-weight: 600">${inst.email}</span>`;
+
+      const blockBadge = inst.isBlocked
+        ? '<span class="badge badge-expired" style="font-size:10px; background:rgba(220,38,38,0.15); color:#dc2626;">🚫 Blocked</span> '
+        : '';
+
+      const blockBtn = inst.isBlocked
+        ? `<button class="btn-unlock" onclick="unblockInstall('${inst.deviceId}')" style="font-size:10px; padding:4px 8px; background:#10b981;">Unblock</button>`
+        : `<button class="btn-revoke-small" onclick="blockInstall('${inst.deviceId}')" style="font-size:10px; padding:4px 8px; background:#dc2626;">Block</button>`;
 
       return `
         <tr style="${rowBg}">
           <td style="color: var(--muted)">${i + 1}</td>
           <td style="font-size: 11px; color: var(--muted); font-family: monospace;" title="${inst.deviceId}">${shortId}</td>
-          <td>${emailDisplay}</td>
+          <td>${blockBadge}${emailDisplay}</td>
           <td style="font-size: 12px; color: var(--muted)">${inst.deviceName}</td>
           <td style="font-size: 12px;">${inst.platform}</td>
           <td style="font-size: 12px; color: var(--muted)">${inst.appVersion}</td>
           <td style="font-weight: 700; color: var(--purple)">${inst.launchCount}</td>
           <td style="font-size: 12px; color: var(--muted)">${firstStr}</td>
           <td style="font-size: 12px; color: var(--muted)">${lastStr}</td>
+          <td>${blockBtn}</td>
         </tr>
       `;
     }).join('');
   } catch (err) {
     console.error('Installs load error:', err);
-    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Error: ' + err.message + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10" class="empty-state">Error: ' + err.message + '</td></tr>';
   }
 }
 
@@ -563,6 +574,37 @@ async function confirmUnblock(email) {
       blockedReason: firebase.firestore.FieldValue.delete(),
     });
     loadClients();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+// ─── Install Block / Unblock ───
+
+async function blockInstall(deviceId) {
+  const reason = prompt('Block reason (shown to user):', 'Blocked by admin');
+  if (reason === null) return; // cancelled
+
+  try {
+    await db.collection('installs').doc(deviceId).update({
+      blocked: true,
+      blockedReason: reason || 'Blocked by admin',
+    });
+    loadInstalls();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+async function unblockInstall(deviceId) {
+  if (!confirm('Unblock device ' + deviceId.substring(0, 12) + '…?')) return;
+
+  try {
+    await db.collection('installs').doc(deviceId).update({
+      blocked: false,
+      blockedReason: firebase.firestore.FieldValue.delete(),
+    });
+    loadInstalls();
   } catch (err) {
     alert('Error: ' + err.message);
   }
