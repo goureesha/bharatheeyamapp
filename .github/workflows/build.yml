@@ -71,15 +71,23 @@ jobs:
           path: build/app/outputs/bundle/release/app-release.aab
           retention-days: 1
 
-      - name: Build APK
-        run: flutter build apk --release --obfuscate --split-debug-info=build/debug-info
+      - name: Build APK (split per ABI)
+        run: flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/debug-info
 
-      - name: Upload APK
+      - name: Upload APK (arm64 — 95%+ of devices)
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: bharatheeyam-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: bharatheeyam-apk-arm64
+          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+          retention-days: 7
+
+      - name: Upload APK (all architectures)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bharatheeyam-apk-all
+          path: build/app/outputs/flutter-apk/*.apk
           retention-days: 7
 
 
