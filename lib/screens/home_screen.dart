@@ -48,10 +48,10 @@ class HomeScreen extends StatelessWidget {
       _Section(AppLocale.l('appointment'), 'Appointments', Icons.event_note, kTeal, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const AppointmentScreen()));
       }),
-      _Section('ಪೂಜಾ ಪಟ್ಟಿ', 'Pooja Lists', Icons.list_alt_rounded, Color(0xFF8E44AD), () {
+      _Section(AppLocale.l('poojaLists'), 'Pooja Lists', Icons.list_alt_rounded, Color(0xFF8E44AD), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const PoojaListsScreen()));
       }),
-      _Section('ವಾಸ್ತು', 'Vastu', Icons.home_work_rounded, Color(0xFFD4A017), () {
+      _Section(AppLocale.l('vastuLabel'), 'Vastu', Icons.home_work_rounded, Color(0xFFD4A017), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const VastuScreen()));
       }),
 

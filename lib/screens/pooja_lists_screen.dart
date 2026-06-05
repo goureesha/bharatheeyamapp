@@ -10,6 +10,120 @@ import 'package:screenshot/screenshot.dart';
 import '../widgets/common.dart';
 import '../services/pooja_list_service.dart';
 
+// ─── Pooja screen translations (self-contained, 5 languages) ───
+const Map<String, Map<String, String>> _poojaStrings = {
+  'kn': {
+    'title': 'ಪೂಜಾ ಪಟ್ಟಿ', 'newList': 'ಹೊಸ ಪೂಜಾ ಪಟ್ಟಿ',
+    'hintName': 'ಉದಾ: ಗಣೇಶ ಪೂಜೆ, ಸತ್ಯನಾರಾಯಣ ಪೂಜೆ...',
+    'cancel': 'ರದ್ದು', 'create': 'ರಚಿಸಿ', 'save': 'ಉಳಿಸಿ', 'delete': 'ಅಳಿಸಿ',
+    'rename': 'ಹೆಸರು ಬದಲಾಯಿಸಿ', 'noLists': 'ಯಾವುದೇ ಪೂಜಾ ಪಟ್ಟಿ ಇಲ್ಲ',
+    'tapCreate': '+ ಒತ್ತಿ ಹೊಸ ಪಟ್ಟಿ ರಚಿಸಿ', 'createList': 'ಪಟ್ಟಿ ರಚಿಸಿ',
+    'items': 'ಐಟಂಗಳು', 'noItems': 'ಯಾವುದೇ ಐಟಂಗಳಿಲ್ಲ', 'item': 'ಐಟಂ', 'qty': 'ಪ್ರಮಾಣ',
+    'addItem': 'ಐಟಂ ಸೇರಿಸಿ', 'selectItem': 'ಐಟಂ ಆಯ್ಕೆ ಮಾಡಿ', 'selectQty': 'ಪ್ರಮಾಣ',
+    'customItem': '── ಕಸ್ಟಮ್ ಐಟಂ ──', 'typeItemName': 'ಐಟಂ ಹೆಸರು ಟೈಪ್ ಮಾಡಿ...',
+    'editItem': 'ಐಟಂ ಬದಲಾಯಿಸಿ', 'itemName': 'ಐಟಂ ಹೆಸರು',
+    'added': 'ಸೇರಿಸಲಾಗಿದೆ', 'selectItemErr': 'ಐಟಂ ಆಯ್ಕೆ ಮಾಡಿ',
+    'purohit': 'ಪುರೋಹಿತರ ವಿವರ', 'purohitName': 'ಪುರೋಹಿತರ ಹೆಸರು', 'mobile': 'ಮೊಬೈಲ್ ಸಂಖ್ಯೆ',
+    'addPurohit': 'ಪುರೋಹಿತರ ಹೆಸರು ಸೇರಿಸಿ',
+    'shareWA': 'WhatsApp ಹಂಚಿಕೊಳ್ಳಿ', 'downloadPdf': 'PDF ಡೌನ್‌ಲೋಡ್',
+    'viewPlain': 'ಪಟ್ಟಿ ನೋಡಿ', 'addDefaults': 'ಡೀಫಾಲ್ಟ್ ಐಟಂ ಸೇರಿಸಿ', 'removeDefaults': 'ಡೀಫಾಲ್ಟ್ ಐಟಂ ತೆಗೆಯಿರಿ',
+    'deleteQ': 'ಅಳಿಸಬೇಕೇ?', 'deleteMsg': 'ಈ ಪಟ್ಟಿ ಮತ್ತು ಎಲ್ಲಾ ಐಟಂಗಳನ್ನು ಅಳಿಸಲಾಗುತ್ತದೆ.',
+    'useDropdown': 'ಮೇಲಿನ ಡ್ರಾಪ್‌ಡೌನ್ ಬಳಸಿ ಸೇರಿಸಿ', 'total': 'ಒಟ್ಟು',
+    'allDefaultsExist': 'ಎಲ್ಲಾ ಡೀಫಾಲ್ಟ್ ಐಟಂ ಈಗಾಗಲೇ ಇದೆ', 'defaultsAdded': 'ಡೀಫಾಲ್ಟ್ ಐಟಂ ಸೇರಿಸಲಾಗಿದೆ',
+    'defaultsRemoved': 'ಡೀಫಾಲ್ಟ್ ಐಟಂ ತೆಗೆಯಲಾಗಿದೆ', 'noDefaultsToRemove': 'ತೆಗೆಯಲು ಡೀಫಾಲ್ಟ್ ಐಟಂ ಇಲ್ಲ',
+    'listName': 'ಪಟ್ಟಿ ಹೆಸರು', 'poojaList': 'ಪೂಜಾ ಸಾಮಗ್ರಿ ಪಟ್ಟಿ', 'itemsDone': 'ಐಟಂ ಮುಗಿದಿದೆ',
+  },
+  'hi': {
+    'title': 'पूजा सूची', 'newList': 'नई पूजा सूची',
+    'hintName': 'उदा: गणेश पूजा, सत्यनारायण पूजा...',
+    'cancel': 'रद्द', 'create': 'बनाएं', 'save': 'सेव', 'delete': 'हटाएं',
+    'rename': 'नाम बदलें', 'noLists': 'कोई पूजा सूची नहीं',
+    'tapCreate': '+ दबाएं नई सूची बनाएं', 'createList': 'सूची बनाएं',
+    'items': 'सामग्री', 'noItems': 'कोई सामग्री नहीं', 'item': 'सामग्री', 'qty': 'मात्रा',
+    'addItem': 'सामग्री जोड़ें', 'selectItem': 'सामग्री चुनें', 'selectQty': 'मात्रा',
+    'customItem': '── कस्टम सामग्री ──', 'typeItemName': 'सामग्री का नाम टाइप करें...',
+    'editItem': 'सामग्री बदलें', 'itemName': 'सामग्री का नाम',
+    'added': 'जोड़ा गया', 'selectItemErr': 'सामग्री चुनें',
+    'purohit': 'पुरोहित विवरण', 'purohitName': 'पुरोहित का नाम', 'mobile': 'मोबाइल नंबर',
+    'addPurohit': 'पुरोहित का नाम जोड़ें',
+    'shareWA': 'WhatsApp शेयर', 'downloadPdf': 'PDF डाउनलोड',
+    'viewPlain': 'सूची देखें', 'addDefaults': 'डिफ़ॉल्ट सामग्री जोड़ें', 'removeDefaults': 'डिफ़ॉल्ट सामग्री हटाएं',
+    'deleteQ': 'हटाना है?', 'deleteMsg': 'यह सूची और सभी सामग्री हटाई जाएगी.',
+    'useDropdown': 'ऊपर ड्रॉपडाउन से जोड़ें', 'total': 'कुल',
+    'allDefaultsExist': 'सभी डिफ़ॉल्ट सामग्री पहले से है', 'defaultsAdded': 'डिफ़ॉल्ट सामग्री जोड़ी गई',
+    'defaultsRemoved': 'डिफ़ॉल्ट सामग्री हटाई गई', 'noDefaultsToRemove': 'हटाने को डिफ़ॉल्ट सामग्री नहीं',
+    'listName': 'सूची नाम', 'poojaList': 'पूजा सामग्री सूची', 'itemsDone': 'सामग्री पूर्ण',
+  },
+  'ta': {
+    'title': 'பூஜை பட்டியல்', 'newList': 'புதிய பூஜை பட்டியல்',
+    'hintName': 'எ.கா: விநாயகர் பூஜை, சத்யநாராயண பூஜை...',
+    'cancel': 'ரத்து', 'create': 'உருவாக்கு', 'save': 'சேமி', 'delete': 'நீக்கு',
+    'rename': 'பெயர் மாற்று', 'noLists': 'பூஜை பட்டியல் இல்லை',
+    'tapCreate': '+ புதிய பட்டியல் உருவாக்கு', 'createList': 'பட்டியல் உருவாக்கு',
+    'items': 'பொருட்கள்', 'noItems': 'பொருட்கள் இல்லை', 'item': 'பொருள்', 'qty': 'அளவு',
+    'addItem': 'பொருள் சேர்', 'selectItem': 'பொருள் தேர்வு', 'selectQty': 'அளவு',
+    'customItem': '── தனிப்பயன் பொருள் ──', 'typeItemName': 'பொருளின் பெயர் தட்டச்சு...',
+    'editItem': 'பொருள் திருத்து', 'itemName': 'பொருளின் பெயர்',
+    'added': 'சேர்க்கப்பட்டது', 'selectItemErr': 'பொருள் தேர்வு செய்யவும்',
+    'purohit': 'புரோஹிதர் விவரம்', 'purohitName': 'புரோஹிதர் பெயர்', 'mobile': 'மொபைல் எண்',
+    'addPurohit': 'புரோஹிதர் பெயர் சேர்',
+    'shareWA': 'WhatsApp பகிர்', 'downloadPdf': 'PDF பதிவிறக்கு',
+    'viewPlain': 'பட்டியல் பார்', 'addDefaults': 'இயல்புநிலை சேர்', 'removeDefaults': 'இயல்புநிலை நீக்கு',
+    'deleteQ': 'நீக்கவா?', 'deleteMsg': 'இந்த பட்டியலும் அனைத்து பொருட்களும் நீக்கப்படும்.',
+    'useDropdown': 'மேலே உள்ள டிராப்டவுன் பயன்படுத்தி சேர்க்கவும்', 'total': 'மொத்தம்',
+    'allDefaultsExist': 'அனைத்து இயல்புநிலை ஏற்கனவே உள்ளன', 'defaultsAdded': 'இயல்புநிலை சேர்க்கப்பட்டன',
+    'defaultsRemoved': 'இயல்புநிலை நீக்கப்பட்டன', 'noDefaultsToRemove': 'நீக்க இயல்புநிலை இல்லை',
+    'listName': 'பட்டியல் பெயர்', 'poojaList': 'பூஜை சாமக்ரி பட்டியல்', 'itemsDone': 'பொருட்கள் முடிந்தது',
+  },
+  'te': {
+    'title': 'పూజ జాబితా', 'newList': 'కొత్త పూజ జాబితా',
+    'hintName': 'ఉదా: గణేశ పూజ, సత్యనారాయణ పూజ...',
+    'cancel': 'రద్దు', 'create': 'సృష్టించు', 'save': 'సేవ్', 'delete': 'తొలగించు',
+    'rename': 'పేరు మార్చు', 'noLists': 'పూజ జాబితా లేదు',
+    'tapCreate': '+ కొత్త జాబితా సృష్టించు', 'createList': 'జాబితా సృష్టించు',
+    'items': 'వస్తువులు', 'noItems': 'వస్తువులు లేవు', 'item': 'వస్తువు', 'qty': 'పరిమాణం',
+    'addItem': 'వస్తువు చేర్చు', 'selectItem': 'వస్తువు ఎంచుకోండి', 'selectQty': 'పరిమాణం',
+    'customItem': '── కస్టమ్ వస్తువు ──', 'typeItemName': 'వస్తువు పేరు టైప్ చేయండి...',
+    'editItem': 'వస్తువు మార్చు', 'itemName': 'వస్తువు పేరు',
+    'added': 'చేర్చబడింది', 'selectItemErr': 'వస్తువు ఎంచుకోండి',
+    'purohit': 'పురోహితుడి వివరాలు', 'purohitName': 'పురోహితుడి పేరు', 'mobile': 'మొబైల్ నంబర్',
+    'addPurohit': 'పురోహితుడి పేరు చేర్చండి',
+    'shareWA': 'WhatsApp షేర్', 'downloadPdf': 'PDF డౌన్‌లోడ్',
+    'viewPlain': 'జాబితా చూడు', 'addDefaults': 'డిఫాల్ట్ చేర్చు', 'removeDefaults': 'డిఫాల్ట్ తొలగించు',
+    'deleteQ': 'తొలగించాలా?', 'deleteMsg': 'ఈ జాబితా మరియు అన్ని వస్తువులు తొలగించబడతాయి.',
+    'useDropdown': 'పైన డ్రాప్‌డౌన్ ఉపయోగించి చేర్చండి', 'total': 'మొత్తం',
+    'allDefaultsExist': 'అన్ని డిఫాల్ట్ ఇప్పటికే ఉన్నాయి', 'defaultsAdded': 'డిఫాల్ట్ చేర్చబడ్డాయి',
+    'defaultsRemoved': 'డిఫాల్ట్ తొలగించబడ్డాయి', 'noDefaultsToRemove': 'తొలగించడానికి డిఫాల్ట్ లేవు',
+    'listName': 'జాబితా పేరు', 'poojaList': 'పూజ సామగ్రి జాబితా', 'itemsDone': 'వస్తువులు పూర్తి',
+  },
+  'ml': {
+    'title': 'പൂജാ പട്ടിക', 'newList': 'പുതിയ പൂജാ പട്ടിക',
+    'hintName': 'ഉദാ: ഗണേശ പൂജ, സത്യനാരായണ പൂജ...',
+    'cancel': 'റദ്ദാക്കുക', 'create': 'സൃഷ്ടിക്കുക', 'save': 'സേവ്', 'delete': 'ഇല്ലാതാക്കുക',
+    'rename': 'പേര് മാറ്റുക', 'noLists': 'പൂജാ പട്ടിക ഇല്ല',
+    'tapCreate': '+ പുതിയ പട്ടിക സൃഷ്ടിക്കുക', 'createList': 'പട്ടിക സൃഷ്ടിക്കുക',
+    'items': 'വസ്തുക്കൾ', 'noItems': 'വസ്തുക്കൾ ഇല്ല', 'item': 'വസ്തു', 'qty': 'അളവ്',
+    'addItem': 'വസ്തു ചേർക്കുക', 'selectItem': 'വസ്തു തിരഞ്ഞെടുക്കുക', 'selectQty': 'അളവ്',
+    'customItem': '── കസ്റ്റം വസ്തു ──', 'typeItemName': 'വസ്തുവിന്റെ പേര് ടൈപ്പ് ചെയ്യുക...',
+    'editItem': 'വസ്തു മാറ്റുക', 'itemName': 'വസ്തുവിന്റെ പേര്',
+    'added': 'ചേർത്തു', 'selectItemErr': 'വസ്തു തിരഞ്ഞെടുക്കുക',
+    'purohit': 'പുരോഹിതന്റെ വിവരങ്ങൾ', 'purohitName': 'പുരോഹിതന്റെ പേര്', 'mobile': 'മൊബൈൽ നമ്പർ',
+    'addPurohit': 'പുരോഹിതന്റെ പേര് ചേർക്കുക',
+    'shareWA': 'WhatsApp ഷെയർ', 'downloadPdf': 'PDF ഡൗൺലോഡ്',
+    'viewPlain': 'പട്ടിക കാണുക', 'addDefaults': 'ഡിഫോൾട്ട് ചേർക്കുക', 'removeDefaults': 'ഡിഫോൾട്ട് നീക്കുക',
+    'deleteQ': 'ഇല്ലാതാക്കണോ?', 'deleteMsg': 'ഈ പട്ടികയും എല്ലാ വസ്തുക്കളും ഇല്ലാതാക്കപ്പെടും.',
+    'useDropdown': 'മുകളിലെ ഡ്രോപ്പ്ഡൗൺ ഉപയോഗിച്ച് ചേർക്കുക', 'total': 'ആകെ',
+    'allDefaultsExist': 'എല്ലാ ഡിഫോൾട്ടും ഇതിനകം ഉണ്ട്', 'defaultsAdded': 'ഡിഫോൾട്ട് ചേർത്തു',
+    'defaultsRemoved': 'ഡിഫോൾട്ട് നീക്കി', 'noDefaultsToRemove': 'നീക്കാൻ ഡിഫോൾട്ട് ഇല്ല',
+    'listName': 'പട്ടിക പേര്', 'poojaList': 'പൂജാ സാമഗ്രി പട്ടിക', 'itemsDone': 'വസ്തുക്കൾ പൂർത്തിയായി',
+  },
+};
+
+String _p(String key) {
+  final lang = AppLocale.current;
+  return _poojaStrings[lang]?[key] ?? _poojaStrings['kn']?[key] ?? key;
+}
+
 /// Default items added to every new pooja list
 const List<Map<String, String>> _defaultPoojaItems = [
   {'n': 'ಅಕ್ಕಿ', 'q': '1 kg'},
@@ -68,13 +182,13 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: kCard,
-        title: Text('New Pooja List', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
+        title: Text(_p('newList'), style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
           style: TextStyle(color: kText),
           decoration: InputDecoration(
-            hintText: 'e.g. Ganesh Pooja, Satyanarayan Pooja...',
+            hintText: _p('hintName'),
             hintStyle: TextStyle(color: kMuted, fontSize: 14),
             filled: true, fillColor: kBg,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kBorder)),
@@ -85,7 +199,7 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: TextStyle(color: kMuted)),
+            child: Text(_p('cancel'), style: TextStyle(color: kMuted)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -102,7 +216,7 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
               _openList(newList);
             },
             style: ElevatedButton.styleFrom(backgroundColor: kOrange, foregroundColor: Colors.white),
-            child: const Text('Create'),
+            child: Text(_p('create')),
           ),
         ],
       ),
@@ -125,7 +239,7 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: kCard,
-        title: Text('Rename List', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
+        title: Text(_p('rename'), style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
@@ -138,7 +252,7 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: kMuted))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(_p('cancel'), style: TextStyle(color: kMuted))),
           ElevatedButton(
             onPressed: () {
               final name = ctrl.text.trim();
@@ -148,7 +262,7 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
               _save();
             },
             style: ElevatedButton.styleFrom(backgroundColor: kOrange, foregroundColor: Colors.white),
-            child: const Text('Save'),
+            child: Text(_p('save')),
           ),
         ],
       ),
@@ -161,12 +275,12 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: kCard,
-        title: Text('Delete "${list.name}"?', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
-        content: Text('This will delete the list and all its items.', style: TextStyle(color: kMuted)),
+        title: Text('${_p('deleteQ')} "${list.name}"', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
+        content: Text(_p('deleteMsg'), style: TextStyle(color: kMuted)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: TextStyle(color: kMuted)),
+            child: Text(_p('cancel'), style: TextStyle(color: kMuted)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -175,7 +289,7 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
               _save();
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-            child: const Text('Delete'),
+            child: Text(_p('delete')),
           ),
         ],
       ),
@@ -188,7 +302,7 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
       backgroundColor: kBg,
       appBar: AppBar(
         backgroundColor: kCard,
-        title: Text('Pooja Lists', style: TextStyle(color: kText, fontSize: 18, fontWeight: FontWeight.w800)),
+        title: Text(_p('title'), style: TextStyle(color: kText, fontSize: 18, fontWeight: FontWeight.w800)),
         iconTheme: IconThemeData(color: kText),
         elevation: 0,
         actions: [
@@ -208,14 +322,14 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
                     children: [
                       Icon(Icons.list_alt_rounded, size: 80, color: kMuted.withOpacity(0.3)),
                       const SizedBox(height: 16),
-                      Text('No pooja lists yet', style: TextStyle(fontSize: 18, color: kMuted, fontWeight: FontWeight.w700)),
+                      Text(_p('noLists'), style: TextStyle(fontSize: 18, color: kMuted, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 8),
-                      Text('Tap + to create your first list', style: TextStyle(fontSize: 14, color: kMuted)),
+                      Text(_p('tapCreate'), style: TextStyle(fontSize: 14, color: kMuted)),
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
                         onPressed: _createNewList,
                         icon: const Icon(Icons.add),
-                        label: const Text('Create List'),
+                        label: Text(_p('createList')),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: kOrange, foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -265,7 +379,7 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
                                       Text(list.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: kText)),
                                       const SizedBox(height: 4),
                                       Text(
-                                        total == 0 ? 'No items' : '$total items',
+                                        total == 0 ? _p('noItems') : '$total ${_p('items')}',
                                         style: TextStyle(fontSize: 13, color: kMuted),
                                       ),
                                     ],
@@ -324,10 +438,10 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
   String? _selectedQty;
   bool _isCustomItem = false;
 
-  // Default item names for dropdown
-  static final List<String> _dropdownItems = [
+  // Default item names for dropdown (getter so it updates with language)
+  List<String> get _dropdownItems => [
     ..._defaultPoojaItems.map((m) => m['n']!),
-    '── ಕಸ್ಟಮ್ ಐಟಂ ──',
+    _p('customItem'),
   ];
 
   // Common quantity options for dropdown
@@ -356,7 +470,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
     final itemName = _isCustomItem ? _customNameCtrl.text.trim() : _selectedItem;
     if (itemName == null || itemName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ಐಟಂ ಆಯ್ಕೆ ಮಾಡಿ'), backgroundColor: Colors.orange),
+        SnackBar(content: Text(_p('selectItemErr')), backgroundColor: Colors.orange),
       );
       return;
     }
@@ -370,7 +484,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
     });
     _saveList();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$itemName ಸೇರಿಸಲಾಗಿದೆ'), backgroundColor: kGreen, duration: Duration(seconds: 1)),
+      SnackBar(content: Text('$itemName ${_p('added')}'), backgroundColor: kGreen, duration: Duration(seconds: 1)),
     );
   }
 
@@ -379,12 +493,12 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
     final existingNames = _list.items.map((i) => i.name).toSet();
     final toAdd = defaults.where((d) => !existingNames.contains(d.name)).toList();
     if (toAdd.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('All default items already exist'), backgroundColor: kMuted));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_p('allDefaultsExist')), backgroundColor: kMuted));
       return;
     }
     setState(() => _list.items.addAll(toAdd));
     _saveList();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added ${toAdd.length} default items'), backgroundColor: kGreen));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${toAdd.length} ${_p('defaultsAdded')}'), backgroundColor: kGreen));
   }
 
   void _removeDefaultItems() {
@@ -394,7 +508,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
     final removed = before - _list.items.length;
     _saveList();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(removed > 0 ? 'Removed $removed default items' : 'No default items to remove'),
+      content: Text(removed > 0 ? '$removed ${_p('defaultsRemoved')}' : _p('noDefaultsToRemove')),
       backgroundColor: removed > 0 ? Colors.red : kMuted,
     ));
   }
@@ -407,14 +521,14 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: kCard,
-        title: Text('Edit Item', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
+        title: Text(_p('editItem'), style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
-          TextField(controller: _nameCtrl, autofocus: true, style: TextStyle(color: kText), decoration: _inputDeco('Item name')),
+          TextField(controller: _nameCtrl, autofocus: true, style: TextStyle(color: kText), decoration: _inputDeco(_p('itemName'))),
           const SizedBox(height: 12),
-          TextField(controller: _qtyCtrl, style: TextStyle(color: kText), decoration: _inputDeco('Quantity')),
+          TextField(controller: _qtyCtrl, style: TextStyle(color: kText), decoration: _inputDeco(_p('qty'))),
         ]),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: kMuted))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(_p('cancel'), style: TextStyle(color: kMuted))),
           ElevatedButton(
             onPressed: () {
               final name = _nameCtrl.text.trim();
@@ -424,7 +538,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
               _saveList();
             },
             style: ElevatedButton.styleFrom(backgroundColor: kOrange, foregroundColor: Colors.white),
-            child: const Text('Save'),
+            child: Text(_p('save')),
           ),
         ],
       ),
@@ -452,10 +566,10 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: kCard,
-        title: Text('Rename List', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
-        content: TextField(controller: ctrl, autofocus: true, style: TextStyle(color: kText), decoration: _inputDeco('List name')),
+        title: Text(_p('rename'), style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
+        content: TextField(controller: ctrl, autofocus: true, style: TextStyle(color: kText), decoration: _inputDeco(_p('listName'))),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: kMuted))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(_p('cancel'), style: TextStyle(color: kMuted))),
           ElevatedButton(
             onPressed: () {
               final name = ctrl.text.trim();
@@ -465,7 +579,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
               _saveList();
             },
             style: ElevatedButton.styleFrom(backgroundColor: kOrange, foregroundColor: Colors.white),
-            child: const Text('Save'),
+            child: Text(_p('save')),
           ),
         ],
       ),
@@ -479,14 +593,14 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: kCard,
-        title: Text('Purohit Details', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
+        title: Text(_p('purohit'), style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
-          TextField(controller: nameCtrl, autofocus: true, style: TextStyle(color: kText), decoration: _inputDeco('Purohit name')),
+          TextField(controller: nameCtrl, autofocus: true, style: TextStyle(color: kText), decoration: _inputDeco(_p('purohitName'))),
           const SizedBox(height: 12),
-          TextField(controller: phoneCtrl, style: TextStyle(color: kText), keyboardType: TextInputType.phone, decoration: _inputDeco('Mobile number')),
+          TextField(controller: phoneCtrl, style: TextStyle(color: kText), keyboardType: TextInputType.phone, decoration: _inputDeco(_p('mobile'))),
         ]),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: kMuted))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(_p('cancel'), style: TextStyle(color: kMuted))),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
@@ -494,7 +608,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
               _saveList();
             },
             style: ElevatedButton.styleFrom(backgroundColor: kOrange, foregroundColor: Colors.white),
-            child: const Text('Save'),
+            child: Text(_p('save')),
           ),
         ],
       ),
@@ -691,12 +805,12 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
               if (val == 'view') _viewPlainList();
             },
             itemBuilder: (_) => [
-              PopupMenuItem(value: 'share', child: Row(children: [Icon(Icons.share, color: kGreen, size: 20), const SizedBox(width: 10), Text('Share via WhatsApp', style: TextStyle(color: kText))])),
-              PopupMenuItem(value: 'pdf', child: Row(children: [Icon(Icons.picture_as_pdf, color: Colors.red, size: 20), const SizedBox(width: 10), Text('Download PDF', style: TextStyle(color: kText))])),
-              PopupMenuItem(value: 'view', child: Row(children: [Icon(Icons.view_list, color: Color(0xFF2980B9), size: 20), const SizedBox(width: 10), Text('View Plain List', style: TextStyle(color: kText))])),
+              PopupMenuItem(value: 'share', child: Row(children: [Icon(Icons.share, color: kGreen, size: 20), const SizedBox(width: 10), Text(_p('shareWA'), style: TextStyle(color: kText))])),
+              PopupMenuItem(value: 'pdf', child: Row(children: [Icon(Icons.picture_as_pdf, color: Colors.red, size: 20), const SizedBox(width: 10), Text(_p('downloadPdf'), style: TextStyle(color: kText))])),
+              PopupMenuItem(value: 'view', child: Row(children: [Icon(Icons.view_list, color: Color(0xFF2980B9), size: 20), const SizedBox(width: 10), Text(_p('viewPlain'), style: TextStyle(color: kText))])),
               const PopupMenuDivider(),
-              PopupMenuItem(value: 'add_defaults', child: Row(children: [Icon(Icons.playlist_add, color: kPurple2, size: 20), const SizedBox(width: 10), Text('Add Default Items', style: TextStyle(color: kText))])),
-              PopupMenuItem(value: 'remove_defaults', child: Row(children: [Icon(Icons.playlist_remove, color: kMuted, size: 20), const SizedBox(width: 10), Text('Remove Default Items', style: TextStyle(color: kText))])),
+              PopupMenuItem(value: 'add_defaults', child: Row(children: [Icon(Icons.playlist_add, color: kPurple2, size: 20), const SizedBox(width: 10), Text(_p('addDefaults'), style: TextStyle(color: kText))])),
+              PopupMenuItem(value: 'remove_defaults', child: Row(children: [Icon(Icons.playlist_remove, color: kMuted, size: 20), const SizedBox(width: 10), Text(_p('removeDefaults'), style: TextStyle(color: kText))])),
             ],
           ),
         ],
@@ -710,7 +824,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('ಐಟಂ ಸೇರಿಸಿ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kOrange)),
+                Text(_p('addItem'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kOrange)),
                 const SizedBox(height: 10),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -724,7 +838,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                             autofocus: true,
                             style: TextStyle(color: kText, fontSize: 14),
                             decoration: InputDecoration(
-                              hintText: 'ಐಟಂ ಹೆಸರು ಟೈಪ್ ಮಾಡಿ...',
+                              hintText: _p('typeItemName'),
                               hintStyle: TextStyle(color: kMuted, fontSize: 13),
                               filled: true, fillColor: kBg,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -744,19 +858,19 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                               child: DropdownButton<String>(
                                 isExpanded: true,
                                 value: _selectedItem,
-                                hint: Text('ಐಟಂ ಆಯ್ಕೆ ಮಾಡಿ', style: TextStyle(color: kMuted, fontSize: 13)),
+                                hint: Text(_p('selectItem'), style: TextStyle(color: kMuted, fontSize: 13)),
                                 dropdownColor: kCard,
                                 style: TextStyle(color: kText, fontSize: 14),
                                 icon: Icon(Icons.arrow_drop_down, color: kOrange),
                                 items: _dropdownItems.map((item) {
-                                  final isCustom = item == '── ಕಸ್ಟಮ್ ಐಟಂ ──';
+                                  final isCustom = item == _p('customItem');
                                   return DropdownMenuItem(value: item, child: Text(item, style: TextStyle(
                                     color: isCustom ? kOrange : kText,
                                     fontWeight: isCustom ? FontWeight.w800 : FontWeight.w500, fontSize: 14,
                                   )));
                                 }).toList(),
                                 onChanged: (val) {
-                                  if (val == '── ಕಸ್ಟಮ್ ಐಟಂ ──') {
+                                  if (val == _p('customItem')) {
                                     setState(() { _isCustomItem = true; _selectedItem = null; });
                                   } else {
                                     setState(() => _selectedItem = val);
@@ -777,7 +891,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                           child: DropdownButton<String>(
                             isExpanded: true,
                             value: _selectedQty,
-                            hint: Text('ಪ್ರಮಾಣ', style: TextStyle(color: kMuted, fontSize: 13)),
+                            hint: Text(_p('selectQty'), style: TextStyle(color: kMuted, fontSize: 13)),
                             dropdownColor: kCard,
                             style: TextStyle(color: kText, fontSize: 14),
                             icon: Icon(Icons.arrow_drop_down, color: kOrange),
@@ -814,7 +928,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               color: kCard,
-              child: Text('$total items', style: TextStyle(fontSize: 13, color: kMuted, fontWeight: FontWeight.w600)),
+              child: Text('$total ${_p('items')}', style: TextStyle(fontSize: 13, color: kMuted, fontWeight: FontWeight.w600)),
             ),
 
           // Purohit info
@@ -828,7 +942,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
               Expanded(child: GestureDetector(
                 onTap: _editPurohitInfo,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(_list.purohitName.isNotEmpty ? _list.purohitName : 'Add Purohit Name',
+                  Text(_list.purohitName.isNotEmpty ? _list.purohitName : _p('addPurohit'),
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _list.purohitName.isNotEmpty ? kText : kMuted)),
                   if (_list.purohitPhone.isNotEmpty)
                     Text(_list.purohitPhone, style: TextStyle(fontSize: 13, color: kMuted)),
@@ -847,9 +961,9 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                 ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
                     Icon(Icons.playlist_add, size: 64, color: kMuted.withOpacity(0.3)),
                     const SizedBox(height: 12),
-                    Text('ಯಾವುದೇ ಐಟಂಗಳಿಲ್ಲ', style: TextStyle(fontSize: 16, color: kMuted, fontWeight: FontWeight.w600)),
+                    Text(_p('noItems'), style: TextStyle(fontSize: 16, color: kMuted, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 6),
-                    Text('ಮೇಲಿನ ಡ್ರಾಪ್‌ಡೌನ್ ಬಳಸಿ ಸೇರಿಸಿ', style: TextStyle(fontSize: 13, color: kMuted)),
+                    Text(_p('useDropdown'), style: TextStyle(fontSize: 13, color: kMuted)),
                   ]))
                 : ListView.builder(
                     padding: const EdgeInsets.all(12),
@@ -969,8 +1083,8 @@ class _PlainListViewPage extends StatelessWidget {
                     child: Row(
                       children: [
                         SizedBox(width: 35, child: Text('#', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kOrange))),
-                        Expanded(flex: 3, child: Text('Item', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kOrange))),
-                        Expanded(flex: 2, child: Text('Quantity', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kOrange))),
+                        Expanded(flex: 3, child: Text(_p('item'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kOrange))),
+                        Expanded(flex: 2, child: Text(_p('qty'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kOrange))),
                       ],
                     ),
                   ),
@@ -999,7 +1113,7 @@ class _PlainListViewPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 16),
               child: Text(
-                'Total: ${list.items.length} items',
+                '${_p('total')}: ${list.items.length} ${_p('items')}',
                 style: TextStyle(fontSize: 14, color: kMuted, fontWeight: FontWeight.w600),
               ),
             ),
