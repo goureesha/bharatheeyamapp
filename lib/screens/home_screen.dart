@@ -14,6 +14,7 @@ import 'settings_screen.dart';
 import 'vedic_clock_screen.dart';
 import 'appointment_screen.dart';
 import 'pooja_lists_screen.dart';
+import 'vastu_screen.dart';
 import '../services/tester_service.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -49,6 +50,9 @@ class HomeScreen extends StatelessWidget {
       }),
       _Section('ಪೂಜಾ ಪಟ್ಟಿ', 'Pooja Lists', Icons.list_alt_rounded, Color(0xFF8E44AD), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const PoojaListsScreen()));
+      }),
+      _Section('ವಾಸ್ತು', 'Vastu', Icons.home_work_rounded, Color(0xFFD4A017), () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const VastuScreen()));
       }),
 
       _Section(AppLocale.l('settings'), 'Settings', Icons.settings, kMuted, () {
