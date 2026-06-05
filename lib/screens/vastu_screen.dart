@@ -2,79 +2,84 @@ import 'package:flutter/material.dart';
 import '../widgets/common.dart';
 import '../constants/strings.dart';
 
-// ─── Vastu Aaya Types ───
-// 8 types: remainder of sqft % 8 (1-based)
+// ─── Vastu Aaya Types (8) ───
+// Remainder 1-8 from (Perimeter_hasta × 9) % 8
 const List<String> _aayaNames = [
-  'ಧ್ವಜ',    // 1 - Dhwaja  (Flag)      ✅ Excellent
-  'ಧೂಮ್ರ',   // 2 - Dhumra  (Smoke)     ❌ Bad
-  'ಸಿಂಹ',    // 3 - Simha   (Lion)      ✅ Good
-  'ಶ್ವಾನ',   // 4 - Shwana  (Dog)       ❌ Bad
-  'ವೃಷಭ',   // 5 - Vrushabha (Bull)    ✅ Good
-  'ಖರ',      // 6 - Khara   (Donkey)    ❌ Bad
-  'ಗಜ',      // 7 - Gaja    (Elephant)  ✅ Excellent
-  'ಧ್ವಾಂಕ್ಷ', // 8 - Dhwanksha (Crow)   ❌ Bad
+  'ಧ್ವಜ',      // 1 - Dhwaja  (Flag)       ✅ Excellent
+  'ಧೂಮ್ರ',     // 2 - Dhumra  (Smoke)      ❌ Bad
+  'ಸಿಂಹ',      // 3 - Simha   (Lion)       ✅ Good
+  'ಶ್ವಾನ',     // 4 - Shwana  (Dog)        ❌ Bad
+  'ವೃಷಭ',     // 5 - Vrushabha (Bull)     ✅ Good
+  'ಖರ',        // 6 - Khara   (Donkey)     ❌ Bad
+  'ಗಜ',        // 7 - Gaja    (Elephant)   ✅ Excellent
+  'ಧ್ವಾಂಕ್ಷ',   // 8 - Dhwanksha (Crow)    ❌ Bad
 ];
 
 const List<String> _aayaEnglish = [
-  'Dhwaja', 'Dhumra', 'Simha', 'Shwana',
-  'Vrushabha', 'Khara', 'Gaja', 'Dhwanksha',
+  'Dhwaja (Flag)', 'Dhumra (Smoke)', 'Simha (Lion)', 'Shwana (Dog)',
+  'Vrushabha (Bull)', 'Khara (Donkey)', 'Gaja (Elephant)', 'Dhwanksha (Crow)',
 ];
 
-// Good Aaya indices (0-based): 0=Dhwaja, 2=Simha, 4=Vrushabha, 6=Gaja
-const Set<int> _goodAaya = {0, 2, 4, 6};
+const Set<int> _goodAaya = {0, 2, 4, 6}; // Dhwaja, Simha, Vrushabha, Gaja
 
 // ─── Tara Names (9 types) ───
 const List<String> _taraNames = [
-  'ಜನ್ಮ ತಾರೆ',        // 1 - Janma        Neutral
-  'ಸಂಪತ್ ತಾರೆ',       // 2 - Sampat       ✅ Excellent
-  'ವಿಪತ್ ತಾರೆ',       // 3 - Vipat        ❌ Bad
-  'ಕ್ಷೇಮ ತಾರೆ',       // 4 - Kshema       ✅ Good
-  'ಪ್ರತ್ಯಕ್ ತಾರೆ',    // 5 - Pratyak      ❌ Bad
-  'ಸಾಧನ ತಾರೆ',       // 6 - Sadhana      ✅ Good
-  'ನೈಧನ ತಾರೆ',       // 7 - Naidhana     ❌ Bad
-  'ಮಿತ್ರ ತಾರೆ',       // 8 - Mitra        ✅ Good
-  'ಪರಮ ಮಿತ್ರ ತಾರೆ',  // 9 - Parama Mitra ✅ Excellent
+  'ಜನ್ಮ ತಾರೆ',        // 1
+  'ಸಂಪತ್ ತಾರೆ',       // 2 ✅
+  'ವಿಪತ್ ತಾರೆ',       // 3 ❌
+  'ಕ್ಷೇಮ ತಾರೆ',       // 4 ✅
+  'ಪ್ರತ್ಯಕ್ ತಾರೆ',    // 5 ❌
+  'ಸಾಧನ ತಾರೆ',       // 6 ✅
+  'ನೈಧನ ತಾರೆ',       // 7 ❌
+  'ಮಿತ್ರ ತಾರೆ',       // 8 ✅
+  'ಪರಮ ಮಿತ್ರ ತಾರೆ',  // 9 ✅
 ];
 
 const List<String> _taraEnglish = [
-  'Janma Tara', 'Sampat Tara', 'Vipat Tara', 'Kshema Tara',
-  'Pratyak Tara', 'Sadhana Tara', 'Naidhana Tara', 'Mitra Tara',
-  'Parama Mitra Tara',
+  'Janma', 'Sampat', 'Vipat', 'Kshema',
+  'Pratyak', 'Sadhana', 'Naidhana', 'Mitra', 'Parama Mitra',
 ];
 
 const List<String> _taraQuality = [
-  'ಸಾಮಾನ್ಯ',    // Neutral
-  'ಅತಿ ಉತ್ತಮ',  // Excellent
-  'ಕೆಟ್ಟದು',     // Bad
-  'ಉತ್ತಮ',       // Good
-  'ಕೆಟ್ಟದು',     // Bad
-  'ಉತ್ತಮ',       // Good
-  'ಕೆಟ್ಟದು',     // Bad
-  'ಉತ್ತಮ',       // Good
-  'ಅತಿ ಉತ್ತಮ',  // Excellent
+  'ಸಾಮಾನ್ಯ', 'ಅತಿ ಉತ್ತಮ', 'ಕೆಟ್ಟದು', 'ಉತ್ತಮ',
+  'ಕೆಟ್ಟದು', 'ಉತ್ತಮ', 'ಕೆಟ್ಟದು', 'ಉತ್ತಮ', 'ಅತಿ ಉತ್ತಮ',
 ];
 
-// Good Tara indices (0-based): 1=Sampat, 3=Kshema, 5=Sadhana, 7=Mitra, 8=Parama Mitra
 const Set<int> _goodTara = {1, 3, 5, 7, 8};
 
+// ─── 1 Hasta = 1.5 feet ───
+const double _feetPerHasta = 1.5;
+
 class _VastuResult {
-  final int sqft;
+  final int length;      // feet
+  final int breadth;     // feet
+  final int area;        // sq ft
+  final int perimeterFt; // feet
+  final int hasta;       // perimeter in hasta (rounded)
   final int aayaIndex;   // 0-7
-  final int nakIndex;    // 0-26 (building nakshatra)
+  final int aayaValue;   // 1-8
+  final int vyayaValue;  // 1-8
+  final bool aayaGtVyaya;
+  final int nakIndex;    // 0-26
   final int taraIndex;   // 0-8
-  final bool isGoodAaya;
-  final bool isGoodTara;
 
   _VastuResult({
-    required this.sqft,
+    required this.length,
+    required this.breadth,
+    required this.area,
+    required this.perimeterFt,
+    required this.hasta,
     required this.aayaIndex,
+    required this.aayaValue,
+    required this.vyayaValue,
+    required this.aayaGtVyaya,
     required this.nakIndex,
     required this.taraIndex,
-    required this.isGoodAaya,
-    required this.isGoodTara,
   });
 
-  bool get isExcellent => isGoodAaya && isGoodTara;
+  bool get isGoodAaya => _goodAaya.contains(aayaIndex);
+  bool get isGoodTara => _goodTara.contains(taraIndex);
+  bool get isExcellent => isGoodAaya && isGoodTara && aayaGtVyaya;
 }
 
 class VastuScreen extends StatefulWidget {
@@ -85,24 +90,28 @@ class VastuScreen extends StatefulWidget {
 }
 
 class _VastuScreenState extends State<VastuScreen> {
-  int? _ownerNakIndex; // 0-26
-  final _minCtrl = TextEditingController(text: '1000');
-  final _maxCtrl = TextEditingController(text: '1200');
+  int? _ownerNakIndex;
+  final _minLenCtrl = TextEditingController(text: '30');
+  final _maxLenCtrl = TextEditingController(text: '40');
+  final _minBreadthCtrl = TextEditingController(text: '40');
+  final _maxBreadthCtrl = TextEditingController(text: '50');
   List<_VastuResult> _results = [];
   bool _searched = false;
   bool _showOnlyGood = true;
 
   @override
   void dispose() {
-    _minCtrl.dispose();
-    _maxCtrl.dispose();
+    _minLenCtrl.dispose();
+    _maxLenCtrl.dispose();
+    _minBreadthCtrl.dispose();
+    _maxBreadthCtrl.dispose();
     super.dispose();
   }
 
   void _search() {
     if (_ownerNakIndex == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('ಯಜಮಾನನ ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ (Select Owner\'s Nakshatra)'),
           backgroundColor: Colors.red,
         ),
@@ -110,46 +119,80 @@ class _VastuScreenState extends State<VastuScreen> {
       return;
     }
 
-    final minSqft = int.tryParse(_minCtrl.text) ?? 500;
-    final maxSqft = int.tryParse(_maxCtrl.text) ?? 2000;
+    final minL = int.tryParse(_minLenCtrl.text) ?? 10;
+    final maxL = int.tryParse(_maxLenCtrl.text) ?? 50;
+    final minB = int.tryParse(_minBreadthCtrl.text) ?? 10;
+    final maxB = int.tryParse(_maxBreadthCtrl.text) ?? 50;
 
-    if (minSqft > maxSqft || maxSqft - minSqft > 5000) {
+    if (minL > maxL || minB > maxB) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid range. Max range is 5000 sq ft.'),
-          backgroundColor: Colors.red,
-        ),
+        const SnackBar(content: Text('Min must be ≤ Max'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    final totalCombos = (maxL - minL + 1) * (maxB - minB + 1);
+    if (totalCombos > 10000) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Range too large. Reduce the range.'), backgroundColor: Colors.red),
       );
       return;
     }
 
     final results = <_VastuResult>[];
 
-    for (int sqft = minSqft; sqft <= maxSqft; sqft++) {
-      // Aaya: sqft % 8 → 0-7 (0-based index)
-      final aayaRemainder = sqft % 8;
-      final aayaIndex = aayaRemainder == 0 ? 7 : aayaRemainder - 1;
+    for (int l = minL; l <= maxL; l++) {
+      for (int b = minB; b <= maxB; b++) {
+        final area = l * b;
+        final perimeterFt = 2 * (l + b);
 
-      // Building Nakshatra: sqft % 27 → 0-26 (0-based index)
-      final nakRemainder = sqft % 27;
-      final nakIndex = nakRemainder == 0 ? 26 : nakRemainder - 1;
+        // Convert to Hasta (1 hasta = 1.5 feet), round to nearest integer
+        final hasta = (perimeterFt / _feetPerHasta).round();
 
-      // Tarabala: count from owner's nak to building's nak
-      final diff = (nakIndex - _ownerNakIndex! + 27) % 27;
-      final taraIndex = diff % 9; // 0-8
+        // Shastra formulas:
+        // Aaya = (hasta × 9) % 8, remainder 1-8
+        final aayaRem = (hasta * 9) % 8;
+        final aayaValue = aayaRem == 0 ? 8 : aayaRem;
+        final aayaIndex = aayaValue - 1; // 0-based
 
-      final isGoodAaya = _goodAaya.contains(aayaIndex);
-      final isGoodTara = _goodTara.contains(taraIndex);
+        // Vyaya = (hasta × 10) % 8, remainder 1-8
+        final vyayaRem = (hasta * 10) % 8;
+        final vyayaValue = vyayaRem == 0 ? 8 : vyayaRem;
 
-      results.add(_VastuResult(
-        sqft: sqft,
-        aayaIndex: aayaIndex,
-        nakIndex: nakIndex,
-        taraIndex: taraIndex,
-        isGoodAaya: isGoodAaya,
-        isGoodTara: isGoodTara,
-      ));
+        // Aaya must be > Vyaya for good result
+        final aayaGtVyaya = aayaValue > vyayaValue;
+
+        // Building Nakshatra = (hasta × 8) % 27, remainder 1-27
+        final nakRem = (hasta * 8) % 27;
+        final nakValue = nakRem == 0 ? 27 : nakRem;
+        final nakIndex = nakValue - 1; // 0-based
+
+        // Tarabala: count from owner's nak to building's nak
+        final diff = (nakIndex - _ownerNakIndex! + 27) % 27;
+        final taraIndex = diff % 9; // 0-8
+
+        results.add(_VastuResult(
+          length: l,
+          breadth: b,
+          area: area,
+          perimeterFt: perimeterFt,
+          hasta: hasta,
+          aayaIndex: aayaIndex,
+          aayaValue: aayaValue,
+          vyayaValue: vyayaValue,
+          aayaGtVyaya: aayaGtVyaya,
+          nakIndex: nakIndex,
+          taraIndex: taraIndex,
+        ));
+      }
     }
+
+    // Sort: excellent first, then by area
+    results.sort((a, b) {
+      if (a.isExcellent && !b.isExcellent) return -1;
+      if (!a.isExcellent && b.isExcellent) return 1;
+      return a.area.compareTo(b.area);
+    });
 
     setState(() {
       _results = results;
@@ -187,166 +230,193 @@ class _VastuScreenState extends State<VastuScreen> {
         child: Column(
           children: [
             // ── Input Section ──
-            Container(
-              margin: const EdgeInsets.all(12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: kCard,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: kBorder),
-                boxShadow: [
-                  BoxShadow(color: kPurple2.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 4)),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Nakshatra dropdown
-                  Text('ಯಜಮಾನನ ನಕ್ಷತ್ರ (Owner\'s Nakshatra)',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
-                  const SizedBox(height: 6),
-                  DropdownButtonFormField<int>(
-                    value: _ownerNakIndex,
-                    isExpanded: true,
-                    decoration: InputDecoration(
-                      hintText: 'ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ (Select Nakshatra)',
-                      hintStyle: TextStyle(color: kMuted, fontSize: 13),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                    items: List.generate(27, (i) => DropdownMenuItem(
-                      value: i,
-                      child: Text('${i + 1}. ${naks[i]}', style: TextStyle(fontSize: 14, color: kText)),
-                    )),
-                    onChanged: (v) => setState(() => _ownerNakIndex = v),
-                  ),
-                  const SizedBox(height: 14),
-
-                  // Min/Max Sq Ft
-                  Text('ವಿಸ್ತೀರ್ಣ (Area in Sq Ft)',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _minCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'Min Sq Ft',
-                            labelStyle: TextStyle(color: kMuted, fontSize: 12),
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          style: TextStyle(fontSize: 14, color: kText),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text('–', style: TextStyle(fontSize: 20, color: kMuted)),
-                      ),
-                      Expanded(
-                        child: TextField(
-                          controller: _maxCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'Max Sq Ft',
-                            labelStyle: TextStyle(color: kMuted, fontSize: 12),
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          style: TextStyle(fontSize: 14, color: kText),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-
-                  // Search button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _search,
-                      icon: const Icon(Icons.search, size: 20),
-                      label: const Text('ಹುಡುಕಿ (Search)', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kPurple2,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // ── Filter toggle ──
-            if (_searched)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    Text(
-                      _showOnlyGood
-                          ? 'ಉತ್ತಮ ಫಲಿತಾಂಶ ಮಾತ್ರ (Good results only)'
-                          : 'ಎಲ್ಲಾ ಫಲಿತಾಂಶ (All results)',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted),
-                    ),
-                    const Spacer(),
-                    Text('${_filteredResults.length} / ${_results.length}',
-                      style: TextStyle(fontSize: 12, color: kPurple2, fontWeight: FontWeight.w800)),
-                    const SizedBox(width: 8),
-                    Switch(
-                      value: _showOnlyGood,
-                      activeColor: kGreen,
-                      onChanged: (v) => setState(() => _showOnlyGood = v),
-                    ),
-                  ],
-                ),
-              ),
-
-            // ── Results ──
             Expanded(
-              child: !_searched
-                  ? Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.home_work_rounded, size: 64, color: kPurple2.withOpacity(0.3)),
-                          const SizedBox(height: 12),
-                          Text('ನಕ್ಷತ್ರ ಮತ್ತು ವಿಸ್ತೀರ್ಣ ನಮೂದಿಸಿ',
-                            style: TextStyle(color: kMuted, fontSize: 14)),
-                          Text('Enter nakshatra and area range',
-                            style: TextStyle(color: kMuted, fontSize: 12)),
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Container(
+                      margin: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: kCard,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: kBorder),
+                        boxShadow: [
+                          BoxShadow(color: kPurple2.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 4)),
                         ],
                       ),
-                    )
-                  : _filteredResults.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Nakshatra dropdown
+                          Text('ಯಜಮಾನನ ನಕ್ಷತ್ರ (Owner\'s Nakshatra)',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
+                          const SizedBox(height: 6),
+                          DropdownButtonFormField<int>(
+                            value: _ownerNakIndex,
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              hintText: 'ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ',
+                              hintStyle: TextStyle(color: kMuted, fontSize: 13),
+                              isDense: true,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            items: List.generate(27, (i) => DropdownMenuItem(
+                              value: i,
+                              child: Text('${i + 1}. ${naks[i]}', style: TextStyle(fontSize: 14, color: kText)),
+                            )),
+                            onChanged: (v) => setState(() => _ownerNakIndex = v),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Length range
+                          Text('ಉದ್ದ / Length (Feet)',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
+                          const SizedBox(height: 6),
+                          Row(
                             children: [
-                              Icon(Icons.search_off, size: 48, color: Colors.red.withOpacity(0.4)),
-                              const SizedBox(height: 8),
-                              Text('ಯಾವುದೇ ಉತ್ತಮ ಫಲಿತಾಂಶ ಸಿಗಲಿಲ್ಲ',
-                                style: TextStyle(color: kMuted, fontSize: 14)),
-                              Text('No favorable results found in this range.',
-                                style: TextStyle(color: kMuted, fontSize: 12)),
+                              Expanded(child: _buildTextField(_minLenCtrl, 'Min')),
+                              _rangeSeparator(),
+                              Expanded(child: _buildTextField(_maxLenCtrl, 'Max')),
                             ],
                           ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          itemCount: _filteredResults.length,
-                          itemBuilder: (context, index) {
-                            final r = _filteredResults[index];
-                            return _buildResultCard(r);
-                          },
+                          const SizedBox(height: 12),
+
+                          // Breadth range
+                          Text('ಅಗಲ / Breadth (Feet)',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Expanded(child: _buildTextField(_minBreadthCtrl, 'Min')),
+                              _rangeSeparator(),
+                              Expanded(child: _buildTextField(_maxBreadthCtrl, 'Max')),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Formula info
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: kPurple2.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: kPurple2.withOpacity(0.15)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('ಶಾಸ್ತ್ರ ಸೂತ್ರ (Shastra Formula):', style: TextStyle(
+                                  fontSize: 11, fontWeight: FontWeight.w800, color: kPurple2)),
+                                const SizedBox(height: 4),
+                                Text('• ಪರಿಧಿ = 2 × (ಉದ್ದ + ಅಗಲ)  →  ಹಸ್ತ = ಪರಿಧಿ ÷ 1.5', style: TextStyle(fontSize: 10, color: kMuted)),
+                                Text('• ಆಯ = (ಹಸ್ತ × 9) % 8', style: TextStyle(fontSize: 10, color: kMuted)),
+                                Text('• ವ್ಯಯ = (ಹಸ್ತ × 10) % 8  |  ಆಯ > ವ್ಯಯ ಆಗಬೇಕು', style: TextStyle(fontSize: 10, color: kMuted)),
+                                Text('• ನಕ್ಷತ್ರ = (ಹಸ್ತ × 8) % 27', style: TextStyle(fontSize: 10, color: kMuted)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Search button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: _search,
+                              icon: const Icon(Icons.search, size: 20),
+                              label: const Text('ಹುಡುಕಿ (Search)', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kPurple2,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // ── Filter toggle ──
+                  if (_searched)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        child: Row(
+                          children: [
+                            Icon(_showOnlyGood ? Icons.filter_alt : Icons.filter_alt_off,
+                                size: 16, color: _showOnlyGood ? kGreen : kMuted),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                _showOnlyGood
+                                    ? 'ಶುಭ ಫಲಿತಾಂಶ (Good: ಆಯ ✓ ತಾರಾ ✓ ಆಯ>ವ್ಯಯ ✓)'
+                                    : 'ಎಲ್ಲಾ ಫಲಿತಾಂಶ (All results)',
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted),
+                              ),
+                            ),
+                            Text('${_filteredResults.length}/${_results.length}',
+                              style: TextStyle(fontSize: 12, color: kPurple2, fontWeight: FontWeight.w800)),
+                            Switch(
+                              value: _showOnlyGood,
+                              activeColor: kGreen,
+                              onChanged: (v) => setState(() => _showOnlyGood = v),
+                            ),
+                          ],
                         ),
+                      ),
+                    ),
+
+                  // ── Results ──
+                  if (!_searched)
+                    SliverFillRemaining(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.home_work_rounded, size: 64, color: kPurple2.withOpacity(0.3)),
+                            const SizedBox(height: 12),
+                            Text('ಉದ್ದ ಮತ್ತು ಅಗಲ ನಮೂದಿಸಿ', style: TextStyle(color: kMuted, fontSize: 14)),
+                            Text('Enter length & breadth range', style: TextStyle(color: kMuted, fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                    )
+                  else if (_filteredResults.isEmpty)
+                    SliverFillRemaining(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.search_off, size: 48, color: Colors.red.withOpacity(0.4)),
+                            const SizedBox(height: 8),
+                            Text('ಯಾವುದೇ ಶುಭ ಫಲಿತಾಂಶ ಸಿಗಲಿಲ್ಲ', style: TextStyle(color: kMuted, fontSize: 14)),
+                            Text('No favorable results found.', style: TextStyle(color: kMuted, fontSize: 12)),
+                            const SizedBox(height: 8),
+                            Text('Try turning off the filter ↗', style: TextStyle(color: kPurple2, fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          if (index >= _filteredResults.length) return null;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: _buildResultCard(_filteredResults[index]),
+                          );
+                        },
+                        childCount: _filteredResults.length,
+                      ),
+                    ),
+
+                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                ],
+              ),
             ),
           ],
         ),
@@ -354,11 +424,32 @@ class _VastuScreenState extends State<VastuScreen> {
     );
   }
 
+  Widget _buildTextField(TextEditingController ctrl, String label) {
+    return TextField(
+      controller: ctrl,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: kMuted, fontSize: 12),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      style: TextStyle(fontSize: 14, color: kText),
+    );
+  }
+
+  Widget _rangeSeparator() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Text('–', style: TextStyle(fontSize: 20, color: kMuted)),
+    );
+  }
+
   Widget _buildResultCard(_VastuResult r) {
     final naks = appNak;
-    final isExcellent = r.isGoodAaya && r.isGoodTara;
+    final isExcellent = r.isExcellent;
     final borderColor = isExcellent ? Colors.green.withOpacity(0.5) : kBorder;
-    final accentColor = isExcellent ? Colors.green : kMuted;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -375,20 +466,26 @@ class _VastuScreenState extends State<VastuScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Sq ft header
+          // ── Header: Dimensions + Area ──
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: accentColor.withOpacity(0.12),
+                  gradient: LinearGradient(
+                    colors: isExcellent
+                        ? [Colors.green.withOpacity(0.15), Colors.green.withOpacity(0.05)]
+                        : [kPurple2.withOpacity(0.1), kPurple2.withOpacity(0.03)],
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${r.sqft} Sq Ft',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: accentColor),
+                  '${r.length} × ${r.breadth} ft',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: isExcellent ? Colors.green.shade700 : kPurple2),
                 ),
               ),
+              const SizedBox(width: 8),
+              Text('${r.area} Sq Ft', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
               const Spacer(),
               if (isExcellent)
                 Container(
@@ -401,37 +498,72 @@ class _VastuScreenState extends State<VastuScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.check_circle, size: 14, color: Colors.green.shade700),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 3),
                       Text('ಶುಭ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.green.shade700)),
                     ],
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
 
-          // Aaya + Building Nakshatra
+          // ── Perimeter / Hasta ──
+          Text(
+            'ಪರಿಧಿ: ${r.perimeterFt} ft  |  ಹಸ್ತ: ${r.hasta}',
+            style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+
+          // ── Aaya + Vyaya ──
           Row(
             children: [
-              Icon(Icons.flag_rounded, size: 15, color: _aayaColor(r.aayaIndex)),
+              Icon(Icons.flag_rounded, size: 14, color: _aayaColor(r.aayaIndex)),
               const SizedBox(width: 4),
               Text('ಆಯ: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
-              Text(
-                '${_aayaNames[r.aayaIndex]} (${_aayaEnglish[r.aayaIndex]})',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _aayaColor(r.aayaIndex)),
+              Flexible(
+                child: Text(
+                  '${_aayaNames[r.aayaIndex]} (${_aayaEnglish[r.aayaIndex]}) [${r.aayaValue}]',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _aayaColor(r.aayaIndex)),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
-
+          const SizedBox(height: 3),
           Row(
             children: [
-              Icon(Icons.star, size: 15, color: kOrange),
+              Icon(Icons.money_off, size: 14, color: kMuted),
+              const SizedBox(width: 4),
+              Text('ವ್ಯಯ: ${r.vyayaValue}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: r.aayaGtVyaya ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  r.aayaGtVyaya ? 'ಆಯ > ವ್ಯಯ ✓' : 'ಆಯ ≤ ವ್ಯಯ ✗',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: r.aayaGtVyaya ? Colors.green.shade700 : Colors.red.shade700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+
+          // ── Building Nakshatra ──
+          Row(
+            children: [
+              Icon(Icons.star, size: 14, color: kOrange),
               const SizedBox(width: 4),
               Text('ಕಟ್ಟಡದ ನಕ್ಷತ್ರ: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
               Flexible(
                 child: Text(
-                  '${naks[r.nakIndex]} (${knNak[r.nakIndex]})',
+                  naks[r.nakIndex],
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kText),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -440,7 +572,7 @@ class _VastuScreenState extends State<VastuScreen> {
           ),
           const SizedBox(height: 6),
 
-          // Tarabala
+          // ── Tarabala ──
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
@@ -449,14 +581,14 @@ class _VastuScreenState extends State<VastuScreen> {
             ),
             child: Row(
               children: [
-                Icon(Icons.shield, size: 15, color: _taraColor(r.taraIndex)),
+                Icon(Icons.shield, size: 14, color: _taraColor(r.taraIndex)),
                 const SizedBox(width: 6),
-                Text('ತಾರಾಬಲ: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                Text('ತಾರಾಬಲ: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
                 Flexible(
                   child: Text(
                     '${_taraNames[r.taraIndex]} (${_taraEnglish[r.taraIndex]}) - ${_taraQuality[r.taraIndex]}',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w800,
                       color: _taraColor(r.taraIndex),
                     ),
