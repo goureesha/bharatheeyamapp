@@ -3,24 +3,10 @@ import 'package:flutter/material.dart';
 import '../widgets/common.dart';
 import '../constants/strings.dart';
 
-// ─── Vastu Aaya Types (8) ───
-const List<String> _aayaNames = [
-  'ಧ್ವಜ', 'ಧೂಮ್ರ', 'ಸಿಂಹ', 'ಶ್ವಾನ',
-  'ವೃಷಭ', 'ಖರ', 'ಗಜ', 'ಧ್ವಾಂಕ್ಷ',
-];
-
+// ─── English names (constant, language-independent) ───
 const List<String> _aayaEnglish = [
   'Dhwaja (Flag)', 'Dhumra (Smoke)', 'Simha (Lion)', 'Shwana (Dog)',
   'Vrushabha (Bull)', 'Khara (Donkey)', 'Gaja (Elephant)', 'Dhwanksha (Crow)',
-];
-
-const Set<int> _goodAaya = {0, 2, 4, 6};
-
-// ─── Tara Names (9 types) ───
-const List<String> _taraNames = [
-  'ಜನ್ಮ ತಾರೆ', 'ಸಂಪತ್ ತಾರೆ', 'ವಿಪತ್ ತಾರೆ', 'ಕ್ಷೇಮ ತಾರೆ',
-  'ಪ್ರತ್ಯಕ್ ತಾರೆ', 'ಸಾಧನ ತಾರೆ', 'ನೈಧನ ತಾರೆ', 'ಮಿತ್ರ ತಾರೆ',
-  'ಪರಮ ಮಿತ್ರ ತಾರೆ',
 ];
 
 const List<String> _taraEnglish = [
@@ -28,14 +14,122 @@ const List<String> _taraEnglish = [
   'Pratyak', 'Sadhana', 'Naidhana', 'Mitra', 'Parama Mitra',
 ];
 
-const List<String> _taraQuality = [
-  'ಸಾಮಾನ್ಯ', 'ಅತಿ ಉತ್ತಮ', 'ಕೆಟ್ಟದು', 'ಉತ್ತಮ',
-  'ಕೆಟ್ಟದು', 'ಉತ್ತಮ', 'ಕೆಟ್ಟದು', 'ಉತ್ತಮ', 'ಅತಿ ಉತ್ತಮ',
-];
-
+const Set<int> _goodAaya = {0, 2, 4, 6};
 const Set<int> _goodTara = {1, 3, 5, 7, 8};
-
 const double _feetPerHasta = 1.5;
+
+// ─── Vastu-specific translations (self-contained, all 5 languages) ───
+const Map<String, Map<String, String>> _vastuStrings = {
+  'kn': {
+    'title': 'ವಾಸ್ತು ಅಳತೆಗಳು', 'sub': 'Vastu Measurements',
+    'ownerNak': 'ಯಜಮಾನನ ನಕ್ಷತ್ರ (Owner\'s Nakshatra)', 'selectNak': 'ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ',
+    'length': 'ಉದ್ದ / Length (Feet)', 'breadth': 'ಅಗಲ / Breadth (Feet)', 'area': 'ವಿಸ್ತೀರ್ಣ / Area (Sq Ft)',
+    'tabLB': 'ಉದ್ದ × ಅಗಲ (L × B)', 'tabSqft': 'ವಿಸ್ತೀರ್ಣ (Sq Ft)',
+    'search': 'ಹುಡುಕಿ (Search)', 'goodOnly': 'ಶುಭ ಫಲಿತಾಂಶ ಮಾತ್ರ (Good only)',
+    'allResults': 'ಎಲ್ಲಾ ಫಲಿತಾಂಶ (All)', 'noResults': 'ಯಾವುದೇ ಶುಭ ಫಲಿತಾಂಶ ಸಿಗಲಿಲ್ಲ',
+    'hint': 'ವಿವರ ನಮೂದಿಸಿ ಮತ್ತು ಹುಡುಕಿ', 'hintEn': 'Enter details and search',
+    'sqftHint': 'ಪ್ರತಿ Sq Ft ಗೆ ಸಾಧ್ಯವಿರುವ ಉದ್ದ × ಅಗಲ ಜೋಡಿಗಳನ್ನು ಹುಡುಕುತ್ತೇವೆ (min side: 5 ft)',
+    'formula': 'ಶಾಸ್ತ್ರ ಸೂತ್ರ (Shastra Formula):',
+    'peridhi': 'ಪರಿಧಿ', 'hasta': 'ಹಸ್ತ',
+    'aaya': 'ಆಯ', 'vyaya': 'ವ್ಯಯ',
+    'buildingNak': 'ಕಟ್ಟಡದ ನಕ್ಷತ್ರ', 'tarabala': 'ತಾರಾಬಲ',
+    'shubha': 'ಶುಭ', 'aayaGt': 'ಆಯ > ವ್ಯಯ ✓', 'aayaLe': 'ಆಯ ≤ ವ್ಯಯ ✗',
+    'selectNakErr': 'ಯಜಮಾನನ ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ',
+    'a1': 'ಧ್ವಜ', 'a2': 'ಧೂಮ್ರ', 'a3': 'ಸಿಂಹ', 'a4': 'ಶ್ವಾನ', 'a5': 'ವೃಷಭ', 'a6': 'ಖರ', 'a7': 'ಗಜ', 'a8': 'ಧ್ವಾಂಕ್ಷ',
+    't1': 'ಜನ್ಮ ತಾರೆ', 't2': 'ಸಂಪತ್ ತಾರೆ', 't3': 'ವಿಪತ್ ತಾರೆ', 't4': 'ಕ್ಷೇಮ ತಾರೆ',
+    't5': 'ಪ್ರತ್ಯಕ್ ತಾರೆ', 't6': 'ಸಾಧನ ತಾರೆ', 't7': 'ನೈಧನ ತಾರೆ', 't8': 'ಮಿತ್ರ ತಾರೆ', 't9': 'ಪರಮ ಮಿತ್ರ ತಾರೆ',
+    'q1': 'ಸಾಮಾನ್ಯ', 'q2': 'ಅತಿ ಉತ್ತಮ', 'q3': 'ಕೆಟ್ಟದು', 'q4': 'ಉತ್ತಮ',
+  },
+  'hi': {
+    'title': 'वास्तु मापन', 'sub': 'Vastu Measurements',
+    'ownerNak': 'मकान मालिक का नक्षत्र (Owner\'s Nakshatra)', 'selectNak': 'नक्षत्र चुनें',
+    'length': 'लम्बाई / Length (Feet)', 'breadth': 'चौड़ाई / Breadth (Feet)', 'area': 'क्षेत्रफल / Area (Sq Ft)',
+    'tabLB': 'लम्बाई × चौड़ाई (L × B)', 'tabSqft': 'क्षेत्रफल (Sq Ft)',
+    'search': 'खोजें (Search)', 'goodOnly': 'शुभ परिणाम (Good only)',
+    'allResults': 'सभी परिणाम (All)', 'noResults': 'कोई शुभ परिणाम नहीं मिला',
+    'hint': 'विवरण दर्ज करें और खोजें', 'hintEn': 'Enter details and search',
+    'sqftHint': 'प्रत्येक Sq Ft के लिए संभव लम्बाई × चौड़ाई जोड़ियां खोजी जाएंगी (min side: 5 ft)',
+    'formula': 'शास्त्र सूत्र (Shastra Formula):',
+    'peridhi': 'परिधि', 'hasta': 'हस्त',
+    'aaya': 'आय', 'vyaya': 'व्यय',
+    'buildingNak': 'भवन नक्षत्र', 'tarabala': 'ताराबल',
+    'shubha': 'शुभ', 'aayaGt': 'आय > व्यय ✓', 'aayaLe': 'आय ≤ व्यय ✗',
+    'selectNakErr': 'मकान मालिक का नक्षत्र चुनें',
+    'a1': 'ध्वज', 'a2': 'धूम्र', 'a3': 'सिंह', 'a4': 'श्वान', 'a5': 'वृषभ', 'a6': 'खर', 'a7': 'गज', 'a8': 'ध्वांक्ष',
+    't1': 'जन्म तारा', 't2': 'सम्पत् तारा', 't3': 'विपत् तारा', 't4': 'क्षेम तारा',
+    't5': 'प्रत्यक् तारा', 't6': 'साधन तारा', 't7': 'नैधन तारा', 't8': 'मित्र तारा', 't9': 'परम मित्र तारा',
+    'q1': 'सामान्य', 'q2': 'अति उत्तम', 'q3': 'बुरा', 'q4': 'उत्तम',
+  },
+  'ta': {
+    'title': 'வாஸ்து அளவீடுகள்', 'sub': 'Vastu Measurements',
+    'ownerNak': 'உரிமையாளர் நக்ஷத்திரம் (Owner\'s Nakshatra)', 'selectNak': 'நக்ஷத்திரம் தேர்வு',
+    'length': 'நீளம் / Length (Feet)', 'breadth': 'அகலம் / Breadth (Feet)', 'area': 'பரப்பளவு / Area (Sq Ft)',
+    'tabLB': 'நீளம் × அகலம் (L × B)', 'tabSqft': 'பரப்பளவு (Sq Ft)',
+    'search': 'தேடு (Search)', 'goodOnly': 'நல்ல முடிவுகள் (Good only)',
+    'allResults': 'அனைத்து முடிவுகள் (All)', 'noResults': 'நல்ல முடிவுகள் இல்லை',
+    'hint': 'விவரங்களை உள்ளிட்டு தேடுங்கள்', 'hintEn': 'Enter details and search',
+    'sqftHint': 'ஒவ்வொரு Sq Ft க்கும் சாத்தியமான நீளம் × அகலம் ஜோடிகள் (min side: 5 ft)',
+    'formula': 'சாஸ்திர சூத்திரம் (Shastra Formula):',
+    'peridhi': 'சுற்றளவு', 'hasta': 'ஹஸ்தம்',
+    'aaya': 'ஆயம்', 'vyaya': 'வியயம்',
+    'buildingNak': 'கட்டிட நக்ஷத்திரம்', 'tarabala': 'தாராபலம்',
+    'shubha': 'சுபம்', 'aayaGt': 'ஆயம் > வியயம் ✓', 'aayaLe': 'ஆயம் ≤ வியயம் ✗',
+    'selectNakErr': 'உரிமையாளர் நக்ஷத்திரம் தேர்வு செய்யவும்',
+    'a1': 'த்வஜம்', 'a2': 'தூம்ரம்', 'a3': 'சிம்மம்', 'a4': 'ச்வானம்', 'a5': 'விருஷபம்', 'a6': 'கரம்', 'a7': 'கஜம்', 'a8': 'த்வாங்க்ஷம்',
+    't1': 'ஜன்ம தாரை', 't2': 'சம்பத் தாரை', 't3': 'விபத் தாரை', 't4': 'க்ஷேம தாரை',
+    't5': 'ப்ரத்யக் தாரை', 't6': 'சாதன தாரை', 't7': 'நைதன தாரை', 't8': 'மித்ர தாரை', 't9': 'பரம மித்ர தாரை',
+    'q1': 'சாதாரணம்', 'q2': 'மிக நல்லது', 'q3': 'கெட்டது', 'q4': 'நல்லது',
+  },
+  'te': {
+    'title': 'వాస్తు కొలతలు', 'sub': 'Vastu Measurements',
+    'ownerNak': 'యజమాని నక్షత్రం (Owner\'s Nakshatra)', 'selectNak': 'నక్షత్రం ఎంచుకోండి',
+    'length': 'పొడవు / Length (Feet)', 'breadth': 'వెడల్పు / Breadth (Feet)', 'area': 'వైశాల్యం / Area (Sq Ft)',
+    'tabLB': 'పొడవు × వెడల్పు (L × B)', 'tabSqft': 'వైశాల్యం (Sq Ft)',
+    'search': 'వెతుకు (Search)', 'goodOnly': 'శుభ ఫలితాలు (Good only)',
+    'allResults': 'అన్ని ఫలితాలు (All)', 'noResults': 'శుభ ఫలితాలు దొరకలేదు',
+    'hint': 'వివరాలు నమోదు చేసి వెతకండి', 'hintEn': 'Enter details and search',
+    'sqftHint': 'ప్రతి Sq Ft కి సాధ్యమైన పొడవు × వెడల్పు జతలు వెతకబడతాయి (min side: 5 ft)',
+    'formula': 'శాస్త్ర సూత్రం (Shastra Formula):',
+    'peridhi': 'చుట్టుకొలత', 'hasta': 'హస్తం',
+    'aaya': 'ఆయం', 'vyaya': 'వ్యయం',
+    'buildingNak': 'భవన నక్షత్రం', 'tarabala': 'తారాబలం',
+    'shubha': 'శుభం', 'aayaGt': 'ఆయం > వ్యయం ✓', 'aayaLe': 'ఆయం ≤ వ్యయం ✗',
+    'selectNakErr': 'యజమాని నక్షత్రం ఎంచుకోండి',
+    'a1': 'ధ్వజం', 'a2': 'ధూమ్రం', 'a3': 'సింహం', 'a4': 'శ్వానం', 'a5': 'వృషభం', 'a6': 'ఖరం', 'a7': 'గజం', 'a8': 'ధ్వాంక్షం',
+    't1': 'జన్మ తార', 't2': 'సంపత్ తార', 't3': 'విపత్ తార', 't4': 'క్షేమ తార',
+    't5': 'ప్రత్యక్ తార', 't6': 'సాధన తార', 't7': 'నైధన తార', 't8': 'మిత్ర తార', 't9': 'పరమ మిత్ర తార',
+    'q1': 'సాధారణం', 'q2': 'అతి ఉత్తమం', 'q3': 'చెడ్డది', 'q4': 'ఉత్తమం',
+  },
+  'ml': {
+    'title': 'വാസ്തു അളവുകൾ', 'sub': 'Vastu Measurements',
+    'ownerNak': 'ഉടമയുടെ നക്ഷത്രം (Owner\'s Nakshatra)', 'selectNak': 'നക്ഷത്രം തിരഞ്ഞെടുക്കുക',
+    'length': 'നീളം / Length (Feet)', 'breadth': 'വീതി / Breadth (Feet)', 'area': 'വിസ്തീർണ്ണം / Area (Sq Ft)',
+    'tabLB': 'നീളം × വീതി (L × B)', 'tabSqft': 'വിസ്തീർണ്ണം (Sq Ft)',
+    'search': 'തിരയുക (Search)', 'goodOnly': 'ശുഭ ഫലങ്ങൾ (Good only)',
+    'allResults': 'എല്ലാ ഫലങ്ങളും (All)', 'noResults': 'ശുഭ ഫലങ്ങൾ കണ്ടെത്തിയില്ല',
+    'hint': 'വിവരങ്ങൾ നൽകി തിരയുക', 'hintEn': 'Enter details and search',
+    'sqftHint': 'ഓരോ Sq Ft നും സാധ്യമായ നീളം × വീതി ജോഡികൾ (min side: 5 ft)',
+    'formula': 'ശാസ്ത്ര സൂത്രം (Shastra Formula):',
+    'peridhi': 'ചുറ്റളവ്', 'hasta': 'ഹസ്തം',
+    'aaya': 'ആയം', 'vyaya': 'വ്യയം',
+    'buildingNak': 'കെട്ടിട നക്ഷത്രം', 'tarabala': 'താരാബലം',
+    'shubha': 'ശുഭം', 'aayaGt': 'ആയം > വ്യയം ✓', 'aayaLe': 'ആയം ≤ വ്യയം ✗',
+    'selectNakErr': 'ഉടമയുടെ നക്ഷത്രം തിരഞ്ഞെടുക്കുക',
+    'a1': 'ധ്വജം', 'a2': 'ധൂമ്രം', 'a3': 'സിംഹം', 'a4': 'ശ്വാനം', 'a5': 'വൃഷഭം', 'a6': 'ഖരം', 'a7': 'ഗജം', 'a8': 'ധ്വാങ്ക്ഷം',
+    't1': 'ജന്മ താര', 't2': 'സമ്പത്ത് താര', 't3': 'വിപത്ത് താര', 't4': 'ക്ഷേമ താര',
+    't5': 'പ്രത്യക് താര', 't6': 'സാധന താര', 't7': 'നൈധന താര', 't8': 'മിത്ര താര', 't9': 'പരമ മിത്ര താര',
+    'q1': 'സാധാരണം', 'q2': 'അതി ഉത്തമം', 'q3': 'ചീത്ത', 'q4': 'ഉത്തമം',
+  },
+};
+
+String _v(String key) {
+  final lang = AppLocale.current;
+  return _vastuStrings[lang]?[key] ?? _vastuStrings['kn']?[key] ?? key;
+}
+
+List<String> get _aayaNames => [_v('a1'), _v('a2'), _v('a3'), _v('a4'), _v('a5'), _v('a6'), _v('a7'), _v('a8')];
+List<String> get _taraNames => [_v('t1'), _v('t2'), _v('t3'), _v('t4'), _v('t5'), _v('t6'), _v('t7'), _v('t8'), _v('t9')];
+List<String> get _taraQuality => [_v('q1'), _v('q2'), _v('q3'), _v('q4'), _v('q3'), _v('q4'), _v('q3'), _v('q4'), _v('q2')];
 
 // ─── Shared result model ───
 class _VastuResult {
@@ -100,9 +194,7 @@ List<List<int>> _factorPairs(int area, {int minSide = 5}) {
   for (int i = minSide; i <= limit; i++) {
     if (area % i == 0) {
       final j = area ~/ i;
-      if (j >= minSide) {
-        pairs.add([i, j]); // i <= j
-      }
+      if (j >= minSide) pairs.add([i, j]);
     }
   }
   return pairs;
@@ -123,13 +215,11 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
   late TabController _tabCtrl;
   int? _ownerNakIndex;
 
-  // Tab 1: L × B
   final _minLenCtrl = TextEditingController(text: '30');
   final _maxLenCtrl = TextEditingController(text: '40');
   final _minBreadthCtrl = TextEditingController(text: '40');
   final _maxBreadthCtrl = TextEditingController(text: '50');
 
-  // Tab 2: Sq Ft
   final _minSqftCtrl = TextEditingController(text: '1000');
   final _maxSqftCtrl = TextEditingController(text: '1200');
 
@@ -160,12 +250,11 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     super.dispose();
   }
 
-  // ─── Validation ───
   bool _validateNak() {
     if (_ownerNakIndex == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('ಯಜಮಾನನ ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ (Select Owner\'s Nakshatra)'),
+        SnackBar(
+          content: Text(_v('selectNakErr')),
           backgroundColor: Colors.red,
         ),
       );
@@ -174,10 +263,8 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     return true;
   }
 
-  // ─── Search: L × B ───
   void _searchLB() {
     if (!_validateNak()) return;
-
     final minL = int.tryParse(_minLenCtrl.text) ?? 10;
     final maxL = int.tryParse(_maxLenCtrl.text) ?? 50;
     final minB = int.tryParse(_minBreadthCtrl.text) ?? 10;
@@ -205,10 +292,8 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     _sortAndSet(results);
   }
 
-  // ─── Search: Sq Ft ───
   void _searchSqft() {
     if (!_validateNak()) return;
-
     final minSq = int.tryParse(_minSqftCtrl.text) ?? 500;
     final maxSq = int.tryParse(_maxSqftCtrl.text) ?? 2000;
 
@@ -228,7 +313,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     final results = <_VastuResult>[];
     for (int sq = minSq; sq <= maxSq; sq++) {
       final pairs = _factorPairs(sq);
-      if (pairs.isEmpty) continue; // prime or no valid pairs
+      if (pairs.isEmpty) continue;
       for (final pair in pairs) {
         results.add(_calculate(pair[0], pair[1], _ownerNakIndex!));
       }
@@ -268,17 +353,17 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ವಾಸ್ತು ಅಳತೆಗಳು', style: TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.w900)),
-            Text('Vastu Measurements', style: TextStyle(color: kMuted, fontSize: 11)),
+            Text(_v('title'), style: TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.w900)),
+            Text(_v('sub'), style: TextStyle(color: kMuted, fontSize: 11)),
           ],
         ),
         iconTheme: IconThemeData(color: kText),
         elevation: 0,
         bottom: TabBar(
           controller: _tabCtrl,
-          tabs: const [
-            Tab(text: 'ಉದ್ದ × ಅಗಲ (L × B)'),
-            Tab(text: 'ವಿಸ್ತೀರ್ಣ (Sq Ft)'),
+          tabs: [
+            Tab(text: _v('tabLB')),
+            Tab(text: _v('tabSqft')),
           ],
           labelColor: kPurple2,
           unselectedLabelColor: kMuted,
@@ -302,14 +387,14 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('ಯಜಮಾನನ ನಕ್ಷತ್ರ (Owner\'s Nakshatra)',
+                  Text(_v('ownerNak'),
                     style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
                   const SizedBox(height: 6),
                   DropdownButtonFormField<int>(
                     value: _ownerNakIndex,
                     isExpanded: true,
                     decoration: InputDecoration(
-                      hintText: 'ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ',
+                      hintText: _v('selectNak'),
                       hintStyle: TextStyle(color: kMuted, fontSize: 13),
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -325,7 +410,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
               ),
             ),
 
-            // ── Tab content (inputs) ──
+            // ── Tab content ──
             Expanded(
               child: CustomScrollView(
                 slivers: [
@@ -351,12 +436,15 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('ಶಾಸ್ತ್ರ ಸೂತ್ರ (Shastra Formula):', style: TextStyle(
+                          Text(_v('formula'), style: TextStyle(
                             fontSize: 11, fontWeight: FontWeight.w800, color: kPurple2)),
                           const SizedBox(height: 4),
-                          Text('• ಪರಿಧಿ = 2 × (ಉದ್ದ + ಅಗಲ)  →  ಹಸ್ತ = ಪರಿಧಿ ÷ 1.5', style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ಆಯ = (ಹಸ್ತ × 9) % 8  |  ವ್ಯಯ = (ಹಸ್ತ × 10) % 8', style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ಆಯ > ವ್ಯಯ ಆಗಬೇಕು  |  ನಕ್ಷತ್ರ = (ಹಸ್ತ × 8) % 27', style: TextStyle(fontSize: 10, color: kMuted)),
+                          Text('• ${_v('peridhi')} = 2 × (${_v('length').split(' /')[0]} + ${_v('breadth').split(' /')[0]})  →  ${_v('hasta')} = ${_v('peridhi')} ÷ 1.5',
+                            style: TextStyle(fontSize: 10, color: kMuted)),
+                          Text('• ${_v('aaya')} = (${_v('hasta')} × 9) % 8  |  ${_v('vyaya')} = (${_v('hasta')} × 10) % 8',
+                            style: TextStyle(fontSize: 10, color: kMuted)),
+                          Text('• ${_v('aaya')} > ${_v('vyaya')}  |  ${AppLocale.l('nakshatra')} = (${_v('hasta')} × 8) % 27',
+                            style: TextStyle(fontSize: 10, color: kMuted)),
                         ],
                       ),
                     ),
@@ -372,7 +460,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                         child: ElevatedButton.icon(
                           onPressed: _tabCtrl.index == 0 ? _searchLB : _searchSqft,
                           icon: const Icon(Icons.search, size: 20),
-                          label: const Text('ಹುಡುಕಿ (Search)', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                          label: Text(_v('search'), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: kPurple2,
                             foregroundColor: Colors.white,
@@ -397,9 +485,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                _showOnlyGood
-                                    ? 'ಶುಭ ಫಲಿತಾಂಶ ಮಾತ್ರ (Good only)'
-                                    : 'ಎಲ್ಲಾ ಫಲಿತಾಂಶ (All)',
+                                _showOnlyGood ? _v('goodOnly') : _v('allResults'),
                                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted),
                               ),
                             ),
@@ -424,8 +510,8 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                           children: [
                             Icon(Icons.home_work_rounded, size: 64, color: kPurple2.withOpacity(0.3)),
                             const SizedBox(height: 12),
-                            Text('ವಿವರ ನಮೂದಿಸಿ ಮತ್ತು ಹುಡುಕಿ', style: TextStyle(color: kMuted, fontSize: 14)),
-                            Text('Enter details and search', style: TextStyle(color: kMuted, fontSize: 12)),
+                            Text(_v('hint'), style: TextStyle(color: kMuted, fontSize: 14)),
+                            Text(_v('hintEn'), style: TextStyle(color: kMuted, fontSize: 12)),
                           ],
                         ),
                       ),
@@ -438,9 +524,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                           children: [
                             Icon(Icons.search_off, size: 48, color: Colors.red.withOpacity(0.4)),
                             const SizedBox(height: 8),
-                            Text('ಯಾವುದೇ ಶುಭ ಫಲಿತಾಂಶ ಸಿಗಲಿಲ್ಲ', style: TextStyle(color: kMuted, fontSize: 14)),
-                            Text('No favorable results. Try turning off the filter ↗',
-                                style: TextStyle(color: kPurple2, fontSize: 12)),
+                            Text(_v('noResults'), style: TextStyle(color: kMuted, fontSize: 14)),
                           ],
                         ),
                       ),
@@ -479,7 +563,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('ಉದ್ದ / Length (Feet)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
+          Text(_v('length'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
           const SizedBox(height: 6),
           Row(children: [
             Expanded(child: _field(_minLenCtrl, 'Min')),
@@ -487,7 +571,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
             Expanded(child: _field(_maxLenCtrl, 'Max')),
           ]),
           const SizedBox(height: 12),
-          Text('ಅಗಲ / Breadth (Feet)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
+          Text(_v('breadth'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
           const SizedBox(height: 6),
           Row(children: [
             Expanded(child: _field(_minBreadthCtrl, 'Min')),
@@ -512,7 +596,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('ವಿಸ್ತೀರ್ಣ / Area (Sq Ft)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
+          Text(_v('area'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
           const SizedBox(height: 6),
           Row(children: [
             Expanded(child: _field(_minSqftCtrl, 'From')),
@@ -521,7 +605,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           ]),
           const SizedBox(height: 8),
           Text(
-            'ಪ್ರತಿ Sq Ft ಗೆ ಸಾಧ್ಯವಿರುವ ಉದ್ದ × ಅಗಲ ಜೋಡಿಗಳನ್ನು ಹುಡುಕುತ್ತೇವೆ (min side: 5 ft)',
+            _v('sqftHint'),
             style: TextStyle(fontSize: 10, color: kMuted, fontStyle: FontStyle.italic),
           ),
         ],
@@ -602,7 +686,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Icon(Icons.check_circle, size: 14, color: Colors.green.shade700),
                     const SizedBox(width: 3),
-                    Text('ಶುಭ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.green.shade700)),
+                    Text(_v('shubha'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.green.shade700)),
                   ]),
                 ),
             ],
@@ -610,7 +694,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           const SizedBox(height: 6),
 
           // Perimeter / Hasta
-          Text('ಪರಿಧಿ: ${r.perimeterFt} ft  |  ಹಸ್ತ: ${r.hasta}',
+          Text('${_v('peridhi')}: ${r.perimeterFt} ft  |  ${_v('hasta')}: ${r.hasta}',
             style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
@@ -618,7 +702,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           Row(children: [
             Icon(Icons.flag_rounded, size: 14, color: _aayaColor(r.aayaIndex)),
             const SizedBox(width: 4),
-            Text('ಆಯ: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            Text('${_v('aaya')}: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
             Flexible(child: Text(
               '${_aayaNames[r.aayaIndex]} (${_aayaEnglish[r.aayaIndex]}) [${r.aayaValue}]',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _aayaColor(r.aayaIndex)),
@@ -631,7 +715,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           Row(children: [
             Icon(Icons.money_off, size: 14, color: kMuted),
             const SizedBox(width: 4),
-            Text('ವ್ಯಯ: ${r.vyayaValue}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            Text('${_v('vyaya')}: ${r.vyayaValue}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -640,7 +724,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
-                r.aayaGtVyaya ? 'ಆಯ > ವ್ಯಯ ✓' : 'ಆಯ ≤ ವ್ಯಯ ✗',
+                r.aayaGtVyaya ? _v('aayaGt') : _v('aayaLe'),
                 style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
                   color: r.aayaGtVyaya ? Colors.green.shade700 : Colors.red.shade700),
               ),
@@ -652,7 +736,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           Row(children: [
             Icon(Icons.star, size: 14, color: kOrange),
             const SizedBox(width: 4),
-            Text('ಕಟ್ಟಡದ ನಕ್ಷತ್ರ: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            Text('${_v('buildingNak')}: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
             Flexible(child: Text(naks[r.nakIndex],
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kText),
               overflow: TextOverflow.ellipsis)),
@@ -669,7 +753,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
             child: Row(children: [
               Icon(Icons.shield, size: 14, color: _taraColor(r.taraIndex)),
               const SizedBox(width: 6),
-              Text('ತಾರಾಬಲ: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
+              Text('${_v('tarabala')}: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
               Flexible(child: Text(
                 '${_taraNames[r.taraIndex]} (${_taraEnglish[r.taraIndex]}) - ${_taraQuality[r.taraIndex]}',
                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _taraColor(r.taraIndex)),
@@ -682,4 +766,3 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     );
   }
 }
-
