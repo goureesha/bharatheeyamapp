@@ -170,6 +170,9 @@ class TransitCalculator {
     }
     
     for (int d = 1; d <= daysInYear; d++) {
+       // Yield to UI thread every 30 days to keep spinner animating
+       if (d % 30 == 0) await Future.delayed(Duration.zero);
+
        final currentDate = DateTime(year, 1, 1).add(Duration(days: d - 1));
        
        // Calculate at 12:00 PM UTC (~5:30 PM IST) to represent the day

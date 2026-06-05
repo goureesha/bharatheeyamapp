@@ -60,6 +60,9 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
+
+    // Yield a frame so the loading spinner renders before heavy computation
+    await Future.delayed(const Duration(milliseconds: 50));
     
     final data = await TransitCalculator.calculateAnnualEvents(_selectedYear);
     
