@@ -139,7 +139,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
       int wIdx = (pyWeekday + 1) % 7; // Sun=0..Sat=6
       // Check if birth JD is before sunrise — if so, use previous day's vara
       // For daily calendar, we use the date's own vara (sunrise-based)
-      final agniVal = (tithiIdx + 1 + wIdx) % 4;
+      final agniVal = (tithiIdx + wIdx + 3) % 4;
       final isPrithvi = (agniVal == 0 || agniVal == 3);
       _dailyAgniVasaCache[normalized] = isPrithvi;
       return isPrithvi;
