@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/transit_calculator.dart';
+import '../core/transit_cache.dart';
 import '../constants/strings.dart';
 import '../widgets/common.dart';
 
@@ -61,16 +61,15 @@ class _PlanetsScreenState extends State<PlanetsScreen> with SingleTickerProvider
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
 
-    // Yield a frame so the loading spinner renders before heavy computation
-    await Future.delayed(const Duration(milliseconds: 50));
-    
-    final data = await TransitCalculator.calculateAnnualEvents(_selectedYear);
+    final data = await TransitCache.getYear(_selectedYear);
     
     if (mounted) {
       setState(() {
         _transitData = data;
         _isLoading = false;
       });
+      // Pre-fetch adjacent years in background for instant navigation
+      TransitCache.prefetchAdjacent(_selectedYear);
     }
   }
 

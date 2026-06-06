@@ -1,97 +1,58 @@
-# Block/Unblock Mechanism — Safe Implementation
+# Pre-calculate Planets Data for 200 Years
 
-Add an admin-controlled block/unblock system that **won't cause app hangs**.
+## Problem
+The Planets screen lags when opened because it calculates transit, vakri, and asta data on-the-fly using Swiss Ephemeris (FFI). Each year requires ~365 ephemeris calculations × 9 planets = ~3,285 calculations. Switching years causes another loading delay.
 
-## Why It Hung Before
+## Proposed Approach: In-Memory Cache + Background Pre-computation
 
-The previous implementation likely hung because:
-1. **Firestore calls without timeouts** — `TesterService`, `DeviceBindingService` writes have NO timeout guards
-2. **Blocking the UI thread** — `SubscriptionService.initialize()` runs BEFORE `runApp()`, so any slow/stuck Firestore call freezes the splash screen indefinitely
-3. **No fail-safe defaults** — if Firestore is unreachable, the app waits forever instead of falling back
+> [!IMPORTANT]
+> Pre-computing 200 years of data and bundling it as a static JSON asset would add **~5-10 MB** to the app size and require a build-time script. Instead, I recommend a **smarter caching approach** that gives instant results after first load.
 
-## Anti-Hang Strategy
+### Strategy
 
-| Protection | How |
-|-----------|-----|
-| **All Firestore reads have timeouts** | Already 8s timeout in `checkManualPremium()` — we piggyback on this |
-| **Fail-OPEN for block check** | If Firestore is unreachable, default to **NOT blocked** (user keeps working offline) |
-| **Cache locally** | Store last known block status in SharedPreferences — only update when Firestore is reachable |
-| **Never add new awaits before runApp** | Block check runs AFTER first frame, not during splash |
-| **Block enforcement is UI-only** | Show a blocking screen overlay — no synchronous network call needed |
+1. **LRU Memory Cache** — Keep the last 5 years of computed data in memory
+2. **Disk Cache** — Save each year's computed data as a JSON file so it loads instantly on next app open
+3. **Background Pre-fetch** — When user views year X, pre-compute X-1 and X+1 in the background
+4. **Compute Isolate** — Move the heavy calculation to a Dart `Isolate` so UI never freezes
 
-## Proposed Changes
-
-### 1. Firestore Document
-
-No new collection needed. Add a `blocked` boolean field to the existing `device_bindings/{email}` document:
-
-```
-device_bindings/{email} {
-  deviceId: "...",
-  manualPremium: true/false,
-  manualPremiumExpiry: Timestamp,
-  blocked: true/false,        // ← NEW
-  blockedReason: "..."        // ← NEW (optional message to show user)
-}
-```
-
----
-
-### 2. SubscriptionService Changes
-
-#### [MODIFY] [subscription_service.dart](file:///d:/bharatheeyamapp%20sample/lib/services/subscription_service.dart)
-
-- Add `static bool isBlocked = false;` and `static String blockedReason = '';`
-- In `checkManualPremium()` (which already reads `device_bindings/{email}` with 8s timeout):
-  - Read `blocked` and `blockedReason` fields from the same document
-  - Cache to SharedPreferences
-  - If Firestore fails → fall back to cached value (default: not blocked)
-- In `hasAccess` getter: add `if (isBlocked) return false;` at the top
-
----
-
-### 3. Main.dart Screen Gate
-
-#### [MODIFY] [main.dart](file:///d:/bharatheeyamapp%20sample/lib/main.dart)
-
-- Add a `_BlockedScreen` widget showing the block reason with a "Retry" button
-- In screen selection logic (line ~344), add blocked check:
-  ```dart
-  home: SubscriptionService.isBlocked
-      ? _BlockedScreen()
-      : !GoogleAuthService.isSignedIn && !kIsWeb
-          ? ...existing logic...
-  ```
-- On app resume (`_verifyAccessOnResume`): also refresh block status
-
----
-
-### 4. Admin Script Update
-
-#### [MODIFY] [unlock_user.py](file:///d:/bharatheeyamapp%20sample/unlock_user.py)
-
-- Add `--block` and `--unblock` flags alongside existing `--premium` functionality
-
----
+### Why this is better than bundling 200 years:
+- No extra app size (data is computed once, cached locally)
+- No build-time script needed
+- Data is always accurate (computed from ephemeris, not stale)
+- Adjacent years pre-fetched = instant navigation
 
 ## Open Questions
 
 > [!IMPORTANT]
-> **What should happen when a blocked user opens the app offline?**
-> - Option A: Show blocked screen (using cached status) — stricter but could lock out user who was blocked by mistake
-> - Option B: Allow offline access, only enforce block when online — more forgiving
-> 
-> Current plan: **Option A** — use cached status, but with a "Contact Support" button
+> Do you want the full 200-year pre-computation (generating a JSON asset at build time), or is the **cache + background pre-fetch** approach acceptable? The cache approach means first-time load for a year takes ~1-2 seconds, but every subsequent load is instant.
 
-> [!IMPORTANT]
-> **Should blocked users still see the app UI behind the block screen, or a completely separate screen?**
-> Current plan: Full-screen replacement (like `_DeviceMismatchScreen`)
+## Proposed Changes
+
+### Transit Calculator Cache
+
+#### [NEW] [transit_cache.dart](file:///d:/bharatheeyamapp%20sample/lib/core/transit_cache.dart)
+- LRU in-memory cache (5 years)
+- Disk cache using JSON files in app's documents directory
+- `getYear(year)` → returns cached data instantly or computes + caches
+- `prefetch(year)` → background computation of adjacent years
+
+---
+
+#### [MODIFY] [transit_calculator.dart](file:///d:/bharatheeyamapp%20sample/lib/core/transit_calculator.dart)
+- Move `calculateAnnualEvents` to run in a Dart `Isolate` for true parallelism
+- Add serialization (toJson/fromJson) to `TransitData`, `TransitEvent`, `VakriPeriod`, `AstaPeriod`
+
+---
+
+#### [MODIFY] [planets_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/planets_screen.dart)
+- Use `TransitCache.getYear()` instead of direct `TransitCalculator.calculateAnnualEvents()`
+- On year change, trigger `prefetch` for adjacent years
+- Show cached data instantly, no spinner for cached years
 
 ## Verification Plan
 
 ### Manual Verification
-1. Set `blocked: true` in Firestore → app shows blocked screen
-2. Set `blocked: false` → app resumes normally
-3. Kill internet → app uses cached status, no hang
-4. Slow network → app loads within 8s timeout, no hang
-5. Test `unlock_user.py --block` and `--unblock` commands
+- Open planets screen → first load shows spinner briefly
+- Navigate to next/previous year → should be instant (pre-fetched)
+- Close and reopen app → same year loads instantly from disk cache
+- Verify transit/vakri/asta data matches the current non-cached version

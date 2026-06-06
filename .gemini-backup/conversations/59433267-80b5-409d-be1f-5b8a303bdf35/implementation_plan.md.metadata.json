@@ -1,6 +1,6 @@
 {
   "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Implementation plan for admin-controlled block/unblock mechanism that prevents app hangs. Uses existing device_bindings Firestore document, piggybacks on checkManualPremium() with 8s timeout, caches status locally, defaults to not-blocked if offline. Modifies subscription_service.dart, main.dart, and unlock_user.py.",
-  "updatedAt":  "2026-06-04T11:16:09.864175600Z",
+  "summary":  "Plan to eliminate planets screen lag using LRU memory cache + disk cache + background pre-fetch of adjacent years, instead of bundling 200 years of static data. Includes moving computation to a Dart Isolate for true UI parallelism.",
+  "updatedAt":  "2026-06-06T05:51:34.693118400Z",
   "requestFeedback":  true
 }
