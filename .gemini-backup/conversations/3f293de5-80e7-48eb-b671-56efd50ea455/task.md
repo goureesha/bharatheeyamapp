@@ -1,45 +1,34 @@
-# Google Calendar 2-Way Sync — Tasks
+# Sync Original → Clone Tasks
 
-## Package Setup
-- [x] Add `googleapis`, `googleapis_auth`, `extension_google_sign_in_as_googleapis_auth` to pubspec.yaml
-- [/] Run `flutter pub get` (running...)
+## Phase 1: Copy new files
+- [x] `core/transit_cache.dart`
+- [x] `screens/panchanga_search_screen.dart`
+- [x] `screens/pooja_lists_screen.dart`
+- [x] `screens/support_screen.dart` (stripped security refs)
+- [x] `screens/vastu_screen.dart`
+- [x] `services/pooja_list_service.dart`
 
-## Model Changes
-- [x] Add `googleEventId` field to `Appointment` class
-- [x] Update `Appointment.fromRow()` and `toRow()` for the new field
-- [x] Add `Appointment.copyWith()` method
-- [x] Update `loadFromCache()` parsing (handles 10th field gracefully)
+## Phase 2: Diff & merge shared files
+- [x] Core logic files (8 files) — copied from original
+- [x] Screen files — copied from original (skip appointment/prashna)
+- [x] Service files — copied from original (skip security)
+- [x] Widgets (7 files) — copied from original (including 326KB common.dart)
+- [x] Constants, models — copied from original
+- [x] main.dart — merged (sunrise widget, scaffoldMessengerKey, theme improvements)
 
-## Auth Service
-- [x] Add calendar scopes to `GoogleAuthService` (`calendar`, `calendar.events`)
-- [x] Add `ensureCalendarScope()` method
-- [x] Add `getAuthenticatedClient()` method via `extension_google_sign_in_as_googleapis_auth`
+## Phase 3: Update navigation
+- [x] Wire new screens into home (Panchanga Search, Pooja Lists, Vastu)
+- [x] Add ValueListenableBuilder for language in home_screen
+- [x] Strip security references from support_screen
 
-## Calendar Service (Full Rewrite)
-- [x] Initialize CalendarApi from GoogleSignIn auth
-- [x] `getOrCreateCalendar()` — find/create "ಭಾರತೀಯಮ್ Appointments" calendar
-- [x] `pushAppointment()` — create/update event from local appointment
-- [x] `pullEvents()` — fetch events from GCal (30 days back, 90 days forward)
-- [x] `deleteEvent()` — remove event
-- [x] `fullSync()` — bidirectional sync logic with app-as-source-of-truth
-- [x] `_toEvent()` / `_toAppointment()` converters
-- [x] Legacy `createAppointment()` method (backward compatible)
-- [x] `loadLastSyncTime()` / `reset()` helpers
-
-## Appointment Service Integration
-- [x] Hook `CalendarService.pushAppointment()` into booking flow
-- [x] Preserve `googleEventId` in `updateStatus()`
-- [x] Add `updateAppointment()` method for full field updates
-- [x] Add `setGoogleEventId()` method
-- [x] Add `addAppointmentDirect()` for pulled events
-
-## UI Updates (appointment_screen.dart)
-- [x] Update `_syncInBackground` to trigger `CalendarService.fullSync()`
-- [x] Update `_syncData` to show sync results (pushed/pulled/deleted counts)
-- [x] Update sync button tooltip with last sync time
-- [x] Replace old `CalendarService.createAppointment()` call with 2-way sync
+## Files kept as clone version (clone has custom improvements):
+- [x] `services/calendar_service.dart` (clone has Google Calendar integration)
+- [x] `services/firebase_service.dart` (clone uses secrets.dart)
+- [x] `services/google_auth_service.dart` (clone has updated client ID)
+- [x] `services/storage_service.dart` (clone may have differences)
 
 ## Verification
-- [ ] `flutter pub get` succeeds
-- [ ] `flutter analyze` passes
-- [ ] `flutter build apk --debug` succeeds
+- [/] Flutter analyze — running
+- [ ] Build APK
+- [x] Verify Prashna/Appointment untouched
+- [x] Verify no security code copied (scan passed ✅)

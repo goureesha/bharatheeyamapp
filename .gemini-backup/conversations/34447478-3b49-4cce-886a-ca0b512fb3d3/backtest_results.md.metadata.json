@@ -1,0 +1,6 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_OTHER",
+  "summary":  "Complete backtest comparison: 5-minute vs daily candles across 11 strategies and 5 stocks. Daily candles show significantly better results with ICT FVG on SBIN returning +22.88%. Includes recommendations for which strategies to use on which timeframes.",
+  "updatedAt":  "2026-06-06T12:53:14.095139200Z",
+  "requestFeedback":  true
+}

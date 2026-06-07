@@ -1,192 +1,111 @@
-# Google Calendar 2-Way Sync for Appointments
+# Sync Original App Features into Clone
 
-Add bidirectional sync between the Bharatheeyam appointment system and Google Calendar, so appointments created in the app appear in Google Calendar and vice versa.
+Bring features from the **original app** (`D:\bharatheeyamapp sample`) into the **clone** (`D:\bharatheeyamapp clone`), while preserving clone-only features and excluding security.
 
-## Current State
+## User Rules
+- ❌ **Do NOT touch** Prashna section (clone-only: `prashna_dashboard_screen.dart`, `prashna_input_screen.dart`, `prashna_chart.dart`)
+- ❌ **Do NOT touch** Appointment section (`appointment_screen.dart`, `appointment_service.dart`)
+- ❌ **Do NOT copy** security features from original (`offline_access_service.dart`, `subscription_service.dart`, `trusted_time_service.dart`, `device_binding_service.dart`)
+- ✅ **Keep** clone-only files: `secrets.dart`, `ad_service.dart`, `ashtamangala_screen.dart`, `graha_phala.dart`
 
-- Appointments stored **locally only** in SharedPreferences
-- `CalendarService` exists but is a **stub** (was disabled — comment says "sensitive scope removed")
-- `GoogleAuthService` with `google_sign_in` is **already working** (used to gate appointment screen access)
-- `googleapis` / `googleapis_auth` packages are **NOT installed**
-- Firestore is used only for inbound web booking requests
+## File Analysis
 
----
+### Files to ADD (in original, missing from clone)
 
-## What YOU Need To Do (Google Cloud Console Setup)
+| File | Purpose | Security? |
+|------|---------|-----------|
+| `core/transit_cache.dart` | Transit calculation caching | No ✅ COPY |
+| `screens/panchanga_search_screen.dart` | Search panchanga by date | No ✅ COPY |
+| `screens/pooja_lists_screen.dart` | Pooja/ritual lists | No ✅ COPY |
+| `screens/support_screen.dart` | Support/help page | No ✅ COPY |
+| `screens/vastu_screen.dart` | Vastu analysis | No ✅ COPY |
+| `services/pooja_list_service.dart` | Pooja list data service | No ✅ COPY |
+| `services/offline_access_service.dart` | Offline license checking | **Yes ❌ SKIP** |
+| `services/subscription_service.dart` | Subscription/payment | **Yes ❌ SKIP** |
+| `services/trusted_time_service.dart` | Tamper-proof time for licenses | **Yes ❌ SKIP** |
 
-> [!IMPORTANT]
-> These steps **must be done by you** in the browser — I cannot do them for you. They take about 15-20 minutes.
+### Files in BOTH (need diff to check for updates)
 
-### Step 1: Enable Google Calendar API
+These exist in both repos but may have improvements in the original. Need to diff each one and selectively merge non-security updates:
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Select your project: **`bharatheeyam-app`**
-3. Go to **APIs & Services → Library**
-4. Search for **"Google Calendar API"**
-5. Click **Enable**
+**Core logic** (likely has improvements):
+- `core/ashtakavarga.dart`
+- `core/calculator.dart`
+- `core/ephemeris.dart`
+- `core/events.dart`
+- `core/match_making.dart`
+- `core/muhurta_rules.dart`
+- `core/shadbala.dart`
+- `core/transit_calculator.dart`
 
-### Step 2: Configure OAuth Consent Screen
+**Screens** (may have UI improvements — exclude appointment/prashna):
+- `screens/about_screen.dart`
+- `screens/client_detail_screen.dart`
+- `screens/dashboard_screen.dart`
+- `screens/home_screen.dart`
+- `screens/input_screen.dart`
+- `screens/match_making_tab.dart`
+- `screens/panchanga_screen.dart`
+- `screens/planets_screen.dart`
+- `screens/settings_screen.dart`
+- `screens/taranukoola_screen.dart`
+- `screens/vedic_clock_screen.dart`
 
-This is the critical step. Google Calendar uses a **"sensitive scope"** (`https://www.googleapis.com/auth/calendar`), which is why it was previously disabled.
+**Services** (may have improvements — exclude security):
+- `services/backup_service.dart` (and mobile/web/stub)
+- `services/calendar_service.dart`
+- `services/client_service.dart`
+- `services/docs_service.dart`
+- `services/drive_backup_service.dart`
+- `services/export_service.dart` (and mobile/web)
+- `services/festival_cache_service.dart`
+- `services/firebase_service.dart`
+- `services/google_auth_service.dart`
+- `services/history_service.dart`
+- `services/janma_patrike_service.dart`
+- `services/location_service.dart`
+- `services/network_service.dart`
+- `services/pdf_service.dart`
+- `services/pdf_theme.dart`
+- `services/sheets_service.dart`
+- `services/storage_service.dart`
 
-1. Go to **APIs & Services → OAuth consent screen**
-2. If not already set, choose **External** user type
-3. Fill in the app info:
-   - App name: `Bharatheeyam`
-   - User support email: your email
-   - Developer contact: your email
-4. On the **Scopes** page, click **Add or remove scopes** and add:
-   - `https://www.googleapis.com/auth/calendar` (read/write calendar)
-   - `https://www.googleapis.com/auth/calendar.events` (read/write events)
-5. Click **Save and Continue**
-
-> [!WARNING]
-> **Sensitive Scope Verification**: While in **Testing** mode, only users you add as **Test Users** can use the calendar sync (up to 100 users). This is fine for personal/small use. For a published Play Store app with many users, you'd need to submit for Google's verification (takes weeks). For now, **Testing mode is sufficient**.
-
-6. On the **Test Users** page, add your own Google email
-7. Click **Save and Continue**
-
-### Step 3: Get Your OAuth Client IDs
-
-You likely already have these (for Google Sign-In), but verify:
-
-1. Go to **APIs & Services → Credentials**
-2. You should see:
-   - **Android OAuth Client** — linked to your app's package name & SHA-1
-   - **Web OAuth Client** — needed for the `googleapis` package
-
-> [!IMPORTANT]
-> **I need from you**: Confirm that both Android and Web OAuth client IDs exist. If the Web client ID is missing, create one:
-> - Click **Create Credentials → OAuth client ID**
-> - Type: **Web application**
-> - Name: `Bharatheeyam Web Client`
-> - No redirect URIs needed
-> - Copy the **Client ID** — I'll need it for the code
-
-### Step 4: Get Android SHA-1 Fingerprint (if not already done)
-
-If your Android OAuth client isn't set up yet:
-```bash
-cd android
-./gradlew signingReport
-```
-Copy the **SHA-1** fingerprint and add it to the Android OAuth client in Cloud Console.
-
----
+**Other:**
+- `main.dart`
+- `constants/places.dart`
+- `constants/strings.dart`
+- `models/library_models.dart`
+- `widgets/*`
 
 ## Open Questions
 
 > [!IMPORTANT]
-> **Q1: Which Google Calendar should appointments sync to?**
-> - **Option A**: The user's primary/default calendar (simplest)
-> - **Option B**: A dedicated "Bharatheeyam Appointments" calendar (cleaner separation)
-> - **Recommendation**: Option B — create a dedicated calendar so personal events don't mix with client appointments
+> The original has **9 new features** to potentially copy and **~60 shared files** to diff. This is a large merge.
 
-> [!IMPORTANT]
-> **Q2: What should happen on conflict?**
-> When the same appointment is edited in both the app and Google Calendar:
-> - **Option A**: App wins (app is source of truth)
-> - **Option B**: Google Calendar wins
-> - **Option C**: Last-edit wins (compare timestamps)
-> - **Recommendation**: Option A — the app is the primary tool, Google Calendar is the mirror
+> [!WARNING]
+> Some shared files (e.g., `main.dart`, `home_screen.dart`, `dashboard_screen.dart`) likely reference security services from the original. We'll need to carefully strip those references when merging.
 
-> [!IMPORTANT]
-> **Q3: Do you want automatic background sync or manual sync button?**
-> - **Option A**: Auto-sync every time the appointment screen opens + manual sync button
-> - **Option B**: Only sync when the user taps the sync button
-> - **Recommendation**: Option A — auto on screen open + manual button for on-demand
-
----
+1. Should I copy ALL non-security improvements from the original, or only specific features?
+2. For shared files with small differences — should I prefer the original's version or just add missing features?
 
 ## Proposed Changes
 
-### Data Mapping: Appointment → Google Calendar Event
+### Phase 1: Copy new files from original
+- Copy `transit_cache.dart`, `panchanga_search_screen.dart`, `pooja_lists_screen.dart`, `support_screen.dart`, `vastu_screen.dart`, `pooja_list_service.dart`
+- Wire them into navigation (home_screen, dashboard)
 
-| Appointment Field | Google Calendar Event Field |
-|---|---|
-| `clientName` | Event **title** → `"🔮 {clientName}"` |
-| `date` + `startTime` | Event **start** (dateTime with timezone) |
-| `date` + `endTime` | Event **end** (dateTime with timezone) |
-| `notes` | Event **description** |
-| `clientPhone` | Event description (appended) |
-| `status` | `cancelled` → delete from GCal; `completed` → update color |
-| `id` (local) | Stored in event **extendedProperties.private["bharatheeyam_id"]** |
-| — | Event **id** stored locally as `googleEventId` field on Appointment |
+### Phase 2: Diff and merge shared files
+- Diff each shared file, identify non-security improvements
+- Apply improvements to clone versions
+- Strip any references to `offline_access_service`, `subscription_service`, `trusted_time_service`
 
----
-
-### Flutter Packages (New Dependencies)
-
-#### [MODIFY] [pubspec.yaml](file:///d:/bharatheeyamapp%20clone/pubspec.yaml)
-Add these packages:
-```yaml
-googleapis: ^13.2.0                          # Google Calendar API client
-googleapis_auth: ^1.6.0                      # OAuth2 for googleapis
-extension_google_sign_in_as_googleapis_auth: ^2.0.12  # Bridge google_sign_in → googleapis auth
-```
-
----
-
-### Service Layer
-
-#### [MODIFY] [calendar_service.dart](file:///d:/bharatheeyamapp%20clone/lib/services/calendar_service.dart)
-Replace the current stub (17 lines) with a full implementation (~250 lines):
-
-- **`initialize()`** — Get authenticated `CalendarApi` client using the existing Google Sign-In session
-- **`getOrCreateCalendar()`** — Find or create a "Bharatheeyam Appointments" calendar
-- **`pushAppointment(Appointment)`** — Create/update a Google Calendar event from a local appointment
-- **`pullEvents(DateTime start, DateTime end)`** — Fetch events from Google Calendar → convert to Appointment objects
-- **`deleteEvent(String googleEventId)`** — Remove event from Google Calendar
-- **`fullSync(List<Appointment> local)`** — Bidirectional sync:
-  1. Push all local appointments that don't have a `googleEventId`
-  2. Pull all GCal events and create/update local appointments
-  3. Handle deletions (cancelled locally → delete from GCal; deleted from GCal → mark cancelled locally)
-- **`_toEvent(Appointment)`** — Convert Appointment → Google Calendar Event
-- **`_toAppointment(Event)`** — Convert Google Calendar Event → Appointment
-
----
-
-#### [MODIFY] [appointment_service.dart](file:///d:/bharatheeyamapp%20clone/lib/services/appointment_service.dart)
-- Add `googleEventId` field to the `Appointment` model (nullable String)
-- Update `toTabSeparated()` / `fromTabSeparated()` to include the new field
-- Add `updateAppointment(Appointment)` method for full field updates (currently only status can be updated)
-- Hook calendar sync into `addAppointment()`, `updateStatus()`, and `deleteAppointment()`
-
----
-
-#### [MODIFY] [google_auth_service.dart](file:///d:/bharatheeyamapp%20clone/lib/services/google_auth_service.dart)
-- Add `calendar` scope to the Google Sign-In scopes list
-- Add method `getAuthenticatedClient()` that returns an `AuthClient` for `googleapis`
-- Users may need to re-sign-in to grant the new calendar scope
-
----
-
-### UI Layer
-
-#### [MODIFY] [appointment_screen.dart](file:///d:/bharatheeyamapp%20clone/lib/screens/appointment_screen.dart)
-- Update the **sync button** (currently just reloads cache) to trigger `CalendarService.fullSync()`
-- Show sync status indicator (syncing spinner, last synced timestamp, error messages)
-- Show a small Google Calendar icon on appointments that are synced
-- Update the existing `CalendarService.createAppointment()` call (line ~1035) to use the real implementation
-- Add a **"Sync Now"** floating action option or toolbar button
-
----
+### Phase 3: Update navigation
+- Add new screens to home/dashboard navigation
+- Update `main.dart` with any new routes (excluding security)
 
 ## Verification Plan
 
-### Automated Tests
-```bash
-# Build check — ensure no compilation errors
-cd "d:\bharatheeyamapp clone"
-flutter analyze
-flutter build apk --debug
-```
-
 ### Manual Verification
-1. **Sign in** → verify calendar scope is requested
-2. **Create appointment** in app → verify it appears in Google Calendar
-3. **Create event** in Google Calendar → tap sync → verify it appears in app
-4. **Cancel appointment** in app → verify it disappears from Google Calendar
-5. **Delete event** in Google Calendar → tap sync → verify appointment is marked cancelled
-6. **Edit appointment time** in app → verify Google Calendar event updates
-7. **Offline resilience** → create appointment without internet → verify it syncs when back online
+- Build APK and test all screens
+- Verify Prashna and Appointment sections unchanged
+- Verify no security/subscription code was copied
