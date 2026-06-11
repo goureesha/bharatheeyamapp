@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'screens/home_screen.dart';
 import 'screens/support_screen.dart';
 import 'widgets/common.dart';
@@ -84,6 +87,10 @@ Future<void> _initEphemeris() async {
 /// Notifier for device binding status — triggers UI rebuild when binding changes
 final ValueNotifier<bool> deviceBindingNotifier = ValueNotifier<bool>(true);
 
+/// Whether the app version is too old and must be updated
+bool _isVersionOutdated = false;
+String _minimumVersionRequired = '';
+
 /// Check device binding BEFORE the app renders.
 /// Auth (signInSilently) already completed in Phase 1.
 /// This ensures the correct screen is shown on the very first frame.
@@ -117,6 +124,56 @@ Future<void> _deferredInit() async {
 
   // Write sunrise data for the native Android home screen widget.
   _writeSunriseForWidget();
+
+  // Check minimum version requirement from admin dashboard
+  await _checkMinimumVersion();
+}
+
+/// Compare two version strings like "2.2.0" → returns true if current < minimum
+bool _isVersionLessThan(String current, String minimum) {
+  final c = current.split('.').map((s) => int.tryParse(s) ?? 0).toList();
+  final m = minimum.split('.').map((s) => int.tryParse(s) ?? 0).toList();
+  // Pad to same length
+  while (c.length < 3) c.add(0);
+  while (m.length < 3) m.add(0);
+  for (int i = 0; i < 3; i++) {
+    if (c[i] < m[i]) return true;
+    if (c[i] > m[i]) return false;
+  }
+  return false; // equal = not less
+}
+
+/// Read minimum_version from Firestore app_config/settings.
+/// If current app version < minimum_version → block the app.
+Future<void> _checkMinimumVersion() async {
+  try {
+    final doc = await FirebaseFirestore.instance
+        .collection('app_config')
+        .doc('settings')
+        .get()
+        .timeout(const Duration(seconds: 5));
+
+    if (!doc.exists || doc.data() == null) return;
+
+    final minVersion = doc.data()!['minimum_version'] as String?;
+    if (minVersion == null || minVersion.isEmpty) return;
+
+    final info = await PackageInfo.fromPlatform();
+    final currentVersion = info.version; // e.g. "2.2.0"
+
+    debugPrint('VersionCheck: current=$currentVersion, minimum=$minVersion');
+
+    if (_isVersionLessThan(currentVersion, minVersion)) {
+      _isVersionOutdated = true;
+      _minimumVersionRequired = minVersion;
+      // Trigger UI rebuild
+      deviceBindingNotifier.value = deviceBindingNotifier.value;
+      debugPrint('🚫 App version $currentVersion is below minimum $minVersion — blocking');
+    }
+  } catch (e) {
+    debugPrint('VersionCheck: Failed to check minimum version: $e');
+    // Silently fail — don't block if we can't reach Firestore
+  }
 }
 
 /// Calculate today's sunrise and save to SharedPreferences for native widget
@@ -363,7 +420,9 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   indicatorSize: TabBarIndicatorSize.tab,
                 ),
               ),
-              home: (SubscriptionService.isBlocked || DeviceBindingService.isDeviceBlocked)
+              home: _isVersionOutdated
+                  ? const _ForceUpdateScreen()
+                  : (SubscriptionService.isBlocked || DeviceBindingService.isDeviceBlocked)
                   ? _BlockedScreen()
                   : !GoogleAuthService.isSignedIn && !kIsWeb
                   ? (SubscriptionService.lastOnlineCheck == null
@@ -376,6 +435,77 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
           },
         );
       },
+    );
+  }
+}
+
+// ============================================================
+// FORCE UPDATE SCREEN — shown when app version < minimum_version
+// ============================================================
+
+class _ForceUpdateScreen extends StatelessWidget {
+  const _ForceUpdateScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: kBg,
+      body: SafeArea(
+        child: Center(child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Image.asset('assets/images/logo.png', width: 80, height: 80),
+            const SizedBox(height: 16),
+            Text(AppLocale.l('appName'), style: TextStyle(
+              fontSize: 26, fontWeight: FontWeight.w900, color: kOrange, letterSpacing: 1.5)),
+            const SizedBox(height: 32),
+            Icon(Icons.system_update, color: kPurple2, size: 72),
+            const SizedBox(height: 20),
+            Text('ಅಪ್‌ಡೇಟ್ ಅಗತ್ಯವಿದೆ', style: TextStyle(
+              fontSize: 22, fontWeight: FontWeight.w800, color: kPurple2)),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: kPurple2.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: kPurple2.withOpacity(0.3)),
+              ),
+              child: Column(children: [
+                Text(
+                  'ದಯವಿಟ್ಟು ಆಪ್ ಅನ್ನು ನವೀಕರಿಸಿ. ಕನಿಷ್ಠ ಆವೃತ್ತಿ: $_minimumVersionRequired',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: kText, height: 1.6),
+                ),
+              ]),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(width: double.infinity, child: ElevatedButton.icon(
+              icon: const Icon(Icons.open_in_new),
+              label: const Text('Play Store', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPurple2, foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              onPressed: () async {
+                // Open Play Store listing
+                const url = 'https://play.google.com/store/apps/details?id=com.bharatheeyam.app';
+                try {
+                  await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                } catch (_) {
+                  // Fallback: copy URL
+                  Clipboard.setData(const ClipboardData(text: url));
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Link copied')));
+                  }
+                }
+              },
+            )),
+          ]),
+        )),
+      ),
     );
   }
 }
