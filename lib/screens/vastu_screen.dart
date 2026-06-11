@@ -28,21 +28,21 @@ const List<String> _vayassuKn = ['ಚಾಲ', 'ಕೌಮಾರ', 'ಯೌವನ',
 // ─── Vastu-specific translations (self-contained, all 5 languages) ───
 const Map<String, Map<String, String>> _vastuStrings = {
   'kn': {
-    'title': 'ವಾಸ್ತು ಅಳತೆಗಳು', 'sub': 'Vastu Measurements',
-    'ownerNak': 'ಯಜಮಾನನ ನಕ್ಷತ್ರ (Owner\'s Nakshatra)', 'selectNak': 'ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ',
-    'length': 'ಉದ್ದ / Length (Feet)', 'breadth': 'ಅಗಲ / Breadth (Feet)', 'area': 'ವಿಸ್ತೀರ್ಣ / Area (Sq Ft)',
-    'tabLB': 'ಉದ್ದ × ಅಗಲ (L × B)', 'tabSqft': 'ವಿಸ್ತೀರ್ಣ (Sq Ft)',
-    'search': 'ಹುಡುಕಿ (Search)', 'goodOnly': 'ಶುಭ ಫಲಿತಾಂಶ ಮಾತ್ರ (Good only)',
-    'allResults': 'ಎಲ್ಲಾ ಫಲಿತಾಂಶ (All)', 'noResults': 'ಯಾವುದೇ ಶುಭ ಫಲಿತಾಂಶ ಸಿಗಲಿಲ್ಲ',
-    'hint': 'ವಿವರ ನಮೂದಿಸಿ ಮತ್ತು ಹುಡುಕಿ', 'hintEn': 'Enter details and search',
-    'sqftHint': 'ಪ್ರತಿ Sq Ft ಗೆ ಸಾಧ್ಯವಿರುವ ಉದ್ದ × ಅಗಲ ಜೋಡಿಗಳನ್ನು ಹುಡುಕುತ್ತೇವೆ (min side: 5 ft)',
-    'formula': 'ಶಾಸ್ತ್ರ ಸೂತ್ರ (Shastra Formula):',
+    'title': 'ವಾಸ್ತು ಅಳತೆಗಳು', 'sub': '',
+    'ownerNak': 'ಯಜಮಾನನ ನಕ್ಷತ್ರ', 'selectNak': 'ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ',
+    'length': 'ಉದ್ದ (ಅಡಿ)', 'breadth': 'ಅಗಲ (ಅಡಿ)', 'area': 'ವಿಸ್ತೀರ್ಣ (ಚ.ಅಡಿ)',
+    'tabLB': 'ಉದ್ದ × ಅಗಲ', 'tabSqft': 'ವಿಸ್ತೀರ್ಣ (ಚ.ಅಡಿ)',
+    'search': 'ಹುಡುಕಿ', 'goodOnly': 'ಶುಭ ಫಲಿತಾಂಶ ಮಾತ್ರ',
+    'allResults': 'ಎಲ್ಲಾ ಫಲಿತಾಂಶ', 'noResults': 'ಯಾವುದೇ ಶುಭ ಫಲಿತಾಂಶ ಸಿಗಲಿಲ್ಲ',
+    'hint': 'ವಿವರ ನಮೂದಿಸಿ ಮತ್ತು ಹುಡುಕಿ', 'hintEn': '',
+    'sqftHint': 'ಪ್ರತಿ ಚ.ಅಡಿಗೆ ಸಾಧ್ಯವಿರುವ ಉದ್ದ × ಅಗಲ ಜೋಡಿಗಳನ್ನು ಹುಡುಕುತ್ತೇವೆ (ಕನಿಷ್ಟ ಬದಿ: 5 ಅಡಿ)',
+    'formula': 'ಶಾಸ್ತ್ರ ಸೂತ್ರ:',
     'peridhi': 'ಪರಿಧಿ', 'hasta': 'ಹಸ್ತ',
-    'aaya': 'ಆಯ', 'vyaya': 'ವ್ಯಯ',
+    'aaya': 'ಆದಾಯ', 'vyaya': 'ವ್ಯಯ',
     'buildingNak': 'ಕಟ್ಟಡದ ನಕ್ಷತ್ರ', 'tarabala': 'ತಾರಾಬಲ',
-    'shubha': 'ಶುಭ', 'aayaGt': 'ಆಯ > ವ್ಯಯ ✓', 'aayaLe': 'ಆಯ ≤ ವ್ಯಯ ✗',
+    'shubha': 'ಶುಭ',
     'selectNakErr': 'ಯಜಮಾನನ ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ',
-    'a1': 'ಧ್ವಜ', 'a2': 'ಧೂಮ್ರ', 'a3': 'ಸಿಂಹ', 'a4': 'ಶ್ವಾನ', 'a5': 'ವೃಷಭ', 'a6': 'ಖರ', 'a7': 'ಗಜ', 'a8': 'ಧ್ವಾಂಕ್ಷ',
+    'a1': 'ಧ್ವಜ', 'a2': 'ಧೂಮ್ರ', 'a3': 'ಸಿಂಹ', 'a4': 'ಶ್ವಾನ', 'a5': 'ವೃಷಭ', 'a6': 'ವೀರ', 'a7': 'ಗಜ', 'a8': 'ವಾಯಸ',
     't1': 'ಜನ್ಮ ತಾರೆ', 't2': 'ಸಂಪತ್ ತಾರೆ', 't3': 'ವಿಪತ್ ತಾರೆ', 't4': 'ಕ್ಷೇಮ ತಾರೆ',
     't5': 'ಪ್ರತ್ಯಕ್ ತಾರೆ', 't6': 'ಸಾಧನ ತಾರೆ', 't7': 'ನೈಧನ ತಾರೆ', 't8': 'ಮಿತ್ರ ತಾರೆ', 't9': 'ಪರಮ ಮಿತ್ರ ತಾರೆ',
     'q1': 'ಸಾಮಾನ್ಯ', 'q2': 'ಅತಿ ಉತ್ತಮ', 'q3': 'ಕೆಟ್ಟದು', 'q4': 'ಉತ್ತಮ',
@@ -721,7 +721,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                 ),
               ),
               const SizedBox(width: 8),
-              Text('${r.area} Sq Ft', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
+              Text('${r.area} ಚ.ಅಡಿ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
               const Spacer(),
               if (isExcellent)
                 Container(
@@ -741,7 +741,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           const SizedBox(height: 6),
 
           // Perimeter / Hasta
-          Text('${_v('peridhi')}: ${r.perimeterFt} ft  |  ${_v('hasta')}: ${r.hasta}',
+          Text('${_v('peridhi')}: ${r.perimeterFt} ಅಡಿ  |  ${_v('hasta')}: ${r.hasta}',
             style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
@@ -751,7 +751,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
             const SizedBox(width: 4),
             Text('ಯೋನಿ: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
             Flexible(child: Text(
-              '${_yoniNames[r.yoniIndex]} (${_yoniEnglish[r.yoniIndex]}) [${r.yoniValue}]',
+              '${_yoniNames[r.yoniIndex]} [${r.yoniValue}]',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _yoniColor(r.yoniIndex)),
               overflow: TextOverflow.ellipsis,
             )),
@@ -797,7 +797,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
             const SizedBox(width: 4),
             Text('ವಯಸ್ಸು: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
             Text(
-              '${_vayassuKn[r.vayassuIndex]} (${_vayassuEnglish[r.vayassuIndex]})',
+              '${_vayassuKn[r.vayassuIndex]}',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _vayassuColor(r.vayassuIndex)),
             ),
           ]),
@@ -826,7 +826,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
               const SizedBox(width: 6),
               Text('${_v('tarabala')}: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
               Flexible(child: Text(
-                '${_taraNames[r.taraIndex]} (${_taraEnglish[r.taraIndex]}) - ${_taraQuality[r.taraIndex]}',
+                '${_taraNames[r.taraIndex]} - ${_taraQuality[r.taraIndex]}',
                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _taraColor(r.taraIndex)),
                 overflow: TextOverflow.ellipsis,
               )),
