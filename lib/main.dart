@@ -145,6 +145,7 @@ bool _isVersionLessThan(String current, String minimum) {
 
 /// Read minimum_version from Firestore app_config/settings.
 /// If current app version < minimum_version → block the app.
+/// Safe: runs post-frame, has timeout, catches all errors.
 Future<void> _checkMinimumVersion() async {
   try {
     final doc = await FirebaseFirestore.instance
@@ -166,8 +167,11 @@ Future<void> _checkMinimumVersion() async {
     if (_isVersionLessThan(currentVersion, minVersion)) {
       _isVersionOutdated = true;
       _minimumVersionRequired = minVersion;
-      // Trigger UI rebuild
-      deviceBindingNotifier.value = deviceBindingNotifier.value;
+      // Toggle notifier to force UI rebuild (ValueNotifier only notifies on change)
+      final current = deviceBindingNotifier.value;
+      deviceBindingNotifier.value = !current;
+      await Future.delayed(const Duration(milliseconds: 50));
+      deviceBindingNotifier.value = current;
       debugPrint('🚫 App version $currentVersion is below minimum $minVersion — blocking');
     }
   } catch (e) {
