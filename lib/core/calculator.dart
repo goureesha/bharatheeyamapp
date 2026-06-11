@@ -741,34 +741,46 @@ class AstroCalculator {
       String chandraMasaRaw = '';
       String chandraMasa = '';
       try {
-        // Approximate days from birth to previous Amavasya
-        // tIdx: 0 = Shukla Pratipada (start of month, 1 tithi after previous Amavasya)
-        // tIdx: 29 = Amavasya (END of month in Amavasyanta)
-        final tithiDuration = 29.530589 / 30.0; // ~0.9844 days per tithi
+        // Find EXACT New Moon (Amavasya) dates using binary search
+        // instead of approximation, which can be off by 1-2 days
+        // and cause wrong Adhika/Nija detection near Sankranti boundaries.
         
-        // Days back to the previous Amavasya (the one that marks the start boundary)
-        // At tIdx=0 (Shukla Pratipada): ~1 tithi back to previous Amavasya
-        // At tIdx=29 (Amavasya): ~30 tithis back (full month) to PREVIOUS Amavasya
-        final daysBackToAmavasya = (tIdx + 1) * tithiDuration;
+        // Helper: find exact JD where Moon-Sun longitude = 0° (New Moon)
+        // near an approximate JD, searching within ±3 days.
+        double findNewMoon(double jdApprox) {
+          double low = jdApprox - 3.0, high = jdApprox + 3.0;
+          for (int i = 0; i < 30; i++) {
+            final mid = (low + high) / 2;
+            final moonCalc = Sweph.swe_calc_ut(mid, HeavenlyBody.SE_MOON, SwephFlag.SEFLG_SWIEPH);
+            final sunCalc = Sweph.swe_calc_ut(mid, HeavenlyBody.SE_SUN, SwephFlag.SEFLG_SWIEPH);
+            final tDeg = ((moonCalc.longitude - sunCalc.longitude) % 360 + 360) % 360;
+            // Map to -180..+180 for convergence at 0°
+            final diff = ((tDeg + 180) % 360) - 180;
+            if (diff < 0) low = mid; else high = mid;
+          }
+          return (low + high) / 2;
+        }
         
-        // Days forward to the next Amavasya (the one that marks the end boundary)
-        // At tIdx=0: ~29 tithis forward
-        // At tIdx=29 (Amavasya): 0 days (we ARE at the end Amavasya)
-        final daysForwardToNextAmavasya = (29 - tIdx) * tithiDuration;
+        // Approximate days to previous/next Amavasya using tithi index
+        final synodic = 29.530589;
+        final tithiDuration = synodic / 30.0;
+        final approxDaysBack = (tIdx + 1) * tithiDuration;
+        final approxDaysForward = (29 - tIdx) * tithiDuration;
         
-
+        // Refine to exact New Moon JDs
+        final jdPrevAmavasya = findNewMoon(jdBirth - approxDaysBack);
+        final jdNextAmavasya = findNewMoon(jdBirth + approxDaysForward);
         
-        final jdPrevAmavasya = jdBirth - daysBackToAmavasya;
-        final jdNextAmavasya = jdBirth + daysForwardToNextAmavasya;
-        
-        // Get Sun's sidereal Rashi at previous Amavasya
+        // Get Sun's sidereal Rashi at exact previous Amavasya
+        final aynPrev = _getAyanamsa(jdPrevAmavasya, ayanamsaMode);
         final sunPrevCalc = Sweph.swe_calc_ut(jdPrevAmavasya, HeavenlyBody.SE_SUN, SwephFlag.SEFLG_SWIEPH);
-        final sunPrevSid = ((sunPrevCalc.longitude - ayn) % 360 + 360) % 360;
+        final sunPrevSid = ((sunPrevCalc.longitude - aynPrev) % 360 + 360) % 360;
         final prevAmaRashi = (sunPrevSid / 30).floor() % 12;
         
-        // Get Sun's sidereal Rashi at next Amavasya
+        // Get Sun's sidereal Rashi at exact next Amavasya
+        final aynNext = _getAyanamsa(jdNextAmavasya, ayanamsaMode);
         final sunNextCalc = Sweph.swe_calc_ut(jdNextAmavasya, HeavenlyBody.SE_SUN, SwephFlag.SEFLG_SWIEPH);
-        final sunNextSid = ((sunNextCalc.longitude - ayn) % 360 + 360) % 360;
+        final sunNextSid = ((sunNextCalc.longitude - aynNext) % 360 + 360) % 360;
         final nextAmaRashi = (sunNextSid / 30).floor() % 12;
         
         // Check if a Sankranti occurred: Sun must have changed Rashi
@@ -879,7 +891,7 @@ class AstroCalculator {
       final srMoon = normDeg(srPlanets['Moon']![0]);
       final srSun = normDeg(srPlanets['Sun']![0]);
       final tIdxSunrise = (((srMoon - srSun + 360) % 360) / 12).floor().clamp(0, 29);
-      final agniVal = (tIdxSunrise + wIdx) % 4;
+      final agniVal = (tIdxSunrise + wIdx + 3) % 4;
       final agniVasaStr = (agniVal == 0 || agniVal == 3) ? AppLocale.l('bhumiShubha') : (agniVal == 1 ? AppLocale.l('akashaAshubha') : AppLocale.l('patalaAshubha'));
 
       // End Times

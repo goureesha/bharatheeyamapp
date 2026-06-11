@@ -1,0 +1,6 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary":  "Cloud-based ORB scanner architecture:\n- Render.com backend (Flask + background scanner)\n- Mobile-friendly dashboard\n- Telegram bot for entry/exit/SL/target alerts\n- Daily flow: paste Fyers token → auto-scan until 3:30 PM\n- Filtered ORB strategy (VWAP + volume + time)\n- Open questions: Telegram bot setup, Render keep-alive",
+  "updatedAt":  "2026-06-08T11:21:22.988738800Z",
+  "requestFeedback":  true
+}

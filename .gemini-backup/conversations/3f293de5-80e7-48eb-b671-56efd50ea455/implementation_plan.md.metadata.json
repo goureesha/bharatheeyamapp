@@ -1,6 +1,6 @@
 {
   "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Plan to sync features from the original Bharatheeyam app into the clone. Covers 6 new files to copy (Panchanga Search, Pooja Lists, Support, Vastu, Transit Cache, Pooja List Service), 3 security files to skip, and ~60 shared files to diff and selectively merge. Preserves clone-only Prashna, Appointment, and Ad service features.",
-  "updatedAt":  "2026-06-07T11:39:45.803219600Z",
+  "summary":  "Plan for Gmail-based mandatory login, Firestore device tracking per user, block/unblock mechanism, and admin web dashboard to monitor users and devices.",
+  "updatedAt":  "2026-06-10T07:12:58.439529Z",
   "requestFeedback":  true
 }
