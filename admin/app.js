@@ -609,3 +609,95 @@ async function unblockInstall(deviceId) {
     alert('Error: ' + err.message);
   }
 }
+
+// ─── App Config ───
+
+async function toggleAppConfig() {
+  const section = document.getElementById('appConfigSection');
+  const isHidden = section.classList.contains('hidden');
+  section.classList.toggle('hidden');
+  if (isHidden) {
+    await loadAppConfig();
+  }
+}
+
+async function loadAppConfig() {
+  try {
+    const doc = await db.collection('app_config').doc('settings').get();
+    const data = doc.exists ? doc.data() : {};
+
+    // Minimum version
+    const minVersion = data.minimum_version || '';
+    document.getElementById('minVersionInput').value = minVersion;
+    document.getElementById('minVersionStatus').textContent = minVersion
+      ? '✅ Currently set to: ' + minVersion
+      : '⚠ Not set — no version blocking active';
+    document.getElementById('minVersionStatus').style.color = minVersion ? '#10b981' : 'var(--muted)';
+
+    // Global offline days
+    const maxOffline = data.max_offline_days || 10;
+    document.getElementById('globalOfflineDaysInput').value = maxOffline;
+    document.getElementById('globalOfflineStatus').textContent = '✅ Currently: ' + maxOffline + ' days';
+    document.getElementById('globalOfflineStatus').style.color = '#10b981';
+  } catch (err) {
+    console.error('App config load error:', err);
+    document.getElementById('minVersionStatus').textContent = '❌ Failed to load: ' + err.message;
+    document.getElementById('minVersionStatus').style.color = '#ef4444';
+  }
+}
+
+async function saveMinVersion() {
+  const version = document.getElementById('minVersionInput').value.trim();
+  const status = document.getElementById('minVersionStatus');
+
+  // Validate format (x.y.z or empty to clear)
+  if (version && !/^\d+\.\d+\.\d+$/.test(version)) {
+    status.textContent = '❌ Invalid format. Use x.y.z (e.g. 2.2.0)';
+    status.style.color = '#ef4444';
+    return;
+  }
+
+  try {
+    if (version) {
+      await db.collection('app_config').doc('settings').set(
+        { minimum_version: version },
+        { merge: true }
+      );
+      status.textContent = '✅ Saved! All versions below ' + version + ' will be blocked.';
+      status.style.color = '#10b981';
+    } else {
+      // Clear — remove the field
+      await db.collection('app_config').doc('settings').update({
+        minimum_version: firebase.firestore.FieldValue.delete(),
+      });
+      status.textContent = '✅ Cleared — no version blocking active.';
+      status.style.color = '#10b981';
+    }
+  } catch (err) {
+    status.textContent = '❌ Error: ' + err.message;
+    status.style.color = '#ef4444';
+  }
+}
+
+async function saveGlobalOfflineDays() {
+  const days = parseInt(document.getElementById('globalOfflineDaysInput').value);
+  const status = document.getElementById('globalOfflineStatus');
+
+  if (isNaN(days) || days < 0) {
+    status.textContent = '❌ Invalid value';
+    status.style.color = '#ef4444';
+    return;
+  }
+
+  try {
+    await db.collection('app_config').doc('settings').set(
+      { max_offline_days: days },
+      { merge: true }
+    );
+    status.textContent = '✅ Saved! Default max offline days: ' + days;
+    status.style.color = '#10b981';
+  } catch (err) {
+    status.textContent = '❌ Error: ' + err.message;
+    status.style.color = '#ef4444';
+  }
+}
