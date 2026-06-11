@@ -4,9 +4,9 @@ import '../widgets/common.dart';
 import '../constants/strings.dart';
 
 // ─── English names (constant, language-independent) ───
-const List<String> _aayaEnglish = [
+const List<String> _yoniEnglish = [
   'Dhwaja (Flag)', 'Dhumra (Smoke)', 'Simha (Lion)', 'Shwana (Dog)',
-  'Vrushabha (Bull)', 'Khara (Donkey)', 'Gaja (Elephant)', 'Dhwanksha (Crow)',
+  'Vrushabha (Bull)', 'Vira (Hero)', 'Gaja (Elephant)', 'Vaayasa (Crow)',
 ];
 
 const List<String> _taraEnglish = [
@@ -14,9 +14,16 @@ const List<String> _taraEnglish = [
   'Pratyak', 'Sadhana', 'Naidhana', 'Mitra', 'Parama Mitra',
 ];
 
-const Set<int> _goodAaya = {0, 2, 4, 6};
+const Set<int> _goodYoni = {0, 2, 4, 6};
 const Set<int> _goodTara = {1, 3, 5, 7, 8};
 const double _feetPerHasta = 1.5;
+
+const List<String> _vayassuEnglish = [
+  'Chaala (Child)', 'Koumara (Young)', 'Youvana (Youth)',
+  'Madhyarka (Middle)', 'Nidhana (Old)',
+];
+const List<String> _vaaraKn = ['ಆದಿತ್ಯ', 'ಸೋಮ', 'ಮಂಗಳ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ'];
+const List<String> _vayassuKn = ['ಚಾಲ', 'ಕೌಮಾರ', 'ಯೌವನ', 'ಮಧ್ಯರ್ಕ', 'ನಿಧನ'];
 
 // ─── Vastu-specific translations (self-contained, all 5 languages) ───
 const Map<String, Map<String, String>> _vastuStrings = {
@@ -127,7 +134,7 @@ String _v(String key) {
   return _vastuStrings[lang]?[key] ?? _vastuStrings['kn']?[key] ?? key;
 }
 
-List<String> get _aayaNames => [_v('a1'), _v('a2'), _v('a3'), _v('a4'), _v('a5'), _v('a6'), _v('a7'), _v('a8')];
+List<String> get _yoniNames => [_v('a1'), _v('a2'), _v('a3'), _v('a4'), _v('a5'), _v('a6'), _v('a7'), _v('a8')];
 List<String> get _taraNames => [_v('t1'), _v('t2'), _v('t3'), _v('t4'), _v('t5'), _v('t6'), _v('t7'), _v('t8'), _v('t9')];
 List<String> get _taraQuality => [_v('q1'), _v('q2'), _v('q3'), _v('q4'), _v('q3'), _v('q4'), _v('q3'), _v('q4'), _v('q2')];
 
@@ -138,42 +145,74 @@ class _VastuResult {
   final int area;
   final int perimeterFt;
   final int hasta;
-  final int aayaIndex;
-  final int aayaValue;
+  final int yoniIndex;
+  final int yoniValue;
+  final int aadaayaValue;
   final int vyayaValue;
-  final bool aayaGtVyaya;
+  final bool aadaayaGtVyaya;
   final int nakIndex;
   final int taraIndex;
+  final int tithiValue;
+  final int vaaraValue;
+  final int vayassuIndex; // 0=Chaala..3=Madhyarka, 4=Nidhana
+  final int veetanaValue;
 
   _VastuResult({
     required this.length, required this.breadth, required this.area,
     required this.perimeterFt, required this.hasta,
-    required this.aayaIndex, required this.aayaValue,
-    required this.vyayaValue, required this.aayaGtVyaya,
+    required this.yoniIndex, required this.yoniValue,
+    required this.aadaayaValue,
+    required this.vyayaValue, required this.aadaayaGtVyaya,
     required this.nakIndex, required this.taraIndex,
+    required this.tithiValue, required this.vaaraValue,
+    required this.vayassuIndex, required this.veetanaValue,
   });
 
-  bool get isGoodAaya => _goodAaya.contains(aayaIndex);
+  bool get isGoodYoni => _goodYoni.contains(yoniIndex);
   bool get isGoodTara => _goodTara.contains(taraIndex);
-  bool get isExcellent => isGoodAaya && isGoodTara && aayaGtVyaya;
+  bool get isExcellent => isGoodYoni && isGoodTara && aadaayaGtVyaya;
 }
 
-// ─── Calculation helper ───
+// ─── Calculation helper (Manushyalaya Chandrika, Adhyaya 9) ───
 _VastuResult _calculate(int l, int b, int ownerNak) {
   final area = l * b;
   final perimeterFt = 2 * (l + b);
   final hasta = (perimeterFt / _feetPerHasta).round();
 
-  final aayaRem = (hasta * 9) % 8;
-  final aayaValue = aayaRem == 0 ? 8 : aayaRem;
-  final aayaIndex = aayaValue - 1;
+  // Yoni = (hasta × 3) % 8
+  final yoniRem = (hasta * 3) % 8;
+  final yoniValue = yoniRem == 0 ? 8 : yoniRem;
+  final yoniIndex = yoniValue - 1;
 
-  final vyayaRem = (hasta * 10) % 8;
-  final vyayaValue = vyayaRem == 0 ? 8 : vyayaRem;
+  // Aadaaya = (hasta × 8) % 12
+  final aadaayaRem = (hasta * 8) % 12;
+  final aadaayaValue = aadaayaRem == 0 ? 12 : aadaayaRem;
 
+  // Vyaya = (hasta × 3) % 14
+  final vyayaRem = (hasta * 3) % 14;
+  final vyayaValue = vyayaRem == 0 ? 14 : vyayaRem;
+
+  // Nakshatra = (hasta × 8) % 27
   final nakRem = (hasta * 8) % 27;
   final nakValue = nakRem == 0 ? 27 : nakRem;
   final nakIndex = nakValue - 1;
+
+  // Tithi = (hasta × 8) % 30
+  final tithiRem = (hasta * 8) % 30;
+  final tithiValue = tithiRem == 0 ? 30 : tithiRem;
+
+  // Vaara = (hasta × 8) % 7
+  final vaaraRem = (hasta * 8) % 7;
+  final vaaraValue = vaaraRem == 0 ? 7 : vaaraRem;
+
+  // Vayassu = quotient((hasta × 8) / 27) % 5
+  final vayassuQuotient = (hasta * 8) ~/ 27;
+  final vayassuRem = vayassuQuotient % 5;
+  final vayassuIndex = vayassuRem == 0 ? 4 : vayassuRem - 1;
+
+  // Veetana = (hasta × 9) % 10
+  final veetanaRem = (hasta * 9) % 10;
+  final veetanaValue = veetanaRem == 0 ? 10 : veetanaRem;
 
   final diff = (nakIndex - ownerNak + 27) % 27;
   final taraIndex = diff % 9;
@@ -181,9 +220,12 @@ _VastuResult _calculate(int l, int b, int ownerNak) {
   return _VastuResult(
     length: l, breadth: b, area: area,
     perimeterFt: perimeterFt, hasta: hasta,
-    aayaIndex: aayaIndex, aayaValue: aayaValue,
-    vyayaValue: vyayaValue, aayaGtVyaya: aayaValue > vyayaValue,
+    yoniIndex: yoniIndex, yoniValue: yoniValue,
+    aadaayaValue: aadaayaValue,
+    vyayaValue: vyayaValue, aadaayaGtVyaya: aadaayaValue > vyayaValue,
     nakIndex: nakIndex, taraIndex: taraIndex,
+    tithiValue: tithiValue, vaaraValue: vaaraValue,
+    vayassuIndex: vayassuIndex, veetanaValue: veetanaValue,
   );
 }
 
@@ -333,7 +375,8 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
   List<_VastuResult> get _filteredResults =>
       _showOnlyGood ? _results.where((r) => r.isExcellent).toList() : _results;
 
-  Color _aayaColor(int i) => _goodAaya.contains(i) ? Colors.green : Colors.red;
+  Color _yoniColor(int i) => _goodYoni.contains(i) ? Colors.green : Colors.red;
+  Color _vayassuColor(int i) => i == 2 ? Colors.green : (i == 1 || i == 3) ? Colors.orange : Colors.red;
   Color _taraColor(int i) => _goodTara.contains(i)
       ? (i == 1 || i == 8 ? Colors.green : Colors.teal)
       : (i == 0 ? Colors.orange : Colors.red);
@@ -441,9 +484,13 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                           const SizedBox(height: 4),
                           Text('• ${_v('peridhi')} = 2 × (${_v('length').split(' /')[0]} + ${_v('breadth').split(' /')[0]})  →  ${_v('hasta')} = ${_v('peridhi')} ÷ 1.5',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${_v('aaya')} = (${_v('hasta')} × 9) % 8  |  ${_v('vyaya')} = (${_v('hasta')} × 10) % 8',
+                          Text('• ${_v('hasta')} = ${_v('peridhi')} ÷ 1.5  |  ಯೋನಿ = (${_v('hasta')} × 3) % 8',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${_v('aaya')} > ${_v('vyaya')}  |  ${AppLocale.l('nakshatra')} = (${_v('hasta')} × 8) % 27',
+                          Text('• ${_v('aaya')} = (${_v('hasta')} × 8) % 12  |  ${_v('vyaya')} = (${_v('hasta')} × 3) % 14',
+                            style: TextStyle(fontSize: 10, color: kMuted)),
+                          Text('• ${AppLocale.l('nakshatra')} = (${_v('hasta')} × 8) % 27  |  ತಿಥಿ = (${_v('hasta')} × 8) % 30',
+                            style: TextStyle(fontSize: 10, color: kMuted)),
+                          Text('• ವಾರ = (${_v('hasta')} × 8) % 7  |  ವೀತನ = (${_v('hasta')} × 9) % 10',
                             style: TextStyle(fontSize: 10, color: kMuted)),
                         ],
                       ),
@@ -698,36 +745,60 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
             style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
-          // Aaya
+          // Yoni
           Row(children: [
-            Icon(Icons.flag_rounded, size: 14, color: _aayaColor(r.aayaIndex)),
+            Icon(Icons.flag_rounded, size: 14, color: _yoniColor(r.yoniIndex)),
             const SizedBox(width: 4),
-            Text('${_v('aaya')}: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            Text('ಯೋನಿ: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
             Flexible(child: Text(
-              '${_aayaNames[r.aayaIndex]} (${_aayaEnglish[r.aayaIndex]}) [${r.aayaValue}]',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _aayaColor(r.aayaIndex)),
+              '${_yoniNames[r.yoniIndex]} (${_yoniEnglish[r.yoniIndex]}) [${r.yoniValue}]',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _yoniColor(r.yoniIndex)),
               overflow: TextOverflow.ellipsis,
             )),
           ]),
           const SizedBox(height: 3),
 
-          // Vyaya
+          // Aadaaya & Vyaya
           Row(children: [
-            Icon(Icons.money_off, size: 14, color: kMuted),
+            Icon(Icons.trending_up, size: 14, color: kMuted),
             const SizedBox(width: 4),
-            Text('${_v('vyaya')}: ${r.vyayaValue}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            Text('${_v('aaya')}: ${r.aadaayaValue}  |  ${_v('vyaya')}: ${r.vyayaValue}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: r.aayaGtVyaya ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                color: r.aadaayaGtVyaya ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
-                r.aayaGtVyaya ? _v('aayaGt') : _v('aayaLe'),
+                r.aadaayaGtVyaya ? '${_v('aaya')} > ${_v('vyaya')} ✓' : '${_v('aaya')} ≤ ${_v('vyaya')} ✗',
                 style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
-                  color: r.aayaGtVyaya ? Colors.green.shade700 : Colors.red.shade700),
+                  color: r.aadaayaGtVyaya ? Colors.green.shade700 : Colors.red.shade700),
               ),
+            ),
+          ]),
+          const SizedBox(height: 3),
+
+          // Tithi, Vaara, Vayassu, Veetana
+          Row(children: [
+            Icon(Icons.calendar_today, size: 12, color: kMuted),
+            const SizedBox(width: 4),
+            Expanded(child: Text(
+              'ತಿಥಿ: ${r.tithiValue}  |  ವಾರ: ${_vaaraKn[r.vaaraValue - 1]}  |  ವೀತನ: ${r.veetanaValue}',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kMuted),
+              overflow: TextOverflow.ellipsis,
+            )),
+          ]),
+          const SizedBox(height: 3),
+
+          // Vayassu
+          Row(children: [
+            Icon(Icons.person, size: 14, color: _vayassuColor(r.vayassuIndex)),
+            const SizedBox(width: 4),
+            Text('ವಯಸ್ಸು: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            Text(
+              '${_vayassuKn[r.vayassuIndex]} (${_vayassuEnglish[r.vayassuIndex]})',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _vayassuColor(r.vayassuIndex)),
             ),
           ]),
           const SizedBox(height: 6),
