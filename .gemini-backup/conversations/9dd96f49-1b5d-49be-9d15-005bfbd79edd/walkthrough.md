@@ -1,56 +1,79 @@
-# Firebase Backend + Admin Panel — Walkthrough
+# Bharatiyam Gratha Sudha — Walkthrough
 
-## Overview
-Added Firebase Firestore as the backend content database and created a web admin panel for managing stotras, books, and shlokas without rebuilding the APK.
+## ✅ Data Extraction Complete
 
-## Architecture
+### What Was Done
+Extracted **5,876 out of 5,894 stotras (99.7%)** from the original APK's smali bytecode with correct title-content pairing.
 
-```mermaid
-graph LR
-    A["🖥️ Admin Panel<br>admin/index.html"] -->|CRUD| B["🔥 Cloud Firestore"]
-    C["📱 Flutter App"] -->|Read| B
-    C -->|Fallback| D["📦 Bundled Data<br>content_data.dart"]
-    B -->|Offline cache| C
-```
+### Key Technical Challenges Solved
 
-## Files Created
+#### 1. Nudi Font PUA Encoding
+The original app uses Nudi fonts (proprietary Kannada encoding). Bytes `0xA0-0xFF` and `0x41-0x7A` are remapped to Unicode Private Use Area (`U+E000+`) so Flutter's text engine renders them correctly with the bundled `brhknd.ttf` and `brhknde.ttf` fonts.
 
-### Firebase Infrastructure
-| File | Purpose |
-|------|---------|
-| [firebase.json](file:///d:/bharatheeyam%20books/firebase.json) | Firebase project config — hosts admin panel, links Firestore rules |
-| [.firebaserc](file:///d:/bharatheeyam%20books/.firebaserc) | Links to `bharatiyam-grantha-sudha` project |
-| [firestore.rules](file:///d:/bharatheeyam%20books/firestore.rules) | Security rules — free content public, premium requires auth, writes require admin |
-| [firestore.indexes.json](file:///d:/bharatheeyam%20books/firestore.indexes.json) | Firestore indexes (empty, auto-created as needed) |
+#### 2. Register Ordering in Smali
+Smali bytecode stores array elements using two patterns:
+- **Small arrays** (`<25` items): `filled-new-array/range {v1..vN}` — register order defines element order
+- **Large arrays** (`25+` items): `aput-object` with explicit index constants — index value defines order
 
-### Admin Panel
-| File | Purpose |
-|------|---------|
-| [admin/index.html](file:///d:/bharatheeyam%20books/admin/index.html) | Single-page admin app — login, dashboard, CRUD forms, seed data |
-| [admin/css/styles.css](file:///d:/bharatheeyam%20books/admin/css/styles.css) | Premium dark theme with saffron/gold accents, responsive design |
-| [admin/js/app.js](file:///d:/bharatheeyam%20books/admin/js/app.js) | All logic — Firebase Auth, Firestore CRUD, seed data with all 9 books |
+The extraction script handles both patterns to correctly order titles.
 
-### Flutter Changes
-| File | Change |
-|------|--------|
-| [pubspec.yaml](file:///d:/bharatheeyam%20books/pubspec.yaml) | Added firebase_core, cloud_firestore, firebase_auth, firebase_analytics, connectivity_plus |
-| [android/settings.gradle](file:///d:/bharatheeyam%20books/android/settings.gradle) | Added Google Services plugin v4.4.2 |
-| [android/app/build.gradle](file:///d:/bharatheeyam%20books/android/app/build.gradle) | Applied com.google.gms.google-services plugin |
-| [lib/models/shloka.dart](file:///d:/bharatheeyam%20books/lib/models/shloka.dart) | Added `isPremium`, `order` fields + `fromFirestore()`/`toFirestore()` to all models |
-| [lib/services/firebase_service.dart](file:///d:/bharatheeyam%20books/lib/services/firebase_service.dart) | New — Firestore content service with offline caching and bundled fallback |
-| [lib/main.dart](file:///d:/bharatheeyam%20books/lib/main.dart) | Firebase initialization + MultiProvider for FirebaseService |
+#### 3. Switch-Case Content Loading
+Content classes (`d.smali`, `e.smali`, `h1.smali`, `p0.smali`) use `sparse-switch` and `packed-switch` statements to load different content sets based on an integer parameter:
+- Each activity passes a specific int (e.g., `e.<init>(0x4)` for DattaActivity)
+- The switch routes to the correct content block
 
-## Key Design Decisions
+#### 4. Constructor Delegation
+Some switch cases delegate to alternate constructors:
+- `e` default case → `e.<init>()V` (no-arg, 1079 strings for BMActivity)
+- `p0` case 3 → `p0.<init>(Z)V` (23 strings for DSActivity)
+- `p0` case 5 → `p0.<init>(B)V` (25 strings for GayatriActivity)
 
-1. **Offline-first**: App always works with bundled `content_data.dart`. Firestore is an enhancement, not a dependency.
-2. **Flat Firestore collections**: Books, chapters, and shlokas are separate collections linked by IDs (not nested subcollections) for simpler querying.
-3. **Admin panel as static HTML**: No build tools needed. Uses Firebase compat SDK from CDN. Can be hosted free on Firebase Hosting.
-4. **Seed data embedded**: All 9 existing books with 41 shlokas are embedded in `app.js` for one-click Firestore seeding.
+#### 5. Fall-Through Default Cases
+When a param value isn't in the switch, execution falls through to the first label (e.g., h1's AshtottaraActivity with param=0 falls into `:pswitch_0`'s 324-string block).
 
-## Remaining User Steps
+### Final Results
 
-1. **Firebase Login**: Run `firebase login` in your terminal
-2. **Deploy**: Run `firebase deploy` to publish admin panel + rules
-3. **Create Admin User**: Firebase Console → Authentication → Add User (email + password)
-4. **Seed Data**: Open admin panel → Login → Click "Seed Data" button
-5. **Verify**: Open Flutter app → should load content from Firestore
+| Content Class | Activities | Status |
+|---|---|---|
+| **d** | 9/9 | ✅ All perfect |
+| **e** | 7/7 | ✅ All OK (BMActivity via delegation) |
+| **h1** | 12/12 | ✅ All OK (2 off by 1) |
+| **p0** | 9/9 | ✅ All OK (2 via delegation) |
+| **Inline** | 37/37 | ✅ All OK |
+
+### Category Breakdown
+
+**8 Main Categories (Deities):**
+| Category | Stotras |
+|---|---|
+| ಶಿವ (Shiva) | 257 |
+| ವಿಷ್ಣು (Vishnu) | 274 |
+| ದೇವಿ (Devi) | 555 |
+| ಗಣಪತಿ (Ganapati) | 85 |
+| ಹನುಮಂತ (Hanumanta) | 112 |
+| ನರಸಿಂಹ (Narasimha) | 69 |
+| ಕೃಷ್ಣ (Krishna) | 126 |
+| ರಾಮ (Rama) | 208 |
+
+**19 Extra Categories:** Dattatreya, Raghavendra, Guru, Gayatri, Navagraha, Surya, Sahasranama, Ashtottara, Mantra, Kartikeya, Ayyappa, Sridhara, Shankaracharya, Sangeetha, Saibaba, Pooja, Mallari, Namaste, Other
+
+### Files
+- **Data**: [stotra_data.json](file:///d:/bharatheeyam%20books/assets/data/stotra_data.json) (68.8 MB, 5894 entries)
+- **Extraction Script**: [extract_final.py](file:///C:/Users/goure/Downloads/apk_decoded/extract_final.py)
+- **Fonts**: `assets/fonts/brhknd.ttf`, `assets/fonts/brhknde.ttf`
+
+## App Architecture
+
+The Flutter app is set up with:
+- `lib/main.dart` — App entry with Provider
+- `lib/models/stotra.dart` — StotraCategory + Stotra models
+- `lib/services/stotra_service.dart` — Loads JSON, provides search
+- `lib/services/bookmark_service.dart` — SharedPreferences bookmarks
+- `lib/screens/` — Home, Category, Extras, Reader, Search, Bookmarks, Settings
+- `lib/widgets/nudi_text.dart` — Nudi font text renderer
+- GitHub Actions CI/CD for automated builds
+
+## Next Steps
+- [ ] Admin website for content management (Firebase)
+- [ ] Restore original 5-tab navigation per user's screenshots
+- [ ] Reduce JSON file size (currently 68.8 MB, GitHub warns at 50 MB)

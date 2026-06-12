@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary":  "Analysis of ಸ್ತೋತ್ರಮಾಲಾ APK (v2.1.8) - a native Android Kannada stotra/mantra app.\nContains 4,590 stotras across 38 categories.\nUI: search list → text reader with font size slider.\nArchitecture: Native Java/Kotlin, all text hardcoded in activities, Google AdMob ads, favorites via long-press.",
+  "updatedAt":  "2026-06-12T05:56:06.282639800Z"
+}

@@ -18,12 +18,7 @@ const Set<int> _goodYoni = {0, 2, 4, 6};
 const Set<int> _goodTara = {1, 3, 5, 7, 8};
 const double _feetPerHasta = 1.5;
 
-const List<String> _vayassuEnglish = [
-  'Chaala (Child)', 'Koumara (Young)', 'Youvana (Youth)',
-  'Madhyarka (Middle)', 'Nidhana (Old)',
-];
 const List<String> _vaaraKn = ['ಆದಿತ್ಯ', 'ಸೋಮ', 'ಮಂಗಳ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ'];
-const List<String> _vayassuKn = ['ಚಾಲ', 'ಕೌಮಾರ', 'ಯೌವನ', 'ಮಧ್ಯರ್ಕ', 'ನಿಧನ'];
 
 // ─── Vastu-specific translations (self-contained, all 5 languages) ───
 const Map<String, Map<String, String>> _vastuStrings = {
@@ -154,7 +149,6 @@ class _VastuResult {
   final int taraIndex;
   final int tithiValue;
   final int vaaraValue;
-  final int vayassuIndex; // 0=Chaala..3=Madhyarka, 4=Nidhana
   final int veetanaValue;
 
   _VastuResult({
@@ -165,7 +159,7 @@ class _VastuResult {
     required this.vyayaValue, required this.aadaayaGtVyaya,
     required this.nakIndex, required this.taraIndex,
     required this.tithiValue, required this.vaaraValue,
-    required this.vayassuIndex, required this.veetanaValue,
+    required this.veetanaValue,
   });
 
   bool get isGoodYoni => _goodYoni.contains(yoniIndex);
@@ -205,10 +199,6 @@ _VastuResult _calculate(int l, int b, int ownerNak) {
   final vaaraRem = (hasta * 8) % 7;
   final vaaraValue = vaaraRem == 0 ? 7 : vaaraRem;
 
-  // Vayassu = quotient((hasta × 8) / 27) % 5
-  final vayassuQuotient = (hasta * 8) ~/ 27;
-  final vayassuRem = vayassuQuotient % 5;
-  final vayassuIndex = vayassuRem == 0 ? 4 : vayassuRem - 1;
 
   // Veetana = (hasta × 9) % 10
   final veetanaRem = (hasta * 9) % 10;
@@ -225,7 +215,7 @@ _VastuResult _calculate(int l, int b, int ownerNak) {
     vyayaValue: vyayaValue, aadaayaGtVyaya: aadaayaValue > vyayaValue,
     nakIndex: nakIndex, taraIndex: taraIndex,
     tithiValue: tithiValue, vaaraValue: vaaraValue,
-    vayassuIndex: vayassuIndex, veetanaValue: veetanaValue,
+    veetanaValue: veetanaValue,
   );
 }
 
@@ -376,7 +366,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
       _showOnlyGood ? _results.where((r) => r.isExcellent).toList() : _results;
 
   Color _yoniColor(int i) => _goodYoni.contains(i) ? Colors.green : Colors.red;
-  Color _vayassuColor(int i) => i == 2 ? Colors.green : (i == 1 || i == 3) ? Colors.orange : Colors.red;
+
   Color _taraColor(int i) => _goodTara.contains(i)
       ? (i == 1 || i == 8 ? Colors.green : Colors.teal)
       : (i == 0 ? Colors.orange : Colors.red);
@@ -788,18 +778,6 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
               style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kMuted),
               overflow: TextOverflow.ellipsis,
             )),
-          ]),
-          const SizedBox(height: 3),
-
-          // Vayassu
-          Row(children: [
-            Icon(Icons.person, size: 14, color: _vayassuColor(r.vayassuIndex)),
-            const SizedBox(width: 4),
-            Text('ವಯಸ್ಸು: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
-            Text(
-              '${_vayassuKn[r.vayassuIndex]}',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _vayassuColor(r.vayassuIndex)),
-            ),
           ]),
           const SizedBox(height: 6),
 

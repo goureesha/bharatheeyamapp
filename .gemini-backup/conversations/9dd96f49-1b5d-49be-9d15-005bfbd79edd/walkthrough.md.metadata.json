@@ -1,5 +1,5 @@
 {
   "artifactType":  "ARTIFACT_TYPE_WALKTHROUGH",
-  "summary":  "Walkthrough of Firebase backend integration and admin panel implementation for Bharatiyam Gratha Sudha. Covers all files created/modified, architecture decisions, and remaining user setup steps.",
-  "updatedAt":  "2026-05-27T05:44:45.166368900Z"
+  "summary":  "Complete walkthrough of data extraction from APK smali bytecode and Flutter app setup for the Bharatiyam Gratha Sudha stotra app.",
+  "updatedAt":  "2026-06-12T13:40:38.792606500Z"
 }

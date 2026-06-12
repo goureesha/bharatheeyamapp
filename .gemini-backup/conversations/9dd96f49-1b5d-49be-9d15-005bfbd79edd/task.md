@@ -1,50 +1,28 @@
-# Firebase Backend + Admin Panel — Task Tracker
+# Stotra Integration Tasks
 
-## Phase 1: Firebase Setup + Firestore
+- [x] **Phase 1: Data Preparation**
+  - [x] Generate stotra_data.json (4,257 stotras, 32 MB)
+  - [x] Copy brhknd.ttf, brhknde.ttf fonts to assets/fonts/
+  - [x] Update pubspec.yaml (fonts, assets, removed Firebase)
 
-### Firebase Infrastructure
-- [x] Create `firestore.rules` — security rules
-- [x] Create `firebase.json` — project config + `.firebaserc`
-- [x] Create `firestore.indexes.json` — indexes file
+- [x] **Phase 2: Models & Services**
+  - [x] New Stotra model (removed sanskrit, meaning, explanation)
+  - [x] StotraService to load/serve data from JSON
+  - [x] Simplified BookmarkService (no Firebase)
+  - [x] Cleaned up old files (shloka.dart, firebase_service, content_data)
 
-### Flutter Firebase Integration
-- [x] Update `pubspec.yaml` — add Firebase dependencies
-- [x] Update `android/settings.gradle` — add Google Services plugin v4.4.2
-- [x] Update `android/app/build.gradle` — apply Google Services plugin
-- [x] Update `lib/models/shloka.dart` — add `isPremium`, `order`, `fromFirestore()`, `toFirestore()`
-- [x] Create `lib/services/firebase_service.dart` — Firestore CRUD + caching + offline fallback
-- [x] Update `lib/main.dart` — initialize Firebase + MultiProvider
-- [x] Confirm `google-services.json` is placed ✅
+- [x] **Phase 3: Screens & Widgets**
+  - [x] NudiText widget for Nudi font rendering
+  - [x] HomeScreen with 8 deity categories + Extras button
+  - [x] CategoryScreen (stotra title list with search)
+  - [x] ExtrasScreen (47 extra categories grid)
+  - [x] ReaderScreen (full text with zoom, bookmark)
+  - [x] BookmarksScreen (saved stotras)
+  - [x] SettingsScreen (dark mode, font size, clear)
+  - [x] SearchScreen (search across all stotras)
 
-### GitHub Actions
-- [x] Build workflow already configured — push triggered new build
-
-## Phase 2: Web Admin Panel
-
-### Admin Panel Files
-- [x] Create `admin/index.html` — main admin SPA
-- [x] Create `admin/css/styles.css` — premium dark theme
-- [x] Create `admin/js/app.js` — admin panel logic (auth, CRUD, routing, seed data)
-
-### Admin Features (all built into app.js)
-- [x] Admin login screen (Firebase Auth)
-- [x] Dashboard with stats (books, chapters, shlokas, categories counts)
-- [x] Book list with filters
-- [x] Add/Edit book form (Kannada, Sanskrit, English titles, category, subcategory, god tags, premium toggle)
-- [x] Add/Edit chapter form (modal)
-- [x] Add/Edit shloka form (Sanskrit, Kannada, meaning, explanation textareas, premium toggle)
-- [x] Premium toggle on books/shlokas
-- [x] Seed existing data to Firestore (all 9 books, 12 chapters, 41 shlokas)
-
-## User Actions Required
-- [ ] Run `firebase login` in terminal (interactive — opens browser)
-- [ ] Run `firebase deploy` to deploy admin panel + Firestore rules
-- [ ] Create admin user in Firebase Console → Authentication → Add User
-- [ ] Log into admin panel and click "Seed Data" to populate Firestore
-
-## Verification
-- [ ] Admin panel loads and authenticates
-- [ ] Seed data populates Firestore
-- [ ] Can add new stotra from admin panel
-- [ ] Flutter app builds with Firebase
-- [ ] App loads content from Firestore
+- [ ] **Phase 4: Verify**
+  - [ ] Install Flutter SDK
+  - [ ] Run flutter pub get
+  - [ ] Run flutter build apk
+  - [ ] Test on device
