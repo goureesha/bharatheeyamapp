@@ -452,9 +452,20 @@ async function loadInstalls() {
       return;
     }
 
+    // Build email → device count map for multi-device detection
+    const emailDeviceCount = {};
+    signedIn.forEach(inst => {
+      const e = inst.email.toLowerCase();
+      emailDeviceCount[e] = (emailDeviceCount[e] || 0) + 1;
+    });
+    const multiDeviceEmails = Object.entries(emailDeviceCount).filter(([, c]) => c > 1);
+
     // Update header with count
     const header = section.querySelector('.section-title');
-    header.innerHTML = `📱 Device Installs — <span style="color: var(--text)">${sorted.length} total</span>, <span style="color: #ef4444; font-weight: 700">${notSignedIn.length} without login</span>`;
+    header.innerHTML = `📱 Device Installs — <span style="color: var(--text)">${sorted.length} total</span>, <span style="color: #ef4444; font-weight: 700">${notSignedIn.length} without login</span>` +
+      (multiDeviceEmails.length > 0
+        ? `, <span style="color: #f59e0b; font-weight: 700">⚠ ${multiDeviceEmails.length} multi-device</span>`
+        : '');
 
     tbody.innerHTML = sorted.map((inst, i) => {
       const firstStr = inst.firstInstall
@@ -466,10 +477,17 @@ async function loadInstalls() {
         : '—';
       const shortId = inst.deviceId.length > 12 ? inst.deviceId.substring(0, 12) + '…' : inst.deviceId;
       const isUnsigned = inst.email === 'not_signed_in' || inst.email === '—';
-      const rowBg = inst.isBlocked ? 'background: rgba(220,38,38,0.1);' : isUnsigned ? 'background: rgba(239,68,68,0.06);' : '';
+      const isMultiDevice = !isUnsigned && (emailDeviceCount[inst.email.toLowerCase()] || 0) > 1;
+      const deviceCount = emailDeviceCount[inst.email.toLowerCase()] || 1;
+      const rowBg = inst.isBlocked ? 'background: rgba(220,38,38,0.1);'
+        : isMultiDevice ? 'background: rgba(245,158,11,0.1);'
+        : isUnsigned ? 'background: rgba(239,68,68,0.06);' : '';
+      const multiDeviceBadge = isMultiDevice
+        ? `<span class="badge" style="font-size:9px; background:rgba(245,158,11,0.2); color:#d97706; margin-right:4px;">⚠ ${deviceCount} devices</span>`
+        : '';
       const emailDisplay = isUnsigned
         ? '<span class="badge badge-expired" style="font-size: 10px;">⚠ No Login</span>'
-        : `<span style="font-weight: 600">${inst.email}</span>`;
+        : `${multiDeviceBadge}<span style="font-weight: 600">${inst.email}</span>`;
 
       const blockBadge = inst.isBlocked
         ? '<span class="badge badge-expired" style="font-size:10px; background:rgba(220,38,38,0.15); color:#dc2626;">🚫 Blocked</span> '
