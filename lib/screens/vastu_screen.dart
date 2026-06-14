@@ -18,9 +18,6 @@ const Set<int> _goodYoni = {0, 2, 4, 6};
 const Set<int> _goodTara = {1, 3, 5, 7, 8};
 const double _feetPerHasta = 1.5;
 
-// Aaya types based on (aadaayaValue - 1) % 4
-const List<String> _ayaTypeKn = ['ಧ್ವಜಾಯ', 'ಸಿಂಹಾಯ', 'ವೃಷಭಾಯ', 'ಗಜಾಯ'];
-
 const List<String> _vaaraKn = ['ಆದಿತ್ಯ', 'ಸೋಮ', 'ಮಂಗಳ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ'];
 
 // ─── Vastu-specific translations (self-contained, all 5 languages) ───
@@ -168,10 +165,6 @@ class _VastuResult {
   bool get isGoodYoni => _goodYoni.contains(yoniIndex);
   bool get isGoodTara => _goodTara.contains(taraIndex);
   bool get isExcellent => isGoodYoni && isGoodTara && aadaayaGtVyaya;
-
-  /// Aaya type: 0=Dhwaja(1-3), 1=Simha(4-6), 2=Vrushabha(7-9), 3=Gaja(10-12)
-  int get ayaType => (aadaayaValue - 1) ~/ 3;
-  String get ayaTypeName => _ayaTypeKn[ayaType];
 }
 
 // ─── Calculation helper (Manushyalaya Chandrika, Adhyaya 9) ───
@@ -265,7 +258,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
   List<_VastuResult> _results = [];
   bool _searched = false;
   bool _showOnlyGood = true;
-  int? _selectedAya; // null = all, 0=Dhwaja, 1=Simha, 2=Vrushabha, 3=Gaja
+  int? _selectedYoni; // null = all, 0-7 = specific yoni index
 
   @override
   void initState() {
@@ -372,20 +365,20 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
 
   List<_VastuResult> get _filteredResults {
     var list = _showOnlyGood ? _results.where((r) => r.isExcellent).toList() : _results;
-    if (_selectedAya != null) {
-      list = list.where((r) => r.ayaType == _selectedAya).toList();
+    if (_selectedYoni != null) {
+      list = list.where((r) => r.yoniIndex == _selectedYoni).toList();
     }
     return list;
   }
 
-  Widget _ayaChip(int? type, String label) {
-    final selected = _selectedAya == type;
+  Widget _yoniChip(int? yoniIdx, String label) {
+    final selected = _selectedYoni == yoniIdx;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () {
-          setState(() => _selectedAya = type);
+          setState(() => _selectedYoni = yoniIdx);
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -576,7 +569,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                       ),
                     ),
 
-                  // ── Aya type filter chips ──
+                  // ── Yoni filter chips ──
                   if (_searched)
                     SliverToBoxAdapter(
                       child: Padding(
@@ -585,11 +578,11 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
-                              _ayaChip(null, 'ಎಲ್ಲಾ'),
+                              _yoniChip(null, 'ಎಲ್ಲಾ'),
                               const SizedBox(width: 6),
-                              ...List.generate(4, (i) => Padding(
+                              ...List.generate(8, (i) => Padding(
                                 padding: const EdgeInsets.only(right: 6),
-                                child: _ayaChip(i, _ayaTypeKn[i]),
+                                child: _yoniChip(i, _yoniNames[i]),
                               )),
                             ],
                           ),
@@ -811,7 +804,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           Row(children: [
             Icon(Icons.trending_up, size: 14, color: kMuted),
             const SizedBox(width: 4),
-            Text('${_v('aaya')}: ${r.aadaayaValue} (${r.ayaTypeName})  |  ${_v('vyaya')}: ${r.vyayaValue}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            Text('${_v('aaya')}: ${r.aadaayaValue}  |  ${_v('vyaya')}: ${r.vyayaValue}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
