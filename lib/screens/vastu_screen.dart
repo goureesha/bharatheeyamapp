@@ -169,8 +169,8 @@ class _VastuResult {
   bool get isGoodTara => _goodTara.contains(taraIndex);
   bool get isExcellent => isGoodYoni && isGoodTara && aadaayaGtVyaya;
 
-  /// Aaya type: 0=Dhwaja, 1=Simha, 2=Vrushabha, 3=Gaja
-  int get ayaType => (aadaayaValue - 1) % 4;
+  /// Aaya type: 0=Dhwaja(1-3), 1=Simha(4-6), 2=Vrushabha(7-9), 3=Gaja(10-12)
+  int get ayaType => (aadaayaValue - 1) ~/ 3;
   String get ayaTypeName => _ayaTypeKn[ayaType];
 }
 
