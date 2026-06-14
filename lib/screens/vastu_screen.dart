@@ -380,19 +380,25 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
 
   Widget _ayaChip(int? type, String label) {
     final selected = _selectedAya == type;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedAya = type),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: selected ? kPurple2 : kCard,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: selected ? kPurple2 : kBorder),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          setState(() => _selectedAya = type);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected ? kPurple2 : kCard,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: selected ? kPurple2 : kBorder, width: 1.5),
+          ),
+          child: Text(label, style: TextStyle(
+            fontSize: 13, fontWeight: FontWeight.w700,
+            color: selected ? Colors.white : kText,
+          )),
         ),
-        child: Text(label, style: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.w700,
-          color: selected ? Colors.white : kMuted,
-        )),
       ),
     );
   }
