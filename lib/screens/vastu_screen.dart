@@ -18,7 +18,7 @@ const Set<int> _goodYoni = {0, 2, 4, 6};
 const Set<int> _goodTara = {1, 3, 5, 7, 8};
 const double _feetPerHasta = 1.5;
 
-const List<String> _vaaraKn = ['ಆದಿತ್ಯ', 'ಸೋಮ', 'ಮಂಗಳ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ'];
+
 
 // ─── Vastu-specific translations (self-contained, all 5 languages) ───
 const Map<String, Map<String, String>> _vastuStrings = {
@@ -35,8 +35,16 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'peridhi': 'ಪರಿಧಿ', 'hasta': 'ಹಸ್ತ',
     'aaya': 'ಆದಾಯ', 'vyaya': 'ವ್ಯಯ',
     'buildingNak': 'ಕಟ್ಟಡದ ನಕ್ಷತ್ರ', 'tarabala': 'ತಾರಾಬಲ',
-    'shubha': 'ಶುಭ',
+    'shubha': 'ಶುಭ', 'aayaGt': 'ಆಯ > ವ್ಯಯ ✓', 'aayaLe': 'ಆಯ ≤ ವ್ಯಯ ✗',
     'selectNakErr': 'ಯಜಮಾನನ ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ',
+    'yoni': 'ಯೋನಿ', 'tithi': 'ತಿಥಿ', 'vaara': 'ವಾರ', 'veetana': 'ವೀತನ',
+    'adi': 'ಅಡಿ', 'sqAdi': 'ಚ.ಅಡಿ', 'all': 'ಎಲ್ಲಾ',
+    'minLabel': 'ಕನಿಷ್ಠ', 'maxLabel': 'ಗರಿಷ್ಠ',
+    'fromLabel': 'ಇಂದ', 'toLabel': 'ವರೆಗೆ',
+    'errMinMax': 'ಕನಿಷ್ಠ ≤ ಗರಿಷ್ಠ ಇರಬೇಕು',
+    'errRange': 'ವ್ಯಾಪ್ತಿ ತುಂಬಾ ದೊಡ್ಡದು, ಕಡಿಮೆ ಮಾಡಿ',
+    'errMaxSqft': 'ಗರಿಷ್ಠ 5000 ಚ.ಅಡಿ',
+    'vaara0': 'ಆದಿತ್ಯ', 'vaara1': 'ಸೋಮ', 'vaara2': 'ಮಂಗಳ', 'vaara3': 'ಬುಧ', 'vaara4': 'ಗುರು', 'vaara5': 'ಶುಕ್ರ', 'vaara6': 'ಶನಿ',
     'a1': 'ಧ್ವಜ', 'a2': 'ಧೂಮ್ರ', 'a3': 'ಸಿಂಹ', 'a4': 'ಶ್ವಾನ', 'a5': 'ವೃಷಭ', 'a6': 'ವೀರ', 'a7': 'ಗಜ', 'a8': 'ವಾಯಸ',
     't1': 'ಜನ್ಮ ತಾರೆ', 't2': 'ಸಂಪತ್ ತಾರೆ', 't3': 'ವಿಪತ್ ತಾರೆ', 't4': 'ಕ್ಷೇಮ ತಾರೆ',
     't5': 'ಪ್ರತ್ಯಕ್ ತಾರೆ', 't6': 'ಸಾಧನ ತಾರೆ', 't7': 'ನೈಧನ ತಾರೆ', 't8': 'ಮಿತ್ರ ತಾರೆ', 't9': 'ಪರಮ ಮಿತ್ರ ತಾರೆ',
@@ -57,6 +65,14 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'buildingNak': 'भवन नक्षत्र', 'tarabala': 'ताराबल',
     'shubha': 'शुभ', 'aayaGt': 'आय > व्यय ✓', 'aayaLe': 'आय ≤ व्यय ✗',
     'selectNakErr': 'मकान मालिक का नक्षत्र चुनें',
+    'yoni': 'योनि', 'tithi': 'तिथि', 'vaara': 'वार', 'veetana': 'वीतन',
+    'adi': 'फीट', 'sqAdi': 'वर्ग.फीट', 'all': 'सभी',
+    'minLabel': 'न्यूनतम', 'maxLabel': 'अधिकतम',
+    'fromLabel': 'से', 'toLabel': 'तक',
+    'errMinMax': 'न्यूनतम ≤ अधिकतम होना चाहिए',
+    'errRange': 'रेंज बहुत बड़ी है, कम करें',
+    'errMaxSqft': 'अधिकतम 5000 वर्ग.फीट',
+    'vaara0': 'रवि', 'vaara1': 'सोम', 'vaara2': 'मंगल', 'vaara3': 'बुध', 'vaara4': 'गुरु', 'vaara5': 'शुक्र', 'vaara6': 'शनि',
     'a1': 'ध्वज', 'a2': 'धूम्र', 'a3': 'सिंह', 'a4': 'श्वान', 'a5': 'वृषभ', 'a6': 'खर', 'a7': 'गज', 'a8': 'ध्वांक्ष',
     't1': 'जन्म तारा', 't2': 'सम्पत् तारा', 't3': 'विपत् तारा', 't4': 'क्षेम तारा',
     't5': 'प्रत्यक् तारा', 't6': 'साधन तारा', 't7': 'नैधन तारा', 't8': 'मित्र तारा', 't9': 'परम मित्र तारा',
@@ -77,6 +93,14 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'buildingNak': 'கட்டிட நக்ஷத்திரம்', 'tarabala': 'தாராபலம்',
     'shubha': 'சுபம்', 'aayaGt': 'ஆயம் > வியயம் ✓', 'aayaLe': 'ஆயம் ≤ வியயம் ✗',
     'selectNakErr': 'உரிமையாளர் நக்ஷத்திரம் தேர்வு செய்யவும்',
+    'yoni': 'யோனி', 'tithi': 'திதி', 'vaara': 'வாரம்', 'veetana': 'வீதன',
+    'adi': 'அடி', 'sqAdi': 'ச.அடி', 'all': 'அனைத்தும்',
+    'minLabel': 'குறைந்தபட்சம்', 'maxLabel': 'அதிகபட்சம்',
+    'fromLabel': 'இருந்து', 'toLabel': 'வரை',
+    'errMinMax': 'குறைந்தபட்சம் ≤ அதிகபட்சம்',
+    'errRange': 'வரம்பு மிகப் பெரியது',
+    'errMaxSqft': 'அதிகபட்சம் 5000 ச.அடி',
+    'vaara0': 'ஞாயிறு', 'vaara1': 'திங்கள்', 'vaara2': 'செவ்வாய்', 'vaara3': 'புதன்', 'vaara4': 'வியாழன்', 'vaara5': 'வெள்ளி', 'vaara6': 'சனி',
     'a1': 'த்வஜம்', 'a2': 'தூம்ரம்', 'a3': 'சிம்மம்', 'a4': 'ச்வானம்', 'a5': 'விருஷபம்', 'a6': 'கரம்', 'a7': 'கஜம்', 'a8': 'த்வாங்க்ஷம்',
     't1': 'ஜன்ம தாரை', 't2': 'சம்பத் தாரை', 't3': 'விபத் தாரை', 't4': 'க்ஷேம தாரை',
     't5': 'ப்ரத்யக் தாரை', 't6': 'சாதன தாரை', 't7': 'நைதன தாரை', 't8': 'மித்ர தாரை', 't9': 'பரம மித்ர தாரை',
@@ -97,6 +121,14 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'buildingNak': 'భవన నక్షత్రం', 'tarabala': 'తారాబలం',
     'shubha': 'శుభం', 'aayaGt': 'ఆయం > వ్యయం ✓', 'aayaLe': 'ఆయం ≤ వ్యయం ✗',
     'selectNakErr': 'యజమాని నక్షత్రం ఎంచుకోండి',
+    'yoni': 'యోని', 'tithi': 'తిథి', 'vaara': 'వారం', 'veetana': 'వీతన',
+    'adi': 'అడి', 'sqAdi': 'చ.అడి', 'all': 'అన్నీ',
+    'minLabel': 'కనిష్ఠం', 'maxLabel': 'గరిష్ఠం',
+    'fromLabel': 'నుండి', 'toLabel': 'వరకు',
+    'errMinMax': 'కనిష్ఠం ≤ గరిష్ఠం ఉండాలి',
+    'errRange': 'పరిధి చాలా పెద్దది',
+    'errMaxSqft': 'గరిష్ఠం 5000 చ.అడి',
+    'vaara0': 'ఆదిత్య', 'vaara1': 'సోమ', 'vaara2': 'మంగళ', 'vaara3': 'బుధ', 'vaara4': 'గురు', 'vaara5': 'శుక్ర', 'vaara6': 'శని',
     'a1': 'ధ్వజం', 'a2': 'ధూమ్రం', 'a3': 'సింహం', 'a4': 'శ్వానం', 'a5': 'వృషభం', 'a6': 'ఖరం', 'a7': 'గజం', 'a8': 'ధ్వాంక్షం',
     't1': 'జన్మ తార', 't2': 'సంపత్ తార', 't3': 'విపత్ తార', 't4': 'క్షేమ తార',
     't5': 'ప్రత్యక్ తార', 't6': 'సాధన తార', 't7': 'నైధన తార', 't8': 'మిత్ర తార', 't9': 'పరమ మిత్ర తార',
@@ -117,6 +149,14 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'buildingNak': 'കെട്ടിട നക്ഷത്രം', 'tarabala': 'താരാബലം',
     'shubha': 'ശുഭം', 'aayaGt': 'ആയം > വ്യയം ✓', 'aayaLe': 'ആയം ≤ വ്യയം ✗',
     'selectNakErr': 'ഉടമയുടെ നക്ഷത്രം തിരഞ്ഞെടുക്കുക',
+    'yoni': 'യോനി', 'tithi': 'തിഥി', 'vaara': 'വാരം', 'veetana': 'വീതന',
+    'adi': 'അടി', 'sqAdi': 'ച.അടി', 'all': 'എല്ലാം',
+    'minLabel': 'കുറഞ്ഞത്', 'maxLabel': 'കൂടിയത്',
+    'fromLabel': 'മുതൽ', 'toLabel': 'വരെ',
+    'errMinMax': 'കുറഞ്ഞത് ≤ കൂടിയത് ആയിരിക്കണം',
+    'errRange': 'പരിധി വളരെ വലുതാണ്',
+    'errMaxSqft': 'കൂടിയത് 5000 ച.അടി',
+    'vaara0': 'ഞായർ', 'vaara1': 'തിങ്കൾ', 'vaara2': 'ചൊവ്വ', 'vaara3': 'ബുധൻ', 'vaara4': 'വ്യാഴം', 'vaara5': 'വെള്ളി', 'vaara6': 'ശനി',
     'a1': 'ധ്വജം', 'a2': 'ധൂമ്രം', 'a3': 'സിംഹം', 'a4': 'ശ്വാനം', 'a5': 'വൃഷഭം', 'a6': 'ഖരം', 'a7': 'ഗജം', 'a8': 'ധ്വാങ്ക്ഷം',
     't1': 'ജന്മ താര', 't2': 'സമ്പത്ത് താര', 't3': 'വിപത്ത് താര', 't4': 'ക്ഷേമ താര',
     't5': 'പ്രത്യക് താര', 't6': 'സാധന താര', 't7': 'നൈധന താര', 't8': 'മിത്ര താര', 't9': 'പരമ മിത്ര താര',
@@ -305,13 +345,13 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
 
     if (minL > maxL || minB > maxB) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Min must be ≤ Max'), backgroundColor: Colors.red),
+        SnackBar(content: Text(_v('errMinMax')), backgroundColor: Colors.red),
       );
       return;
     }
     if ((maxL - minL + 1) * (maxB - minB + 1) > 10000) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Range too large. Reduce the range.'), backgroundColor: Colors.red),
+        SnackBar(content: Text(_v('errRange')), backgroundColor: Colors.red),
       );
       return;
     }
@@ -332,13 +372,13 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
 
     if (minSq > maxSq) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Min must be ≤ Max'), backgroundColor: Colors.red),
+        SnackBar(content: Text(_v('errMinMax')), backgroundColor: Colors.red),
       );
       return;
     }
     if (maxSq - minSq > 5000) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Max range is 5000 sq ft.'), backgroundColor: Colors.red),
+        SnackBar(content: Text(_v('errMaxSqft')), backgroundColor: Colors.red),
       );
       return;
     }
@@ -505,13 +545,13 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                           const SizedBox(height: 4),
                           Text('• ${_v('peridhi')} = 2 × (${_v('length').split(' /')[0]} + ${_v('breadth').split(' /')[0]})  →  ${_v('hasta')} = ${_v('peridhi')} ÷ 1.5',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${_v('hasta')} = ${_v('peridhi')} ÷ 1.5  |  ಯೋನಿ = (${_v('hasta')} × 3) % 8',
+                          Text('• ${_v('hasta')} = ${_v('peridhi')} ÷ 1.5  |  ${_v('yoni')} = (${_v('hasta')} × 3) % 8',
                             style: TextStyle(fontSize: 10, color: kMuted)),
                           Text('• ${_v('aaya')} = (${_v('hasta')} × 8) % 12  |  ${_v('vyaya')} = (${_v('hasta')} × 3) % 14',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${AppLocale.l('nakshatra')} = (${_v('hasta')} × 8) % 27  |  ತಿಥಿ = (${_v('hasta')} × 8) % 30',
+                          Text('• ${AppLocale.l('nakshatra')} = (${_v('hasta')} × 8) % 27  |  ${_v('tithi')} = (${_v('hasta')} × 8) % 30',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ವಾರ = (${_v('hasta')} × 8) % 7  |  ವೀತನ = (${_v('hasta')} × 9) % 10',
+                          Text('• ${_v('vaara')} = (${_v('hasta')} × 8) % 7  |  ${_v('veetana')} = (${_v('hasta')} × 9) % 10',
                             style: TextStyle(fontSize: 10, color: kMuted)),
                         ],
                       ),
@@ -578,7 +618,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
-                              _yoniChip(null, 'ಎಲ್ಲಾ'),
+                              _yoniChip(null, _v('all')),
                               const SizedBox(width: 6),
                               ...List.generate(8, (i) => Padding(
                                 padding: const EdgeInsets.only(right: 6),
@@ -655,17 +695,17 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           Text(_v('length'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
           const SizedBox(height: 6),
           Row(children: [
-            Expanded(child: _field(_minLenCtrl, 'Min')),
+            Expanded(child: _field(_minLenCtrl, _v('minLabel'))),
             _sep(),
-            Expanded(child: _field(_maxLenCtrl, 'Max')),
+            Expanded(child: _field(_maxLenCtrl, _v('maxLabel'))),
           ]),
           const SizedBox(height: 12),
           Text(_v('breadth'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
           const SizedBox(height: 6),
           Row(children: [
-            Expanded(child: _field(_minBreadthCtrl, 'Min')),
+            Expanded(child: _field(_minBreadthCtrl, _v('minLabel'))),
             _sep(),
-            Expanded(child: _field(_maxBreadthCtrl, 'Max')),
+            Expanded(child: _field(_maxBreadthCtrl, _v('maxLabel'))),
           ]),
         ],
       ),
@@ -688,9 +728,9 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           Text(_v('area'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
           const SizedBox(height: 6),
           Row(children: [
-            Expanded(child: _field(_minSqftCtrl, 'From')),
+            Expanded(child: _field(_minSqftCtrl, _v('fromLabel'))),
             _sep(),
-            Expanded(child: _field(_maxSqftCtrl, 'To')),
+            Expanded(child: _field(_maxSqftCtrl, _v('toLabel'))),
           ]),
           const SizedBox(height: 8),
           Text(
@@ -757,13 +797,13 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${r.length} × ${r.breadth} ft',
+                  '${r.length} × ${r.breadth} ${_v('adi')}',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900,
                     color: isExcellent ? Colors.green.shade700 : kPurple2),
                 ),
               ),
               const SizedBox(width: 8),
-              Text('${r.area} ಚ.ಅಡಿ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
+              Text('${r.area} ${_v('sqAdi')}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
               const Spacer(),
               if (isExcellent)
                 Container(
@@ -783,7 +823,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           const SizedBox(height: 6),
 
           // Perimeter / Hasta
-          Text('${_v('peridhi')}: ${r.perimeterFt} ಅಡಿ  |  ${_v('hasta')}: ${r.hasta}',
+          Text('${_v('peridhi')}: ${r.perimeterFt} ${_v('adi')}  |  ${_v('hasta')}: ${r.hasta}',
             style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
@@ -791,7 +831,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           Row(children: [
             Icon(Icons.flag_rounded, size: 14, color: _yoniColor(r.yoniIndex)),
             const SizedBox(width: 4),
-            Text('ಯೋನಿ: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            Text('${_v('yoni')}: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
             Flexible(child: Text(
               '${_yoniNames[r.yoniIndex]} [${r.yoniValue}]',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _yoniColor(r.yoniIndex)),
@@ -813,7 +853,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
-                r.aadaayaGtVyaya ? '${_v('aaya')} > ${_v('vyaya')} ✓' : '${_v('aaya')} ≤ ${_v('vyaya')} ✗',
+                r.aadaayaGtVyaya ? _v('aayaGt') : _v('aayaLe'),
                 style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
                   color: r.aadaayaGtVyaya ? Colors.green.shade700 : Colors.red.shade700),
               ),
@@ -826,7 +866,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
             Icon(Icons.calendar_today, size: 12, color: kMuted),
             const SizedBox(width: 4),
             Expanded(child: Text(
-              'ತಿಥಿ: ${r.tithiValue}  |  ವಾರ: ${_vaaraKn[r.vaaraValue - 1]}  |  ವೀತನ: ${r.veetanaValue}',
+              '${_v('tithi')}: ${r.tithiValue}  |  ${_v('vaara')}: ${_v('vaara${r.vaaraValue - 1}')}  |  ${_v('veetana')}: ${r.veetanaValue}',
               style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kMuted),
               overflow: TextOverflow.ellipsis,
             )),
