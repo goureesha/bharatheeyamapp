@@ -1,5 +1,6 @@
 {
   "artifactType":  "ARTIFACT_TYPE_WALKTHROUGH",
-  "summary":  "Complete walkthrough of data extraction from APK smali bytecode and Flutter app setup for the Bharatiyam Gratha Sudha stotra app.",
-  "updatedAt":  "2026-06-12T13:40:38.792606500Z"
+  "summary":  "Summarizes translation updates and validation results for Hansa and Kshurika Upanishads",
+  "updatedAt":  "2026-06-19T13:17:34.420306600Z",
+  "userFacing":  true
 }

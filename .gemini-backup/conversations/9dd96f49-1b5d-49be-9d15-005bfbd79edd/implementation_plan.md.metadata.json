@@ -1,6 +1,7 @@
 {
   "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Plan to integrate 4,911 extracted stotras into the Flutter app with deity-based main categories and extras section. Removes Sanskrit/meaning/explanation. Uses Nudi font rendering with svara support.",
-  "updatedAt":  "2026-06-12T11:13:59.829283700Z",
-  "requestFeedback":  true
+  "summary":  "Implementation plan to translate the next batch of three short untranslated Upanishads (Kshurika, Hansa, and Narayana) into Kannada with shabdartha, bhavartha, and proper formatting.",
+  "updatedAt":  "2026-06-19T13:13:41.969591700Z",
+  "requestFeedback":  true,
+  "userFacing":  true
 }

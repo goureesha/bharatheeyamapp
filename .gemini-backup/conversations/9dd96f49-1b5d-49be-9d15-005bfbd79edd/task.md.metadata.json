@@ -1,5 +1,7 @@
 {
   "artifactType":  "ARTIFACT_TYPE_TASK",
-  "summary":  "Task list for stotra integration - all code files created, needs Flutter SDK to build.",
-  "updatedAt":  "2026-06-12T11:36:05.260636900Z"
+  "summary":  "Task list for Batch 5 Upanishad translations (Kshurika, Hansa, and Narayana).",
+  "updatedAt":  "2026-06-19T13:13:54.072300600Z",
+  "requestFeedback":  true,
+  "userFacing":  true
 }

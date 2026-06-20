@@ -645,12 +645,9 @@ class _InputScreenState extends State<InputScreen> {
                                 );
                                 if (confirm == true) {
                                   await StorageService.delete(name);
-                                  // Also remove the member from ClientService if it exists
+                                  // Also remove the member from ClientService (properly persist)
                                   if (profile.clientId != null && profile.clientId!.isNotEmpty) {
-                                    final members = ClientService.getMembersForClient(profile.clientId!);
-                                    if (members.any((m) => m.memberName == name)) {
-                                      members.removeWhere((m) => m.memberName == name);
-                                    }
+                                    await ClientService.removeFamilyMember(profile.clientId!, name);
                                   }
                                   await _loadProfiles();
                                   setSheetState(() {}); // refresh the sheet
