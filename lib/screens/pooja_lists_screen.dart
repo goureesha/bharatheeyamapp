@@ -146,7 +146,7 @@ const List<Map<String, String>> _defaultPoojaItems = [
   {'n': 'ಮಾವಿನ ಕುಡಿ', 'q': ''},
 
   // ── ದಾರ / ನೂಲು ──
-  {'n': 'ರಜ್ಜು (ಮೂರು)', 'q': ''},
+  {'n': 'ರಜ್ಜು', 'q': ''},
   {'n': 'ನೂಲುಂಡೆ', 'q': ''},
   {'n': 'ಜನಿವಾರ', 'q': ''},
 
@@ -313,7 +313,7 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
               final newList = PoojaList(
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
                 name: name,
-                items: _createDefaultItems(),
+                items: [],
               );
               setState(() => _lists.insert(0, newList));
               _save();
@@ -544,8 +544,8 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
 
   // Default item names for dropdown (getter so it updates with language)
   List<String> get _dropdownItems => [
-    ..._defaultPoojaItems.map((m) => m['n']!),
     _p('customItem'),
+    ..._defaultPoojaItems.map((m) => m['n']!),
   ];
 
   // Common quantity options for dropdown
