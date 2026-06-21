@@ -75,6 +75,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'koluType': 'ಕೋಲು ಪ್ರಕಾರ', 'angula': 'ಅಂಗುಲ',
     'kishku': 'ಕಿಷ್ಕು', 'prajapatya': 'ಪ್ರಾಜಾಪತ್ಯ', 'dhanurmushti': 'ಧನುರ್ಮುಷ್ಟಿ', 'dhanugraha': 'ಧನುರ್ಗ್ರಹ',
     'prachya': 'ಪ್ರಾಚ್ಯ', 'vaideha': 'ವೈದೇಹ', 'vaipulya': 'ವೈಪುಲ್ಯ', 'prakeerna': 'ಪ್ರಕೀರ್ಣ',
+    'vayassu': 'ವಯಸ್ಸು', 'v0': 'ಚಾಲ', 'v1': 'ಕೌಮಾರ', 'v2': 'ಯೌವನ', 'v3': 'ಮಧ್ಯರ್ಕ', 'v4': 'ನಿಧನ',
     'vaara0': 'ಆದಿತ್ಯ', 'vaara1': 'ಸೋಮ', 'vaara2': 'ಮಂಗಳ', 'vaara3': 'ಬುಧ', 'vaara4': 'ಗುರು', 'vaara5': 'ಶುಕ್ರ', 'vaara6': 'ಶನಿ',
     'a1': 'ಧ್ವಜ', 'a2': 'ಧೂಮ್ರ', 'a3': 'ಸಿಂಹ', 'a4': 'ಶ್ವಾನ', 'a5': 'ವೃಷಭ', 'a6': 'ವೀರ', 'a7': 'ಗಜ', 'a8': 'ವಾಯಸ',
     't1': 'ಜನ್ಮ ತಾರೆ', 't2': 'ಸಂಪತ್ ತಾರೆ', 't3': 'ವಿಪತ್ ತಾರೆ', 't4': 'ಕ್ಷೇಮ ತಾರೆ',
@@ -106,6 +107,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'koluType': 'कोलु प्रकार', 'angula': 'अंगुल',
     'kishku': 'किष्कु', 'prajapatya': 'प्राजापत्य', 'dhanurmushti': 'धनुर्मुष्टि', 'dhanugraha': 'धनुर्ग्रह',
     'prachya': 'प्राच्य', 'vaideha': 'वैदेह', 'vaipulya': 'वैपुल्य', 'prakeerna': 'प्रकीर्ण',
+    'vayassu': 'वयस्सु', 'v0': 'चाल', 'v1': 'कौमार', 'v2': 'यौवन', 'v3': 'मध्यर्क', 'v4': 'निधन',
     'vaara0': 'रवि', 'vaara1': 'सोम', 'vaara2': 'मंगल', 'vaara3': 'बुध', 'vaara4': 'गुरु', 'vaara5': 'शुक्र', 'vaara6': 'शनि',
     'a1': 'ध्वज', 'a2': 'धूम्र', 'a3': 'सिंह', 'a4': 'श्वान', 'a5': 'वृषभ', 'a6': 'खर', 'a7': 'गज', 'a8': 'ध्वांक्ष',
     't1': 'जन्म तारा', 't2': 'सम्पत् तारा', 't3': 'विपत् तारा', 't4': 'क्षेम तारा',
@@ -137,6 +139,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'koluType': 'கோலு வகை', 'angula': 'அங்குலம்',
     'kishku': 'கிஷ்கு', 'prajapatya': 'ப்ராஜாபத்ய', 'dhanurmushti': 'தனுர்முஷ்டி', 'dhanugraha': 'தனுர்க்ரஹ',
     'prachya': 'ப்ராச்ய', 'vaideha': 'வைதேஹ', 'vaipulya': 'வைபுல்ய', 'prakeerna': 'ப்ரகீர்ண',
+    'vayassu': 'வயஸ்ஸு', 'v0': 'சால', 'v1': 'கௌமார', 'v2': 'யௌவன', 'v3': 'மத்யர்க', 'v4': 'நிதன',
     'vaara0': 'ஞாயிறு', 'vaara1': 'திங்கள்', 'vaara2': 'செவ்வாய்', 'vaara3': 'புதன்', 'vaara4': 'வியாழன்', 'vaara5': 'வெள்ளி', 'vaara6': 'சனி',
     'a1': 'த்வஜம்', 'a2': 'தூம்ரம்', 'a3': 'சிம்மம்', 'a4': 'ச்வானம்', 'a5': 'விருஷபம்', 'a6': 'கரம்', 'a7': 'கஜம்', 'a8': 'த்வாங்க்ஷம்',
     't1': 'ஜன்ம தாரை', 't2': 'சம்பத் தாரை', 't3': 'விபத் தாரை', 't4': 'க்ஷேம தாரை',
@@ -168,6 +171,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'koluType': 'కోలు రకం', 'angula': 'అంగుళం',
     'kishku': 'కిష్కు', 'prajapatya': 'ప్రాజాపత్య', 'dhanurmushti': 'ధనుర్ముష్టి', 'dhanugraha': 'ధనుర్గ్రహ',
     'prachya': 'ప్రాచ్య', 'vaideha': 'వైదేహ', 'vaipulya': 'వైపుల్య', 'prakeerna': 'ప్రకీర్ణ',
+    'vayassu': 'వయస్సు', 'v0': 'చాల', 'v1': 'కౌమార', 'v2': 'యౌవన', 'v3': 'మధ్యర్క', 'v4': 'నిధన',
     'vaara0': 'ఆదిత్య', 'vaara1': 'సోమ', 'vaara2': 'మంగళ', 'vaara3': 'బుధ', 'vaara4': 'గురు', 'vaara5': 'శుక్ర', 'vaara6': 'శని',
     'a1': 'ధ్వజం', 'a2': 'ధూమ్రం', 'a3': 'సింహం', 'a4': 'శ్వానం', 'a5': 'వృషభం', 'a6': 'ఖరం', 'a7': 'గజం', 'a8': 'ధ్వాంక్షం',
     't1': 'జన్మ తార', 't2': 'సంపత్ తార', 't3': 'విపత్ తార', 't4': 'క్షేమ తార',
@@ -199,6 +203,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'koluType': 'കോലു തരം', 'angula': 'അംഗുലം',
     'kishku': 'കിഷ്കു', 'prajapatya': 'പ്രാജാപത്യ', 'dhanurmushti': 'ധനുർമുഷ്ടി', 'dhanugraha': 'ധനുർഗ്രഹ',
     'prachya': 'പ്രാച്യ', 'vaideha': 'വൈദേഹ', 'vaipulya': 'വൈപുല്യ', 'prakeerna': 'പ്രകീർണ',
+    'vayassu': 'വയസ്സ്', 'v0': 'ചാല', 'v1': 'കൗമാര', 'v2': 'യൗവന', 'v3': 'മധ്യർക', 'v4': 'നിധന',
     'vaara0': 'ഞായർ', 'vaara1': 'തിങ്കൾ', 'vaara2': 'ചൊവ്വ', 'vaara3': 'ബുധൻ', 'vaara4': 'വ്യാഴം', 'vaara5': 'വെള്ളി', 'vaara6': 'ശനി',
     'a1': 'ധ്വജം', 'a2': 'ധൂമ്രം', 'a3': 'സിംഹം', 'a4': 'ശ്വാനം', 'a5': 'വൃഷഭം', 'a6': 'ഖരം', 'a7': 'ഗജം', 'a8': 'ധ്വാങ്ക്ഷം',
     't1': 'ജന്മ താര', 't2': 'സമ്പത്ത് താര', 't3': 'വിപത്ത് താര', 't4': 'ക്ഷേമ താര',
@@ -232,6 +237,7 @@ class _VastuResult {
   final int taraIndex;
   final int tithiValue;
   final int vaaraValue;
+  final int vayassuIndex; // 0=Chaala..3=Madhyarka, 4=Nidhana
   final int veetanaValue;
 
   _VastuResult({
@@ -242,7 +248,7 @@ class _VastuResult {
     required this.vyayaValue, required this.aadaayaGtVyaya,
     required this.nakIndex, required this.taraIndex,
     required this.tithiValue, required this.vaaraValue,
-    required this.veetanaValue,
+    required this.vayassuIndex, required this.veetanaValue,
   });
 
   bool get isGoodYoni => _goodYoni.contains(yoniIndex);
@@ -282,6 +288,10 @@ _VastuResult _calculate(int l, int b, int ownerNak, double feetPerHasta) {
   final vaaraRem = (hasta * 8) % 7;
   final vaaraValue = vaaraRem == 0 ? 7 : vaaraRem;
 
+  // Vayassu = quotient((hasta × 8) / 27) % 5
+  final vayassuQuotient = (hasta * 8) ~/ 27;
+  final vayassuRem = vayassuQuotient % 5;
+  final vayassuIndex = vayassuRem == 0 ? 4 : vayassuRem - 1;
 
   // Veetana = (hasta × 9) % 10
   final veetanaRem = (hasta * 9) % 10;
@@ -298,7 +308,7 @@ _VastuResult _calculate(int l, int b, int ownerNak, double feetPerHasta) {
     vyayaValue: vyayaValue, aadaayaGtVyaya: aadaayaValue > vyayaValue,
     nakIndex: nakIndex, taraIndex: taraIndex,
     tithiValue: tithiValue, vaaraValue: vaaraValue,
-    veetanaValue: veetanaValue,
+    vayassuIndex: vayassuIndex, veetanaValue: veetanaValue,
   );
 }
 
@@ -483,6 +493,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
   }
 
   Color _yoniColor(int i) => _goodYoni.contains(i) ? Colors.green : Colors.red;
+  Color _vayassuColor(int i) => i == 2 ? Colors.green : (i == 1 || i == 3) ? Colors.orange : Colors.red;
 
   Color _taraColor(int i) => _goodTara.contains(i)
       ? (i == 1 || i == 8 ? Colors.green : Colors.teal)
@@ -909,6 +920,18 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _yoniColor(r.yoniIndex)),
               overflow: TextOverflow.ellipsis,
             )),
+          ]),
+          const SizedBox(height: 3),
+
+          // Vayassu
+          Row(children: [
+            Icon(Icons.person, size: 14, color: _vayassuColor(r.vayassuIndex)),
+            const SizedBox(width: 4),
+            Text('${_v('vayassu')}: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            Text(
+              _v('v${r.vayassuIndex}'),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _vayassuColor(r.vayassuIndex)),
+            ),
           ]),
           const SizedBox(height: 3),
 
