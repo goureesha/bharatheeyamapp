@@ -468,7 +468,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     results.sort((a, b) {
       if (a.isExcellent && !b.isExcellent) return -1;
       if (!a.isExcellent && b.isExcellent) return 1;
-      return a.area.compareTo(b.area);
+      return a.areaIn.compareTo(b.areaIn);
     });
     setState(() { _results = results; _searched = true; });
   }
