@@ -65,7 +65,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'buildingNak': 'ಕಟ್ಟಡದ ನಕ್ಷತ್ರ', 'tarabala': 'ತಾರಾಬಲ',
     'shubha': 'ಶುಭ', 'aayaGt': 'ಆಯ > ವ್ಯಯ ✓', 'aayaLe': 'ಆಯ ≤ ವ್ಯಯ ✗',
     'selectNakErr': 'ಯಜಮಾನನ ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ',
-    'yoni': 'ಯೋನಿ', 'tithi': 'ತಿಥಿ', 'vaara': 'ವಾರ', 'veetana': 'ವೀತನ',
+    'yoni': 'ಯೋನಿ', 'tithi': 'ತಿಥಿ', 'vaara': 'ವಾರ',
     'adi': 'ಅಡಿ', 'sqAdi': 'ಚ.ಅಡಿ', 'all': 'ಎಲ್ಲಾ',
     'minLabel': 'ಕನಿಷ್ಠ', 'maxLabel': 'ಗರಿಷ್ಠ',
     'fromLabel': 'ಇಂದ', 'toLabel': 'ವರೆಗೆ',
@@ -97,7 +97,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'buildingNak': 'भवन नक्षत्र', 'tarabala': 'ताराबल',
     'shubha': 'शुभ', 'aayaGt': 'आय > व्यय ✓', 'aayaLe': 'आय ≤ व्यय ✗',
     'selectNakErr': 'मकान मालिक का नक्षत्र चुनें',
-    'yoni': 'योनि', 'tithi': 'तिथि', 'vaara': 'वार', 'veetana': 'वीतन',
+    'yoni': 'योनि', 'tithi': 'तिथि', 'vaara': 'वार',
     'adi': 'फीट', 'sqAdi': 'वर्ग.फीट', 'all': 'सभी',
     'minLabel': 'न्यूनतम', 'maxLabel': 'अधिकतम',
     'fromLabel': 'से', 'toLabel': 'तक',
@@ -129,7 +129,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'buildingNak': 'கட்டிட நக்ஷத்திரம்', 'tarabala': 'தாராபலம்',
     'shubha': 'சுபம்', 'aayaGt': 'ஆயம் > வியயம் ✓', 'aayaLe': 'ஆயம் ≤ வியயம் ✗',
     'selectNakErr': 'உரிமையாளர் நக்ஷத்திரம் தேர்வு செய்யவும்',
-    'yoni': 'யோனி', 'tithi': 'திதி', 'vaara': 'வாரம்', 'veetana': 'வீதன',
+    'yoni': 'யோனி', 'tithi': 'திதி', 'vaara': 'வாரம்',
     'adi': 'அடி', 'sqAdi': 'ச.அடி', 'all': 'அனைத்தும்',
     'minLabel': 'குறைந்தபட்சம்', 'maxLabel': 'அதிகபட்சம்',
     'fromLabel': 'இருந்து', 'toLabel': 'வரை',
@@ -161,7 +161,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'buildingNak': 'భవన నక్షత్రం', 'tarabala': 'తారాబలం',
     'shubha': 'శుభం', 'aayaGt': 'ఆయం > వ్యయం ✓', 'aayaLe': 'ఆయం ≤ వ్యయం ✗',
     'selectNakErr': 'యజమాని నక్షత్రం ఎంచుకోండి',
-    'yoni': 'యోని', 'tithi': 'తిథి', 'vaara': 'వారం', 'veetana': 'వీతన',
+    'yoni': 'యోని', 'tithi': 'తిథి', 'vaara': 'వారం',
     'adi': 'అడి', 'sqAdi': 'చ.అడి', 'all': 'అన్నీ',
     'minLabel': 'కనిష్ఠం', 'maxLabel': 'గరిష్ఠం',
     'fromLabel': 'నుండి', 'toLabel': 'వరకు',
@@ -193,7 +193,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'buildingNak': 'കെട്ടിട നക്ഷത്രം', 'tarabala': 'താരാബലം',
     'shubha': 'ശുഭം', 'aayaGt': 'ആയം > വ്യയം ✓', 'aayaLe': 'ആയം ≤ വ്യയം ✗',
     'selectNakErr': 'ഉടമയുടെ നക്ഷത്രം തിരഞ്ഞെടുക്കുക',
-    'yoni': 'യോനി', 'tithi': 'തിഥി', 'vaara': 'വാരം', 'veetana': 'വീതന',
+    'yoni': 'യോനി', 'tithi': 'തിഥി', 'vaara': 'വാരം',
     'adi': 'അടി', 'sqAdi': 'ച.അടി', 'all': 'എല്ലാം',
     'minLabel': 'കുറഞ്ഞത്', 'maxLabel': 'കൂടിയത്',
     'fromLabel': 'മുതൽ', 'toLabel': 'വരെ',
@@ -238,7 +238,6 @@ class _VastuResult {
   final int tithiValue;
   final int vaaraValue;
   final int vayassuIndex; // 0=Chaala..3=Madhyarka, 4=Nidhana
-  final int veetanaValue;
 
   _VastuResult({
     required this.length, required this.breadth, required this.area,
@@ -248,7 +247,7 @@ class _VastuResult {
     required this.vyayaValue, required this.aadaayaGtVyaya,
     required this.nakIndex, required this.taraIndex,
     required this.tithiValue, required this.vaaraValue,
-    required this.vayassuIndex, required this.veetanaValue,
+    required this.vayassuIndex,
   });
 
   bool get isGoodYoni => _goodYoni.contains(yoniIndex);
@@ -293,10 +292,6 @@ _VastuResult _calculate(int l, int b, int ownerNak, double feetPerHasta) {
   final vayassuRem = vayassuQuotient % 5;
   final vayassuIndex = vayassuRem == 0 ? 4 : vayassuRem - 1;
 
-  // Veetana = (hasta × 9) % 10
-  final veetanaRem = (hasta * 9) % 10;
-  final veetanaValue = veetanaRem == 0 ? 10 : veetanaRem;
-
   final diff = (nakIndex - ownerNak + 27) % 27;
   final taraIndex = diff % 9;
 
@@ -308,7 +303,7 @@ _VastuResult _calculate(int l, int b, int ownerNak, double feetPerHasta) {
     vyayaValue: vyayaValue, aadaayaGtVyaya: aadaayaValue > vyayaValue,
     nakIndex: nakIndex, taraIndex: taraIndex,
     tithiValue: tithiValue, vaaraValue: vaaraValue,
-    vayassuIndex: vayassuIndex, veetanaValue: veetanaValue,
+    vayassuIndex: vayassuIndex,
   );
 }
 
@@ -634,7 +629,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                             style: TextStyle(fontSize: 10, color: kMuted)),
                           Text('• ${AppLocale.l('nakshatra')} = (${_v('hasta')} × 8) % 27  |  ${_v('tithi')} = (${_v('hasta')} × 8) % 30',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${_v('vaara')} = (${_v('hasta')} × 8) % 7  |  ${_v('veetana')} = (${_v('hasta')} × 9) % 10',
+                          Text('• ${_v('vaara')} = (${_v('hasta')} × 8) % 7',
                             style: TextStyle(fontSize: 10, color: kMuted)),
                         ],
                       ),
@@ -956,12 +951,12 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           ]),
           const SizedBox(height: 3),
 
-          // Tithi, Vaara, Vayassu, Veetana
+          // Tithi, Vaara
           Row(children: [
             Icon(Icons.calendar_today, size: 12, color: kMuted),
             const SizedBox(width: 4),
             Expanded(child: Text(
-              '${_v('tithi')}: ${r.tithiValue}  |  ${_v('vaara')}: ${_v('vaara${r.vaaraValue - 1}')}  |  ${_v('veetana')}: ${r.veetanaValue}',
+              '${_v('tithi')}: ${r.tithiValue}  |  ${_v('vaara')}: ${_v('vaara${r.vaaraValue - 1}')}',
               style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kMuted),
               overflow: TextOverflow.ellipsis,
             )),
