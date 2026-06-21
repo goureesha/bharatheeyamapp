@@ -37,13 +37,19 @@ final List<_KoluType> _koluTypes = [
   _KoluType('prakeerna', 31),
 ];
 
-/// Format feet as  30′ 10″
-String _fmtFtIn(double totalFeet) {
-  final ft = totalFeet.truncate();
-  final inches = ((totalFeet - ft) * 12).round();
+/// Format total inches as  30′ 10″
+String _fmtFtIn(int totalInches) {
+  final ft = totalInches ~/ 12;
+  final inches = totalInches % 12;
   if (inches == 0) return '$ft′';
-  if (inches == 12) return '${ft + 1}′';
   return '$ft′ $inches″';
+}
+
+/// Format area (sq inches) as sq ft string
+String _fmtSqFt(int sqInches) {
+  final sqft = sqInches / 144.0;
+  if (sqft == sqft.roundToDouble()) return '${sqft.toInt()}';
+  return sqft.toStringAsFixed(1);
 }
 
 
@@ -221,12 +227,12 @@ List<String> get _yoniNames => [_v('a1'), _v('a2'), _v('a3'), _v('a4'), _v('a5')
 List<String> get _taraNames => [_v('t1'), _v('t2'), _v('t3'), _v('t4'), _v('t5'), _v('t6'), _v('t7'), _v('t8'), _v('t9')];
 List<String> get _taraQuality => [_v('q1'), _v('q2'), _v('q3'), _v('q4'), _v('q3'), _v('q4'), _v('q3'), _v('q4'), _v('q2')];
 
-// ─── Shared result model ───
+// ─── Shared result model (dimensions in inches) ───
 class _VastuResult {
-  final int length;
-  final int breadth;
-  final int area;
-  final int perimeterFt;
+  final int lengthIn;   // total inches
+  final int breadthIn;  // total inches
+  final int areaIn;     // sq inches
+  final int perimeterIn; // total inches
   final int hasta;
   final int yoniIndex;
   final int yoniValue;
@@ -237,11 +243,11 @@ class _VastuResult {
   final int taraIndex;
   final int tithiValue;
   final int vaaraValue;
-  final int vayassuIndex; // 0=Chaala..3=Madhyarka, 4=Nidhana
+  final int vayassuIndex;
 
   _VastuResult({
-    required this.length, required this.breadth, required this.area,
-    required this.perimeterFt, required this.hasta,
+    required this.lengthIn, required this.breadthIn, required this.areaIn,
+    required this.perimeterIn, required this.hasta,
     required this.yoniIndex, required this.yoniValue,
     required this.aadaayaValue,
     required this.vyayaValue, required this.aadaayaGtVyaya,
@@ -255,11 +261,12 @@ class _VastuResult {
   bool get isExcellent => isGoodYoni && isGoodTara && aadaayaGtVyaya;
 }
 
-// ─── Calculation helper (Manushyalaya Chandrika, Adhyaya 9) ───
-_VastuResult _calculate(int l, int b, int ownerNak, double feetPerHasta) {
-  final area = l * b;
-  final perimeterFt = 2 * (l + b);
-  final hasta = (perimeterFt / feetPerHasta).round();
+// ─── Calculation helper (dimensions in inches) ───
+_VastuResult _calculate(int lIn, int bIn, int ownerNak, double koluCm) {
+  final areaIn = lIn * bIn;
+  final perimeterIn = 2 * (lIn + bIn);
+  final perimeterCm = perimeterIn * 2.54;
+  final hasta = (perimeterCm / koluCm).round();
 
   // Yoni = (hasta × 3) % 8
   final yoniRem = (hasta * 3) % 8;
@@ -296,8 +303,8 @@ _VastuResult _calculate(int l, int b, int ownerNak, double feetPerHasta) {
   final taraIndex = diff % 9;
 
   return _VastuResult(
-    length: l, breadth: b, area: area,
-    perimeterFt: perimeterFt, hasta: hasta,
+    lengthIn: lIn, breadthIn: bIn, areaIn: areaIn,
+    perimeterIn: perimeterIn, hasta: hasta,
     yoniIndex: yoniIndex, yoniValue: yoniValue,
     aadaayaValue: aadaayaValue,
     vyayaValue: vyayaValue, aadaayaGtVyaya: aadaayaValue > vyayaValue,
@@ -398,7 +405,13 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
       );
       return;
     }
-    if ((maxL - minL + 1) * (maxB - minB + 1) > 10000) {
+    // Iterate by inch: convert feet to inches
+    final minLIn = minL * 12;
+    final maxLIn = maxL * 12 + 11;
+    final minBIn = minB * 12;
+    final maxBIn = maxB * 12 + 11;
+
+    if ((maxLIn - minLIn + 1) * (maxBIn - minBIn + 1) > 200000) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_v('errRange')), backgroundColor: Colors.red),
       );
@@ -406,10 +419,15 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     }
 
     final results = <_VastuResult>[];
-    final fph = _koluTypes[_koluIndex].feetPerHasta;
-    for (int l = minL; l <= maxL; l++) {
-      for (int b = minB; b <= maxB; b++) {
-        results.add(_calculate(l, b, _ownerNakIndex!, fph));
+    final koluCm = _koluTypes[_koluIndex].cm;
+    final seen = <int>{}; // deduplicate by hasta value
+    for (int li = minLIn; li <= maxLIn; li++) {
+      for (int bi = minBIn; bi <= maxBIn; bi++) {
+        final perimCm = 2 * (li + bi) * 2.54;
+        final hasta = (perimCm / koluCm).round();
+        if (seen.add(hasta)) {
+          results.add(_calculate(li, bi, _ownerNakIndex!, koluCm));
+        }
       }
     }
     _sortAndSet(results);
@@ -434,12 +452,13 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     }
 
     final results = <_VastuResult>[];
-    final fph = _koluTypes[_koluIndex].feetPerHasta;
+    final koluCm = _koluTypes[_koluIndex].cm;
     for (int sq = minSq; sq <= maxSq; sq++) {
       final pairs = _factorPairs(sq);
       if (pairs.isEmpty) continue;
       for (final pair in pairs) {
-        results.add(_calculate(pair[0], pair[1], _ownerNakIndex!, fph));
+        // pair is in feet; convert to inches
+        results.add(_calculate(pair[0] * 12, pair[1] * 12, _ownerNakIndex!, koluCm));
       }
     }
     _sortAndSet(results);
@@ -619,9 +638,9 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                           Text(_v('formula'), style: TextStyle(
                             fontSize: 11, fontWeight: FontWeight.w800, color: kPurple2)),
                           const SizedBox(height: 4),
-                          Text('• ${_v('peridhi')} = 2 × (${_v('length').split(' /')[0]} + ${_v('breadth').split(' /')[0]})  →  ${_v('hasta')} = ${_v('peridhi')} ÷ ${_koluTypes[_koluIndex].feetPerHasta.toStringAsFixed(2)}',
+                          Text('• ${_v('peridhi')} (cm) = ${_v('peridhi')} (${_v('adi')}) × 2.54  →  ${_v('hasta')} = ${_v('peridhi')} (cm) ÷ ${_koluTypes[_koluIndex].cm.toInt()}',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• 1 ${_v(_koluTypes[_koluIndex].id)} = ${_koluTypes[_koluIndex].angula} ${_v('angula')} = ${_koluTypes[_koluIndex].cm.toInt()} cm = ${_koluTypes[_koluIndex].feetPerHasta.toStringAsFixed(2)} ${_v('adi')}',
+                          Text('• 1 ${_v(_koluTypes[_koluIndex].id)} = ${_koluTypes[_koluIndex].angula} ${_v('angula')} = ${_koluTypes[_koluIndex].cm.toInt()} cm',
                             style: TextStyle(fontSize: 10, color: kOrange, fontWeight: FontWeight.w700)),
                           Text('• ${_v('yoni')} = (${_v('hasta')} × 3) % 8',
                             style: TextStyle(fontSize: 10, color: kMuted)),
@@ -875,13 +894,13 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${_fmtFtIn(r.length.toDouble())} × ${_fmtFtIn(r.breadth.toDouble())}',
+                  '${_fmtFtIn(r.lengthIn)} × ${_fmtFtIn(r.breadthIn)}',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900,
                     color: isExcellent ? Colors.green.shade700 : kPurple2),
                 ),
               ),
               const SizedBox(width: 8),
-              Text('${r.area} ${_v('sqAdi')}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
+              Text('${_fmtSqFt(r.areaIn)} ${_v('sqAdi')}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
               const Spacer(),
               if (isExcellent)
                 Container(
@@ -901,7 +920,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           const SizedBox(height: 6),
 
           // Perimeter / Hasta
-          Text('${_v('peridhi')}: ${_fmtFtIn(r.perimeterFt.toDouble())}  |  ${_v('hasta')}: ${r.hasta}  (${_v(_koluTypes[_koluIndex].id)})',
+          Text('${_v('peridhi')}: ${_fmtFtIn(r.perimeterIn)}  |  ${_v('hasta')}: ${r.hasta}  (${_v(_koluTypes[_koluIndex].id)})',
             style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
