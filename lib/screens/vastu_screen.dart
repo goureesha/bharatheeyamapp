@@ -258,7 +258,8 @@ class _VastuResult {
 
   bool get isGoodYoni => _goodYoni.contains(yoniIndex);
   bool get isGoodTara => _goodTara.contains(taraIndex);
-  bool get isExcellent => isGoodYoni && isGoodTara && aadaayaGtVyaya;
+  bool get isGoodVayassu => vayassuIndex != 4; // nidhana is not good
+  bool get isExcellent => isGoodYoni && isGoodTara && aadaayaGtVyaya && isGoodVayassu;
 }
 
 // ─── Calculation helper (dimensions in inches) ───

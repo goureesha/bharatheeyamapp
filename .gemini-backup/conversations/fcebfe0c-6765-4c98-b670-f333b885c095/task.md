@@ -1,16 +1,11 @@
-- [x] Draft translations for Batch 6:
-  - [x] 1. Hayagriva Upanishad
-  - [x] 2. Itihasopanishat
-  - [x] 3. Jabala Upanishad
-  - [x] 4. Kalikopanishat
-  - [x] 5. Katha Upanishad
-  - [x] 6. Katharudra Upanishad
-  - [x] 7. Kena Upanishad
-  - [x] 8. Krishna Upanishad
-  - [x] 9. Kumaropanishat
-  - [x] 10. Kundika Upanishad
-- [x] Create and run `translate_batch_alpha_6.py` to write translations
-- [x] Verify using check scripts
-- [x] Git commit and push with backup
-
-
+- [x] Parse standard Aitareya Upanishad (`upanishad_aitareya_ch_1.txt`)
+- [x] Merge and write Aitareya Sasvara translations (`upanishad_aitareyopanishatsasvara_ch_1` to `ch_5`)
+- [x] Translate stotras:
+  - [x] `upanishad_dashopanishatsarah3_ch_1`
+  - [x] `upanishad_dashopanishatsarashriramabhadrastotram_ch_1`
+- [x] Translate `upanishad_dashopanishadrahasyam_ch_1` (and clean up Hindi article)
+- [x] Translate and summarize the large Brihadaranyaka files:
+  - [x] `upanishad_brinew-proofed_ch_1.txt`
+  - [x] `upanishad_bri_ch_1.txt`
+- [x] Verify using check script
+- [x] Commit & Push to Git
