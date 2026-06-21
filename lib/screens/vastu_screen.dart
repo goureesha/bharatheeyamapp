@@ -16,7 +16,35 @@ const List<String> _taraEnglish = [
 
 const Set<int> _goodYoni = {0, 2, 4, 6};
 const Set<int> _goodTara = {1, 3, 5, 7, 8};
-const double _feetPerHasta = 1.5;
+
+// ─── Kolu/Hasta types (1 angula = 3 cm) ───
+class _KoluType {
+  final String id;
+  final int angula;
+  _KoluType(this.id, this.angula);
+  double get cm => angula * 3.0;
+  double get feetPerHasta => cm / 30.48;
+}
+
+final List<_KoluType> _koluTypes = [
+  _KoluType('kishku', 24),
+  _KoluType('prajapatya', 25),
+  _KoluType('dhanurmushti', 26),
+  _KoluType('dhanugraha', 27),
+  _KoluType('prachya', 28),
+  _KoluType('vaideha', 29),
+  _KoluType('vaipulya', 30),
+  _KoluType('prakeerna', 31),
+];
+
+/// Format feet as  30′ 10″
+String _fmtFtIn(double totalFeet) {
+  final ft = totalFeet.truncate();
+  final inches = ((totalFeet - ft) * 12).round();
+  if (inches == 0) return '$ft′';
+  if (inches == 12) return '${ft + 1}′';
+  return '$ft′ $inches″';
+}
 
 
 
@@ -44,6 +72,9 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'errMinMax': 'ಕನಿಷ್ಠ ≤ ಗರಿಷ್ಠ ಇರಬೇಕು',
     'errRange': 'ವ್ಯಾಪ್ತಿ ತುಂಬಾ ದೊಡ್ಡದು, ಕಡಿಮೆ ಮಾಡಿ',
     'errMaxSqft': 'ಗರಿಷ್ಠ 5000 ಚ.ಅಡಿ',
+    'koluType': 'ಕೋಲು ಪ್ರಕಾರ', 'angula': 'ಅಂಗುಲ',
+    'kishku': 'ಕಿಷ್ಕು', 'prajapatya': 'ಪ್ರಾಜಾಪತ್ಯ', 'dhanurmushti': 'ಧನುರ್ಮುಷ್ಟಿ', 'dhanugraha': 'ಧನುರ್ಗ್ರಹ',
+    'prachya': 'ಪ್ರಾಚ್ಯ', 'vaideha': 'ವೈದೇಹ', 'vaipulya': 'ವೈಪುಲ್ಯ', 'prakeerna': 'ಪ್ರಕೀರ್ಣ',
     'vaara0': 'ಆದಿತ್ಯ', 'vaara1': 'ಸೋಮ', 'vaara2': 'ಮಂಗಳ', 'vaara3': 'ಬುಧ', 'vaara4': 'ಗುರು', 'vaara5': 'ಶುಕ್ರ', 'vaara6': 'ಶನಿ',
     'a1': 'ಧ್ವಜ', 'a2': 'ಧೂಮ್ರ', 'a3': 'ಸಿಂಹ', 'a4': 'ಶ್ವಾನ', 'a5': 'ವೃಷಭ', 'a6': 'ವೀರ', 'a7': 'ಗಜ', 'a8': 'ವಾಯಸ',
     't1': 'ಜನ್ಮ ತಾರೆ', 't2': 'ಸಂಪತ್ ತಾರೆ', 't3': 'ವಿಪತ್ ತಾರೆ', 't4': 'ಕ್ಷೇಮ ತಾರೆ',
@@ -72,6 +103,9 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'errMinMax': 'न्यूनतम ≤ अधिकतम होना चाहिए',
     'errRange': 'रेंज बहुत बड़ी है, कम करें',
     'errMaxSqft': 'अधिकतम 5000 वर्ग.फीट',
+    'koluType': 'कोलु प्रकार', 'angula': 'अंगुल',
+    'kishku': 'किष्कु', 'prajapatya': 'प्राजापत्य', 'dhanurmushti': 'धनुर्मुष्टि', 'dhanugraha': 'धनुर्ग्रह',
+    'prachya': 'प्राच्य', 'vaideha': 'वैदेह', 'vaipulya': 'वैपुल्य', 'prakeerna': 'प्रकीर्ण',
     'vaara0': 'रवि', 'vaara1': 'सोम', 'vaara2': 'मंगल', 'vaara3': 'बुध', 'vaara4': 'गुरु', 'vaara5': 'शुक्र', 'vaara6': 'शनि',
     'a1': 'ध्वज', 'a2': 'धूम्र', 'a3': 'सिंह', 'a4': 'श्वान', 'a5': 'वृषभ', 'a6': 'खर', 'a7': 'गज', 'a8': 'ध्वांक्ष',
     't1': 'जन्म तारा', 't2': 'सम्पत् तारा', 't3': 'विपत् तारा', 't4': 'क्षेम तारा',
@@ -100,6 +134,9 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'errMinMax': 'குறைந்தபட்சம் ≤ அதிகபட்சம்',
     'errRange': 'வரம்பு மிகப் பெரியது',
     'errMaxSqft': 'அதிகபட்சம் 5000 ச.அடி',
+    'koluType': 'கோலு வகை', 'angula': 'அங்குலம்',
+    'kishku': 'கிஷ்கு', 'prajapatya': 'ப்ராஜாபத்ய', 'dhanurmushti': 'தனுர்முஷ்டி', 'dhanugraha': 'தனுர்க்ரஹ',
+    'prachya': 'ப்ராச்ய', 'vaideha': 'வைதேஹ', 'vaipulya': 'வைபுல்ய', 'prakeerna': 'ப்ரகீர்ண',
     'vaara0': 'ஞாயிறு', 'vaara1': 'திங்கள்', 'vaara2': 'செவ்வாய்', 'vaara3': 'புதன்', 'vaara4': 'வியாழன்', 'vaara5': 'வெள்ளி', 'vaara6': 'சனி',
     'a1': 'த்வஜம்', 'a2': 'தூம்ரம்', 'a3': 'சிம்மம்', 'a4': 'ச்வானம்', 'a5': 'விருஷபம்', 'a6': 'கரம்', 'a7': 'கஜம்', 'a8': 'த்வாங்க்ஷம்',
     't1': 'ஜன்ம தாரை', 't2': 'சம்பத் தாரை', 't3': 'விபத் தாரை', 't4': 'க்ஷேம தாரை',
@@ -128,6 +165,9 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'errMinMax': 'కనిష్ఠం ≤ గరిష్ఠం ఉండాలి',
     'errRange': 'పరిధి చాలా పెద్దది',
     'errMaxSqft': 'గరిష్ఠం 5000 చ.అడి',
+    'koluType': 'కోలు రకం', 'angula': 'అంగుళం',
+    'kishku': 'కిష్కు', 'prajapatya': 'ప్రాజాపత్య', 'dhanurmushti': 'ధనుర్ముష్టి', 'dhanugraha': 'ధనుర్గ్రహ',
+    'prachya': 'ప్రాచ్య', 'vaideha': 'వైదేహ', 'vaipulya': 'వైపుల్య', 'prakeerna': 'ప్రకీర్ణ',
     'vaara0': 'ఆదిత్య', 'vaara1': 'సోమ', 'vaara2': 'మంగళ', 'vaara3': 'బుధ', 'vaara4': 'గురు', 'vaara5': 'శుక్ర', 'vaara6': 'శని',
     'a1': 'ధ్వజం', 'a2': 'ధూమ్రం', 'a3': 'సింహం', 'a4': 'శ్వానం', 'a5': 'వృషభం', 'a6': 'ఖరం', 'a7': 'గజం', 'a8': 'ధ్వాంక్షం',
     't1': 'జన్మ తార', 't2': 'సంపత్ తార', 't3': 'విపత్ తార', 't4': 'క్షేమ తార',
@@ -156,6 +196,9 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'errMinMax': 'കുറഞ്ഞത് ≤ കൂടിയത് ആയിരിക്കണം',
     'errRange': 'പരിധി വളരെ വലുതാണ്',
     'errMaxSqft': 'കൂടിയത് 5000 ച.അടി',
+    'koluType': 'കോലു തരം', 'angula': 'അംഗുലം',
+    'kishku': 'കിഷ്കു', 'prajapatya': 'പ്രാജാപത്യ', 'dhanurmushti': 'ധനുർമുഷ്ടി', 'dhanugraha': 'ധനുർഗ്രഹ',
+    'prachya': 'പ്രാച്യ', 'vaideha': 'വൈദേഹ', 'vaipulya': 'വൈപുല്യ', 'prakeerna': 'പ്രകീർണ',
     'vaara0': 'ഞായർ', 'vaara1': 'തിങ്കൾ', 'vaara2': 'ചൊവ്വ', 'vaara3': 'ബുധൻ', 'vaara4': 'വ്യാഴം', 'vaara5': 'വെള്ളി', 'vaara6': 'ശനി',
     'a1': 'ധ്വജം', 'a2': 'ധൂമ്രം', 'a3': 'സിംഹം', 'a4': 'ശ്വാനം', 'a5': 'വൃഷഭം', 'a6': 'ഖരം', 'a7': 'ഗജം', 'a8': 'ധ്വാങ്ക്ഷം',
     't1': 'ജന്മ താര', 't2': 'സമ്പത്ത് താര', 't3': 'വിപത്ത് താര', 't4': 'ക്ഷേമ താര',
@@ -208,10 +251,10 @@ class _VastuResult {
 }
 
 // ─── Calculation helper (Manushyalaya Chandrika, Adhyaya 9) ───
-_VastuResult _calculate(int l, int b, int ownerNak) {
+_VastuResult _calculate(int l, int b, int ownerNak, double feetPerHasta) {
   final area = l * b;
   final perimeterFt = 2 * (l + b);
-  final hasta = (perimeterFt / _feetPerHasta).round();
+  final hasta = (perimeterFt / feetPerHasta).round();
 
   // Yoni = (hasta × 3) % 8
   final yoniRem = (hasta * 3) % 8;
@@ -286,6 +329,7 @@ class VastuScreen extends StatefulWidget {
 class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStateMixin {
   late TabController _tabCtrl;
   int? _ownerNakIndex;
+  int _koluIndex = 0; // default: Kishku (24 angula)
 
   final _minLenCtrl = TextEditingController(text: '30');
   final _maxLenCtrl = TextEditingController(text: '40');
@@ -357,9 +401,10 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     }
 
     final results = <_VastuResult>[];
+    final fph = _koluTypes[_koluIndex].feetPerHasta;
     for (int l = minL; l <= maxL; l++) {
       for (int b = minB; b <= maxB; b++) {
-        results.add(_calculate(l, b, _ownerNakIndex!));
+        results.add(_calculate(l, b, _ownerNakIndex!, fph));
       }
     }
     _sortAndSet(results);
@@ -384,11 +429,12 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     }
 
     final results = <_VastuResult>[];
+    final fph = _koluTypes[_koluIndex].feetPerHasta;
     for (int sq = minSq; sq <= maxSq; sq++) {
       final pairs = _factorPairs(sq);
       if (pairs.isEmpty) continue;
       for (final pair in pairs) {
-        results.add(_calculate(pair[0], pair[1], _ownerNakIndex!));
+        results.add(_calculate(pair[0], pair[1], _ownerNakIndex!, fph));
       }
     }
     _sortAndSet(results);
@@ -510,6 +556,30 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                     )),
                     onChanged: (v) => setState(() => _ownerNakIndex = v),
                   ),
+                  const SizedBox(height: 12),
+                  Text(_v('koluType'),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
+                  const SizedBox(height: 6),
+                  DropdownButtonFormField<int>(
+                    value: _koluIndex,
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    items: List.generate(_koluTypes.length, (i) {
+                      final k = _koluTypes[i];
+                      return DropdownMenuItem(
+                        value: i,
+                        child: Text(
+                          '${_v(k.id)}  (${k.angula} ${_v('angula')} = ${k.cm.toInt()} cm)',
+                          style: TextStyle(fontSize: 13, color: kText),
+                        ),
+                      );
+                    }),
+                    onChanged: (v) => setState(() { _koluIndex = v!; _searched = false; _results = []; }),
+                  ),
                 ],
               ),
             ),
@@ -543,9 +613,11 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                           Text(_v('formula'), style: TextStyle(
                             fontSize: 11, fontWeight: FontWeight.w800, color: kPurple2)),
                           const SizedBox(height: 4),
-                          Text('• ${_v('peridhi')} = 2 × (${_v('length').split(' /')[0]} + ${_v('breadth').split(' /')[0]})  →  ${_v('hasta')} = ${_v('peridhi')} ÷ 1.5',
+                          Text('• ${_v('peridhi')} = 2 × (${_v('length').split(' /')[0]} + ${_v('breadth').split(' /')[0]})  →  ${_v('hasta')} = ${_v('peridhi')} ÷ ${_koluTypes[_koluIndex].feetPerHasta.toStringAsFixed(2)}',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${_v('hasta')} = ${_v('peridhi')} ÷ 1.5  |  ${_v('yoni')} = (${_v('hasta')} × 3) % 8',
+                          Text('• 1 ${_v(_koluTypes[_koluIndex].id)} = ${_koluTypes[_koluIndex].angula} ${_v('angula')} = ${_koluTypes[_koluIndex].cm.toInt()} cm = ${_koluTypes[_koluIndex].feetPerHasta.toStringAsFixed(2)} ${_v('adi')}',
+                            style: TextStyle(fontSize: 10, color: kOrange, fontWeight: FontWeight.w700)),
+                          Text('• ${_v('yoni')} = (${_v('hasta')} × 3) % 8',
                             style: TextStyle(fontSize: 10, color: kMuted)),
                           Text('• ${_v('aaya')} = (${_v('hasta')} × 8) % 12  |  ${_v('vyaya')} = (${_v('hasta')} × 3) % 14',
                             style: TextStyle(fontSize: 10, color: kMuted)),
@@ -797,7 +869,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${r.length} × ${r.breadth} ${_v('adi')}',
+                  '${_fmtFtIn(r.length.toDouble())} × ${_fmtFtIn(r.breadth.toDouble())}',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900,
                     color: isExcellent ? Colors.green.shade700 : kPurple2),
                 ),
@@ -823,7 +895,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           const SizedBox(height: 6),
 
           // Perimeter / Hasta
-          Text('${_v('peridhi')}: ${r.perimeterFt} ${_v('adi')}  |  ${_v('hasta')}: ${r.hasta}',
+          Text('${_v('peridhi')}: ${_fmtFtIn(r.perimeterFt.toDouble())}  |  ${_v('hasta')}: ${r.hasta}  (${_v(_koluTypes[_koluIndex].id)})',
             style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
