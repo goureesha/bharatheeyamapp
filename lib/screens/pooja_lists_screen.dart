@@ -539,21 +539,12 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
 
   // Dropdown state
   String? _selectedItem;
-  String? _selectedQty;
   bool _isCustomItem = false;
 
   // Default item names for dropdown (getter so it updates with language)
   List<String> get _dropdownItems => [
     _p('customItem'),
     ..._defaultPoojaItems.map((m) => m['n']!),
-  ];
-
-  // Common quantity options for dropdown
-  static const List<String> _qtyOptions = [
-    '1', '2', '3', '5', '10',
-    '50 gm', '100 gm', '250 gm', '500 gm', '1 kg',
-    '100 ml', '250 ml', '500 ml', '1 L',
-    '1 packet', '1 dozen', '1 bundle',
   ];
 
   @override
@@ -578,13 +569,13 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       );
       return;
     }
-    final qty = _selectedQty ?? '';
+    final qty = _qtyCtrl.text.trim();
     setState(() {
       _list.items.add(PoojaItem(name: itemName, quantity: qty));
       _selectedItem = null;
-      _selectedQty = null;
       _isCustomItem = false;
       _customNameCtrl.clear();
+      _qtyCtrl.clear();
     });
     _saveList();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -985,23 +976,22 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                           ),
                     ),
                     const SizedBox(width: 8),
-                    // Quantity dropdown
+                    // Quantity text field
                     Expanded(
                       flex: 2,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: kBorder)),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: _selectedQty,
-                            hint: Text(_p('selectQty'), style: TextStyle(color: kMuted, fontSize: 13)),
-                            dropdownColor: kCard,
-                            style: TextStyle(color: kText, fontSize: 14),
-                            icon: Icon(Icons.arrow_drop_down, color: kOrange),
-                            items: _qtyOptions.map((q) => DropdownMenuItem(value: q, child: Text(q, style: TextStyle(color: kText, fontSize: 14)))).toList(),
-                            onChanged: (val) => setState(() => _selectedQty = val),
-                          ),
+                      child: TextField(
+                        controller: _qtyCtrl,
+                        style: TextStyle(color: kText, fontSize: 14),
+                        decoration: InputDecoration(
+                          hintText: _p('selectQty'),
+                          hintStyle: TextStyle(color: kMuted, fontSize: 13),
+                          filled: true,
+                          fillColor: kBg,
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kBorder)),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kBorder)),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kOrange)),
                         ),
                       ),
                     ),
