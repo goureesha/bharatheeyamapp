@@ -614,8 +614,93 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
       _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
       _buildAshtaKootaTable(fr['ashtaKoota']),
 
+      // ── DASHA SANDHI ──
+      _sectionHeader(AppLocale.l('dashaSandhi'), Icons.swap_horiz, Colors.deepPurple),
+      _buildDashaSandhiSection(br, gr),
+
       const SizedBox(height: 32),
     ]);
+  }
+
+  /// Check if any mahadasha of bride and groom end within 6 months of each other
+  Widget _buildDashaSandhiSection(KundaliResult br, KundaliResult gr) {
+    final bName = _bNameCtrl.text.isNotEmpty ? _bNameCtrl.text : AppLocale.l('brideDetails');
+    final gName = _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : AppLocale.l('groomDetails');
+
+    // Collect mahadasha end dates
+    final bDashas = br.dashas;
+    final gDashas = gr.dashas;
+
+    // Find pairs where both have a mahadasha ending within 6 months of each other
+    final matches = <Map<String, dynamic>>[];
+    const sixMonths = Duration(days: 183);
+
+    for (final bd in bDashas) {
+      for (final gd in gDashas) {
+        final diff = bd.end.difference(gd.end).abs();
+        if (diff <= sixMonths) {
+          matches.add({
+            'brideLord': bd.lord,
+            'brideEnd': bd.end,
+            'groomLord': gd.lord,
+            'groomEnd': gd.end,
+          });
+        }
+      }
+    }
+
+    final hasSandhi = matches.isNotEmpty;
+    final verdict = hasSandhi ? AppLocale.l('dashaSandhiYes') : AppLocale.l('dashaSandhiNo');
+    final vColor = hasSandhi ? Colors.red.shade700 : Colors.green.shade700;
+
+    String _fmtDate(DateTime d) => '${d.day.toString().padLeft(2, "0")}-${d.month.toString().padLeft(2, "0")}-${d.year}';
+
+    return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // Verdict
+      Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(color: vColor.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+        child: Row(children: [
+          Icon(hasSandhi ? Icons.warning : Icons.check_circle, color: vColor, size: 20),
+          const SizedBox(width: 8),
+          Flexible(child: Text(verdict, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: vColor))),
+        ]),
+      ),
+      if (matches.isNotEmpty) ...[
+        const SizedBox(height: 12),
+        Text('${AppLocale.l('mahadashaEnds')} (${AppLocale.l('within6Months')})',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: kMuted)),
+        const SizedBox(height: 8),
+        ...matches.map((m) => Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.06),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.orange.withOpacity(0.2)),
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Icon(Icons.male, size: 16, color: kTeal),
+                const SizedBox(width: 4),
+                Text('$gName: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kMuted)),
+                Text('${trAll(m['groomLord'])} → ${_fmtDate(m['groomEnd'])}',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kText)),
+              ]),
+              const SizedBox(height: 4),
+              Row(children: [
+                Icon(Icons.female, size: 16, color: kOrange),
+                const SizedBox(width: 4),
+                Text('$bName: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kMuted)),
+                Text('${trAll(m['brideLord'])} → ${_fmtDate(m['brideEnd'])}',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kText)),
+              ]),
+            ]),
+          ),
+        )),
+      ],
+    ]));
   }
 
   Widget _buildPersonSummary(KundaliResult r, String name, DateTime dob, int hour, int minute, String ampm, String place) {
