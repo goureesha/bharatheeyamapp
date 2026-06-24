@@ -1,11 +1,9 @@
-- [x] Parse standard Aitareya Upanishad (`upanishad_aitareya_ch_1.txt`)
-- [x] Merge and write Aitareya Sasvara translations (`upanishad_aitareyopanishatsasvara_ch_1` to `ch_5`)
-- [x] Translate stotras:
-  - [x] `upanishad_dashopanishatsarah3_ch_1`
-  - [x] `upanishad_dashopanishatsarashriramabhadrastotram_ch_1`
-- [x] Translate `upanishad_dashopanishadrahasyam_ch_1` (and clean up Hindi article)
-- [x] Translate and summarize the large Brihadaranyaka files:
-  - [x] `upanishad_brinew-proofed_ch_1.txt`
-  - [x] `upanishad_bri_ch_1.txt`
-- [x] Verify using check script
-- [x] Commit & Push to Git
+# Task List - Remaining Upanishads (Batch 1)
+
+- [x] Process Subset 1: Annapurna Upanishad (Chapters 2–5)
+- [x] Process Subset 2: Aitareya Upanishad With Vedic Accents (Chapters 1–5)
+- [x] Process Subset 3: Brihadaranyaka Upanishad (Chapters 1–6)
+- [x] Process Subset 4a: Chandogyopanishad.H (Chapters 1–4)
+- [ ] Process Subset 4b: Chandogyopanishad.H (Chapters 5–9)
+- [ ] Verify character cleanliness and block count statuses
+- [ ] Commit & Push to Git

@@ -1,56 +1,49 @@
-# Implementation Plan - Translate Batch 8 Upanishad Chapters into Kannada
+# Implementation Plan - Shloka-by-Shloka Translation of Remaining Upanishads (Batch 1)
 
-This plan details the translation of the next 10 chapters (Batch 8) into Kannada, adding word-by-word meanings (**ಶಬ್ದಾರ್ಥ**) and overall explanations (**ಭಾವಾರ್ಥ**).
+This plan details the next phase of the translation project: converting the remaining 371 chapters of other Upanishad books to the **shloka-by-shloka style** (Annapurna Chapter 1 style). 
 
-## User Review Required
+Due to the volume of chapters (371 chapters total across 229 books), we will execute the refactoring in batches. This plan defines **Batch 1**, which focuses on key, highly-referenced Upanishad books.
 
-> [!IMPORTANT]
-> - **Aitareya Accented Files:** We will automatically extract translations from the already completed standard Aitareya Upanishad (`upanishad_aitareya_ch_1.txt`) and align them verse-by-verse with the accented versions (`upanishad_aitareyopanishatsasvara_ch_1` to `ch_5`).
-> - **Dashopanishadrahasyam:** We will remove the Hindi article/footnotes from the end of `upanishad_dashopanishadrahasyam_ch_1.txt` (lines 64-172) and translate the 12 Sanskrit verses.
-> - **Large Brihadaranyaka Files:** To prevent exceeding LLM context windows and keep file sizes manageable, we will append a comprehensive summary of all 6 Adhyayas and translate the key verses (e.g. *Asato ma sadgamaya*, *Aham brahmasmi*) under `ಶಬ್ದಾರ್ಥ` and `ಭಾವಾರ್ಥ` sections at the end of `upanishad_brinew-proofed_ch_1.txt` and `upanishad_bri_ch_1.txt`.
+## Proposed Changes (Batch 1)
 
-## Proposed Changes
+We will modify the following 24 chapters to restructure them with shloka-by-shloka translations:
 
-### Chapters Directory
+### 1. Annapurna Upanishad (4 chapters)
+- [upanishad_annapurnaupan_ch_2.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_annapurnaupan_ch_2.txt)
+- [upanishad_annapurnaupan_ch_3.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_annapurnaupan_ch_3.txt)
+- [upanishad_annapurnaupan_ch_4.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_annapurnaupan_ch_4.txt)
+- [upanishad_annapurnaupan_ch_5.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_annapurnaupan_ch_5.txt)
 
-#### [MODIFY] [upanishad_aitareyopanishatsasvara_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_aitareyopanishatsasvara_ch_1.txt)
-#### [MODIFY] [upanishad_aitareyopanishatsasvara_ch_2.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_aitareyopanishatsasvara_ch_2.txt)
-#### [MODIFY] [upanishad_aitareyopanishatsasvara_ch_3.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_aitareyopanishatsasvara_ch_3.txt)
-#### [MODIFY] [upanishad_aitareyopanishatsasvara_ch_4.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_aitareyopanishatsasvara_ch_4.txt)
-#### [MODIFY] [upanishad_aitareyopanishatsasvara_ch_5.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_aitareyopanishatsasvara_ch_5.txt)
-- Extract translations for each chapter from the standard `upanishad_aitareya_ch_1.txt` and merge them.
+### 2. Aitareya Upanishad With Vedic Accents (5 chapters)
+- [upanishad_aitareyaupanvedic_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_aitareyaupanvedic_ch_1.txt) to [upanishad_aitareyaupanvedic_ch_5.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_aitareyaupanvedic_ch_5.txt)
 
-#### [MODIFY] [upanishad_dashopanishatsarah3_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_dashopanishatsarah3_ch_1.txt)
-- Translate 14 verses of this stotra into Kannada with `ಶಬ್ದಾರ್ಥ:` and `ಭಾವಾರ್ಥ:` sections.
+### 3. Brihadaranyaka Upanishad (6 chapters)
+- [upanishad_brihadaranyaka_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_brihadaranyaka_ch_1.txt) to [upanishad_brihadaranyaka_ch_6.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_brihadaranyaka_ch_6.txt)
 
-#### [MODIFY] [upanishad_dashopanishatsarashriramabhadrastotram_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_dashopanishatsarashriramabhadrastotram_ch_1.txt)
-- Translate 14 verses of this stotra into Kannada with `ಶಬ್ದಾರ್ಥ:` and `ಭಾವಾರ್ಥ:` sections.
-
-#### [MODIFY] [upanishad_dashopanishadrahasyam_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_dashopanishadrahasyam_ch_1.txt)
-- Remove the Hindi footnotes (lines 64-172).
-- Translate the 12 Sanskrit verses into Kannada with `ಶಬ್ದಾರ್ಥ:` and `ಭಾವಾರ್ಥ:` sections.
-
-#### [MODIFY] [upanishad_brinew-proofed_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_brinew-proofed_ch_1.txt)
-#### [MODIFY] [upanishad_bri_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_bri_ch_1.txt)
-- Append a detailed summary of all 6 Adhyayas and key verse translations (e.g. *Asato ma sadgamaya*, *Aham brahmasmi*, *Neti neti*) under `ಶಬ್ದಾರ್ಥ` and `ಭಾವಾರ್ಥ` sections at the end of each file.
+### 4. Chandogyopanishad.H (9 chapters)
+- [upanishad_chandogyopanishad_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_chandogyopanishad_ch_1.txt) to [upanishad_chandogyopanishad_ch_9.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_chandogyopanishad_ch_9.txt)
 
 ---
 
-### [Component: Translation Script]
+### Execution Strategy
 
-#### [NEW] [translate_batch_8.py](file:///C:/Users/goure/.gemini/antigravity/brain/fcebfe0c-6765-4c98-b670-f333b885c095/scratch/translate_batch_8.py)
-- A python script to orchestrate the translation of Batch 8:
-  - Parses standard Aitareya to extract and align Shabdartha/Bhavartha sections for accented files.
-  - Translates the stotras and rahasyam.
-  - Appends the summaries and key verse translations to the large Brihadaranyaka files.
+We will reuse the specialized `translation_helper` subagent to process these files sequentially in smaller subsets (to prevent rate limits):
+1. **Subset 1**: *Annapurna Upanishad* (Chapters 2–5)
+2. **Subset 2**: *Aitareya Upanishad With Vedic Accents* (Chapters 1–5)
+3. **Subset 3**: *Brihadaranyaka Upanishad* (Chapters 1–6)
+4. **Subset 4**: *Chandogyopanishad.H* (Chapters 1–9)
+
+For each chapter:
+- Split the text into individual Sanskrit blocks (verses ending with standard dandas or vertical bars).
+- Generate a dedicated **ಶಬ್ದಾರ್ಥ:** (word-meanings) and **ಭಾವಾರ್ಥ:** (overall meaning) directly underneath each block.
+- Remove the old summary blocks from the end.
+- Standardize the punctuation and ensure exactly 0% non-permitted characters (no Latin/Devanagari characters).
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `translate_batch_8.py` to generate translations.
-- Run `check_shabdartha_bhavartha.py` to verify the completed chapter counts.
-- Run `git diff` to review code and text changes.
+- **Verification Script**: Run `verify_all_characters.py` to confirm 0 bad characters.
+- **Audit Script**: Run `aggregate_upanishad_status.py` to verify that the target books have successfully moved to the "Fully Shloka-by-Shloka" status.
 
 ### Manual Verification
-- Verify that accented verses and Sanskrit stotras retain 100% integrity.
-- Check that the translated Kannada is natural, grammatical, and formatting matches standard templates.
+- Review random chapters from each of the 4 books to ensure translations are natural, grammatically correct, and properly aligned.

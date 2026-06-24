@@ -639,7 +639,9 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                           Text(_v('formula'), style: TextStyle(
                             fontSize: 11, fontWeight: FontWeight.w800, color: kPurple2)),
                           const SizedBox(height: 4),
-                          Text('• ${_v('peridhi')} (cm) = ${_v('peridhi')} (${_v('adi')}) × 2.54  →  ${_v('hasta')} = ${_v('peridhi')} (cm) ÷ ${_koluTypes[_koluIndex].cm.toInt()}',
+                          Text('• ${_v('peridhi')} = 2 × (${_v('length').split(' /')[0].split(' (')[0]} + ${_v('breadth').split(' /')[0].split(' (')[0]})',
+                            style: TextStyle(fontSize: 10, color: kMuted)),
+                          Text('• ${_v('hasta')} = ${_v('peridhi')} ÷ ${_v(_koluTypes[_koluIndex].id)}',
                             style: TextStyle(fontSize: 10, color: kMuted)),
                           Text('• 1 ${_v(_koluTypes[_koluIndex].id)} = ${_koluTypes[_koluIndex].angula} ${_v('angula')} = ${_koluTypes[_koluIndex].cm.toInt()} cm',
                             style: TextStyle(fontSize: 10, color: kOrange, fontWeight: FontWeight.w700)),
