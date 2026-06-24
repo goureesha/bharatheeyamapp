@@ -627,9 +627,10 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
     final bName = _bNameCtrl.text.isNotEmpty ? _bNameCtrl.text : AppLocale.l('brideDetails');
     final gName = _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : AppLocale.l('groomDetails');
 
-    // Collect mahadasha end dates
-    final bDashas = br.dashas;
-    final gDashas = gr.dashas;
+    // Only consider mahadashas ending in the future
+    final now = DateTime.now();
+    final bDashas = br.dashas.where((d) => d.end.isAfter(now)).toList();
+    final gDashas = gr.dashas.where((d) => d.end.isAfter(now)).toList();
 
     // Find pairs where both have a mahadasha ending within 6 months of each other
     final matches = <Map<String, dynamic>>[];
