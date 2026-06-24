@@ -233,7 +233,7 @@ class _VastuResult {
   final int breadthIn;  // total inches
   final int areaIn;     // sq inches
   final int perimeterIn; // total inches
-  final int hasta;
+  final double hasta;   // exact decimal, displayed rounded
   final int yoniIndex;
   final int yoniValue;
   final int aadaayaValue;
@@ -263,40 +263,41 @@ class _VastuResult {
 }
 
 // ─── Calculation helper (dimensions in inches) ───
+// hasta is kept as exact decimal; each formula floors the product before modulo
 _VastuResult _calculate(int lIn, int bIn, int ownerNak, double koluCm) {
   final areaIn = lIn * bIn;
   final perimeterIn = 2 * (lIn + bIn);
   final perimeterCm = perimeterIn * 2.54;
-  final hasta = (perimeterCm / koluCm).round();
+  final hasta = perimeterCm / koluCm; // exact, no rounding
 
-  // Yoni = (hasta × 3) % 8
-  final yoniRem = (hasta * 3) % 8;
+  // Yoni = floor(hasta × 3) % 8
+  final yoniRem = (hasta * 3).floor() % 8;
   final yoniValue = yoniRem == 0 ? 8 : yoniRem;
   final yoniIndex = yoniValue - 1;
 
-  // Aadaaya = (hasta × 8) % 12
-  final aadaayaRem = (hasta * 8) % 12;
+  // Aadaaya = floor(hasta × 8) % 12
+  final aadaayaRem = (hasta * 8).floor() % 12;
   final aadaayaValue = aadaayaRem == 0 ? 12 : aadaayaRem;
 
-  // Vyaya = (hasta × 3) % 14
-  final vyayaRem = (hasta * 3) % 14;
+  // Vyaya = floor(hasta × 3) % 14
+  final vyayaRem = (hasta * 3).floor() % 14;
   final vyayaValue = vyayaRem == 0 ? 14 : vyayaRem;
 
-  // Nakshatra = (hasta × 8) % 27
-  final nakRem = (hasta * 8) % 27;
+  // Nakshatra = floor(hasta × 8) % 27
+  final nakRem = (hasta * 8).floor() % 27;
   final nakValue = nakRem == 0 ? 27 : nakRem;
   final nakIndex = nakValue - 1;
 
-  // Tithi = (hasta × 8) % 30
-  final tithiRem = (hasta * 8) % 30;
+  // Tithi = floor(hasta × 8) % 30
+  final tithiRem = (hasta * 8).floor() % 30;
   final tithiValue = tithiRem == 0 ? 30 : tithiRem;
 
-  // Vaara = (hasta × 8) % 7
-  final vaaraRem = (hasta * 8) % 7;
+  // Vaara = floor(hasta × 8) % 7
+  final vaaraRem = (hasta * 8).floor() % 7;
   final vaaraValue = vaaraRem == 0 ? 7 : vaaraRem;
 
-  // Vayassu = quotient((hasta × 8) / 27) % 5
-  final vayassuQuotient = (hasta * 8) ~/ 27;
+  // Vayassu = (floor(hasta × 8) ~/ 27) % 5
+  final vayassuQuotient = (hasta * 8).floor() ~/ 27;
   final vayassuRem = vayassuQuotient % 5;
   final vayassuIndex = vayassuRem == 0 ? 4 : vayassuRem - 1;
 
@@ -421,12 +422,13 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
 
     final results = <_VastuResult>[];
     final koluCm = _koluTypes[_koluIndex].cm;
-    final seen = <int>{}; // deduplicate by hasta value
+    final seen = <int>{}; // deduplicate by floor(hasta×8)
     for (int li = minLIn; li <= maxLIn; li++) {
       for (int bi = minBIn; bi <= maxBIn; bi++) {
         final perimCm = 2 * (li + bi) * 2.54;
-        final hasta = (perimCm / koluCm).round();
-        if (seen.add(hasta)) {
+        final hasta = perimCm / koluCm;
+        final key = (hasta * 8).floor();
+        if (seen.add(key)) {
           results.add(_calculate(li, bi, _ownerNakIndex!, koluCm));
         }
       }
@@ -923,7 +925,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           const SizedBox(height: 6),
 
           // Perimeter / Hasta
-          Text('${_v('peridhi')}: ${_fmtFtIn(r.perimeterIn)}  |  ${_v('hasta')}: ${r.hasta}  (${_v(_koluTypes[_koluIndex].id)})',
+          Text('${_v('peridhi')}: ${_fmtFtIn(r.perimeterIn)}  |  ${_v('hasta')}: ${r.hasta.round()}  (${_v(_koluTypes[_koluIndex].id)})',
             style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
