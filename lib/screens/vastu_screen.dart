@@ -684,6 +684,8 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                             style: TextStyle(fontSize: 10, color: kMuted)),
                           Text('• ${_v('vaara')} = (${_v('hasta')} × 8) % 7',
                             style: TextStyle(fontSize: 10, color: kMuted)),
+                          Text('• ${_v('vayassu')} = ((${_v('hasta')} × 8) ÷ 27) % 5',
+                            style: TextStyle(fontSize: 10, color: kMuted)),
                         ],
                       ),
                     ),
