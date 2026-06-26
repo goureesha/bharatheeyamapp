@@ -657,6 +657,13 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
     String _fmtDate(DateTime d) => '${d.day.toString().padLeft(2, "0")}-${d.month.toString().padLeft(2, "0")}-${d.year}';
 
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // ── Current Dasha Details for both ──
+      _buildCurrentDashaInfo(br, bName, Icons.female, kOrange),
+      const SizedBox(height: 10),
+      _buildCurrentDashaInfo(gr, gName, Icons.male, kTeal),
+      const SizedBox(height: 14),
+      Divider(color: kBorder),
+      const SizedBox(height: 10),
       // Verdict
       Container(
         padding: const EdgeInsets.all(10),
@@ -702,6 +709,86 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
         )),
       ],
     ]));
+  }
+
+  /// Build current running dasha info for a person
+  Widget _buildCurrentDashaInfo(KundaliResult r, String name, IconData icon, Color accent) {
+    final now = DateTime.now();
+    String _fmtD(DateTime d) => '${d.day.toString().padLeft(2, "0")}-${d.month.toString().padLeft(2, "0")}-${d.year}';
+
+    // Find current Mahadasha
+    String mdLord = '', mdEnd = '';
+    String adLord = '', adEnd = '';
+    String pdLord = '', pdEnd = '';
+    String sdLord = '', sdEnd = '';
+
+    for (final md in r.dashas) {
+      if (now.isBefore(md.end) && (now.isAfter(md.start) || now.isAtSameMomentAs(md.start))) {
+        mdLord = trAll(md.lord);
+        mdEnd = _fmtD(md.end);
+        for (final ad in md.antardashas) {
+          if (now.isBefore(ad.end) && (now.isAfter(ad.start) || now.isAtSameMomentAs(ad.start))) {
+            adLord = trAll(ad.lord);
+            adEnd = _fmtD(ad.end);
+            for (final pd in ad.antardashas) {
+              if (now.isBefore(pd.end) && (now.isAfter(pd.start) || now.isAtSameMomentAs(pd.start))) {
+                pdLord = trAll(pd.lord);
+                pdEnd = _fmtD(pd.end);
+                for (final sd in pd.antardashas) {
+                  if (now.isBefore(sd.end) && (now.isAfter(sd.start) || now.isAtSameMomentAs(sd.start))) {
+                    sdLord = trAll(sd.lord);
+                    sdEnd = _fmtD(sd.end);
+                    break;
+                  }
+                }
+                break;
+              }
+            }
+            break;
+          }
+        }
+        break;
+      }
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: accent.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: accent.withOpacity(0.2)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(icon, size: 18, color: accent),
+          const SizedBox(width: 6),
+          Text(name, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: accent)),
+          const Spacer(),
+          Text(AppLocale.l('currentDasha'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: kMuted)),
+        ]),
+        const SizedBox(height: 8),
+        if (mdLord.isNotEmpty)
+          _dashaRow(AppLocale.l('mahadasha'), mdLord, mdEnd, FontWeight.w900, 12),
+        if (adLord.isNotEmpty)
+          _dashaRow(AppLocale.l('bhukti'), adLord, adEnd, FontWeight.w700, 11),
+        if (pdLord.isNotEmpty)
+          _dashaRow(AppLocale.l('pratyantara'), pdLord, pdEnd, FontWeight.w600, 11),
+        if (sdLord.isNotEmpty)
+          _dashaRow(AppLocale.l('sookshma'), sdLord, sdEnd, FontWeight.w600, 10),
+      ]),
+    );
+  }
+
+  Widget _dashaRow(String label, String lord, String endDate, FontWeight fw, double fs) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 3),
+      child: Row(children: [
+        SizedBox(width: 80, child: Text(label, style: TextStyle(fontSize: fs, fontWeight: FontWeight.w600, color: kMuted))),
+        Text(lord, style: TextStyle(fontSize: fs, fontWeight: fw, color: kText)),
+        const Spacer(),
+        Text('→ $endDate', style: TextStyle(fontSize: fs - 1, fontWeight: FontWeight.w600, color: kMuted)),
+      ]),
+    );
   }
 
   Widget _buildPersonSummary(KundaliResult r, String name, DateTime dob, int hour, int minute, String ampm, String place) {
