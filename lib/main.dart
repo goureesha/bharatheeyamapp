@@ -11,6 +11,7 @@ import 'widgets/common.dart';
 import 'services/subscription_service.dart';
 import 'services/trusted_time_service.dart';
 import 'services/google_auth_service.dart';
+import 'core/transit_cache.dart';
 
 import 'services/device_binding_service.dart';
 import 'services/firebase_service.dart';
@@ -67,6 +68,8 @@ Future<void> main() async {
     await _initAuthAndBinding();
     TesterService.init();
     _deferredInit();
+    // Preload 10 years of planet transit data in background
+    TransitCache.preloadRange();
     // Check device-level block (installs collection) — runs AFTER trackInstall
     await DeviceBindingService.checkDeviceBlock();
     // Trigger UI rebuild if device is blocked
