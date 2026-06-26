@@ -454,7 +454,18 @@ class AstroCalculator {
               pdCum = nextPdCum;
               final pdDays = (pdY * 365.25).round();
               final pe = cpd.add(Duration(days: pdDays));
-              pratyantars.add(DashaEntry(lord: dashaLords[ip], start: cpd, end: pe));
+              // Sookshma dashas within partial pratyantara
+              final List<DashaEntry> sookshmas = [];
+              DateTime csd = cpd;
+              for (int k2 = 0; k2 < 9; k2++) {
+                final is2 = (ip + k2) % 9;
+                double sdY = (totalMdYears * dashaYears[ia] * dashaYears[ip] * dashaYears[is2]) / (120.0 * 120.0 * 120.0);
+                final sdDays = (sdY * 365.25).round();
+                final se = csd.add(Duration(days: sdDays));
+                sookshmas.add(DashaEntry(lord: dashaLords[is2], start: csd, end: se));
+                csd = se;
+              }
+              pratyantars.add(DashaEntry(lord: dashaLords[ip], start: cpd, end: pe, antardashas: sookshmas));
               cpd = pe;
             }
           } else {
@@ -464,7 +475,20 @@ class AstroCalculator {
               double pdY = (totalMdYears * dashaYears[ia] * dashaYears[ip]) / (120.0 * 120.0);
               final pdDays = (pdY * 365.25).round();
               final pe = cpd.add(Duration(days: pdDays));
-              pratyantars.add(DashaEntry(lord: dashaLords[ip], start: cpd, end: pe));
+
+              // Sookshma dashas
+              final List<DashaEntry> sookshmas = [];
+              DateTime csd = cpd;
+              for (int k2 = 0; k2 < 9; k2++) {
+                final is2 = (ip + k2) % 9;
+                double sdY = (totalMdYears * dashaYears[ia] * dashaYears[ip] * dashaYears[is2]) / (120.0 * 120.0 * 120.0);
+                final sdDays = (sdY * 365.25).round();
+                final se = csd.add(Duration(days: sdDays));
+                sookshmas.add(DashaEntry(lord: dashaLords[is2], start: csd, end: se));
+                csd = se;
+              }
+
+              pratyantars.add(DashaEntry(lord: dashaLords[ip], start: cpd, end: pe, antardashas: sookshmas));
               cpd = pe;
             }
           }
@@ -487,7 +511,20 @@ class AstroCalculator {
             double pdY = (dashaYears[im] * dashaYears[ia] * dashaYears[ip]) / (120.0 * 120.0);
             final pdDays = (pdY * 365.25).round();
             final pe = cpd.add(Duration(days: pdDays));
-            pratyantars.add(DashaEntry(lord: dashaLords[ip], start: cpd, end: pe));
+
+            // Sookshma dashas within pratyantara
+            final List<DashaEntry> sookshmas = [];
+            DateTime csd = cpd;
+            for (int k2 = 0; k2 < 9; k2++) {
+              final is2 = (ip + k2) % 9;
+              double sdY = (dashaYears[im] * dashaYears[ia] * dashaYears[ip] * dashaYears[is2]) / (120.0 * 120.0 * 120.0);
+              final sdDays = (sdY * 365.25).round();
+              final se = csd.add(Duration(days: sdDays));
+              sookshmas.add(DashaEntry(lord: dashaLords[is2], start: csd, end: se));
+              csd = se;
+            }
+
+            pratyantars.add(DashaEntry(lord: dashaLords[ip], start: cpd, end: pe, antardashas: sookshmas));
             cpd = pe;
           }
 
