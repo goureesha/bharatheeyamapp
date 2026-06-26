@@ -914,7 +914,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Hasta number + shubha badge
+          // Header: L × B with area and shubha badge
           Row(
             children: [
               Container(
@@ -928,11 +928,14 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${_v('hasta')}: ${r.hasta}  (${_v(_koluTypes[_koluIndex].id)})',
+                  '${_cmToFtIn(r.minLenCm)} × ${_cmToFtIn(r.maxBreCm)}',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900,
                     color: isExcellent ? Colors.green.shade700 : kPurple2),
                 ),
               ),
+              const SizedBox(width: 8),
+              Text('${(r.minLenCm * r.maxBreCm / (30.48 * 30.48)).toStringAsFixed(1)} ${_v('sqAdi')}',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
               const Spacer(),
               if (isExcellent)
                 Container(
@@ -951,24 +954,9 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           ),
           const SizedBox(height: 6),
 
-          // L×B range in feet′inches″ and cm
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: kBg,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('${_v('length')}: ${_cmToFtIn(r.minLenCm)} – ${_cmToFtIn(r.maxLenCm)}  (${_fmtCm(r.minLenCm)} – ${_fmtCm(r.maxLenCm)})',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kText)),
-              const SizedBox(height: 2),
-              Text('${_v('breadth')}: ${_cmToFtIn(r.minBreCm)} – ${_cmToFtIn(r.maxBreCm)}  (${_fmtCm(r.minBreCm)} – ${_fmtCm(r.maxBreCm)})',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kText)),
-              const SizedBox(height: 2),
-              Text('${_v('peridhi')}: ${_fmtCm(r.perimeterCm)}  |  L+B = ${_fmtCm(r.sumCm)}',
-                style: TextStyle(fontSize: 10, color: kMuted, fontWeight: FontWeight.w600)),
-            ]),
-          ),
+          // Perimeter / Hasta
+          Text('${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)}  |  ${_v('hasta')}: ${r.hasta}  (${_v(_koluTypes[_koluIndex].id)})',
+            style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
           // Yoni
