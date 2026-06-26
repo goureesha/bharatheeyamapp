@@ -78,7 +78,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'errMinMax': 'ಕನಿಷ್ಠ ≤ ಗರಿಷ್ಠ ಇರಬೇಕು',
     'errRange': 'ವ್ಯಾಪ್ತಿ ತುಂಬಾ ದೊಡ್ಡದು, ಕಡಿಮೆ ಮಾಡಿ',
     'errMaxSqft': 'ಗರಿಷ್ಠ 5000 ಚ.ಅಡಿ',
-    'koluType': 'ಕೋಲು ಪ್ರಕಾರ', 'angula': 'ಅಂಗುಲ',
+    'koluType': 'ಕೋಲು ಪ್ರಕಾರ', 'angula': 'ಅಂಗುಲ', 'custom': 'ಕಸ್ಟಮ್', 'koluName': 'ಕೋಲು ಹೆಸರು',
     'kishku': 'ಕಿಷ್ಕು', 'prajapatya': 'ಪ್ರಾಜಾಪತ್ಯ', 'dhanurmushti': 'ಧನುರ್ಮುಷ್ಟಿ', 'dhanugraha': 'ಧನುರ್ಗ್ರಹ',
     'prachya': 'ಪ್ರಾಚ್ಯ', 'vaideha': 'ವೈದೇಹ', 'vaipulya': 'ವೈಪುಲ್ಯ', 'prakeerna': 'ಪ್ರಕೀರ್ಣ',
     'vayassu': 'ವಯಸ್ಸು', 'v0': 'ಬಾಲ', 'v1': 'ಕೌಮಾರ', 'v2': 'ಯೌವನ', 'v3': 'ಮಧ್ಯರ್ಕ', 'v4': 'ನಿಧನ',
@@ -110,7 +110,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'errMinMax': 'न्यूनतम ≤ अधिकतम होना चाहिए',
     'errRange': 'रेंज बहुत बड़ी है, कम करें',
     'errMaxSqft': 'अधिकतम 5000 वर्ग.फीट',
-    'koluType': 'कोलु प्रकार', 'angula': 'अंगुल',
+    'koluType': 'कोलु प्रकार', 'angula': 'अंगुल', 'custom': 'कस्टम', 'koluName': 'कोलु नाम',
     'kishku': 'किष्कु', 'prajapatya': 'प्राजापत्य', 'dhanurmushti': 'धनुर्मुष्टि', 'dhanugraha': 'धनुर्ग्रह',
     'prachya': 'प्राच्य', 'vaideha': 'वैदेह', 'vaipulya': 'वैपुल्य', 'prakeerna': 'प्रकीर्ण',
     'vayassu': 'वयस्सु', 'v0': 'बाल', 'v1': 'कौमार', 'v2': 'यौवन', 'v3': 'मध्यर्क', 'v4': 'निधन',
@@ -142,7 +142,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'errMinMax': 'குறைந்தபட்சம் ≤ அதிகபட்சம்',
     'errRange': 'வரம்பு மிகப் பெரியது',
     'errMaxSqft': 'அதிகபட்சம் 5000 ச.அடி',
-    'koluType': 'கோலு வகை', 'angula': 'அங்குலம்',
+    'koluType': 'கோலு வகை', 'angula': 'அங்குலம்', 'custom': 'கஸ்டம்', 'koluName': 'கோலு பெயர்',
     'kishku': 'கிஷ்கு', 'prajapatya': 'ப்ராஜாபத்ய', 'dhanurmushti': 'தனுர்முஷ்டி', 'dhanugraha': 'தனுர்க்ரஹ',
     'prachya': 'ப்ராச்ய', 'vaideha': 'வைதேஹ', 'vaipulya': 'வைபுல்ய', 'prakeerna': 'ப்ரகீர்ண',
     'vayassu': 'வயஸ்ஸு', 'v0': 'பால', 'v1': 'கௌமார', 'v2': 'யௌவன', 'v3': 'மத்யர்க', 'v4': 'நிதன',
@@ -174,7 +174,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'errMinMax': 'కనిష్ఠం ≤ గరిష్ఠం ఉండాలి',
     'errRange': 'పరిధి చాలా పెద్దది',
     'errMaxSqft': 'గరిష్ఠం 5000 చ.అడి',
-    'koluType': 'కోలు రకం', 'angula': 'అంగుళం',
+    'koluType': 'కోలు రకం', 'angula': 'అంగుళం', 'custom': 'కస్టమ్', 'koluName': 'కోలు పేరు',
     'kishku': 'కిష్కు', 'prajapatya': 'ప్రాజాపత్య', 'dhanurmushti': 'ధనుర్ముష్టి', 'dhanugraha': 'ధనుర్గ్రహ',
     'prachya': 'ప్రాచ్య', 'vaideha': 'వైదేహ', 'vaipulya': 'వైపుల్య', 'prakeerna': 'ప్రకీర్ణ',
     'vayassu': 'వయస్సు', 'v0': 'బాల', 'v1': 'కౌమార', 'v2': 'యౌవన', 'v3': 'మధ్యర్క', 'v4': 'నిధన',
@@ -206,7 +206,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
     'errMinMax': 'കുറഞ്ഞത് ≤ കൂടിയത് ആയിരിക്കണം',
     'errRange': 'പരിധി വളരെ വലുതാണ്',
     'errMaxSqft': 'കൂടിയത് 5000 ച.അടി',
-    'koluType': 'കോലു തരം', 'angula': 'അംഗുലം',
+    'koluType': 'കോലു തരം', 'angula': 'അംഗുലം', 'custom': 'കസ്റ്റം', 'koluName': 'കോലു പേര്',
     'kishku': 'കിഷ്കു', 'prajapatya': 'പ്രാജാപത്യ', 'dhanurmushti': 'ധനുർമുഷ്ടി', 'dhanugraha': 'ധനുർഗ്രഹ',
     'prachya': 'പ്രാച്യ', 'vaideha': 'വൈദേഹ', 'vaipulya': 'വൈപുല്യ', 'prakeerna': 'പ്രകീർണ',
     'vayassu': 'വയസ്സ്', 'v0': 'ബാല', 'v1': 'കൗമാര', 'v2': 'യൗവന', 'v3': 'മധ്യർക', 'v4': 'നിധന',
@@ -361,7 +361,19 @@ class VastuScreen extends StatefulWidget {
 class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStateMixin {
   late TabController _tabCtrl;
   int? _ownerNakIndex;
-  int _koluIndex = 0; // default: Kishku (24 angula)
+  int _koluIndex = 0; // default: Kishku (24 angula), -1 = custom
+  final _customKoluNameCtrl = TextEditingController(text: '');
+  final _customKoluCmCtrl = TextEditingController(text: '72');
+
+  // Get effective kolu cm and display name
+  double get _effectiveKoluCm {
+    if (_koluIndex == -1) return double.tryParse(_customKoluCmCtrl.text) ?? 72;
+    return _koluTypes[_koluIndex].cm;
+  }
+  String get _effectiveKoluName {
+    if (_koluIndex == -1) return _customKoluNameCtrl.text.isNotEmpty ? _customKoluNameCtrl.text : _v('custom');
+    return _v(_koluTypes[_koluIndex].id);
+  }
 
   final _minLenCtrl = TextEditingController(text: '30');
   final _maxLenCtrl = TextEditingController(text: '40');
@@ -396,6 +408,8 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     _maxBreadthCtrl.dispose();
     _minSqftCtrl.dispose();
     _maxSqftCtrl.dispose();
+    _customKoluNameCtrl.dispose();
+    _customKoluCmCtrl.dispose();
     super.dispose();
   }
 
@@ -427,7 +441,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
       return;
     }
 
-    final koluCm = _koluTypes[_koluIndex].cm;
+    final koluCm = _effectiveKoluCm;
     // Convert feet to cm (1 foot = 30.48 cm)
     final minLenCm = minL * 30.48;
     final maxLenCm = maxL * 30.48;
@@ -475,7 +489,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     }
 
     final results = <_VastuResult>[];
-    final koluCm = _koluTypes[_koluIndex].cm;
+    final koluCm = _effectiveKoluCm;
     final seen = <int>{};
     for (int sq = minSq; sq <= maxSq; sq++) {
       final pairs = _factorPairs(sq);
@@ -625,18 +639,56 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    items: List.generate(_koluTypes.length, (i) {
-                      final k = _koluTypes[i];
-                      return DropdownMenuItem(
-                        value: i,
-                        child: Text(
-                          '${_v(k.id)}  (${k.angula} ${_v('angula')} = ${k.cm.toInt()} cm)',
-                          style: TextStyle(fontSize: 13, color: kText),
-                        ),
-                      );
-                    }),
+                    items: [
+                      ...List.generate(_koluTypes.length, (i) {
+                        final k = _koluTypes[i];
+                        return DropdownMenuItem(
+                          value: i,
+                          child: Text(
+                            '${_v(k.id)}  (${k.angula} ${_v('angula')} = ${k.cm.toInt()} cm)',
+                            style: TextStyle(fontSize: 13, color: kText),
+                          ),
+                        );
+                      }),
+                      DropdownMenuItem(
+                        value: -1,
+                        child: Text('✏️ ${_v('custom')}', style: TextStyle(fontSize: 13, color: kOrange, fontWeight: FontWeight.w700)),
+                      ),
+                    ],
                     onChanged: (v) => setState(() { _koluIndex = v!; _searched = false; _results = []; }),
                   ),
+                  if (_koluIndex == -1) ...[
+                    const SizedBox(height: 8),
+                    Row(children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _customKoluNameCtrl,
+                          decoration: InputDecoration(
+                            labelText: _v('koluName'),
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          style: TextStyle(fontSize: 13, color: kText),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 100,
+                        child: TextField(
+                          controller: _customKoluCmCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'cm',
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          style: TextStyle(fontSize: 13, color: kText),
+                        ),
+                      ),
+                    ]),
+                  ],
                 ],
               ),
             ),
@@ -672,9 +724,9 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                           const SizedBox(height: 4),
                           Text('• ${_v('peridhi')} (cm) = 2 × (${_v('length').split(' /')[0].split(' (')[0]} + ${_v('breadth').split(' /')[0].split(' (')[0]}) × 30.48',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${_v('hasta')} = ${_v('peridhi')} (cm) ÷ ${_koluTypes[_koluIndex].cm.toInt()}  (whole number only)',
+                          Text('• ${_v('hasta')} = ${_v('peridhi')} (cm) ÷ ${_effectiveKoluCm.toInt()}  (whole number only)',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• 1 foot = 30.48 cm  |  1 ${_v(_koluTypes[_koluIndex].id)} = ${_koluTypes[_koluIndex].angula} ${_v('angula')} = ${_koluTypes[_koluIndex].cm.toInt()} cm',
+                          Text('• 1 foot = 30.48 cm  |  1 $_effectiveKoluName = ${_effectiveKoluCm.toInt()} cm',
                             style: TextStyle(fontSize: 10, color: kOrange, fontWeight: FontWeight.w700)),
                           Text('• ${_v('yoni')} = (${_v('hasta')} × 3) % 8',
                             style: TextStyle(fontSize: 10, color: kMuted)),
@@ -957,7 +1009,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           const SizedBox(height: 6),
 
           // Perimeter / Hasta
-          Text('${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)} (${_fmtCm(r.perimeterCm)})  |  ${_v('hasta')}: ${r.hasta}  (${_v(_koluTypes[_koluIndex].id)})',
+          Text('${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)} (${_fmtCm(r.perimeterCm)})  |  ${_v('hasta')}: ${r.hasta}  ($_effectiveKoluName)',
             style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
