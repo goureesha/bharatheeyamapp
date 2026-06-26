@@ -49,6 +49,7 @@ Future<void> main() async {
     GoogleAuthService.signInSilently(),
     AppThemes.loadTheme(),
     ChartStyle.loadStyle(),
+    SamshakaMode.load(),
     AppLocale.loadLang(),
     LocationService.init(),
   ]);

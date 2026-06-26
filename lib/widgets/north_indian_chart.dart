@@ -369,13 +369,20 @@ class NorthIndianChart extends StatelessWidget {
 
       // D1 (Rashi) and Bhava: show rashi degree; Amshas: show amsha degree
       final bool showRashiDeg = (varga == 1) || isBhava;
-      final double degToShow = showRashiDeg ? (info.longitude % 30) : (displayDeg ?? info.longitude % 30);
-      final totalSec = (degToShow * 3600).round();
-      int dg = totalSec ~/ 3600;
-      int mn = (totalSec % 3600) ~/ 60;
-      int sc = totalSec % 60;
-      if (showRashiDeg && dg == 30) { dg = 29; mn = 59; sc = 59; }
-      displayText = '$shortName $dg°${mn.toString().padLeft(2, '0')}\'';
+
+      if (showRashiDeg && SamshakaMode.isActive) {
+        // Samshaka mode: show navamsha rashi number instead of degree
+        final navNum = SamshakaMode.navamshaSign(info.longitude);
+        displayText = '$shortName $navNum';
+      } else {
+        final double degToShow = showRashiDeg ? (info.longitude % 30) : (displayDeg ?? info.longitude % 30);
+        final totalSec = (degToShow * 3600).round();
+        int dg = totalSec ~/ 3600;
+        int mn = (totalSec % 3600) ~/ 60;
+        int sc = totalSec % 60;
+        if (showRashiDeg && dg == 30) { dg = 29; mn = 59; sc = 59; }
+        displayText = '$shortName $dg°${mn.toString().padLeft(2, '0')}\'';
+      }
 
       if (isVakri) displayText = '$displayText↩';
       if (isCombust) displayText = '($displayText)';

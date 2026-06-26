@@ -227,6 +227,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Divider(color: kBorder),
                     const SizedBox(height: 24),
 
+                    // Samshaka Kundali toggle
+                    SectionTitle('${AppLocale.l('samshakaTitle')} / Samshaka Kundali'),
+                    const SizedBox(height: 10),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: SamshakaMode.notifier,
+                      builder: (context, isActive, _) {
+                        return SwitchListTile(
+                          value: isActive,
+                          onChanged: (val) => SamshakaMode.toggle(val),
+                          activeColor: kPurple2,
+                          title: Text(AppLocale.l('samshakaLabel'), style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
+                          subtitle: Text(
+                            AppLocale.l('samshakaDesc'),
+                            style: TextStyle(fontSize: 11, color: kMuted),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+                    Divider(color: kBorder),
+                    const SizedBox(height: 24),
+
                     // Language selection
                     SectionTitle(AppLocale.l('language')),
                     const SizedBox(height: 10),

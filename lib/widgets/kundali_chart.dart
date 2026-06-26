@@ -536,7 +536,11 @@ class KundaliChart extends StatelessWidget {
       final bool showDeg = (varga == 1) || isBhava;
       final bool showAmshaDeg = (varga != 1) && !isBhava;
 
-      if (showDeg) {
+      if (showDeg && SamshakaMode.isActive) {
+        // Samshaka mode: show navamsha rashi number instead of degree
+        final navNum = SamshakaMode.navamshaSign(info.longitude);
+        displayText = '$shortName $navNum';
+      } else if (showDeg) {
         // Degree within D1 rashi
         final degInRashi = info.longitude % 30;
         final totalSec = (degInRashi * 3600).round();
