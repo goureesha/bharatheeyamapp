@@ -95,8 +95,33 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
         return m;
       }
 
+      // Extract bhava house (1-12) for each planet based on bhava cusps
+      Map<String, int> extractBhavaHouses(KundaliResult r) {
+        final m = <String, int>{};
+        final cusps = r.bhavas; // 12 house cusps (longitudes)
+        for (final e in r.planets.entries) {
+          if (e.key == 'ಲಗ್ನ') continue; // skip lagna
+          final pLon = e.value.longitude;
+          int house = 1;
+          for (int i = 0; i < 12; i++) {
+            final start = cusps[i];
+            final end = cusps[(i + 1) % 12];
+            if (end > start) {
+              if (pLon >= start && pLon < end) { house = i + 1; break; }
+            } else {
+              // wraps around 360°
+              if (pLon >= start || pLon < end) { house = i + 1; break; }
+            }
+          }
+          m[e.key] = house;
+        }
+        return m;
+      }
+
       final bRashis = extractRashis(brideR);
       final gRashis = extractRashis(groomR);
+      final bBhavaHouses = extractBhavaHouses(brideR);
+      final gBhavaHouses = extractBhavaHouses(groomR);
       final bLagnaRashi = brideR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
       final gLagnaRashi = groomR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
       final bMoonRashi = brideR.planets['ಚಂದ್ರ']?.rashiIndex ?? 0;
@@ -115,6 +140,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
         brideNavLagnaRashi: bNavLagna, brideNavMoonRashi: bNavMoon,
         groomNakIdx: gNakIdx, groomMoonRashi: gMoonRashi, groomLagnaRashi: gLagnaRashi, groomPlanetRashis: gRashis,
         groomNavLagnaRashi: gNavLagna, groomNavMoonRashi: gNavMoon,
+        brideBhavaHouses: bBhavaHouses, groomBhavaHouses: gBhavaHouses,
       );
 
       setState(() {
