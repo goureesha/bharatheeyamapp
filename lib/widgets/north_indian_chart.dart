@@ -371,9 +371,10 @@ class NorthIndianChart extends StatelessWidget {
       final bool showRashiDeg = (varga == 1) || isBhava;
 
       if (showRashiDeg && SamshakaMode.isActive) {
-        // Samshaka mode: show navamsha rashi number instead of degree
+        // Samshaka mode: show navamsha rashi number with full planet name
         final navNum = SamshakaMode.navamshaSign(info.longitude);
-        displayText = '$shortName $navNum';
+        final fullName = appPlanetNames[name] ?? name;
+        displayText = '$fullName $navNum';
       } else {
         final double degToShow = showRashiDeg ? (info.longitude % 30) : (displayDeg ?? info.longitude % 30);
         final totalSec = (degToShow * 3600).round();

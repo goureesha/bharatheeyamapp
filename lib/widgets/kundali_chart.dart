@@ -537,9 +537,10 @@ class KundaliChart extends StatelessWidget {
       final bool showAmshaDeg = (varga != 1) && !isBhava;
 
       if (showDeg && SamshakaMode.isActive) {
-        // Samshaka mode: show navamsha rashi number instead of degree
+        // Samshaka mode: show navamsha rashi number with full planet name
         final navNum = SamshakaMode.navamshaSign(info.longitude);
-        displayText = '$shortName $navNum';
+        final fullName = appPlanetNames[name] ?? name;
+        displayText = '$fullName $navNum';
       } else if (showDeg) {
         // Degree within D1 rashi
         final degInRashi = info.longitude % 30;
