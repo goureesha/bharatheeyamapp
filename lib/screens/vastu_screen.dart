@@ -227,13 +227,16 @@ List<String> get _yoniNames => [_v('a1'), _v('a2'), _v('a3'), _v('a4'), _v('a5')
 List<String> get _taraNames => [_v('t1'), _v('t2'), _v('t3'), _v('t4'), _v('t5'), _v('t6'), _v('t7'), _v('t8'), _v('t9')];
 List<String> get _taraQuality => [_v('q1'), _v('q2'), _v('q3'), _v('q4'), _v('q3'), _v('q4'), _v('q3'), _v('q4'), _v('q2')];
 
-// ─── Shared result model (dimensions in inches) ───
+// ─── Shared result model (hasta-first approach) ───
 class _VastuResult {
-  final int lengthIn;   // total inches
-  final int breadthIn;  // total inches
-  final int areaIn;     // sq inches
-  final int perimeterIn; // total inches
-  final double hasta;   // exact decimal, displayed rounded
+  final int hasta;          // exact whole-number hasta
+  final double perimeterCm; // hasta × koluCm
+  final double sumCm;       // L + B in cm = perimeterCm / 2
+  // Valid length/breadth range in cm
+  final double minLenCm;
+  final double maxLenCm;
+  final double minBreCm;
+  final double maxBreCm;
   final int yoniIndex;
   final int yoniValue;
   final int aadaayaValue;
@@ -246,8 +249,9 @@ class _VastuResult {
   final int vayassuIndex;
 
   _VastuResult({
-    required this.lengthIn, required this.breadthIn, required this.areaIn,
-    required this.perimeterIn, required this.hasta,
+    required this.hasta, required this.perimeterCm, required this.sumCm,
+    required this.minLenCm, required this.maxLenCm,
+    required this.minBreCm, required this.maxBreCm,
     required this.yoniIndex, required this.yoniValue,
     required this.aadaayaValue,
     required this.vyayaValue, required this.aadaayaGtVyaya,
@@ -262,42 +266,40 @@ class _VastuResult {
   bool get isExcellent => isGoodYoni && isGoodTara && aadaayaGtVyaya && isGoodVayassu;
 }
 
-// ─── Calculation helper (dimensions in inches) ───
-// hasta is kept as exact decimal; each formula floors the product before modulo
-_VastuResult _calculate(int lIn, int bIn, int ownerNak, double koluCm) {
-  final areaIn = lIn * bIn;
-  final perimeterIn = 2 * (lIn + bIn);
-  final perimeterCm = perimeterIn * 2.54;
-  final hasta = perimeterCm / koluCm; // exact, no rounding
+// ─── Calculation from integer hasta ───
+_VastuResult _calcFromHasta(int hasta, double koluCm, int ownerNak,
+    double minLenCm, double maxLenCm, double minBreCm, double maxBreCm) {
+  final perimeterCm = hasta * koluCm;
+  final sumCm = perimeterCm / 2; // L + B
 
-  // Yoni = floor(hasta × 3) % 8
-  final yoniRem = (hasta * 3).floor() % 8;
+  // Valid L range: L ∈ [minLen, maxLen] and B = sumCm - L ∈ [minBre, maxBre]
+  final lMin = max(minLenCm, sumCm - maxBreCm);
+  final lMax = min(maxLenCm, sumCm - minBreCm);
+  final bMin = sumCm - lMax;
+  final bMax = sumCm - lMin;
+
+  // Shastra formulas — directly on integer hasta (no floor needed)
+  final yoniRem = (hasta * 3) % 8;
   final yoniValue = yoniRem == 0 ? 8 : yoniRem;
   final yoniIndex = yoniValue - 1;
 
-  // Aadaaya = floor(hasta × 8) % 12
-  final aadaayaRem = (hasta * 8).floor() % 12;
+  final aadaayaRem = (hasta * 8) % 12;
   final aadaayaValue = aadaayaRem == 0 ? 12 : aadaayaRem;
 
-  // Vyaya = floor(hasta × 3) % 14
-  final vyayaRem = (hasta * 3).floor() % 14;
+  final vyayaRem = (hasta * 3) % 14;
   final vyayaValue = vyayaRem == 0 ? 14 : vyayaRem;
 
-  // Nakshatra = floor(hasta × 8) % 27
-  final nakRem = (hasta * 8).floor() % 27;
+  final nakRem = (hasta * 8) % 27;
   final nakValue = nakRem == 0 ? 27 : nakRem;
   final nakIndex = nakValue - 1;
 
-  // Tithi = floor(hasta × 8) % 30
-  final tithiRem = (hasta * 8).floor() % 30;
+  final tithiRem = (hasta * 8) % 30;
   final tithiValue = tithiRem == 0 ? 30 : tithiRem;
 
-  // Vaara = floor(hasta × 8) % 7
-  final vaaraRem = (hasta * 8).floor() % 7;
+  final vaaraRem = (hasta * 8) % 7;
   final vaaraValue = vaaraRem == 0 ? 7 : vaaraRem;
 
-  // Vayassu = (floor(hasta × 8) ~/ 27) % 5
-  final vayassuQuotient = (hasta * 8).floor() ~/ 27;
+  final vayassuQuotient = (hasta * 8) ~/ 27;
   final vayassuRem = vayassuQuotient % 5;
   final vayassuIndex = vayassuRem == 0 ? 4 : vayassuRem - 1;
 
@@ -305,8 +307,9 @@ _VastuResult _calculate(int lIn, int bIn, int ownerNak, double koluCm) {
   final taraIndex = diff % 9;
 
   return _VastuResult(
-    lengthIn: lIn, breadthIn: bIn, areaIn: areaIn,
-    perimeterIn: perimeterIn, hasta: hasta,
+    hasta: hasta, perimeterCm: perimeterCm, sumCm: sumCm,
+    minLenCm: lMin, maxLenCm: lMax,
+    minBreCm: bMin, maxBreCm: bMax,
     yoniIndex: yoniIndex, yoniValue: yoniValue,
     aadaayaValue: aadaayaValue,
     vyayaValue: vyayaValue, aadaayaGtVyaya: aadaayaValue > vyayaValue,
@@ -314,6 +317,21 @@ _VastuResult _calculate(int lIn, int bIn, int ownerNak, double koluCm) {
     tithiValue: tithiValue, vaaraValue: vaaraValue,
     vayassuIndex: vayassuIndex,
   );
+}
+
+/// Format cm to feet′ inches″
+String _cmToFtIn(double cm) {
+  final totalInches = (cm / 2.54).round();
+  final ft = totalInches ~/ 12;
+  final inches = totalInches % 12;
+  if (inches == 0) return '$ft′';
+  return '$ft′ $inches″';
+}
+
+/// Format cm as readable string
+String _fmtCm(double cm) {
+  if (cm == cm.roundToDouble()) return '${cm.toInt()} cm';
+  return '${cm.toStringAsFixed(1)} cm';
 }
 
 // ─── Find factor pairs for a given area (min side >= 5 ft) ───
@@ -394,6 +412,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     return true;
   }
 
+  /// Hasta-first L×B search: find valid whole-number hastas, then back-calculate L×B
   void _searchLB() {
     if (!_validateNak()) return;
     final minL = int.tryParse(_minLenCtrl.text) ?? 10;
@@ -407,30 +426,31 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
       );
       return;
     }
-    // Iterate by inch: convert feet to inches
-    final minLIn = minL * 12;
-    final maxLIn = maxL * 12 + 11;
-    final minBIn = minB * 12;
-    final maxBIn = maxB * 12 + 11;
 
-    if ((maxLIn - minLIn + 1) * (maxBIn - minBIn + 1) > 200000) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_v('errRange')), backgroundColor: Colors.red),
-      );
-      return;
-    }
+    final koluCm = _koluTypes[_koluIndex].cm;
+    // Convert feet to cm (1 foot = 30.48 cm)
+    final minLenCm = minL * 30.48;
+    final maxLenCm = maxL * 30.48;
+    final minBreCm = minB * 30.48;
+    final maxBreCm = maxB * 30.48;
+
+    // Perimeter range in cm
+    final minPerimCm = 2 * (minLenCm + minBreCm);
+    final maxPerimCm = 2 * (maxLenCm + maxBreCm);
+
+    // Valid whole-number hasta range
+    final minHasta = (minPerimCm / koluCm).ceil();
+    final maxHasta = (maxPerimCm / koluCm).floor();
 
     final results = <_VastuResult>[];
-    final koluCm = _koluTypes[_koluIndex].cm;
-    final seen = <int>{}; // deduplicate by floor(hasta×8)
-    for (int li = minLIn; li <= maxLIn; li++) {
-      for (int bi = minBIn; bi <= maxBIn; bi++) {
-        final perimCm = 2 * (li + bi) * 2.54;
-        final hasta = perimCm / koluCm;
-        final key = (hasta * 8).floor();
-        if (seen.add(key)) {
-          results.add(_calculate(li, bi, _ownerNakIndex!, koluCm));
-        }
+    for (int h = minHasta; h <= maxHasta; h++) {
+      final sumCm = (h * koluCm) / 2;
+      // Check if valid L×B exists within user's range
+      final lMin = max(minLenCm, sumCm - maxBreCm);
+      final lMax = min(maxLenCm, sumCm - minBreCm);
+      if (lMin <= lMax) {
+        results.add(_calcFromHasta(h, koluCm, _ownerNakIndex!,
+            minLenCm, maxLenCm, minBreCm, maxBreCm));
       }
     }
     _sortAndSet(results);
@@ -456,12 +476,21 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
 
     final results = <_VastuResult>[];
     final koluCm = _koluTypes[_koluIndex].cm;
+    final seen = <int>{};
     for (int sq = minSq; sq <= maxSq; sq++) {
       final pairs = _factorPairs(sq);
       if (pairs.isEmpty) continue;
       for (final pair in pairs) {
-        // pair is in feet; convert to inches
-        results.add(_calculate(pair[0] * 12, pair[1] * 12, _ownerNakIndex!, koluCm));
+        // pair is in feet; calculate perimeter and hasta
+        final perimCm = 2 * (pair[0] + pair[1]) * 30.48;
+        final hastaExact = perimCm / koluCm;
+        final hasta = hastaExact.round();
+        if (seen.add(hasta)) {
+          final lenCm = pair[1] * 30.48; // longer side
+          final breCm = pair[0] * 30.48; // shorter side
+          results.add(_calcFromHasta(hasta, koluCm, _ownerNakIndex!,
+              breCm, lenCm, breCm, lenCm));
+        }
       }
     }
     _sortAndSet(results);
@@ -471,7 +500,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     results.sort((a, b) {
       if (a.isExcellent && !b.isExcellent) return -1;
       if (!a.isExcellent && b.isExcellent) return 1;
-      return a.areaIn.compareTo(b.areaIn);
+      return a.hasta.compareTo(b.hasta);
     });
     setState(() { _results = results; _searched = true; });
   }
@@ -641,11 +670,11 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                           Text(_v('formula'), style: TextStyle(
                             fontSize: 11, fontWeight: FontWeight.w800, color: kPurple2)),
                           const SizedBox(height: 4),
-                          Text('• ${_v('peridhi')} = 2 × (${_v('length').split(' /')[0].split(' (')[0]} + ${_v('breadth').split(' /')[0].split(' (')[0]})',
+                          Text('• ${_v('peridhi')} (cm) = 2 × (${_v('length').split(' /')[0].split(' (')[0]} + ${_v('breadth').split(' /')[0].split(' (')[0]}) × 30.48',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${_v('hasta')} = ${_v('peridhi')} ÷ ${_v(_koluTypes[_koluIndex].id)}',
+                          Text('• ${_v('hasta')} = ${_v('peridhi')} (cm) ÷ ${_koluTypes[_koluIndex].cm.toInt()}  (whole number only)',
                             style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• 1 ${_v(_koluTypes[_koluIndex].id)} = ${_koluTypes[_koluIndex].angula} ${_v('angula')} = ${_koluTypes[_koluIndex].cm.toInt()} cm',
+                          Text('• 1 foot = 30.48 cm  |  1 ${_v(_koluTypes[_koluIndex].id)} = ${_koluTypes[_koluIndex].angula} ${_v('angula')} = ${_koluTypes[_koluIndex].cm.toInt()} cm',
                             style: TextStyle(fontSize: 10, color: kOrange, fontWeight: FontWeight.w700)),
                           Text('• ${_v('yoni')} = (${_v('hasta')} × 3) % 8',
                             style: TextStyle(fontSize: 10, color: kMuted)),
@@ -885,7 +914,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          // Header: Hasta number + shubha badge
           Row(
             children: [
               Container(
@@ -899,13 +928,11 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${_fmtFtIn(r.lengthIn)} × ${_fmtFtIn(r.breadthIn)}',
+                  '${_v('hasta')}: ${r.hasta}  (${_v(_koluTypes[_koluIndex].id)})',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900,
                     color: isExcellent ? Colors.green.shade700 : kPurple2),
                 ),
               ),
-              const SizedBox(width: 8),
-              Text('${_fmtSqFt(r.areaIn)} ${_v('sqAdi')}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
               const Spacer(),
               if (isExcellent)
                 Container(
@@ -924,9 +951,24 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           ),
           const SizedBox(height: 6),
 
-          // Perimeter / Hasta
-          Text('${_v('peridhi')}: ${_fmtFtIn(r.perimeterIn)}  |  ${_v('hasta')}: ${r.hasta.round()}  (${_v(_koluTypes[_koluIndex].id)})',
-            style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+          // L×B range in feet′inches″ and cm
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: kBg,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('${_v('length')}: ${_cmToFtIn(r.minLenCm)} – ${_cmToFtIn(r.maxLenCm)}  (${_fmtCm(r.minLenCm)} – ${_fmtCm(r.maxLenCm)})',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kText)),
+              const SizedBox(height: 2),
+              Text('${_v('breadth')}: ${_cmToFtIn(r.minBreCm)} – ${_cmToFtIn(r.maxBreCm)}  (${_fmtCm(r.minBreCm)} – ${_fmtCm(r.maxBreCm)})',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kText)),
+              const SizedBox(height: 2),
+              Text('${_v('peridhi')}: ${_fmtCm(r.perimeterCm)}  |  L+B = ${_fmtCm(r.sumCm)}',
+                style: TextStyle(fontSize: 10, color: kMuted, fontWeight: FontWeight.w600)),
+            ]),
+          ),
           const SizedBox(height: 8),
 
           // Yoni

@@ -1,6 +1,7 @@
 {
   "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Plan for Gmail-based mandatory login, Firestore device tracking per user, block/unblock mechanism, and admin web dashboard to monitor users and devices.",
-  "updatedAt":  "2026-06-10T07:12:58.439529Z",
-  "requestFeedback":  true
+  "summary":  "Implementation plan for adding Rashi Phala and Yogas features to the Prashna section. Phase 1 prepares Brihad Jataka shlokas in Kannada for user verification. Phase 2 implements the UI. Includes open questions about tab placement and yoga types.",
+  "updatedAt":  "2026-06-25T12:06:38.062222700Z",
+  "requestFeedback":  true,
+  "userFacing":  true
 }
