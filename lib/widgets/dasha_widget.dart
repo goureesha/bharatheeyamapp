@@ -126,7 +126,7 @@ class _PratyantaraBlock extends StatelessWidget {
   }
 }
 
-// Level 4: Sookshma Dasha (purple accent, flat row)
+// Level 4: Sookshma Dasha (purple accent, expandable)
 class _SookshmaRow extends StatelessWidget {
   final DashaEntry sd;
   final String Function(DateTime) fmt;
@@ -134,20 +134,58 @@ class _SookshmaRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasSub = sd.antardashas.isNotEmpty;
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: kBorder.withOpacity(0.5))),
+          color: const Color(0xFFF9F5FF),
+        ),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 56, vertical: 0),
+          trailing: hasSub ? null : const SizedBox.shrink(),
+          childrenPadding: EdgeInsets.zero,
+          title: Row(children: [
+            Container(width: 2, height: 14, color: kPurple2.withOpacity(0.6),
+              margin: const EdgeInsets.only(right: 8)),
+            Text(appPlanetNames[sd.lord] ?? tr(sd.lord), style: TextStyle(
+              color: kPurple2, fontWeight: FontWeight.w700, fontSize: 12)),
+            const Spacer(),
+            Text(fmt(sd.end), style: TextStyle(
+              color: kMuted, fontSize: 11, fontWeight: FontWeight.w600)),
+          ]),
+          children: hasSub
+            ? sd.antardashas.map((pr) => _PranaRow(pr: pr, fmt: fmt)).toList()
+            : [],
+        ),
+      ),
+    );
+  }
+}
+
+// Level 5: Prana Dasha (rose/pink accent, flat row)
+class _PranaRow extends StatelessWidget {
+  final DashaEntry pr;
+  final String Function(DateTime) fmt;
+  const _PranaRow({required this.pr, required this.fmt});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: kBorder.withOpacity(0.5))),
-        color: const Color(0xFFF9F5FF),
+        border: Border(bottom: BorderSide(color: kBorder.withOpacity(0.3))),
+        color: const Color(0xFFFFF5F5),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 5),
       child: Row(children: [
-        Container(width: 2, height: 14, color: kPurple2.withOpacity(0.6),
-          margin: const EdgeInsets.only(right: 8)),
-        Text(appPlanetNames[sd.lord] ?? tr(sd.lord), style: TextStyle(
-          color: kPurple2, fontWeight: FontWeight.w700, fontSize: 12)),
+        Container(width: 2, height: 12, color: const Color(0xFFE53E3E).withOpacity(0.5),
+          margin: const EdgeInsets.only(right: 6)),
+        Text(appPlanetNames[pr.lord] ?? tr(pr.lord), style: TextStyle(
+          color: const Color(0xFFE53E3E), fontWeight: FontWeight.w600, fontSize: 11)),
         const Spacer(),
-        Text(fmt(sd.end), style: TextStyle(
-          color: kMuted, fontSize: 11, fontWeight: FontWeight.w600)),
+        Text(fmt(pr.end), style: TextStyle(
+          color: kMuted, fontSize: 10, fontWeight: FontWeight.w600)),
       ]),
     );
   }
