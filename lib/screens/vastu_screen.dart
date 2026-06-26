@@ -955,7 +955,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           const SizedBox(height: 6),
 
           // Perimeter / Hasta
-          Text('${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)}  |  ${_v('hasta')}: ${r.hasta}  (${_v(_koluTypes[_koluIndex].id)})',
+          Text('${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)} (${_fmtCm(r.perimeterCm)})  |  ${_v('hasta')}: ${r.hasta}  (${_v(_koluTypes[_koluIndex].id)})',
             style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
