@@ -51,6 +51,12 @@ class _InputScreenState extends State<InputScreen> {
   int? _loadedJanmaNakshatraIdx;
   List<String> _loadedGroupMembers = [];
 
+  // Udayadi Ghati input
+  bool _showGhatiInput = false;
+  final _ghatiCtrl = TextEditingController();
+  final _vighatiCtrl = TextEditingController();
+  String? _computedSunrise; // display sunrise for feedback
+
 
 
   @override
@@ -70,6 +76,8 @@ class _InputScreenState extends State<InputScreen> {
     _latCtrl.dispose();
     _lonCtrl.dispose();
     _tzCtrl.dispose();
+    _ghatiCtrl.dispose();
+    _vighatiCtrl.dispose();
     super.dispose();
   }
 
@@ -949,6 +957,95 @@ class _InputScreenState extends State<InputScreen> {
               ]),
             ),
           ),
+          const SizedBox(height: 8),
+
+          // Udayadi Ghati toggle + input
+          GestureDetector(
+            onTap: () => setState(() => _showGhatiInput = !_showGhatiInput),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: _showGhatiInput ? kPurple2.withOpacity(0.08) : kCard,
+                border: Border.all(color: _showGhatiInput ? kPurple2.withOpacity(0.3) : kBorder),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(children: [
+                Icon(Icons.sunny, size: 18, color: _showGhatiInput ? kOrange : kMuted),
+                const SizedBox(width: 10),
+                Expanded(child: Text(
+                  AppLocale.l('udayadiGhatiLabel'),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _showGhatiInput ? kPurple2 : kText),
+                )),
+                Icon(_showGhatiInput ? Icons.expand_less : Icons.expand_more, color: kMuted, size: 20),
+              ]),
+            ),
+          ),
+          if (_showGhatiInput) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: kCard,
+                border: Border.all(color: kPurple2.withOpacity(0.2)),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(AppLocale.l('udayadiGhatiHint'),
+                  style: TextStyle(fontSize: 11, color: kMuted, fontStyle: FontStyle.italic)),
+                const SizedBox(height: 10),
+                Row(children: [
+                  Expanded(child: TextField(
+                    controller: _ghatiCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: AppLocale.l('ghatiLabel'),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    style: TextStyle(fontSize: 14, color: kText),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: TextField(
+                    controller: _vighatiCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: AppLocale.l('vighatiLabel'),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    style: TextStyle(fontSize: 14, color: kText),
+                  )),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kPurple2,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: _applyGhatiTime,
+                    child: Text(AppLocale.l('applyLabel'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                  ),
+                ]),
+                if (_computedSunrise != null) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '☀️ ${AppLocale.l('sunriseLabel')}: $_computedSunrise',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.green.shade700),
+                    ),
+                  ),
+                ],
+              ]),
+            ),
+          ],
           const SizedBox(height: 14),
 
           // Searchable Place Selector (Offline + Online)
@@ -1205,6 +1302,61 @@ class _InputScreenState extends State<InputScreen> {
             ),
           ]),
         ],
+      ),
+    );
+  }
+  /// Calculate birth time from Udayadi Ghati/Vighati
+  void _applyGhatiTime() {
+    final ghati = int.tryParse(_ghatiCtrl.text) ?? 0;
+    final vighati = int.tryParse(_vighatiCtrl.text) ?? 0;
+
+    if (ghati == 0 && vighati == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocale.l('enterGhatiErr')), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    final lat = double.tryParse(_latCtrl.text) ?? 0;
+    final lon = double.tryParse(_lonCtrl.text) ?? 0;
+    final tzText = _tzCtrl.text.replaceAll('+', '');
+    final tz = double.tryParse(tzText) ?? 5.5;
+
+    // Get sunrise JD for the selected date
+    final srSs = Ephemeris.findSunriseSetForDate(
+      _dob.year, _dob.month, _dob.day, lat, lon, tzOffset: tz,
+    );
+    final sunriseJd = srSs[0];
+
+    // Convert ghati/vighati to JD offset
+    // 1 ghati = 24 min = 1/60 day, 1 vighati = 24 sec = 1/3600 day
+    final totalGhatis = ghati + (vighati / 60.0);
+    final jdBirth = sunriseJd + (totalGhatis / 60.0);
+
+    // Convert sunrise JD to local time string for display
+    final sunriseStr = formatTimeFromJd(sunriseJd, tzOffset: tz);
+
+    // Convert birth JD to local time
+    final localJd = jdBirth + 0.5 + (tz / 24.0);
+    double frac = localJd - localJd.floor();
+    frac = ((frac % 1.0) + 1.0) % 1.0;
+    int totalMinutes = (frac * 24 * 60).round();
+    if (totalMinutes >= 1440) totalMinutes -= 1440;
+    int h24 = totalMinutes ~/ 60;
+    int min = totalMinutes % 60;
+    if (h24 >= 24) h24 -= 24;
+
+    setState(() {
+      _ampm = h24 >= 12 ? 'PM' : 'AM';
+      _hour = h24 % 12 == 0 ? 12 : h24 % 12;
+      _minute = min;
+      _computedSunrise = sunriseStr;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${AppLocale.l('timeAdjusted')}: ${_hour.toString().padLeft(2, '0')}:${_minute.toString().padLeft(2, '0')} $_ampm'),
+        backgroundColor: Colors.green,
       ),
     );
   }
