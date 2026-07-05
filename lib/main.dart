@@ -287,11 +287,8 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
     if (!SubscriptionService.hasAccess ||
         SubscriptionService.isBlocked ||
         DeviceBindingService.isDeviceBlocked) {
-      // Force rebuild by toggling value — ValueNotifier only notifies on change
-      final current = deviceBindingNotifier.value;
-      deviceBindingNotifier.value = !current;
-      await Future.delayed(const Duration(milliseconds: 50));
-      deviceBindingNotifier.value = current;
+      // Force rebuild without toggling the MaterialApp key
+      if (mounted) setState(() {});
       debugPrint('🔒 Access revoked on resume — forcing UI rebuild');
     }
 
@@ -307,7 +304,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
           builder: (context, isBound, child) {
             return MaterialApp(
               scaffoldMessengerKey: scaffoldMessengerKey,
-              key: ValueKey('theme_${themeIndex}_bound_${isBound}'),
+              key: ValueKey('theme_$themeIndex'),
               title: AppLocale.l('appName'),
               debugShowCheckedModeBanner: false,
               locale: const Locale('en', 'IN'),
