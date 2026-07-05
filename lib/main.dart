@@ -225,6 +225,8 @@ class BharatheeyamApp extends StatefulWidget {
 }
 
 class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingObserver {
+  int _rebuildKey = 0; // Incremented only when access is actually revoked
+
   @override
   void initState() {
     super.initState();
@@ -287,8 +289,8 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
     if (!SubscriptionService.hasAccess ||
         SubscriptionService.isBlocked ||
         DeviceBindingService.isDeviceBlocked) {
-      // Force rebuild without toggling the MaterialApp key
-      if (mounted) setState(() {});
+      // Increment rebuild key to force MaterialApp recreation with blocked/support screen
+      if (mounted) setState(() => _rebuildKey++);
       debugPrint('🔒 Access revoked on resume — forcing UI rebuild');
     }
 
@@ -304,7 +306,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
           builder: (context, isBound, child) {
             return MaterialApp(
               scaffoldMessengerKey: scaffoldMessengerKey,
-              key: ValueKey('theme_$themeIndex'),
+              key: ValueKey('theme_${themeIndex}_bound_${isBound}_$_rebuildKey'),
               title: AppLocale.l('appName'),
               debugShowCheckedModeBanner: false,
               locale: const Locale('en', 'IN'),
