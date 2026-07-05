@@ -995,6 +995,14 @@ class _InputScreenState extends State<InputScreen> {
                   Expanded(child: TextField(
                     controller: _ghatiCtrl,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(2),
+                    ],
+                    onChanged: (v) {
+                      final n = int.tryParse(v) ?? 0;
+                      if (n > 60) _ghatiCtrl.text = '60';
+                    },
                     decoration: InputDecoration(
                       labelText: AppLocale.l('ghatiLabel'),
                       isDense: true,
@@ -1007,6 +1015,14 @@ class _InputScreenState extends State<InputScreen> {
                   Expanded(child: TextField(
                     controller: _vighatiCtrl,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(2),
+                    ],
+                    onChanged: (v) {
+                      final n = int.tryParse(v) ?? 0;
+                      if (n > 60) _vighatiCtrl.text = '60';
+                    },
                     decoration: InputDecoration(
                       labelText: AppLocale.l('vighatiLabel'),
                       isDense: true,
