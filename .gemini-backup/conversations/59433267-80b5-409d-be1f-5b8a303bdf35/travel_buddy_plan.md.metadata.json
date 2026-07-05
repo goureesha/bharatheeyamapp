@@ -1,6 +1,0 @@
-{
-  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Comprehensive implementation plan for a Travel Buddy app featuring team-based real-time location sharing, live maps, fuel/cost tracking, team chat, and travel blogging. Architecture uses Flutter + Firebase free tier + OpenStreetMap for zero monthly cost up to 500 users. Includes database schema, feature phases, sprint plan, cost estimates, revenue model, and risk mitigation.",
-  "updatedAt":  "2026-04-30T04:26:46.580531100Z",
-  "requestFeedback":  true
-}

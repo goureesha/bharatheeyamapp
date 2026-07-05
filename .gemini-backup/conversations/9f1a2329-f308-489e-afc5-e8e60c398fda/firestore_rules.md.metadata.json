@@ -1,6 +1,0 @@
-{
-  "artifactType": "ARTIFACT_TYPE_OTHER",
-  "summary": "Firestore security rules that allow authenticated users to read/write their own data in device_bindings, user_data, and appointments collections. Includes instructions for applying via Firebase Console.",
-  "updatedAt": "2026-04-09T13:52:26.896879900Z",
-  "requestFeedback": true
-}

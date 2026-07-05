@@ -1,49 +1,46 @@
-# Implementation Plan - Shloka-by-Shloka Translation of Remaining Upanishads (Batch 1)
+# Implementation Plan - Translate and Restructure Shiva Purana Rudra Parvati Chapters 3 and 4
 
-This plan details the next phase of the translation project: converting the remaining 371 chapters of other Upanishad books to the **shloka-by-shloka style** (Annapurna Chapter 1 style). 
+This plan describes the process to translate and restructure the Sanskrit verses/prose blocks of Shiva Purana Rudra Samhita (Parvati Khanda) Chapters 3 and 4 into a high-quality Kannada shloka-by-shloka (Sanskrit + Shabdartha + Bhavartha) format.
 
-Due to the volume of chapters (371 chapters total across 229 books), we will execute the refactoring in batches. This plan defines **Batch 1**, which focuses on key, highly-referenced Upanishad books.
+## Proposed Changes
 
-## Proposed Changes (Batch 1)
+We will modify the following 2 chapter files in `assets/data/chapters/` to fully translate and format all verses:
 
-We will modify the following 24 chapters to restructure them with shloka-by-shloka translations:
+- [purana_shiva_rudra_parvati_ch_3.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/purana_shiva_rudra_parvati_ch_3.txt) (43 verses + 1 colophon = 44 blocks)
+- [purana_shiva_rudra_parvati_ch_4.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/purana_shiva_rudra_parvati_ch_4.txt) (54 verses + 1 colophon = 55 blocks)
 
-### 1. Annapurna Upanishad (4 chapters)
-- [upanishad_annapurnaupan_ch_2.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_annapurnaupan_ch_2.txt)
-- [upanishad_annapurnaupan_ch_3.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_annapurnaupan_ch_3.txt)
-- [upanishad_annapurnaupan_ch_4.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_annapurnaupan_ch_4.txt)
-- [upanishad_annapurnaupan_ch_5.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_annapurnaupan_ch_5.txt)
-
-### 2. Aitareya Upanishad With Vedic Accents (5 chapters)
-- [upanishad_aitareyaupanvedic_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_aitareyaupanvedic_ch_1.txt) to [upanishad_aitareyaupanvedic_ch_5.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_aitareyaupanvedic_ch_5.txt)
-
-### 3. Brihadaranyaka Upanishad (6 chapters)
-- [upanishad_brihadaranyaka_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_brihadaranyaka_ch_1.txt) to [upanishad_brihadaranyaka_ch_6.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_brihadaranyaka_ch_6.txt)
-
-### 4. Chandogyopanishad.H (9 chapters)
-- [upanishad_chandogyopanishad_ch_1.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_chandogyopanishad_ch_1.txt) to [upanishad_chandogyopanishad_ch_9.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/upanishad_chandogyopanishad_ch_9.txt)
+### Restructuring Rules
+- Each block of Sanskrit is followed by:
+  - `"ಶಬ್ದಾರ್ಥ:"` header and a bulleted list of word meanings separated by hyphens (`-`).
+  - `"ಭಾವಾರ್ಥ:"` header and a clean Kannada explanation of the verse.
+- Ensure 0% foreign/Devanagari/Latin characters in the Shabdartha and Bhavartha sections.
 
 ---
 
-### Execution Strategy
+## Detailed Steps
 
-We will reuse the specialized `translation_helper` subagent to process these files sequentially in smaller subsets (to prevent rate limits):
-1. **Subset 1**: *Annapurna Upanishad* (Chapters 2–5)
-2. **Subset 2**: *Aitareya Upanishad With Vedic Accents* (Chapters 1–5)
-3. **Subset 3**: *Brihadaranyaka Upanishad* (Chapters 1–6)
-4. **Subset 4**: *Chandogyopanishad.H* (Chapters 1–9)
+### Step 1: Chunking the Input
+- We have chunked the 2 chapters into 7 JSON files in the scratch directory (14 blocks per batch, except Batch 7 which has 15).
 
-For each chapter:
-- Split the text into individual Sanskrit blocks (verses ending with standard dandas or vertical bars).
-- Generate a dedicated **ಶಬ್ದಾರ್ಥ:** (word-meanings) and **ಭಾವಾರ್ಥ:** (overall meaning) directly underneath each block.
-- Remove the old summary blocks from the end.
-- Standardize the punctuation and ensure exactly 0% non-permitted characters (no Latin/Devanagari characters).
+### Step 2: Translation Subagents
+- Define and invoke `shridhisha_translator` subagents to process the 7 batches.
+- We will execute them in sequential/paired waves to stay safely under rate limit thresholds.
+
+### Step 3: Merging & Reconstruction
+- Write a merge script `merge_shiva_rudra_parvati_ch3_4.py` to compile the translated batches back into their respective files.
+
+### Step 4: Verification
+- Write and run a validation script `validate_shiva_rudra_parvati_ch3_4.py` to verify block counts, headers, and script range.
+
+### Step 5: Git Operations
+- Stage the changes, commit, and push to GitHub.
+
+---
 
 ## Verification Plan
 
 ### Automated Tests
-- **Verification Script**: Run `verify_all_characters.py` to confirm 0 bad characters.
-- **Audit Script**: Run `aggregate_upanishad_status.py` to verify that the target books have successfully moved to the "Fully Shloka-by-Shloka" status.
+- Run `validate_shiva_rudra_parvati_ch3_4.py` to check block counts, character compliance, and formatting on both chapters.
 
 ### Manual Verification
-- Review random chapters from each of the 4 books to ensure translations are natural, grammatically correct, and properly aligned.
+- View sample lines of each merged file using `view_file` to verify readability, layout, and correct formatting.

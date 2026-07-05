@@ -1,6 +1,0 @@
-{
-  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Plan to eliminate planets screen lag using LRU memory cache + disk cache + background pre-fetch of adjacent years, instead of bundling 200 years of static data. Includes moving computation to a Dart Isolate for true UI parallelism.",
-  "updatedAt":  "2026-06-06T05:51:34.693118400Z",
-  "requestFeedback":  true
-}

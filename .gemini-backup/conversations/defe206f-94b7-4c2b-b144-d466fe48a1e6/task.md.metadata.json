@@ -1,6 +1,0 @@
-{
-  "artifactType":  "ARTIFACT_TYPE_TASK",
-  "summary":  "Tracks all remaining Kannada text that needs localization across 10+ files in the Bharatheeyam app. Organized by priority with notes about what should NOT be changed (engine keys).",
-  "updatedAt":  "2026-04-26T05:37:33.186175800Z",
-  "version":  "8"
-}

@@ -1,6 +1,0 @@
-{
-  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Implementation plan for a paste-based input dashboard where users copy columns from Excel and paste them into labeled text fields, then the website builds a dashboard from the pasted data.",
-  "updatedAt":  "2026-05-23T16:32:23.588681600Z",
-  "requestFeedback":  true
-}

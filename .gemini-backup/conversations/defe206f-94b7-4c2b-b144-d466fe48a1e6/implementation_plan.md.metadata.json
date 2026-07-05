@@ -1,7 +1,0 @@
-{
-  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Multi-language implementation plan covering 5 languages (Kannada + Hindi, Tamil, Telugu, Malayalam). Analyzes 2,115 lines of Kannada text across 41 files, categorized into astrological terms, UI labels, and domain content. Proposes a 3-phase approach: infrastructure (AppLocale + strings), settings UI, then screen-by-screen migration. Includes open questions about fonts, places, priority order, and PDF support.",
-  "updatedAt":  "2026-04-23T11:29:02.104100500Z",
-  "version":  "7",
-  "requestFeedback":  true
-}

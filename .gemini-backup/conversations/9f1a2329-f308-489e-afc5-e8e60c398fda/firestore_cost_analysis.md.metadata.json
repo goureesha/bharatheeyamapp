@@ -1,5 +1,0 @@
-{
-  "artifactType": "ARTIFACT_TYPE_OTHER",
-  "summary": "Complete Firestore usage and cost breakdown for the Bharatheeyam app at 2000 users scale. Covers all 4 Firestore services (device binding, cloud sync, tester service, appointment listener), calculates daily/monthly reads/writes/storage, and compares against Firebase free tier limits. Conclusion: 2000 users fits well within the FREE Spark plan.",
-  "updatedAt": "2026-04-09T13:41:57.462155300Z"
-}
