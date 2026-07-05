@@ -1,4 +1,4 @@
-- `[x]` Launch translation subagents for Shiva Rudra Parvati Chapters 3 and 4 Batches 1 to 7
-- `[x]` Merge all translated batches into Chapters 3 and 4
-- `[x]` Run validation script to verify character range and block counts
-- `[x]` Commit and push changes to GitHub
+- `[/]` Launch translation subagents for Shiva Rudra Parvati Chapters 5 and 6 Batches 1 to 8
+- `[ ]` Merge all translated batches into Chapters 5 and 6
+- `[ ]` Run validation script to verify character range and block counts
+- `[ ]` Commit and push changes to GitHub

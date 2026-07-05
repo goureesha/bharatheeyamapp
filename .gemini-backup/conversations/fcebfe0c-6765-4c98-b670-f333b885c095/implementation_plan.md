@@ -1,13 +1,13 @@
-# Implementation Plan - Translate and Restructure Shiva Purana Rudra Parvati Chapters 3 and 4
+# Implementation Plan - Translate and Restructure Shiva Purana Rudra Parvati Chapters 5 and 6
 
-This plan describes the process to translate and restructure the Sanskrit verses/prose blocks of Shiva Purana Rudra Samhita (Parvati Khanda) Chapters 3 and 4 into a high-quality Kannada shloka-by-shloka (Sanskrit + Shabdartha + Bhavartha) format.
+This plan describes the process to translate and restructure the Sanskrit verses/prose blocks of Shiva Purana Rudra Samhita (Parvati Khanda) Chapters 5 and 6 into a high-quality Kannada shloka-by-shloka (Sanskrit + Shabdartha + Bhavartha) format.
 
 ## Proposed Changes
 
 We will modify the following 2 chapter files in `assets/data/chapters/` to fully translate and format all verses:
 
-- [purana_shiva_rudra_parvati_ch_3.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/purana_shiva_rudra_parvati_ch_3.txt) (43 verses + 1 colophon = 44 blocks)
-- [purana_shiva_rudra_parvati_ch_4.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/purana_shiva_rudra_parvati_ch_4.txt) (54 verses + 1 colophon = 55 blocks)
+- [purana_shiva_rudra_parvati_ch_5.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/purana_shiva_rudra_parvati_ch_5.txt) (54 verses + 1 colophon = 55 blocks)
+- [purana_shiva_rudra_parvati_ch_6.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/purana_shiva_rudra_parvati_ch_6.txt) (58 verses + 1 colophon = 59 blocks)
 
 ### Restructuring Rules
 - Each block of Sanskrit is followed by:
@@ -20,17 +20,17 @@ We will modify the following 2 chapter files in `assets/data/chapters/` to fully
 ## Detailed Steps
 
 ### Step 1: Chunking the Input
-- We have chunked the 2 chapters into 7 JSON files in the scratch directory (14 blocks per batch, except Batch 7 which has 15).
+- We have chunked the 2 chapters into 8 JSON files in the scratch directory (14 blocks per batch, except Batch 8 which has 16).
 
 ### Step 2: Translation Subagents
-- Define and invoke `shridhisha_translator` subagents to process the 7 batches.
+- Define and invoke `shridhisha_translator` subagents to process the 8 batches.
 - We will execute them in sequential/paired waves to stay safely under rate limit thresholds.
 
 ### Step 3: Merging & Reconstruction
-- Write a merge script `merge_shiva_rudra_parvati_ch3_4.py` to compile the translated batches back into their respective files.
+- Write a merge script `merge_shiva_rudra_parvati_ch5_6.py` to compile the translated batches back into their respective files.
 
 ### Step 4: Verification
-- Write and run a validation script `validate_shiva_rudra_parvati_ch3_4.py` to verify block counts, headers, and script range.
+- Write and run a validation script `validate_shiva_rudra_parvati_ch5_6.py` to verify block counts, headers, and script range.
 
 ### Step 5: Git Operations
 - Stage the changes, commit, and push to GitHub.
@@ -40,7 +40,7 @@ We will modify the following 2 chapter files in `assets/data/chapters/` to fully
 ## Verification Plan
 
 ### Automated Tests
-- Run `validate_shiva_rudra_parvati_ch3_4.py` to check block counts, character compliance, and formatting on both chapters.
+- Run `validate_shiva_rudra_parvati_ch5_6.py` to check block counts, character compliance, and formatting on both chapters.
 
 ### Manual Verification
 - View sample lines of each merged file using `view_file` to verify readability, layout, and correct formatting.
