@@ -2275,6 +2275,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                   _tableRow([AppLocale.l('souraMasaGataDina'), pan.souraMasaGataDina]),
                   _tableRow([AppLocale.l('sunrise'), pan.sunrise]),
                   _tableRow([AppLocale.l('sunset'), pan.sunset]),
+                  _tableRow([AppLocale.l('divamana'), pan.divamana]),
+                  _tableRow([AppLocale.l('ratrimana'), pan.ratrimana]),
                   _tableRow([AppLocale.l('udayadiGhati'), pan.udayadiGhati]),
                   _tableRow([AppLocale.l('gataGhati'), pan.gataGhati]),
                   _tableRow([AppLocale.l('paramaGhati'), pan.paramaGhati]),
