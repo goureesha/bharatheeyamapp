@@ -884,6 +884,22 @@ class AstroCalculator {
       final jdAS = js + (nakDurationDays * (amrutaG / 60.0));
       final jdAE = js + (nakDurationDays * ((amrutaG + 4.0) / 60.0)); // 4 ghati duration
 
+      // Find the sunrise immediately preceding a given event JD
+      double eventSunrise(double eventJd) {
+        final utcMs = ((eventJd - 2440587.5) * 86400000).round();
+        final localDt = DateTime.fromMillisecondsSinceEpoch(utcMs, isUtc: true)
+            .add(Duration(milliseconds: (hourUtcOffset * 3600000).round()));
+        final srSs = Ephemeris.findSunriseSetForDate(
+            localDt.year, localDt.month, localDt.day, lat, lon, tzOffset: hourUtcOffset);
+        if (eventJd >= srSs[0]) return srSs[0];
+        final prevDt = localDt.subtract(const Duration(days: 1));
+        final prevSrSs = Ephemeris.findSunriseSetForDate(
+            prevDt.year, prevDt.month, prevDt.day, lat, lon, tzOffset: hourUtcOffset);
+        return prevSrSs[0];
+      }
+      final vishaSr = eventSunrise(jdVS);
+      final amrutaSr = eventSunrise(jdAS);
+
       final vishaStr = '${formatTimeFromJd(jdVS, tzOffset: hourUtcOffset)} - ${formatTimeFromJd(jdVE, tzOffset: hourUtcOffset)}';
       final amrutaStr = '${formatTimeFromJd(jdAS, tzOffset: hourUtcOffset)} - ${formatTimeFromJd(jdAE, tzOffset: hourUtcOffset)}';
 
@@ -1010,8 +1026,8 @@ class AstroCalculator {
         souraMasaGataDina: souraMasaGataDina,
         chandraMasa: chandraMasa,
         samvatsara: samvatsara,
-        vishaPraghati: '${formatGhati((jdVS - panchSr) * 60)} - ${formatGhati((jdVE - panchSr) * 60)} ($vishaStr)',
-        amrutaPraghati: '${formatGhati((jdAS - panchSr) * 60)} - ${formatGhati((jdAE - panchSr) * 60)} ($amrutaStr)',
+        vishaPraghati: '${formatGhati((jdVS - vishaSr) * 60)} - ${formatGhati((jdVE - vishaSr) * 60)} ($vishaStr)',
+        amrutaPraghati: '${formatGhati((jdAS - amrutaSr) * 60)} - ${formatGhati((jdAE - amrutaSr) * 60)} ($amrutaStr)',
         tithiEndTime: formatTimeFromJd(jdTEnd, tzOffset: hourUtcOffset),
         tithiEndsNextDay: isNextDay(jdBirth, jdTEnd),
         karanaEndTime: formatTimeFromJd(jdKEnd, tzOffset: hourUtcOffset),
