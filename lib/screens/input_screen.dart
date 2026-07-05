@@ -990,9 +990,7 @@ class _InputScreenState extends State<InputScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(AppLocale.l('udayadiGhatiHint'),
-                  style: TextStyle(fontSize: 11, color: kMuted, fontStyle: FontStyle.italic)),
-                const SizedBox(height: 10),
+
                 Row(children: [
                   Expanded(child: TextField(
                     controller: _ghatiCtrl,
