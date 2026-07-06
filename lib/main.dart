@@ -89,8 +89,23 @@ Future<void> _initEphemeris() async {
   }
 }
 
+/// Custom notifier that always fires, even when value is identical.
+/// Standard ValueNotifier skips if old == new, which breaks the
+/// sign-in → home screen transition (both values are `true`).
+class _AlwaysNotify<T> extends ValueNotifier<T> {
+  _AlwaysNotify(super.value);
+  @override
+  set value(T newValue) {
+    if (super.value == newValue) {
+      notifyListeners(); // fire even for same value
+    } else {
+      super.value = newValue; // fires automatically
+    }
+  }
+}
+
 /// Notifier for device binding status — triggers UI rebuild when binding changes
-final ValueNotifier<bool> deviceBindingNotifier = ValueNotifier<bool>(true);
+final ValueNotifier<bool> deviceBindingNotifier = _AlwaysNotify<bool>(true);
 
 /// Whether the app version is too old and must be updated
 bool _isVersionOutdated = false;
