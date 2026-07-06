@@ -129,6 +129,25 @@ class SamshakaMode {
 }
 
 // ─────────────────────────────────────────────
+// Single letter mode: show only abbreviation, no degrees
+// ─────────────────────────────────────────────
+class SingleLetterMode {
+  static final ValueNotifier<bool> notifier = ValueNotifier(false);
+
+  static bool get isActive => notifier.value;
+
+  static void toggle(bool v) {
+    notifier.value = v;
+    SharedPreferences.getInstance().then((prefs) => prefs.setBool('single_letter_mode', v));
+  }
+
+  static Future<void> load() async {
+    final prefs = await SharedPreferences.getInstance();
+    notifier.value = prefs.getBool('single_letter_mode') ?? false;
+  }
+}
+
+// ─────────────────────────────────────────────
 // App Language / Locale (5 languages)
 // ─────────────────────────────────────────────
 class AppLocale {
@@ -233,6 +252,7 @@ class AppLocale {
       'chartStyle': 'ಕುಂಡಲಿ ಶೈಲಿ', 'southIndian': 'ದಕ್ಷಿಣ ಭಾರತ', 'northIndian': 'ಉತ್ತರ ಭಾರತ',
       'southDesc': '4×4 ಗ್ರಿಡ್ - ರಾಶಿ ಸ್ಥಿರ, ಗ್ರಹಗಳು ಚಲಿಸುವವು', 'northDesc': 'ವಜ್ರ (Diamond) - ಭಾವ ಸ್ಥಿರ, ರಾಶಿಗಳು ಚಲಿಸುವವು',
       'samshakaTitle': 'ಸಂಶಕ ಕುಂಡಲಿ', 'samshakaLabel': 'ನವಾಂಶ ಸಂಖ್ಯೆ ತೋರಿಸಿ', 'samshakaDesc': 'ಡಿಗ್ರಿ ಬದಲು ನವಾಂಶ ರಾಶಿ ಸಂಖ್ಯೆ (1-12) ತೋರಿಸುತ್ತದೆ. ಉದಾ: ರವಿ 5 (ಸಿಂಹ)',
+      'singleLetterMode': 'ಏಕಾಕ್ಷರ ಕುಂಡಲಿ',
       'searchLocation': 'ಸ್ಥಳ ಹುಡುಕಿ', 'onlineSearch': 'ಆನ್‌ಲೈನ್ ಹುಡುಕಿ', 'defaultLocationSet': 'ಡೀಫಾಲ್ಟ್ ಸ್ಥಳ',
       'googleSyncActive': 'Google ಸಿಂಕ್ ಸಕ್ರಿಯವಾಗಿದೆ', 'signInForCloud': 'ಕ್ಲೌಡ್ ಬ್ಯಾಕಪ್‌ಗಾಗಿ Google ಗೆ ಸೈನ್ ಇನ್ ಮಾಡಿ',
       'signInSuccess': 'Google Sign In ಯಶಸ್ವಿ!', 'signInFailed': 'Sign In ವಿಫಲ',
@@ -718,6 +738,7 @@ class AppLocale {
       'chartStyle': 'कुंडली शैली', 'southIndian': 'दक्षिण भारत', 'northIndian': 'उत्तर भारत',
       'southDesc': '4×4 ग्रिड - राशि स्थिर, ग्रह चलते हैं', 'northDesc': 'हीरा (Diamond) - भाव स्थिर, राशियाँ चलती हैं',
       'samshakaTitle': 'संशक कुंडली', 'samshakaLabel': 'नवांश संख्या दिखाएं', 'samshakaDesc': 'डिग्री के बदले नवांश राशि संख्या (1-12) दिखाता है. उदा: रवि 5 (सिंह)',
+      'singleLetterMode': 'एकाक्षर कुंडली',
       'searchLocation': 'स्थान खोजें', 'onlineSearch': 'ऑनलाइन खोजें', 'defaultLocationSet': 'डिफॉल्ट स्थान',
       'googleSyncActive': 'Google सिंक सक्रिय है', 'signInForCloud': 'क्लाउड बैकअप के लिए Google में साइन इन करें',
       'signInSuccess': 'Google Sign In सफल!', 'signInFailed': 'Sign In विफल',
@@ -1228,6 +1249,7 @@ class AppLocale {
       'chartStyle': 'ஜாதக பாணி', 'southIndian': 'தென் இந்திய', 'northIndian': 'வட இந்திய',
       'southDesc': '4×4 கட்டம் - ராசி நிலையான, கிரகங்கள் நகரும்', 'northDesc': 'வைரம் - பாவம் நிலையான, ராசிகள் நகரும்',
       'samshakaTitle': 'சம்சக ஜாதகம்', 'samshakaLabel': 'நவாம்ச எண் காட்டு', 'samshakaDesc': 'டிகிரிக்கு பதிலாக நவாம்ச ராசி எண் (1-12) காட்டும். உதா: ரவி 5 (சிம்மம்)',
+      'singleLetterMode': 'ஒற்றை எழுத்து குண்டலி',
       'searchLocation': 'இடம் தேடு', 'onlineSearch': 'ஆன்லைன் தேடல்', 'defaultLocationSet': 'இயல்பு இடம்',
       'googleSyncActive': 'Google ஒத்திசைவு செயலில்', 'signInForCloud': 'கிளவுட் காப்புக்கு Google இல் உள்நுழையவும்',
       'signInSuccess': 'Google Sign In வெற்றி!', 'signInFailed': 'Sign In தோல்வி',
@@ -1734,6 +1756,7 @@ class AppLocale {
       'chartStyle': 'కుండలి శైలి', 'southIndian': 'దక్షిణ భారతం', 'northIndian': 'ఉత్తర భారతం',
       'southDesc': '4×4 గ్రిడ్ - రాశి స్థిరం, గ్రహాలు కదులుతాయి', 'northDesc': 'వజ్రం (Diamond) - భావం స్థిరం, రాశులు కదులుతాయి',
       'samshakaTitle': 'సంశక కుండలి', 'samshakaLabel': 'నవాంశ సంఖ్య చూపండి', 'samshakaDesc': 'డిగ్రీ బదులు నవాంశ రాశి సంఖ్య (1-12) చూపిస్తుంది. ఉదా: రవి 5 (సింహం)',
+      'singleLetterMode': 'ఏకాక్షర కుండలి',
       'searchLocation': 'ప్రదేశం వెతకండి', 'onlineSearch': 'ఆన్‌లైన్ వెతకండి', 'defaultLocationSet': 'డీఫాల్ట్ ప్రదేశం',
       'googleSyncActive': 'Google సింక్ యాక్టివ్', 'signInForCloud': 'క్లౌడ్ బ్యాకప్ కోసం Google లో సైన్ ఇన్ చేయండి',
       'signInSuccess': 'Google Sign In విజయవంతం!', 'signInFailed': 'Sign In విఫలం',
@@ -2240,6 +2263,7 @@ class AppLocale {
       'chartStyle': 'ജാതക ശൈലി', 'southIndian': 'ദക്ഷിണ ഭാരതം', 'northIndian': 'ഉത്തര ഭാരതം',
       'southDesc': '4×4 ഗ്രിഡ് - രാശി സ്ഥിരം, ഗ്രഹങ്ങൾ ചലിക്കുന്നു', 'northDesc': 'വജ്രം (Diamond) - ഭാവം സ്ഥിരം, രാശികൾ ചലിക്കുന്നു',
       'samshakaTitle': 'സംശക ജാതകം', 'samshakaLabel': 'നവാംശ നമ്പർ കാണിക്കുക', 'samshakaDesc': 'ഡിഗ്രിക്കു പകരം നവാംശ രാശി നമ്പർ (1-12) കാണിക്കും. ഉദാ: രവി 5 (ചിംഹം)',
+      'singleLetterMode': 'ഏകാക്ഷര കുണ്ഡലി',
       'searchLocation': 'സ്ഥലം തിരയുക', 'onlineSearch': 'ഓൺലൈൻ തിരയൽ', 'defaultLocationSet': 'ഇയൽപ്പു സ്ഥലം',
       'googleSyncActive': 'Google സിങ്ക് സജീവം', 'signInForCloud': 'ക്ലൗഡ് ബാക്കപ്പിനായി Google ൽ സൈൻ ഇൻ ചെയ്യുക',
       'signInSuccess': 'Google Sign In വിജയം!', 'signInFailed': 'Sign In പരാജയം',

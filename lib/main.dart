@@ -51,6 +51,7 @@ Future<void> main() async {
     AppThemes.loadTheme(),
     ChartStyle.loadStyle(),
     SamshakaMode.load(),
+    SingleLetterMode.load(),
     AppLocale.loadLang(),
     LocationService.init(),
   ]);

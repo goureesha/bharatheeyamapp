@@ -541,6 +541,9 @@ class KundaliChart extends StatelessWidget {
         final navNum = SamshakaMode.navamshaSign(info.longitude);
         final fullName = appPlanetNames[name] ?? name;
         displayText = '$fullName $navNum';
+      } else if (showDeg && SingleLetterMode.isActive) {
+        // Single letter mode: abbreviation only, no degrees
+        displayText = shortName;
       } else if (showDeg) {
         // Degree within D1 rashi
         final degInRashi = info.longitude % 30;

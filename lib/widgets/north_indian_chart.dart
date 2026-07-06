@@ -375,6 +375,9 @@ class NorthIndianChart extends StatelessWidget {
         final navNum = SamshakaMode.navamshaSign(info.longitude);
         final fullName = appPlanetNames[name] ?? name;
         displayText = '$fullName $navNum';
+      } else if (showRashiDeg && SingleLetterMode.isActive) {
+        // Single letter mode: abbreviation only, no degrees
+        displayText = shortName;
       } else {
         final double degToShow = showRashiDeg ? (info.longitude % 30) : (displayDeg ?? info.longitude % 30);
         final totalSec = (degToShow * 3600).round();
