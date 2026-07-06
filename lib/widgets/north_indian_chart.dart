@@ -303,27 +303,46 @@ class NorthIndianChart extends StatelessWidget {
       final w = isCorner ? boxW * 0.85 : boxW;
       final ht = isCorner ? boxH * 0.85 : boxH;
 
+      final bool singleLetter = SingleLetterMode.isActive && ((varga == 1) || isBhava);
+
       widgets.add(Positioned(
         left: center.dx * s - w / 2,
         top: center.dy * s - ht / 2,
         width: w,
         height: ht,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Rashi number label
-            Text(rashiNum,
-              style: TextStyle(
-                fontSize: s * 0.028 * textScale,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF718096),
-              ),
+        child: singleLetter
+          ? Wrap(
+              spacing: 2,
+              runSpacing: 0,
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.center,
+              children: [
+                Text(rashiNum,
+                  style: TextStyle(
+                    fontSize: s * 0.028 * textScale,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF718096),
+                  ),
+                ),
+                ...planets,
+              ],
+            )
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Rashi number label
+                Text(rashiNum,
+                  style: TextStyle(
+                    fontSize: s * 0.028 * textScale,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF718096),
+                  ),
+                ),
+                // Planet chips
+                ...planets.take(5),
+              ],
             ),
-            // Planet chips
-            ...planets.take(5),
-          ],
-        ),
       ));
     }
 

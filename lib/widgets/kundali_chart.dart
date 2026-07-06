@@ -354,6 +354,7 @@ class KundaliChart extends StatelessWidget {
   }
 
   Widget _rashiBox(int rashiIdx, List<Widget> planets) {
+    final bool singleLetter = SingleLetterMode.isActive && ((varga == 1) || isBhava);
     return Container(
       margin: const EdgeInsets.all(1.0),
       decoration: BoxDecoration(
@@ -361,21 +362,34 @@ class KundaliChart extends StatelessWidget {
         border: Border.all(color: const Color(0xFFCBD5E0), width: 1.0),
         borderRadius: BorderRadius.circular(6),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(2),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: planets.map((p) => Padding(padding: const EdgeInsets.only(bottom: 2), child: p)).toList(),
-              ),
+      child: singleLetter
+        // Single letter mode: Wrap layout — all planets visible without scrolling
+        ? Padding(
+            padding: const EdgeInsets.all(2),
+            child: Wrap(
+              spacing: 4,
+              runSpacing: 2,
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.center,
+              children: planets,
             ),
+          )
+        // Normal mode: scrollable column with degrees
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(2),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: planets.map((p) => Padding(padding: const EdgeInsets.only(bottom: 2), child: p)).toList(),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
