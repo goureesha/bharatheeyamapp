@@ -1,7 +1,7 @@
-- [ ] Add SingleLetterMode class in common.dart
-- [ ] Add locale strings for toggle label in all 5 languages
-- [ ] Add SingleLetterMode.load() to main.dart init
-- [ ] Update _planetChip() in kundali_chart.dart
-- [ ] Update _planetChip() in north_indian_chart.dart
-- [ ] Add toggle switch in input_screen.dart
-- [ ] Push and verify
+- [x] Add SingleLetterMode class in common.dart
+- [x] Add locale strings for toggle label in all 5 languages
+- [x] Add SingleLetterMode.load() to main.dart init
+- [x] Update _planetChip() in kundali_chart.dart
+- [x] Update _planetChip() in north_indian_chart.dart
+- [x] Add toggle switch in input_screen.dart
+- [x] Push and verify
