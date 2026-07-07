@@ -200,8 +200,9 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     _loadJyotishiDetails();
 
-    // Rebuild charts when single letter mode changes
-    SingleLetterMode.notifier.addListener(_onSingleLetterModeChanged);
+    // Rebuild charts when chart mode toggles change
+    SingleLetterMode.notifier.addListener(_onChartModeChanged);
+    SamshakaMode.notifier.addListener(_onChartModeChanged);
   }
 
   @override
@@ -214,11 +215,12 @@ class _DashboardScreenState extends State<DashboardScreen>
     _gotraCtrl.dispose();
     _jyotishiNameCtrl.dispose();
     _jyotishiPhoneCtrl.dispose();
-    SingleLetterMode.notifier.removeListener(_onSingleLetterModeChanged);
+    SingleLetterMode.notifier.removeListener(_onChartModeChanged);
+    SamshakaMode.notifier.removeListener(_onChartModeChanged);
     super.dispose();
   }
 
-  void _onSingleLetterModeChanged() {
+  void _onChartModeChanged() {
     if (mounted) setState(() {});
   }
 
