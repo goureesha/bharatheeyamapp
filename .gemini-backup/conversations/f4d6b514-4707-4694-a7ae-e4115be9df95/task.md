@@ -1,7 +1,9 @@
-- [x] Add SingleLetterMode class in common.dart
-- [x] Add locale strings for toggle label in all 5 languages
-- [x] Add SingleLetterMode.load() to main.dart init
-- [x] Update _planetChip() in kundali_chart.dart
-- [x] Update _planetChip() in north_indian_chart.dart
-- [x] Add toggle switch in input_screen.dart
-- [x] Push and verify
+# Tasks
+
+- `[ ]` Add `_selectedPersonIdx` state variable
+- `[ ]` Add person selector chip bar UI
+- `[ ]` Add `_filterPersons()` method
+- `[ ]` Apply `_filterPersons()` to all tab methods
+- `[ ]` Add 'ಭಾವ ಷಡ್ವರ್ಗ' tab definition (12 tabs)
+- `[ ]` Add `_buildBhavaShadvargaTab()` method
+- `[ ]` Push and verify

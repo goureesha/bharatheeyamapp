@@ -1,74 +1,27 @@
-# Single Letter Kundali View
+# Copy Multi-Person Kundali View from Clone App
 
-Add a toggle on the input page to switch between the current view (abbreviation + degrees) and a "single letter" view (abbreviation only, no degrees) for Rashi and Bhava kundali charts.
-
-## Reference Screenshots
-
-The reference app shows:
-- Planet abbreviations only (ಚ, ಶ, ಕು, ರ, etc.) — **NO degrees**
-- Multiple planets in one house shown as individual letter chips
-- Clean, minimal layout
+Port 3 features from `D:\bharatheeyamapp clone` → `D:\bharatheeyamapp sample`:
 
 ## Proposed Changes
 
-### Settings Model
+### [MODIFY] [dashboard_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/dashboard_screen.dart)
 
-#### [MODIFY] [common.dart](file:///d:/bharatheeyamapp%20sample/lib/widgets/common.dart)
+#### 1. Person Selector Chip Bar
+- Add `int _selectedPersonIdx = -1` state variable (`-1` = show all)
+- Add horizontal `ChoiceChip` bar between app bar and tab bar — shows "All", primary name, and extra person names
+- Only visible when `_extraPersons.isNotEmpty`
 
-Add a `SingleLetterMode` class (similar to `SamshakaMode`):
-- `static ValueNotifier<bool> notifier`
-- `static bool get isActive`
-- `static Future<void> load()` — reads from SharedPreferences
-- `static Future<void> toggle()` — toggles and persists
+#### 2. `_filterPersons()` Method
+- New method: filters `allPersons` list by `_selectedPersonIdx`
+- Called in **every tab** (`_buildKundaliTab`, `_buildSphutas`, `_buildDashaTab`, `_buildPanchangTab`, `_buildBhavaTab`, `_buildGrahaShadvargaTab`, `_buildShadbalaTab`, `_buildAshtakaTab`)
 
----
-
-### Chart Rendering
-
-#### [MODIFY] [kundali_chart.dart](file:///d:/bharatheeyamapp%20sample/lib/widgets/kundali_chart.dart)
-
-In `_planetChip()` (line 513):
-- When `SingleLetterMode.isActive` is true AND the chart is D1 (Rashi) or Bhava:
-  - Show only `shortName` without degrees
-  - Skip degree string entirely
-
-#### [MODIFY] [north_indian_chart.dart](file:///d:/bharatheeyamapp%20sample/lib/widgets/north_indian_chart.dart)
-
-Same change in the North Indian chart's planet chip rendering for consistency.
-
----
-
-### Input Page Toggle
-
-#### [MODIFY] [input_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/input_screen.dart)
-
-Add a toggle/switch for "Single Letter View" in the input form, near the existing settings area. This will be a `SwitchListTile` that controls `SingleLetterMode`.
-
----
-
-### Locale Strings
-
-#### [MODIFY] [common.dart](file:///d:/bharatheeyamapp%20sample/lib/widgets/common.dart)
-
-Add locale key `singleLetterMode` with translations:
-- Kannada: `ಏಕಾಕ್ಷರ ಕುಂಡಲಿ`
-- Hindi: `एकाक्षर कुंडली`
-- Tamil: `ஒற்றை எழுத்து குண்டலி`
-- Telugu: `ఏకాక్షర కుండలి`
-- Malayalam: `ഏകാക്ഷര കുണ്ഡലി`
-
----
-
-### Initialization
-
-#### [MODIFY] [main.dart](file:///d:/bharatheeyamapp%20sample/lib/main.dart)
-
-Add `SingleLetterMode.load()` to the Phase 1 init (alongside `SamshakaMode.load()`).
+#### 3. New "Bhava Shadvarga" Tab (ಭಾವ ಷಡ್ವರ್ಗ)
+- 12 tabs instead of 11
+- New `_buildBhavaShadvargaTab()` method showing Bhava varga table with D1, D3, D2, D9, D12, D30, sub-drekkana columns, and D81
 
 ## Verification Plan
 
 ### Manual Verification
-- Toggle ON: Rashi and Bhava charts show only single letter abbreviations (no degrees)
-- Toggle OFF: Charts show abbreviations + degrees as before
-- Other charts (Navamsha, Hora, etc.) are unaffected
-- Preference persists across app restarts
+- Build and test with multiple persons added
+- Verify chip bar appears and filters work per tab
+- Verify new Bhava Shadvarga tab renders correctly

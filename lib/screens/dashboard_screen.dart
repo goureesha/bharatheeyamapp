@@ -122,6 +122,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   // Multi-person support
   final List<_PersonEntry> _extraPersons = [];
+  int _selectedPersonIdx = -1; // -1 = show all, 0+ = show specific person
 
   // Mutable primary person (editable)
   late String _primaryName;
@@ -1417,6 +1418,66 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ],
               ),
             ),
+            // Person selector (multi-person only)
+            if (_extraPersons.isNotEmpty)
+              Container(
+                color: kCard,
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: SizedBox(
+                  height: 36,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    children: [
+                      // "All" chip
+                      Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: ChoiceChip(
+                          label: Text('ಎಲ್ಲ / All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIdx == -1 ? Colors.white : kText)),
+                          selected: _selectedPersonIdx == -1,
+                          selectedColor: kPurple2,
+                          backgroundColor: kCard,
+                          side: BorderSide(color: _selectedPersonIdx == -1 ? kPurple2 : kBorder),
+                          onSelected: (_) => setState(() => _selectedPersonIdx = -1),
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                      // Primary person chip
+                      Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: ChoiceChip(
+                          label: Text(_primaryName, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIdx == 0 ? Colors.white : kText)),
+                          selected: _selectedPersonIdx == 0,
+                          selectedColor: kPurple2,
+                          backgroundColor: kCard,
+                          side: BorderSide(color: _selectedPersonIdx == 0 ? kPurple2 : kBorder),
+                          onSelected: (_) => setState(() => _selectedPersonIdx = 0),
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                      // Extra person chips
+                      ...List.generate(_extraPersons.length, (i) {
+                        final idx = i + 1;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: ChoiceChip(
+                            label: Text(_extraPersons[i].name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIdx == idx ? Colors.white : kText)),
+                            selected: _selectedPersonIdx == idx,
+                            selectedColor: kTeal,
+                            backgroundColor: kCard,
+                            side: BorderSide(color: _selectedPersonIdx == idx ? kTeal : kBorder),
+                            onSelected: (_) => setState(() => _selectedPersonIdx = idx),
+                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ),
 
             // Tab bar
             Container(
@@ -1456,6 +1517,14 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   // ─────────────────────────────────────────────
+  // Filter allPersons by selected person index
+  // ─────────────────────────────────────────────
+  List<Map<String, dynamic>> _filterPersons(List<Map<String, dynamic>> allPersons) {
+    if (_selectedPersonIdx < 0 || _selectedPersonIdx >= allPersons.length) return allPersons;
+    return [allPersons[_selectedPersonIdx]];
+  }
+
+  // ─────────────────────────────────────────────
   // TAB 1: KUNDALI (All vargas stacked vertically)
   // ─────────────────────────────────────────────
   Widget _buildKundaliTab() {
@@ -1470,10 +1539,11 @@ class _DashboardScreenState extends State<DashboardScreen>
     ];
 
     // All persons: primary + extras
-    final allPersons = <Map<String, dynamic>>[
+    var allPersons = <Map<String, dynamic>>[
       {'name': _primaryName, 'result': _primaryResult, 'isPrimary': true},
       ..._extraPersons.map((p) => {'name': p.name, 'result': p.result, 'isPrimary': false}),
     ];
+    allPersons = _filterPersons(allPersons);
 
     final screenWidth = MediaQuery.of(context).size.width;
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
@@ -1612,10 +1682,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   // TAB 2: UPAGRAHA SPHUTA (multi-person)
   // ─────────────────────────────────────────────
   Widget _buildSphutas() {
-    final allPersons = <Map<String, dynamic>>[
+    var allPersons = <Map<String, dynamic>>[
       {'name': _primaryName, 'result': _primaryResult},
       ..._extraPersons.map((p) => {'name': p.name, 'result': p.result}),
     ];
+    allPersons = _filterPersons(allPersons);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -2157,10 +2228,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   // TAB 5: DASHA
   // ─────────────────────────────────────────────
   Widget _buildDashaTab() {
-    final allPersons = <Map<String, dynamic>>[
+    var allPersons = <Map<String, dynamic>>[
       {'name': _primaryName, 'result': _primaryResult},
       ..._extraPersons.map((p) => {'name': p.name, 'result': p.result}),
     ];
+    allPersons = _filterPersons(allPersons);
     return SingleChildScrollView(
       child: Column(
         children: allPersons.map((person) {
@@ -2193,10 +2265,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   // TAB 6: PANCHANG
   // ─────────────────────────────────────────────
   Widget _buildPanchangTab() {
-    final allPersons = <Map<String, dynamic>>[
+    var allPersons = <Map<String, dynamic>>[
       {'name': _primaryName, 'result': _primaryResult, 'dob': _primaryDob, 'hour': _primaryHour, 'minute': _primaryMinute, 'ampm': _primaryAmpm, 'place': _primaryPlace},
       ..._extraPersons.map((p) => {'name': p.name, 'result': p.result, 'dob': p.dob, 'hour': p.hour, 'minute': p.minute, 'ampm': p.ampm, 'place': p.place}),
     ];
+    allPersons = _filterPersons(allPersons);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -2307,10 +2380,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   // TAB 7.5: BHAVA DREKKAANA
   // ─────────────────────────────────────────────
   Widget _buildBhavaDrekkaanaTab() {
-    final allPersons = <Map<String, dynamic>>[
+    var allPersons = <Map<String, dynamic>>[
       {'name': _primaryName, 'result': _primaryResult},
       ..._extraPersons.map((p) => {'name': p.name, 'result': p.result}),
     ];
+    allPersons = _filterPersons(allPersons);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -2455,10 +2529,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   // TAB 7: BHAVA
   // ─────────────────────────────────────────────
   Widget _buildBhavaTab() {
-    final allPersons = <Map<String, dynamic>>[
+    var allPersons = <Map<String, dynamic>>[
       {'name': _primaryName, 'result': _primaryResult},
       ..._extraPersons.map((p) => {'name': p.name, 'result': p.result}),
     ];
+    allPersons = _filterPersons(allPersons);
 
     // Planet selector list
     final selectablePlanets = planetOrder.where((p) => p != 'ಲಗ್ನ' && p != 'ಮಾಂದಿ').toList();
@@ -2618,10 +2693,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   // TAB 7.6: GRAHA SHADVARGA
   // ─────────────────────────────────────────────
   Widget _buildGrahaShadvargaTab() {
-    final allPersons = <Map<String, dynamic>>[
+    var allPersons = <Map<String, dynamic>>[
       {'name': _primaryName, 'result': _primaryResult},
       ..._extraPersons.map((p) => {'name': p.name, 'result': p.result}),
     ];
+    allPersons = _filterPersons(allPersons);
 
     final hGraha = AppLocale.l('hGraha');
     final hD3 = AppLocale.l('hD3');
@@ -2774,10 +2850,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   // TAB 8: ASHTAKA VARGA (multi-person)
   // ─────────────────────────────────────────────
   Widget _buildAshtakaTab() {
-    final allPersons = <Map<String, dynamic>>[
+    var allPersons = <Map<String, dynamic>>[
       {'name': _primaryName, 'result': _primaryResult},
       ..._extraPersons.map((p) => {'name': p.name, 'result': p.result}),
     ];
+    allPersons = _filterPersons(allPersons);
 
     if (allPersons.length == 1) {
       return AshtakaVargaWidget(result: widget.result);
@@ -2804,10 +2881,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _buildShadbalaTab() {
-    final allPersons = <Map<String, dynamic>>[
+    var allPersons = <Map<String, dynamic>>[
       {'name': _primaryName, 'result': _primaryResult},
       ..._extraPersons.map((p) => {'name': p.name, 'result': p.result}),
     ];
+    allPersons = _filterPersons(allPersons);
 
     if (allPersons.length == 1) {
       return ShadbalaWidget(key: UniqueKey(), shadbala: widget.result.shadbala);
@@ -3087,10 +3165,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _buildNotesTab() {
-    final allPersons = <Map<String, dynamic>>[
+    var allPersons = <Map<String, dynamic>>[
       {'name': _primaryName, 'isPrimary': true, 'entry': null},
       ..._extraPersons.map((p) => {'name': p.name, 'isPrimary': false, 'entry': p}),
     ];
+    allPersons = _filterPersons(allPersons);
 
     return ListView.builder(
       itemCount: allPersons.length,

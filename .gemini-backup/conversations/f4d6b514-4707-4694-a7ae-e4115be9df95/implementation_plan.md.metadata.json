@@ -1,6 +1,6 @@
 {
-  "summary":  "Implementation plan for adding a single letter kundali view toggle that shows only planet abbreviations (no degrees) in Rashi and Bhava charts. Includes changes to common.dart (settings model), kundali_chart.dart and north_indian_chart.dart (rendering), input_screen.dart (toggle UI), and main.dart (initialization).",
-  "updatedAt":  "2026-07-06T11:38:26.512739500Z",
+  "summary":  "Plan to port 3 features from clone app: person selector chips, filterPersons method, and Bhava Shadvarga tab",
+  "updatedAt":  "2026-07-08T04:30:59.348394700Z",
   "requestFeedback":  true,
   "userFacing":  true
 }
