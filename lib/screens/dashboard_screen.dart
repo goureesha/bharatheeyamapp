@@ -123,6 +123,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   // Multi-person support
   final List<_PersonEntry> _extraPersons = [];
   int _selectedPersonIdx = -1; // -1 = show all, 0+ = show specific person
+  int _selectedChartIdx = 0;  // which chart type is selected (0 = Rashi, 1 = Navamsha, ...)
 
   // Mutable primary person (editable)
   late String _primaryName;
@@ -1545,122 +1546,127 @@ class _DashboardScreenState extends State<DashboardScreen>
     ];
     allPersons = _filterPersons(allPersons);
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-    final isLargeScreen = screenWidth > 600 || isLandscape;
+    final selectedChart = charts[_selectedChartIdx];
+    final isBhavaChart = selectedChart['isBhava'] as bool;
+    final label = selectedChart['label'] as String;
 
-    // Use 45% of screen width for 2 charts side-by-side on large screens, or 85% for single chart on mobile
-    final chartSize = isLargeScreen ? (screenWidth * 0.45).clamp(350.0, 550.0) : screenWidth * 0.85;
-    
-    // Scale text up slightly on bigger charts for readability
-    final textScale = isLargeScreen ? (chartSize / 350.0).clamp(1.1, 1.4) : 1.0;
-
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 8),
-          // Each person's charts in a horizontal scrollable row
-          ...allPersons.map((person) {
-            final personResult = person['result'] as KundaliResult;
-            final personName = person['name'] as String;
-            final isPrimary = person['isPrimary'] as bool;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Person header
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  child: Row(
-                    children: [
-                      Icon(Icons.person, size: 18, color: isPrimary ? kPurple2 : kTeal),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(personName, style: TextStyle(fontSize: 15 * textScale, fontWeight: FontWeight.w900, color: isPrimary ? kPurple2 : kTeal)),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.edit, size: 18, color: kPurple2),
-                        tooltip: AppLocale.l('editTooltip'),
-                        onPressed: () => isPrimary ? _showEditPrimaryDialog() : _showEditPersonDialog(personName),
-                      ),
-                      if (!isPrimary)
-                        IconButton(
-                          icon: Icon(Icons.close, size: 18, color: Colors.redAccent),
-                          onPressed: () => setState(() => _extraPersons.removeWhere((p) => p.name == personName)),
-                        ),
-                    ],
+    return Column(
+      children: [
+        // Chart type selector chips
+        Container(
+          color: kCard,
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: SizedBox(
+            height: 34,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              itemCount: charts.length,
+              itemBuilder: (context, i) {
+                final isSelected = i == _selectedChartIdx;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: ChoiceChip(
+                    label: Text(charts[i]['label'] as String,
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: isSelected ? Colors.white : kText)),
+                    selected: isSelected,
+                    selectedColor: kPurple2,
+                    backgroundColor: kCard,
+                    side: BorderSide(color: isSelected ? kPurple2 : kBorder),
+                    onSelected: (_) => setState(() => _selectedChartIdx = i),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
                   ),
-                ),
-                // Horizontal scrollable charts
-                SizedBox(
-                  height: chartSize + (40 * textScale),
-                  child: ScrollConfiguration(
-                    behavior: ScrollConfiguration.of(context).copyWith(
-                      dragDevices: {
-                        PointerDeviceKind.touch,
-                        PointerDeviceKind.mouse,
-                      },
-                    ),
-                    child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    itemCount: charts.length,
-                    itemBuilder: (context, i) {
-                      final chart = charts[i];
-                      final isBhavaChart = chart['isBhava'] as bool;
-                      final label = chart['label'] as String;
-                      return SizedBox(
-                        width: chartSize,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Column(
-                            children: [
-                              Text(label, style: TextStyle(fontSize: 15 * textScale, fontWeight: FontWeight.w800, color: kPurple2)),
-                              SizedBox(height: 4 * textScale),
-                              Expanded(
-                                child: KundaliChart(
-                                  result: personResult,
-                                  varga: chart['varga'] as int,
-                                  isBhava: isBhavaChart,
-                                  textScale: textScale,
-                                  showSphutas: false,
-                                  centerLabel: label,
-                                  onPlanetTap: _showPlanetDetail,
-                                  selectedPlanet: isBhavaChart ? _bhavaPlanet : null,
-                                  onPlanetLongPress: isBhavaChart ? (pName) {
-                                    setState(() => _bhavaPlanet = _bhavaPlanet == pName ? null : pName);
-                                  } : null,
-                                  bhavaFromPlanet: isBhavaChart ? _bhavaPlanet : null,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                ),
-                Divider(thickness: 1, color: kBorder),
-              ],
-            );
-          }),
-          // Add person button
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: OutlinedButton.icon(
-              onPressed: _showAddPersonDialog,
-              icon: Icon(Icons.person_add, color: kPurple2),
-              label: Text(AppLocale.l('addPerson'), style: TextStyle(color: kPurple2, fontWeight: FontWeight.w800)),
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: kPurple2),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
+                );
+              },
             ),
           ),
-          const SizedBox(height: 24),
-        ],
-      ),
+        ),
+        // Charts — one per person, bigger
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 8),
+                ...allPersons.map((person) {
+                  final personResult = person['result'] as KundaliResult;
+                  final personName = person['name'] as String;
+                  final isPrimary = person['isPrimary'] as bool;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Person header
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        child: Row(
+                          children: [
+                            Icon(Icons.person, size: 18, color: isPrimary ? kPurple2 : kTeal),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(personName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: isPrimary ? kPurple2 : kTeal)),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.edit, size: 18, color: kPurple2),
+                              tooltip: AppLocale.l('editTooltip'),
+                              onPressed: () => isPrimary ? _showEditPrimaryDialog() : _showEditPersonDialog(personName),
+                            ),
+                            if (!isPrimary)
+                              IconButton(
+                                icon: Icon(Icons.close, size: 18, color: Colors.redAccent),
+                                onPressed: () => setState(() => _extraPersons.removeWhere((p) => p.name == personName)),
+                              ),
+                          ],
+                        ),
+                      ),
+                      // Chart label
+                      Center(
+                        child: Text(label, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: kPurple2)),
+                      ),
+                      const SizedBox(height: 4),
+                      // Single large chart
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: AspectRatio(
+                          aspectRatio: 1.0,
+                          child: KundaliChart(
+                            result: personResult,
+                            varga: selectedChart['varga'] as int,
+                            isBhava: isBhavaChart,
+                            showSphutas: false,
+                            centerLabel: label,
+                            onPlanetTap: _showPlanetDetail,
+                            selectedPlanet: isBhavaChart ? _bhavaPlanet : null,
+                            onPlanetLongPress: isBhavaChart ? (pName) {
+                              setState(() => _bhavaPlanet = _bhavaPlanet == pName ? null : pName);
+                            } : null,
+                            bhavaFromPlanet: isBhavaChart ? _bhavaPlanet : null,
+                          ),
+                        ),
+                      ),
+                      if (allPersons.length > 1) Divider(thickness: 1, color: kBorder),
+                    ],
+                  );
+                }),
+                // Add person button
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: OutlinedButton.icon(
+                    onPressed: _showAddPersonDialog,
+                    icon: Icon(Icons.person_add, color: kPurple2),
+                    label: Text(AppLocale.l('addPerson'), style: TextStyle(color: kPurple2, fontWeight: FontWeight.w800)),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: kPurple2),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
