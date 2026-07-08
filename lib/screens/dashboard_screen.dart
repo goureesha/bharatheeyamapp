@@ -3556,10 +3556,6 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
             ),
           ),
           const SizedBox(height: 4),
-          // Chart name label
-          Text(widget.charts[_page]['label'] as String,
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kPurple2)),
-          const SizedBox(height: 4),
           // Dot indicators
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
