@@ -1546,129 +1546,72 @@ class _DashboardScreenState extends State<DashboardScreen>
     ];
     allPersons = _filterPersons(allPersons);
 
-    final selectedChart = charts[_selectedChartIdx];
-    final isBhavaChart = selectedChart['isBhava'] as bool;
-    final label = selectedChart['label'] as String;
-
-    return Column(
-      children: [
-        // Chart type selector chips
-        Container(
-          color: kCard,
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: SizedBox(
-            height: 34,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              itemCount: charts.length,
-              itemBuilder: (context, i) {
-                final isSelected = i == _selectedChartIdx;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: ChoiceChip(
-                    label: Text(charts[i]['label'] as String,
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: isSelected ? Colors.white : kText)),
-                    selected: isSelected,
-                    selectedColor: kPurple2,
-                    backgroundColor: kCard,
-                    side: BorderSide(color: isSelected ? kPurple2 : kBorder),
-                    onSelected: (_) => setState(() => _selectedChartIdx = i),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-        // Charts — one per person, bigger
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 8),
+          ...allPersons.map((person) {
+            final personResult = person['result'] as KundaliResult;
+            final personName = person['name'] as String;
+            final isPrimary = person['isPrimary'] as bool;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 8),
-                ...allPersons.map((person) {
-                  final personResult = person['result'] as KundaliResult;
-                  final personName = person['name'] as String;
-                  final isPrimary = person['isPrimary'] as bool;
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Person header
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        child: Row(
-                          children: [
-                            Icon(Icons.person, size: 18, color: isPrimary ? kPurple2 : kTeal),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(personName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: isPrimary ? kPurple2 : kTeal)),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.edit, size: 18, color: kPurple2),
-                              tooltip: AppLocale.l('editTooltip'),
-                              onPressed: () => isPrimary ? _showEditPrimaryDialog() : _showEditPersonDialog(personName),
-                            ),
-                            if (!isPrimary)
-                              IconButton(
-                                icon: Icon(Icons.close, size: 18, color: Colors.redAccent),
-                                onPressed: () => setState(() => _extraPersons.removeWhere((p) => p.name == personName)),
-                              ),
-                          ],
-                        ),
-                      ),
-                      // Chart label
-                      Center(
-                        child: Text(label, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: kPurple2)),
-                      ),
-                      const SizedBox(height: 4),
-                      // Single large chart
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: AspectRatio(
-                          aspectRatio: 1.0,
-                          child: KundaliChart(
-                            result: personResult,
-                            varga: selectedChart['varga'] as int,
-                            isBhava: isBhavaChart,
-                            showSphutas: false,
-                            centerLabel: label,
-                            onPlanetTap: _showPlanetDetail,
-                            selectedPlanet: isBhavaChart ? _bhavaPlanet : null,
-                            onPlanetLongPress: isBhavaChart ? (pName) {
-                              setState(() => _bhavaPlanet = _bhavaPlanet == pName ? null : pName);
-                            } : null,
-                            bhavaFromPlanet: isBhavaChart ? _bhavaPlanet : null,
-                          ),
-                        ),
-                      ),
-                      if (allPersons.length > 1) Divider(thickness: 1, color: kBorder),
-                    ],
-                  );
-                }),
-                // Add person button
+                // Person header
                 Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: OutlinedButton.icon(
-                    onPressed: _showAddPersonDialog,
-                    icon: Icon(Icons.person_add, color: kPurple2),
-                    label: Text(AppLocale.l('addPerson'), style: TextStyle(color: kPurple2, fontWeight: FontWeight.w800)),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: kPurple2),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: Row(
+                    children: [
+                      Icon(Icons.person, size: 18, color: isPrimary ? kPurple2 : kTeal),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(personName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: isPrimary ? kPurple2 : kTeal)),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.edit, size: 18, color: kPurple2),
+                        tooltip: AppLocale.l('editTooltip'),
+                        onPressed: () => isPrimary ? _showEditPrimaryDialog() : _showEditPersonDialog(personName),
+                      ),
+                      if (!isPrimary)
+                        IconButton(
+                          icon: Icon(Icons.close, size: 18, color: Colors.redAccent),
+                          onPressed: () => setState(() => _extraPersons.removeWhere((p) => p.name == personName)),
+                        ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                // Swipeable chart with dots
+                _KundaliPageView(
+                  charts: charts,
+                  personResult: personResult,
+                  bhavaPlanet: _bhavaPlanet,
+                  onBhavaPlanetToggle: (pName) => setState(() => _bhavaPlanet = _bhavaPlanet == pName ? null : pName),
+                  onPlanetTap: _showPlanetDetail,
+                ),
+                if (allPersons.length > 1) Divider(thickness: 1, color: kBorder),
               ],
+            );
+          }),
+          // Add person button
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: OutlinedButton.icon(
+              onPressed: _showAddPersonDialog,
+              icon: Icon(Icons.person_add, color: kPurple2),
+              label: Text(AppLocale.l('addPerson'), style: TextStyle(color: kPurple2, fontWeight: FontWeight.w800)),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: kPurple2),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 24),
+        ],
+      ),
     );
   }
+
 
   void _showPlanetDetail(String pName) {
     final info = widget.result.planets[pName];
@@ -3551,6 +3494,88 @@ class _DashboardScreenState extends State<DashboardScreen>
         Text('$k: ', style: TextStyle(fontWeight: FontWeight.w800, color: kPurple2)),
         Expanded(child: Text(v, style: TextStyle())),
       ]),
+    );
+  }
+}
+
+/// Swipeable kundali chart viewer with dot indicators
+class _KundaliPageView extends StatefulWidget {
+  final List<Map<String, dynamic>> charts;
+  final KundaliResult personResult;
+  final String? bhavaPlanet;
+  final void Function(String) onBhavaPlanetToggle;
+  final void Function(String) onPlanetTap;
+
+  const _KundaliPageView({
+    required this.charts,
+    required this.personResult,
+    required this.bhavaPlanet,
+    required this.onBhavaPlanetToggle,
+    required this.onPlanetTap,
+  });
+
+  @override
+  State<_KundaliPageView> createState() => _KundaliPageViewState();
+}
+
+class _KundaliPageViewState extends State<_KundaliPageView> {
+  int _page = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final chartSize = screenWidth - 32; // 16px padding each side
+
+    return SizedBox(
+      height: chartSize + 40, // chart + label + dots
+      child: Column(
+        children: [
+          Expanded(
+            child: PageView.builder(
+              onPageChanged: (i) => setState(() => _page = i),
+              itemCount: widget.charts.length,
+              itemBuilder: (context, i) {
+                final chart = widget.charts[i];
+                final isBhava = chart['isBhava'] as bool;
+                final label = chart['label'] as String;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: KundaliChart(
+                    result: widget.personResult,
+                    varga: chart['varga'] as int,
+                    isBhava: isBhava,
+                    showSphutas: false,
+                    centerLabel: label,
+                    onPlanetTap: widget.onPlanetTap,
+                    selectedPlanet: isBhava ? widget.bhavaPlanet : null,
+                    onPlanetLongPress: isBhava ? widget.onBhavaPlanetToggle : null,
+                    bhavaFromPlanet: isBhava ? widget.bhavaPlanet : null,
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 4),
+          // Chart name label
+          Text(widget.charts[_page]['label'] as String,
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kPurple2)),
+          const SizedBox(height: 4),
+          // Dot indicators
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(widget.charts.length, (i) => Container(
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: _page == i ? 18 : 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: _page == i ? kPurple2 : kBorder,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            )),
+          ),
+          const SizedBox(height: 6),
+        ],
+      ),
     );
   }
 }
