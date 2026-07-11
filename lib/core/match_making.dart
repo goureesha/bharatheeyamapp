@@ -267,20 +267,14 @@ class MatchMakingLogic {
   /// 0=Sun, 1=Moon, 2=Mars, 3=Mercury, 4=Jupiter, 5=Venus, 6=Saturn
   /// Values: 1=Mitra, 0=Sama, -1=Shatru
   static const List<List<int>> _naisargikaMaitri = [
-    // Sun
-    [ 0,  1,  1, -1,  1, -1, -1],
-    // Moon
-    [ 1,  0, -1,  1,  1, -1, -1],
-    // Mars
-    [ 1,  1,  0, -1,  1, -1, -1],
-    // Mercury
-    [ 1, -1, -1,  0, -1,  1,  1],
-    // Jupiter
-    [ 1,  1,  1, -1,  0, -1, -1],
-    // Venus
-    [-1, -1,  0,  1, -1,  0,  1],
-    // Saturn
-    [-1, -1, -1,  1, -1,  1,  0],
+    //        Sun  Moon Mars Merc Jup  Ven  Sat
+    /* Sun */  [ 0,  1,  1,  0,  1, -1, -1],
+    /* Moon */ [ 1,  0,  0,  1,  0,  0,  0],
+    /* Mars */ [ 1,  1,  0, -1,  1,  0,  0],
+    /* Merc */ [ 1, -1,  0,  0,  0,  1,  0],
+    /* Jup */  [ 1,  1,  1, -1,  0, -1,  0],
+    /* Ven */  [-1, -1,  0,  1,  0,  0,  1],
+    /* Sat */  [-1, -1, -1,  1,  0,  1,  0],
   ];
 
   /// Get planet lord index (0-6) for a rashi (0-11)
