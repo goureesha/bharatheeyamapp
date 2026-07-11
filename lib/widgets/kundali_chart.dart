@@ -536,7 +536,7 @@ class KundaliChart extends StatelessWidget {
 
     // Build display text
     final map = _shortNames;
-    final shortName = map[name] ?? name;
+    final shortName = map[name] ?? translateKn(name);
     String displayText = shortName;
     bool isCombust = false;
     bool isVakri = false;
@@ -553,7 +553,7 @@ class KundaliChart extends StatelessWidget {
       if (showDeg && SamshakaMode.isActive) {
         // Samshaka mode: show navamsha rashi number with full planet name
         final navNum = SamshakaMode.navamshaSign(info.longitude);
-        final fullName = appPlanetNames[name] ?? name;
+        final fullName = translateKn(name);
         displayText = '$fullName $navNum';
       } else if (showDeg && SingleLetterMode.isActive) {
         // Single letter mode: abbreviation only, no degrees

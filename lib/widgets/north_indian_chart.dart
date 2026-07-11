@@ -377,7 +377,7 @@ class NorthIndianChart extends StatelessWidget {
 
   Widget _planetChip(String name, {PlanetInfo? info, double? displayDeg}) {
     final map = _shortNames;
-    final shortName = map[name] ?? name;
+    final shortName = map[name] ?? translateKn(name);
     String displayText = shortName;
     bool isCombust = false;
     bool isVakri = false;
@@ -392,7 +392,7 @@ class NorthIndianChart extends StatelessWidget {
       if (showRashiDeg && SamshakaMode.isActive) {
         // Samshaka mode: show navamsha rashi number with full planet name
         final navNum = SamshakaMode.navamshaSign(info.longitude);
-        final fullName = appPlanetNames[name] ?? name;
+        final fullName = translateKn(name);
         displayText = '$fullName $navNum';
       } else if (showRashiDeg && SingleLetterMode.isActive) {
         // Single letter mode: abbreviation only, no degrees

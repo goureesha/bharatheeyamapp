@@ -1,27 +1,65 @@
-# Copy Multi-Person Kundali View from Clone App
+# Fix Localization Issues Across the App
 
-Port 3 features from `D:\bharatheeyamapp clone` → `D:\bharatheeyamapp sample`:
+## Problem
+When the app is set to Hindi (or other non-Kannada languages), several UI elements still display in Kannada.
+
+## Issues Found
+
+### 1. Matchmaking — Hardcoded Kannada Strings
+**File**: [match_making_tab.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/match_making_tab.dart)
+- Line 878: `'ಇಬ್ಬರಿಗೂ ಕುಜ ದೋಷ ✅'` and `'ಇಬ್ಬರಿಗೂ ಕುಜ ದೋಷ ಇಲ್ಲ ✅'` — hardcoded Kannada
+- **Fix**: Replace with `AppLocale.l()` locale keys for all Kuja Dosha verdict strings
+
+### 2. Kundali Chart — Planet Names Stay in Kannada
+**File**: [kundali_chart.dart](file:///d:/bharatheeyamapp%20sample/lib/widgets/kundali_chart.dart)
+- The `_shortNames` maps (line 517) ARE locale-aware, but the **degree display** path (line 570) uses `shortName` which falls back to the raw Kannada `name` if the map lookup fails
+- Need to verify all keys in `_shortNamesHi/Ta/Te/Ml` match exactly with engine output keys
+- **Fix**: Add `translateKn(name)` fallback when `_shortNames[name]` returns null
+
+### 3. Panchanga Search — Dropdown Values
+**File**: [panchanga_search_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/panchanga_search_screen.dart)
+- Dropdown items use Kannada source strings (line 17-38) passed through `trAll()` (line 379)
+- The `trAll()` chain should translate via `translateKn()`, but some masa/tithi names may not be in the translation map
+- **Fix**: Verify all Chandra Masa, Soura Masa, and Tithi names are covered by `translateKn()` mapping
+
+### 4. North Indian Chart
+**File**: [north_indian_chart.dart](file:///d:/bharatheeyamapp%20sample/lib/widgets/north_indian_chart.dart)
+- Same issue as kundali_chart — no `translateKn()` usage
+- **Fix**: Apply same planet name translation fix
 
 ## Proposed Changes
 
-### [MODIFY] [dashboard_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/dashboard_screen.dart)
+### Matchmaking Tab
+#### [MODIFY] [match_making_tab.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/match_making_tab.dart)
+- Add locale keys for Kuja Dosha verdict strings
+- Add locale keys for "वर के विवरण" / "वधू के विवरण" labels if hardcoded
+- Search for all remaining hardcoded Kannada strings and replace with `AppLocale.l()` calls
 
-#### 1. Person Selector Chip Bar
-- Add `int _selectedPersonIdx = -1` state variable (`-1` = show all)
-- Add horizontal `ChoiceChip` bar between app bar and tab bar — shows "All", primary name, and extra person names
-- Only visible when `_extraPersons.isNotEmpty`
+---
 
-#### 2. `_filterPersons()` Method
-- New method: filters `allPersons` list by `_selectedPersonIdx`
-- Called in **every tab** (`_buildKundaliTab`, `_buildSphutas`, `_buildDashaTab`, `_buildPanchangTab`, `_buildBhavaTab`, `_buildGrahaShadvargaTab`, `_buildShadbalaTab`, `_buildAshtakaTab`)
+### Kundali Chart  
+#### [MODIFY] [kundali_chart.dart](file:///d:/bharatheeyamapp%20sample/lib/widgets/kundali_chart.dart)
+- In `_planetChip()`, use `translateKn(name)` as fallback when `_shortNames[name]` returns null
+- Ensure all display paths use locale-aware names
 
-#### 3. New "Bhava Shadvarga" Tab (ಭಾವ ಷಡ್ವರ್ಗ)
-- 12 tabs instead of 11
-- New `_buildBhavaShadvargaTab()` method showing Bhava varga table with D1, D3, D2, D9, D12, D30, sub-drekkana columns, and D81
+#### [MODIFY] [north_indian_chart.dart](file:///d:/bharatheeyamapp%20sample/lib/widgets/north_indian_chart.dart)
+- Apply same translation fix for planet names
+
+---
+
+### Panchanga Search
+#### [MODIFY] [panchanga_search_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/panchanga_search_screen.dart)
+- Verify `trAll()` correctly translates all dropdown items
+- If needed, use `AppLocale.l('cm$i')` directly for Chandra Masa items instead of hardcoded Kannada
+
+---
+
+### Locale Strings
+#### [MODIFY] [common.dart](file:///d:/bharatheeyamapp%20sample/lib/widgets/common.dart)
+- Add any missing locale keys for matchmaking verdict strings
 
 ## Verification Plan
-
-### Manual Verification
-- Build and test with multiple persons added
-- Verify chip bar appears and filters work per tab
-- Verify new Bhava Shadvarga tab renders correctly
+- Switch app to Hindi and verify all tabs display correctly
+- Test matchmaking Kuja Dosha section
+- Test panchanga search dropdowns
+- Test kundali chart planet names in all 5 languages

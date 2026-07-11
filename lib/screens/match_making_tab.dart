@@ -875,10 +875,10 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
     String verdict;
     Color vColor;
     if (bothHave || neitherHas) {
-      verdict = bothHave ? 'ಇಬ್ಬರಿಗೂ ಕುಜ ದೋಷ ✅' : 'ಇಬ್ಬರಿಗೂ ಕುಜ ದೋಷ ಇಲ್ಲ ✅';
+      verdict = bothHave ? AppLocale.l('kujaDoshaBoth') : AppLocale.l('kujaDoshaNone');
       vColor = Colors.green.shade700;
     } else {
-      verdict = 'ಕುಜ ದೋಷ ಅಸಮಾನ ⚠️';
+      verdict = AppLocale.l('kujaDoshaMismatch');
       vColor = Colors.red.shade700;
     }
 
@@ -923,7 +923,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
           Icon((ps['isSamya'] as bool) ? Icons.check_circle : Icons.warning, color: (ps['isSamya'] as bool) ? Colors.green : Colors.red, size: 20),
           const SizedBox(width: 8),
           Flexible(child: Text(
-            (ps['isSamya'] as bool) ? 'ಪಾಪ ಸಾಮ್ಯ ✅ (ವ್ಯತ್ಯಾಸ: ${ps['difference']})' : 'ಪಾಪ ಅಸಮಾನ ⚠️ (ವ್ಯತ್ಯಾಸ: ${ps['difference']})',
+            (ps['isSamya'] as bool) ? '${AppLocale.l('papaSamyaOk')} (${AppLocale.l('diffLabel')}: ${ps['difference']})' : '${AppLocale.l('papaAsaman')} (${AppLocale.l('diffLabel')}: ${ps['difference']})',
             style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: (ps['isSamya'] as bool) ? Colors.green.shade800 : Colors.red.shade800),
           )),
         ]),
@@ -945,7 +945,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
     final gName = _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : AppLocale.l('groomDetails');
 
     return AppCard(padding: EdgeInsets.zero, child: Column(children: [
-      _tableRow2(['', bName, gName, 'ಫಲ'], header: true, bg: kPurple2.withOpacity(0.08)),
+      _tableRow2(['', bName, gName, AppLocale.l('phala')], header: true, bg: kPurple2.withOpacity(0.08)),
       ...rows.map((r) => Container(
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder))),
         child: Row(children: [
@@ -976,7 +976,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
           Icon(has ? Icons.close : Icons.check, color: has ? Colors.red : Colors.green, size: 14),
           const SizedBox(width: 4),
           Text('$label: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kMuted)),
-          Text(has ? 'ದೋಷ ಇದೆ' : 'ದೋಷ ಇಲ್ಲ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: has ? Colors.red.shade700 : Colors.green.shade700)),
+          Text(has ? AppLocale.l('doshaPresent') : AppLocale.l('doshaAbsent'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: has ? Colors.red.shade700 : Colors.green.shade700)),
           Text(' (${d['brideFromGroom']}/${d['groomFromBride']})', style: TextStyle(fontSize: 10, color: kMuted)),
         ]),
       );

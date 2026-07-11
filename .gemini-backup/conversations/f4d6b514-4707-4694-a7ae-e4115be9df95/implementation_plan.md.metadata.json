@@ -1,6 +1,6 @@
 {
-  "summary":  "Plan to port 3 features from clone app: person selector chips, filterPersons method, and Bhava Shadvarga tab",
-  "updatedAt":  "2026-07-08T04:30:59.348394700Z",
+  "summary":  "Plan to fix localization issues across the app:\n1. Matchmaking hardcoded Kannada strings → use AppLocale.l() keys\n2. Kundali chart planet names not translating → investigate and fix _shortNames lookup\n3. Panchanga search dropdown values showing corrupted text → verify trAll() pipeline\n4. Any other hardcoded Kannada strings in UI",
+  "updatedAt":  "2026-07-11T04:54:32.275814500Z",
   "requestFeedback":  true,
   "userFacing":  true
 }
