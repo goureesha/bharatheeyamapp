@@ -1,0 +1,5 @@
+{
+  "summary":  "Complete build walkthrough for Bharatiyam Panchanga app — documents all 31 files created, feature inventory (5 panchanga limbs, 4 calendar systems, 15+15 muhurtas, 12-rashi lagna, hora, chougadiya, 7 languages, GPS location, PDF/image export), project structure, and GitHub Actions deployment instructions.",
+  "updatedAt":  "2026-07-13T11:37:48.662532800Z",
+  "userFacing":  true
+}

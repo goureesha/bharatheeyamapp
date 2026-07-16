@@ -754,7 +754,8 @@ class AstroCalculator {
       }
 
       // Vedic day (Sunrise to Sunrise) calculation for Panchang & Udayadi Ghati
-      final udayadiGhati = formatGhati((jdBirth - panchSr) * 60);
+      // Use panchSunrise (refraction-corrected, -0.5667°) to match displayed panchanga sunrise
+      final udayadiGhati = formatGhati((jdBirth - panchSunrise) * 60);
 
       // Nakshatra ghatis
       final js = findNakLimit(jdBirth, nIdx * _nakSize, ayanamsaMode);

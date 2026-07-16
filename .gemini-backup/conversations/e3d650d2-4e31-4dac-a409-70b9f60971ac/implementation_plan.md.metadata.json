@@ -1,0 +1,6 @@
+{
+  "summary":  "Updated implementation plan for Bharatiyam Panchanga — Flutter app with Android APK + Web preview.\n\nKey changes from v1:\n- Technology: Flutter (not Vite+JS) — builds Android APK + web via GitHub Actions\n- Pournimanta: Full calculation with Purnima-to-Purnima boundary detection\n- Lagna: Full 12-rashi rising/setting times for day and night\n- Night muhurtas: All 15 included\n- Location: GPS auto-detect + city selector with 500+ Indian cities\n- Date range: 1900–2100\n- Export: PDF + image (screenshot) export\n- Swiss Ephemeris via sweph Dart package (same as reference app)\n- Lahiri Ayanamsha, mid-limb sunrise\n- 7 languages: Kannada, Hindi, Tamil, Telugu, Malayalam, English, Sanskrit\n- GitHub Actions CI/CD for build\n- All panchanga features from reference app plus new additions\n- 5 implementation phases with detailed file structure",
+  "updatedAt":  "2026-07-12T13:40:55.842544900Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

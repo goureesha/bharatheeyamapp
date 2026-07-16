@@ -1,0 +1,6 @@
+{
+  "summary":  "UI design document for Bharatiyam Panchanga app with 3 screen mockups:\n1. Home Screen - calendar grid with today's panchanga summary\n2. Detail Screen - full panchanga view with 4 calendar system tabs\n3. Muhurta Screen - timings, lagna transits, hora\n\nIncludes design system specification: dark purple theme, gold accents, glassmorphism cards, sacred geometry elements, Indic typography.",
+  "updatedAt":  "2026-07-12T13:43:44.154712800Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}
