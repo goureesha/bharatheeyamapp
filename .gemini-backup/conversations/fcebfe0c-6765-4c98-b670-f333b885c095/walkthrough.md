@@ -1,34 +1,20 @@
-# Walkthrough - Translation and Formatting of Shiva Purana Rudra Parvati Chapters 17 and 18
+# Walkthrough - Translate and Restructure Shiva Purana Rudra Kumara Chapters 15 and 16
 
-We have successfully translated and completed the shloka-by-shloka translations of the Sanskrit verses/prose of **Shiva Purana Rudra Samhita (Parvati Khanda) Chapters 17 and 18** to Kannada, resolved character conflicts, verified block counts, and pushed the updates to GitHub.
+We have successfully translated and restructured the Sanskrit verses/prose blocks of Shiva Purana Rudra Samhita (Kumara Khanda) Chapters 15 and 16 into a high-quality Kannada shloka-by-shloka (Sanskrit + Shabdartha + Bhavartha) format.
 
 ## Changes Made
 
-### 1. Translation and Validation
-- Extracted Sanskrit verses/prose blocks from Shiva Purana Rudra Parvati Chapters 17 and 18 (98 blocks total).
-- Chunked the 98 blocks into 8 batches.
-- Invoked translation subagents in waves to translate each batch into Kannada script.
-- Verified that all Shabdartha and Bhavartha blocks contain:
-  - **0% foreign characters** (only Kannada characters, standard punctuation, and spaces are present).
-  - Exclusive use of hyphens (`-`) as separators in Shabdartha.
-  - Correct headers (`ಶಬ್ದಾರ್ಥ:` and `ಭಾವಾರ್ಥ:`).
+- **Chapter 15**: Reconstructed [purana_shiva_rudra_kumara_ch_15.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/purana_shiva_rudra_kumara_ch_15.txt) (77 verses).
+- **Chapter 16**: Reconstructed [purana_shiva_rudra_kumara_ch_16.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/purana_shiva_rudra_kumara_ch_16.txt) (42 verses).
 
-### 2. Merging & Restructuring
-- Standardized Sanskrit verses to a single line.
-- Merged the batches back into their respective files:
-  - [purana_shiva_rudra_parvati_ch_17.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/purana_shiva_rudra_parvati_ch_17.txt) (47 verses + 1 colophon = 48 blocks)
-  - [purana_shiva_rudra_parvati_ch_18.txt](file:///d:/bharatheeyam%20books/assets/data/chapters/purana_shiva_rudra_parvati_ch_18.txt) (49 verses + 1 colophon = 50 blocks)
+## Formatting Compliance
+- Each block contains:
+  - Exact Sanskrit text in Kannada script.
+  - `"ಶಬ್ದಾರ್ಥ:"` header followed by bullet points with hyphens (`-`) as separators.
+  - `"ಭಾವಾರ್ಥ:"` header followed by the overall verse meaning in Kannada.
+- Exactly 0% foreign/Latin/Devanagari characters are present in the Shabdartha or Bhavartha sections.
 
-### 3. Git Operations
-- Staged, committed, and pushed changes successfully to the remote repository on GitHub:
-  ```bash
-  git push
-  # To https://github.com/goureesha/bharatiyam-gratha-sudha.git
-  #   d185242..fa75786  main -> main
-  ```
-
-## Verification Results
-- Ran verification scripts successfully:
-  - **Chapter 17**: 48 Sanskrit, 48 Shabdartha, and 48 Bhavartha blocks (100% compliant, 0 errors).
-  - **Chapter 18**: 50 Sanskrit, 50 Shabdartha, and 50 Bhavartha blocks (100% compliant, 0 errors).
-
+## Verification Run
+- Ran `validate_shiva_rudra_kumara_ch15_16.py` which parsed all 357 blocks (expected 231 for Ch 15, 126 for Ch 16) and reported 0 errors.
+- Ran `check_latin_sanskrit_kumara_ch15_16.py` to check for typos in Sanskrit, and found no errors.
+- Staged, committed, and pushed changes successfully (`c8c061f`).

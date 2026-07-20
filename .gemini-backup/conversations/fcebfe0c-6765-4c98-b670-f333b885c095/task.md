@@ -1,4 +1,11 @@
-- `[/]` Launch translation subagents for Shiva Rudra Parvati Chapters 19 and 20 Batches 1 to 7
-- `[ ]` Merge all translated batches into Chapters 19 and 20
-- `[ ]` Run validation script to verify character range and block counts
-- `[ ]` Commit and push changes to GitHub
+- [x] Chunk Kumara Khanda Chapters 17 and 18 into JSON batches
+- [x] Launch Wave 1 translation subagents (Batches 1 to 3)
+- [/] Launch Wave 2 translation subagents (Batches 4 to 6)
+- [ ] Launch Wave 3 translation subagents (Batches 7 to 9)
+- [ ] Launch Wave 4 translation subagents (Batches 10 to 12)
+- [ ] Launch Wave 5 translation subagents (Batches 13 and 14)
+- [ ] Restore chapter metadata to translated JSON files
+- [ ] Reconstruct Chapters 17 and 18 from translated batches
+- [ ] Validate character constraints, formatting, and Sanskrit block counts
+- [ ] Verify Sanskrit verses for any Latin typos
+- [ ] Commit and push to GitHub

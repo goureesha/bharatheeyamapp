@@ -755,7 +755,14 @@ class AstroCalculator {
 
       // Vedic day (Sunrise to Sunrise) calculation for Panchang & Udayadi Ghati
       // Use panchSunrise (refraction-corrected, -0.5667°) to match displayed panchanga sunrise
-      final udayadiGhati = formatGhati((jdBirth - panchSunrise) * 60);
+      // If birth is before today's sunrise, use previous day's sunrise (Vedic day starts at sunrise)
+      double udayadiSr = panchSunrise;
+      if (jdBirth < panchSunrise) {
+        final prevD = dob.subtract(const Duration(days: 1));
+        final prevSrSs = Ephemeris.findSunriseSetForDate(prevD.year, prevD.month, prevD.day, lat, lon, tzOffset: hourUtcOffset);
+        udayadiSr = prevSrSs[0];
+      }
+      final udayadiGhati = formatGhati((jdBirth - udayadiSr) * 60);
 
       // Nakshatra ghatis
       final js = findNakLimit(jdBirth, nIdx * _nakSize, ayanamsaMode);
