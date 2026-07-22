@@ -1,6 +1,0 @@
-- `[ ]` Fix matchmaking hardcoded Kannada strings
-- `[ ]` Fix kundali chart planet name translation
-- `[ ]` Fix north indian chart planet name translation  
-- `[ ]` Fix panchanga search dropdown translation
-- `[ ]` Add missing locale keys in common.dart
-- `[ ]` Push and verify

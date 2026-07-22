@@ -1,6 +1,0 @@
-{
-  "summary":  "Implementation plan for overhauling the TravelBuddy trip planning system. Covers three phases:\n1. Trip Planning on Map — unified TripPlan model, save/load routes with waypoints from the map, round trip toggle\n2. Trip Sharing — share plans in-app via codes and via WhatsApp deep links\n3. Live Trip Mode — real-time location sharing with team, activity-tagged stops (fuel, food, hotel, viewpoint etc.) saved to the trip plan\n\nIncludes Firestore schema, file-by-file changes, new files, and verification plan.",
-  "updatedAt":  "2026-07-02T10:46:04.717830700Z",
-  "requestFeedback":  true,
-  "userFacing":  true
-}

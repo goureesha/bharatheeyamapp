@@ -6,7 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'google_auth_service.dart';
-import 'subscription_service.dart';
+import 'app_access_service.dart';
 
 /// Manages one-Gmail-one-device binding using Firestore for cross-device enforcement.
 ///
@@ -50,7 +50,7 @@ class DeviceBindingService {
     return _deviceId!;
   }
 
-  /// Collect rich device + subscription details for Firestore
+  /// Collect rich device + access details for Firestore
   static Future<Map<String, dynamic>> _getDeviceDetails(String email, String devId) async {
     final data = <String, dynamic>{
       'deviceId': devId,
@@ -91,17 +91,17 @@ class DeviceBindingService {
     } catch (_) {}
 
     // Trial details
-    data['isTrialActive'] = SubscriptionService.isTrialActive;
-    data['trialMinutesRemaining'] = SubscriptionService.trialMinutesRemaining;
-    if (SubscriptionService.trialStartDate != null) {
-      data['trialStartedAt'] = Timestamp.fromDate(SubscriptionService.trialStartDate!);
+    data['isTrialActive'] = AppAccessService.isTrialActive;
+    data['trialMinutesRemaining'] = AppAccessService.trialMinutesRemaining;
+    if (AppAccessService.trialStartDate != null) {
+      data['trialStartedAt'] = Timestamp.fromDate(AppAccessService.trialStartDate!);
     }
 
-    // NOTE: Do NOT write premiumActive or premiumDaysRemaining from the app.
-    // Only manualPremium (admin-set) controls access.
+    // NOTE: Do NOT write accessActive or accessDaysRemaining from the app.
+    // Only adminAccess (admin-set) controls access.
     // Writing these fields from the app was causing lockout failures.
 
-    // Clean up all stale/app-written fields — admin uses manualPremium only
+    // Clean up all stale/app-written fields — admin uses adminAccess only
     data['premiumActive'] = FieldValue.delete();
     data['premiumDaysRemaining'] = FieldValue.delete();
     data['subscribedAt'] = FieldValue.delete();
@@ -434,7 +434,7 @@ class DeviceBindingService {
         data['buildNumber'] = pkgInfo.buildNumber;
       } catch (_) {}
 
-      // NOTE: Do not write premium status — admin-controlled via device_bindings only
+      // NOTE: Do not write access status — admin-controlled via device_bindings only
 
       final docRef = FirebaseFirestore.instance
           .collection('installs')

@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'screens/home_screen.dart';
 import 'screens/support_screen.dart';
 import 'widgets/common.dart';
-import 'services/subscription_service.dart';
+import 'services/app_access_service.dart';
 import 'services/trusted_time_service.dart';
 import 'services/google_auth_service.dart';
 import 'core/transit_cache.dart';
@@ -36,7 +36,7 @@ Future<void> main() async {
     DeviceOrientation.landscapeRight,
   ]);
 
-  // NTP must init BEFORE SubscriptionService so trusted time is available
+  // NTP must init BEFORE AppAccessService so trusted time is available
   await TrustedTimeService.init();
 
   // Firebase must init BEFORE auth/binding/tester because sign-in triggers
@@ -56,8 +56,8 @@ Future<void> main() async {
     LocationService.init(),
   ]);
 
-  // Phase 2: Subscription (needs userEmail from sign-in)
-  await SubscriptionService.initialize();
+  // Phase 2: AppAccess (needs userEmail from sign-in)
+  await AppAccessService.initialize();
   await OfflineAccessService.initialize();
 
   // Show the app IMMEDIATELY — no more blocking on binding/tester
@@ -123,7 +123,7 @@ Future<void> _initAuthAndBinding() async {
       deviceBindingNotifier.value = bound;
       debugPrint('DeviceBinding: pre-render check result=$bound');
       // Sync trial start with Firestore (prevents trial reset on reinstall)
-      await SubscriptionService.syncTrialWithFirestore();
+      await AppAccessService.syncTrialWithFirestore();
       // Restore offline day count from server (prevents reset on reinstall)
       await OfflineAccessService.restoreFromServer();
     }
@@ -252,7 +252,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    SubscriptionService.dispose();
+    AppAccessService.dispose();
     super.dispose();
   }
 
@@ -264,8 +264,8 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
       // Sync offline usage when coming back online
       OfflineAccessService.syncToServer();
       OfflineAccessService.clearExpiredClaim();
-      // Re-check subscription + device binding on resume.
-      // If access has been revoked (offline too long, premium expired, etc.)
+      // Re-check access + device binding on resume.
+      // If access has been revoked (offline too long, access expired, etc.)
       // redirect to the root gate screen.
       _verifyAccessOnResume();
     }
@@ -275,24 +275,24 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
 
     // Always try to verify with the server, even during active offline claims.
     // This ensures admin revocations take effect even if the user claimed a day.
-    final serverReached = await SubscriptionService.checkManualPremium();
+    final serverReached = await AppAccessService.checkAdminAccess();
     // Also check device-level block (installs collection)
     await DeviceBindingService.checkDeviceBlock();
 
     if (GoogleAuthService.isSignedIn) {
       final bound = await DeviceBindingService.checkBinding();
       deviceBindingNotifier.value = bound;
-      SubscriptionService.syncTrialWithFirestore();
+      AppAccessService.syncTrialWithFirestore();
     }
 
     // If the server was successfully reached and says no access,
     // the offline claim should NOT override an explicit server revocation.
     // Clear the claim and kick the user to the gate screen.
     if (serverReached &&
-        !SubscriptionService.manualPremium &&
-        !SubscriptionService.hasSubscription &&
-        !SubscriptionService.isTrialActive) {
-      // Server confirmed: no premium, no subscription, no trial.
+        !AppAccessService.adminAccess &&
+        !AppAccessService.isActivated &&
+        !AppAccessService.isTrialActive) {
+      // Server confirmed: no access, no access, no trial.
       // If there's an active offline claim, invalidate it — server authority wins.
       if (OfflineAccessService.hasActiveClaim) {
         await OfflineAccessService.clearActiveClaim();
@@ -302,8 +302,8 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
 
     // Force UI rebuild if access was revoked or user was blocked.
     // This kicks the user out of HomeScreen to SupportScreen/BlockedScreen.
-    if (!SubscriptionService.hasAccess ||
-        SubscriptionService.isBlocked ||
+    if (!AppAccessService.hasAccess ||
+        AppAccessService.isBlocked ||
         DeviceBindingService.isDeviceBlocked) {
       // Increment rebuild key to force MaterialApp recreation with blocked/support screen
       if (mounted) setState(() => _rebuildKey++);
@@ -445,15 +445,15 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
               ),
               home: _isVersionOutdated
                   ? const _ForceUpdateScreen()
-                  : (SubscriptionService.isBlocked || DeviceBindingService.isDeviceBlocked)
+                  : (AppAccessService.isBlocked || DeviceBindingService.isDeviceBlocked)
                   ? _BlockedScreen()
                   : !GoogleAuthService.isSignedIn && !kIsWeb
-                  ? (SubscriptionService.lastOnlineCheck == null
+                  ? (AppAccessService.lastOnlineCheck == null
                     ? const _FirstTimeSignInScreen()
                     : const _OfflineVerifyScreen())
                   : !isBound
                     ? const _DeviceMismatchScreen()
-                    : SubscriptionService.hasAccess ? const HomeScreen() : const SupportScreen(),
+                    : AppAccessService.hasAccess ? const HomeScreen() : const SupportScreen(),
             );
           },
         );
@@ -548,8 +548,8 @@ class _BlockedScreenState extends State<_BlockedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final reason = SubscriptionService.isBlocked
-        ? SubscriptionService.blockedReason
+    final reason = AppAccessService.isBlocked
+        ? AppAccessService.blockedReason
         : DeviceBindingService.deviceBlockedReason;
     return Scaffold(
       backgroundColor: kBg,
@@ -607,11 +607,11 @@ class _BlockedScreenState extends State<_BlockedScreen> {
                 onPressed: () async {
                   setState(() => _checking = true);
                   try {
-                    await SubscriptionService.checkManualPremium();
+                    await AppAccessService.checkAdminAccess();
                     await DeviceBindingService.checkDeviceBlock();
                   } catch (_) {}
                   if (mounted) {
-                    if (!SubscriptionService.isBlocked && !DeviceBindingService.isDeviceBlocked) {
+                    if (!AppAccessService.isBlocked && !DeviceBindingService.isDeviceBlocked) {
                       // Unblocked! Rebuild the app
                       deviceBindingNotifier.value = deviceBindingNotifier.value;
                     } else {
@@ -707,7 +707,7 @@ class _DeviceMismatchScreenState extends State<_DeviceMismatchScreen> {
                 final bound = await DeviceBindingService.checkBinding();
                 deviceBindingNotifier.value = bound;
                 if (bound) {
-                  await SubscriptionService.syncTrialWithFirestore();
+                  await AppAccessService.syncTrialWithFirestore();
                 }
               }
               // If sign-in cancelled/failed, stay on mismatch screen
@@ -756,11 +756,11 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12, color: kMuted, height: 1.5),
           ),
-          if (SubscriptionService.lastOnlineCheck != null) ...[
+          if (AppAccessService.lastOnlineCheck != null) ...[
             const SizedBox(height: 12),
             Builder(builder: (_) {
-              final hoursSince = TrustedTimeService.now().difference(SubscriptionService.lastOnlineCheck!).inHours;
-              final graceDaysLeft = 10 - TrustedTimeService.now().difference(SubscriptionService.lastOnlineCheck!).inDays;
+              final hoursSince = TrustedTimeService.now().difference(AppAccessService.lastOnlineCheck!).inHours;
+              final graceDaysLeft = 10 - TrustedTimeService.now().difference(AppAccessService.lastOnlineCheck!).inDays;
               return Text(
                 'Last verified: ${hoursSince}h ago  •  Grace: ${graceDaysLeft > 0 ? graceDaysLeft : 0} days left',
                 textAlign: TextAlign.center,
@@ -783,15 +783,15 @@ class _InternetRequiredScreenState extends State<_InternetRequiredScreen> {
                 setState(() => _checking = true);
                 try {
                   await Future.wait([
-                    SubscriptionService.checkManualPremium(),
-                    SubscriptionService.recordOnlineCheck(),
+                    AppAccessService.checkAdminAccess(),
+                    AppAccessService.recordOnlineCheck(),
                   ]).timeout(const Duration(seconds: 5), onTimeout: () => []);
                 } catch (_) {}
                 if (mounted) {
-                  if (!SubscriptionService.needsInternetVerification) {
+                  if (!AppAccessService.needsInternetVerification) {
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
-                        builder: (_) => SubscriptionService.hasAccess
+                        builder: (_) => AppAccessService.hasAccess
                           ? const HomeScreen()
                           : const SupportScreen(),
                       ),
@@ -1089,14 +1089,14 @@ class _FirstTimeSignInScreenState extends State<_FirstTimeSignInScreen> {
                     if (ok && mounted) {
                       // Binding check MUST complete — don't timeout
                       final bound = await DeviceBindingService.checkBinding();
-                      // Subscription check MUST complete before UI rebuild
-                      // so hasAccess is correct (trial/premium state resolved)
-                      await SubscriptionService.checkManualPremium();
-                      await SubscriptionService.recordOnlineCheck();
+                      // AppAccess check MUST complete before UI rebuild
+                      // so hasAccess is correct (trial/access state resolved)
+                      await AppAccessService.checkAdminAccess();
+                      await AppAccessService.recordOnlineCheck();
                       // Now trigger UI rebuild with correct state
                       deviceBindingNotifier.value = bound;
                       // These can run in background
-                      SubscriptionService.syncTrialWithFirestore();
+                      AppAccessService.syncTrialWithFirestore();
                     } else if (mounted) {
                       setState(() => _signingIn = false);
                     }
@@ -1201,13 +1201,13 @@ class _GmailRequiredScreenState extends State<_GmailRequiredScreen> {
                         if (ok && mounted) {
                           // Binding check MUST complete — don't timeout
                           final bound = await DeviceBindingService.checkBinding();
-                          // Subscription check MUST complete before UI rebuild
-                          await SubscriptionService.checkManualPremium();
-                          await SubscriptionService.recordOnlineCheck();
+                          // AppAccess check MUST complete before UI rebuild
+                          await AppAccessService.checkAdminAccess();
+                          await AppAccessService.recordOnlineCheck();
                           // Now trigger UI rebuild with correct state
                           deviceBindingNotifier.value = bound;
                           // Background tasks
-                          SubscriptionService.syncTrialWithFirestore();
+                          AppAccessService.syncTrialWithFirestore();
                         } else if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Sign-in cancelled'), backgroundColor: Colors.orange),

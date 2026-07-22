@@ -7,9 +7,9 @@ import 'google_auth_service.dart';
 import 'offline_access_service.dart';
 import '../widgets/common.dart';
 
-class SubscriptionService {
+class AppAccessService {
   // ── Pref keys ──
-  static const String _subStatusKey = 'has_active_subscription';
+  static const String _accessStatusKey = 'has_active_access';
   static const String _trialStartKey = 'trial_start_timestamp';
   static const String _lastOnlineCheckKey = 'last_online_check_timestamp';
   static const String _blockedKey = 'user_blocked';
@@ -21,9 +21,9 @@ class SubscriptionService {
   static const int _offlineGraceDays = 10;      // Max offline grace: 10 days
 
   // ── State ──
-  static bool hasSubscription = false;
-  static bool manualPremium = false;
-  static DateTime? manualPremiumExpiry;
+  static bool isActivated = false;
+  static bool adminAccess = false;
+  static DateTime? adminAccessExpiry;
   static DateTime? trialStartDate;
   static DateTime? lastOnlineCheck;
   static bool isBlocked = false;
@@ -33,26 +33,26 @@ class SubscriptionService {
   // COMPUTED PROPERTIES FOR UI
   // ════════════════════════════════════════════════
 
-  /// True if the user has access (manual premium OR trial active OR active offline claim)
+  /// True if the user has access (admin access OR trial active OR active offline claim)
   static bool get hasAccess {
     if (isBlocked) return false;
     if (kIsWeb) return true;
     if (OfflineAccessService.hasActiveClaim) return true;
-    if (manualPremium) {
-      if (manualPremiumExpiry != null &&
-          manualPremiumExpiry!.isBefore(TrustedTimeService.now())) {
-        manualPremium = false;
-        hasSubscription = false;
+    if (adminAccess) {
+      if (adminAccessExpiry != null &&
+          adminAccessExpiry!.isBefore(TrustedTimeService.now())) {
+        adminAccess = false;
+        isActivated = false;
         return false;
       }
       return true;
     }
-    return hasSubscription || isTrialActive;
+    return isActivated || isTrialActive;
   }
 
   /// True if the user hasn't connected to the internet within the allowed window.
   /// - Trial users: NO grace period — must always have internet.
-  /// - Premium users: 10-day offline grace, but must connect every 24 hours.
+  /// - Activated users: 10-day offline grace, but must connect every 24 hours.
   static bool get needsInternetVerification {
     if (kIsWeb) return false;
     if (lastOnlineCheck == null) return true; // Never verified
@@ -61,7 +61,7 @@ class SubscriptionService {
     final hoursSinceCheck = now.difference(lastOnlineCheck!).inHours;
 
     // Trial users get NO offline grace — must always have internet
-    if (!manualPremium && !hasSubscription) {
+    if (!adminAccess && !isActivated) {
       if (hoursSinceCheck >= 1) {
         debugPrint('🔒 Trial user offline > 1 hour. No grace period. Must connect.');
         return true;
@@ -69,14 +69,14 @@ class SubscriptionService {
       return false;
     }
 
-    // Premium users: 10-day hard grace limit
+    // Activated users: 10-day hard grace limit
     final daysSinceCheck = now.difference(lastOnlineCheck!).inDays;
     if (daysSinceCheck >= _offlineGraceDays) {
       debugPrint('🔒 Offline grace period expired ($daysSinceCheck days). Must connect.');
       return true;
     }
 
-    // Premium users: must connect at least once every 24 hours
+    // Activated users: must connect at least once every 24 hours
     if (hoursSinceCheck >= _maxOfflineHours) {
       debugPrint('🔒 Offline > $_maxOfflineHours hours ($hoursSinceCheck h). Must connect.');
       return true;
@@ -112,11 +112,11 @@ class SubscriptionService {
 
   /// App status text for UI display
   static String get statusText {
-    if (manualPremium && manualPremiumExpiry != null) {
-      final days = manualPremiumExpiry!.difference(TrustedTimeService.now()).inDays;
+    if (adminAccess && adminAccessExpiry != null) {
+      final days = adminAccessExpiry!.difference(TrustedTimeService.now()).inDays;
       return 'Beta Access ✅ ($days ${AppLocale.l('daysRemaining')})';
     }
-    if (hasSubscription) {
+    if (isActivated) {
       return '${AppLocale.l('premiumActive')}';
     }
     if (isTrialActive) {
@@ -156,18 +156,18 @@ class SubscriptionService {
     blockedReason = prefs.getString(_blockedReasonKey) ?? '';
 
     // ── CRITICAL: Check Firestore on EVERY app open ──
-    // Do NOT load cached subscription status first — always check server.
+    // Do NOT load cached access status first — always check server.
     // This ensures admin revocations take effect immediately on next app open.
     // If Firestore check succeeds → use server value (authoritative).
     // If Firestore check fails → fall back to cached value (10-day offline grace).
-    final firestoreChecked = await checkManualPremium();
+    final firestoreChecked = await checkAdminAccess();
     if (!firestoreChecked) {
       // Firestore unreachable — use cached value as offline fallback.
       // The 10-day grace period is enforced by needsInternetVerification.
       // After 10 days without successful Firestore check, app locks.
-      hasSubscription = prefs.getBool(_subStatusKey) ?? false;
-      manualPremium = hasSubscription;
-      debugPrint('⚠️ Firestore unreachable — using cached subscription: $hasSubscription');
+      isActivated = prefs.getBool(_accessStatusKey) ?? false;
+      adminAccess = isActivated;
+      debugPrint('⚠️ Firestore unreachable — using cached access: $isActivated');
       debugPrint('⚠️ Last online check: $lastOnlineCheck');
       if (lastOnlineCheck != null) {
         final daysSince = TrustedTimeService.now().difference(lastOnlineCheck!).inDays;
@@ -228,13 +228,13 @@ class SubscriptionService {
   }
 
   // ════════════════════════════════════════════════
-  // MANUAL PREMIUM (admin-set via Firestore)
+  // ADMIN ACCESS (admin-set via Firestore)
   // ════════════════════════════════════════════════
 
-  /// Check if the admin has manually granted premium for this user.
+  /// Check if the admin has granted access for this user.
   /// Reads `manualPremium` flag from Firestore `device_bindings/{email}`.
   /// Returns true if Firestore was successfully reached, false on error.
-  static Future<bool> checkManualPremium() async {
+  static Future<bool> checkAdminAccess() async {
     final email = GoogleAuthService.userEmail;
     if (email == null) return false;
 
@@ -247,12 +247,12 @@ class SubscriptionService {
 
       if (!doc.exists || doc.data() == null) {
         // Successfully reached Firestore — record online check
-        // No document = no premium
+        // No document = no access
         await recordOnlineCheck();
-        manualPremium = false;
-        hasSubscription = false;
+        adminAccess = false;
+        isActivated = false;
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool(_subStatusKey, false);
+        await prefs.setBool(_accessStatusKey, false);
         return true;
       }
 
@@ -273,21 +273,22 @@ class SubscriptionService {
         debugPrint('🚫 User BLOCKED: $reason');
       }
 
-      final isPremium = data['manualPremium'] == true;
+      // Firestore field names kept as-is for data compatibility
+      final hasAdminGrant = data['manualPremium'] == true;
 
-      if (isPremium) {
-        // manualPremiumExpiry is REQUIRED — no lifetime access
+      if (hasAdminGrant) {
+        // Expiry is REQUIRED — no lifetime access
         final expiryTs = data['manualPremiumExpiry'];
         if (expiryTs != null && expiryTs is Timestamp) {
           final expiryDate = expiryTs.toDate();
           if (expiryDate.isBefore(TrustedTimeService.now())) {
             // Expired — update local state
-            manualPremium = false;
-            manualPremiumExpiry = null;
-            hasSubscription = false;
+            adminAccess = false;
+            adminAccessExpiry = null;
+            isActivated = false;
             final prefs = await SharedPreferences.getInstance();
-            await prefs.setBool(_subStatusKey, false);
-            debugPrint('🔒 Manual premium EXPIRED on $expiryDate');
+            await prefs.setBool(_accessStatusKey, false);
+            debugPrint('🔒 Admin access EXPIRED on $expiryDate');
 
             // Write back to Firestore so admin dashboard reflects it
             try {
@@ -295,41 +296,41 @@ class SubscriptionService {
                   .collection('device_bindings')
                   .doc(email!.toLowerCase())
                   .update({'manualPremium': false});
-              debugPrint('🔄 Firestore updated: manualPremium → false');
+              debugPrint('🔄 Firestore updated: access revoked');
             } catch (_) {}
             return true;
           }
-          manualPremiumExpiry = expiryDate;
-          manualPremium = true;
-          hasSubscription = true;
+          adminAccessExpiry = expiryDate;
+          adminAccess = true;
+          isActivated = true;
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool(_subStatusKey, true);
-          debugPrint('✅ Manual premium ACTIVE for $email (expires: $expiryDate)');
+          await prefs.setBool(_accessStatusKey, true);
+          debugPrint('✅ Admin access ACTIVE for $email (expires: $expiryDate)');
         } else {
-          // manualPremium=true but NO expiry set → deny access
-          manualPremium = false;
-          manualPremiumExpiry = null;
-          hasSubscription = false;
+          // Flag set but NO expiry → deny access
+          adminAccess = false;
+          adminAccessExpiry = null;
+          isActivated = false;
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool(_subStatusKey, false);
-          debugPrint('🔒 manualPremium=true but NO expiry set — access denied');
+          await prefs.setBool(_accessStatusKey, false);
+          debugPrint('🔒 Admin flag set but NO expiry — access denied');
         }
       } else {
-        manualPremium = false;
-        manualPremiumExpiry = null;
-        hasSubscription = false;
+        adminAccess = false;
+        adminAccessExpiry = null;
+        isActivated = false;
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool(_subStatusKey, false);
-        debugPrint('🔒 Manual premium REVOKED/OFF for $email');
+        await prefs.setBool(_accessStatusKey, false);
+        debugPrint('🔒 Admin access REVOKED/OFF for $email');
       }
       return true;
     } catch (e) {
-      debugPrint('Manual premium check error: $e');
+      debugPrint('Admin access check error: $e');
       // Firestore unreachable — return false so caller knows to use cache
       return false;
     }
   }
 
   // ── Legacy compatibility ──
-  static bool get hasAdFree => hasSubscription;
+  static bool get hasFullAccess => isActivated;
 }

@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../widgets/common.dart';
 import '../services/google_auth_service.dart';
 import '../services/device_binding_service.dart';
-import '../services/subscription_service.dart';
+import '../services/app_access_service.dart';
 import '../main.dart';
 
 class SupportScreen extends StatefulWidget {
@@ -24,13 +24,13 @@ class _SupportScreenState extends State<SupportScreen> {
     try {
       final ok = await GoogleAuthService.signIn();
       if (ok && mounted) {
-        // After sign-in, register device binding + check manual premium
+        // After sign-in, register device binding + check admin access
         await DeviceBindingService.checkBinding();
-        await SubscriptionService.checkManualPremium();
-        await SubscriptionService.syncTrialWithFirestore();
+        await AppAccessService.checkAdminAccess();
+        await AppAccessService.syncTrialWithFirestore();
         deviceBindingNotifier.value = await DeviceBindingService.checkBinding();
 
-        if (SubscriptionService.hasAccess && mounted) {
+        if (AppAccessService.hasAccess && mounted) {
           // User has access now — refresh the whole app
           deviceBindingNotifier.value = true;
           // Force app rebuild by notifying
@@ -252,15 +252,15 @@ class _SupportScreenState extends State<SupportScreen> {
                   ),
                 ),
 
-                // ── Re-check Premium button (if signed in but locked out) ──
+                // ── Re-check Access button (if signed in but locked out) ──
                 if (isSignedIn) ...[
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: () async {
-                        await SubscriptionService.checkManualPremium();
-                        if (SubscriptionService.hasAccess && mounted) {
+                        await AppAccessService.checkAdminAccess();
+                        if (AppAccessService.hasAccess && mounted) {
                           deviceBindingNotifier.value = true;
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('✅ Access restored!'), backgroundColor: Colors.green),

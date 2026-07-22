@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../widgets/common.dart';
 
-import '../services/subscription_service.dart';
+import '../services/app_access_service.dart';
 import '../services/trusted_time_service.dart';
 import '../services/backup_service.dart';
 import '../services/google_auth_service.dart';
@@ -466,9 +466,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     'Firebase Auth: ${GoogleAuthService.isFirebaseAuthActive ? "Active ✅" : "Inactive ❌"}',
                                     style: TextStyle(fontSize: 10, color: GoogleAuthService.isFirebaseAuthActive ? Colors.green : Colors.red),
                                   ),
-                                  if (SubscriptionService.manualPremium)
+                                  if (AppAccessService.adminAccess)
                                     Text(
-                                      'Beta Access: Active ✅${SubscriptionService.manualPremiumExpiry != null ? " (${SubscriptionService.manualPremiumExpiry!.day}/${SubscriptionService.manualPremiumExpiry!.month}/${SubscriptionService.manualPremiumExpiry!.year})" : ""}',
+                                      'Beta Access: Active ✅${AppAccessService.adminAccessExpiry != null ? " (${AppAccessService.adminAccessExpiry!.day}/${AppAccessService.adminAccessExpiry!.month}/${AppAccessService.adminAccessExpiry!.year})" : ""}',
                                       style: const TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold),
                                     ),
                                 ],
@@ -710,9 +710,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: SubscriptionService.hasSubscription ? Colors.green.shade50 : kPurple1.withOpacity(0.05),
+                        color: AppAccessService.isActivated ? Colors.green.shade50 : kPurple1.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: SubscriptionService.hasSubscription ? Colors.green.shade200 : kPurple2.withOpacity(0.2)),
+                        border: Border.all(color: AppAccessService.isActivated ? Colors.green.shade200 : kPurple2.withOpacity(0.2)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -720,34 +720,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
                            Row(
                              children: [
                                Icon(
-                                 (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Icons.check_circle
-                                   : SubscriptionService.isTrialActive ? Icons.hourglass_bottom
+                                 (AppAccessService.isActivated || AppAccessService.adminAccess) ? Icons.check_circle
+                                   : AppAccessService.isTrialActive ? Icons.hourglass_bottom
                                    : Icons.info_outline, 
-                                 color: (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Colors.green.shade700
-                                   : SubscriptionService.isTrialActive ? kOrange
+                                 color: (AppAccessService.isActivated || AppAccessService.adminAccess) ? Colors.green.shade700
+                                   : AppAccessService.isTrialActive ? kOrange
                                    : kMuted,
                                  size: 28,
                                ),
                                const SizedBox(width: 12),
                                Expanded(
                                  child: Text(
-                                   (SubscriptionService.hasSubscription || SubscriptionService.manualPremium)
+                                   (AppAccessService.isActivated || AppAccessService.adminAccess)
                                       ? AppLocale.l('premiumActive')
-                                      : SubscriptionService.isTrialActive
-                                        ? AppLocale.l('trialActive').replaceAll('{h}', '${SubscriptionService.trialMinutesRemaining}')
+                                      : AppAccessService.isTrialActive
+                                        ? AppLocale.l('trialActive').replaceAll('{h}', '${AppAccessService.trialMinutesRemaining}')
                                         : AppLocale.l('trialExpired'),
                                    style: TextStyle(
                                      fontSize: 16, 
                                      fontWeight: FontWeight.bold,
-                                     color: (SubscriptionService.hasSubscription || SubscriptionService.manualPremium) ? Colors.green.shade800
-                                       : SubscriptionService.isTrialActive ? kOrange
+                                     color: (AppAccessService.isActivated || AppAccessService.adminAccess) ? Colors.green.shade800
+                                       : AppAccessService.isTrialActive ? kOrange
                                        : kMuted
                                    ),
                                  ),
                                ),
                              ],
                            ),
-                           // ── Subscription Status Info ──
+                           // ── AppAccess Status Info ──
                            const SizedBox(height: 12),
                            Container(
                              padding: const EdgeInsets.all(12),
@@ -760,17 +760,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                children: [
                                  Row(children: [
                                    Icon(Icons.verified_user, size: 16,
-                                     color: SubscriptionService.hasSubscription ? Colors.green : kMuted),
+                                     color: AppAccessService.isActivated ? Colors.green : kMuted),
                                    const SizedBox(width: 8),
                                    Expanded(child: Text(
-                                     SubscriptionService.statusText,
+                                     AppAccessService.statusText,
                                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText),
                                    )),
                                  ]),
-                                 if (SubscriptionService.manualPremium && SubscriptionService.manualPremiumExpiry != null) ...[
+                                 if (AppAccessService.adminAccess && AppAccessService.adminAccessExpiry != null) ...[
                                    const SizedBox(height: 10),
                                    Builder(builder: (_) {
-                                     final expiry = SubscriptionService.manualPremiumExpiry!;
+                                     final expiry = AppAccessService.adminAccessExpiry!;
                                      final now = DateTime.now();
                                      final totalDays = 365;
                                      final remaining = expiry.difference(now).inDays;
@@ -806,23 +806,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                ],
                              ),
                            ),
-                           if (!SubscriptionService.hasSubscription && !SubscriptionService.manualPremium) ...[
-                             const SizedBox(height: 12),
-                             OutlinedButton.icon(
-                               onPressed: () {
-                                 Navigator.push(context, MaterialPageRoute(
-                                   builder: (_) => const SupportScreen()));
-                               },
-                               icon: Icon(Icons.support_agent, color: kPurple2),
-                               label: Text('Contact Support',
-                                 style: TextStyle(color: kPurple2, fontSize: 14, fontWeight: FontWeight.w700)),
-                               style: OutlinedButton.styleFrom(
-                                 padding: const EdgeInsets.symmetric(vertical: 12),
-                                 side: BorderSide(color: kPurple2),
-                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                               ),
-                             ),
-                           ]
+                           if (!AppAccessService.isActivated && !AppAccessService.adminAccess) ...[
+                              const SizedBox(height: 12),
+                              OutlinedButton.icon(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(
+                                    builder: (_) => const SupportScreen()));
+                                },
+                                icon: Icon(Icons.support_agent, color: kPurple2),
+                                label: Text('Contact Support',
+                                  style: TextStyle(color: kPurple2, fontSize: 14, fontWeight: FontWeight.w700)),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  side: BorderSide(color: kPurple2),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                              ),
+                            ]
                         ],
                       ),
                     ),

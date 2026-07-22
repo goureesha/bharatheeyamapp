@@ -1,11 +1,23 @@
-- [x] Chunk Kumara Khanda Chapters 17 and 18 into JSON batches
-- [x] Launch Wave 1 translation subagents (Batches 1 to 3)
-- [/] Launch Wave 2 translation subagents (Batches 4 to 6)
-- [ ] Launch Wave 3 translation subagents (Batches 7 to 9)
-- [ ] Launch Wave 4 translation subagents (Batches 10 to 12)
-- [ ] Launch Wave 5 translation subagents (Batches 13 and 14)
-- [ ] Restore chapter metadata to translated JSON files
-- [ ] Reconstruct Chapters 17 and 18 from translated batches
-- [ ] Validate character constraints, formatting, and Sanskrit block counts
-- [ ] Verify Sanskrit verses for any Latin typos
-- [ ] Commit and push to GitHub
+# Task: Translate Shiva Purana — Kotirudra Samhita (43 Chapters)
+
+- [x] Chunk and translate Chapters 1 & 2
+- [x] Chunk and translate Chapters 3 & 4
+- [x] Chunk and translate Chapters 5 & 6
+- [x] Chunk and translate Chapters 7 & 8
+- [x] Chunk and translate Chapters 9 & 10
+- [x] Chunk and translate Chapters 11 & 12
+- [x] Chunk and translate Chapters 13 & 14
+- [x] Chunk and translate Chapters 15 & 16
+- [x] Chunk and translate Chapters 17 & 18
+- [x] Chunk and translate Chapters 19 & 20
+- [ ] Chunk and translate Chapters 21 & 22
+- [ ] Chunk and translate Chapters 23 & 24
+- [ ] Chunk and translate Chapters 25 & 26
+- [ ] Chunk and translate Chapters 27 & 28
+- [ ] Chunk and translate Chapters 29 & 30
+- [ ] Chunk and translate Chapters 31 & 32
+- [ ] Chunk and translate Chapters 33 & 34
+- [ ] Chunk and translate Chapters 35 & 36
+- [ ] Chunk and translate Chapters 37 & 38
+- [ ] Chunk and translate Chapters 39 & 40
+- [ ] Chunk and translate Chapters 41 to 43

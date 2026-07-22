@@ -1,0 +1,6 @@
+{
+  "summary": "Implementation plan covering:\n1. Update compileSdk and targetSdk to API 36 (Android 16) to meet Google Play's Aug 31, 2026 deadline\n2. Add the official Flutter `in_app_purchase` plugin (v3.3.0) for Google Play Billing integration\n3. Create a new BillingService to handle purchases\n4. Integrate billing with the existing Firestore-based SubscriptionService\n5. Add Subscribe/Restore UI buttons\n\nIncludes open questions about product IDs, coexistence with manual premium, and trial behavior.",
+  "updatedAt": "2026-07-22T04:46:40.528100200Z",
+  "requestFeedback": true,
+  "userFacing": true
+}
