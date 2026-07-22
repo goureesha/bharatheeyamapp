@@ -58,6 +58,7 @@ String _fmtSqFt(int sqInches) {
 const Map<String, Map<String, String>> _vastuStrings = {
   'kn': {
     'title': 'ವಾಸ್ತು ಅಳತೆಗಳು', 'sub': '',
+    'tabParidhi': 'ಪರಿಧಿ (ಅಡಿ)', 'paridhiHint': 'ಕಟ್ಟಡದ ಸುತ್ತಳತೆ ಅಡಿಯಲ್ಲಿ ನಮೂದಿಸಿ', 'sqftHintNew': 'ವಿಸ್ತೀರ್ಣ ಚ.ಅಡಿಯಲ್ಲಿ ನಮೂದಿಸಿ',
     'ownerNak': 'ಯಜಮಾನನ ನಕ್ಷತ್ರ', 'selectNak': 'ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ',
     'length': 'ಉದ್ದ (ಅಡಿ)', 'breadth': 'ಅಗಲ (ಅಡಿ)', 'area': 'ವಿಸ್ತೀರ್ಣ (ಚ.ಅಡಿ)',
     'tabLB': 'ಉದ್ದ × ಅಗಲ', 'tabSqft': 'ವಿಸ್ತೀರ್ಣ (ಚ.ಅಡಿ)',
@@ -90,6 +91,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
   },
   'hi': {
     'title': 'वास्तु मापन', 'sub': 'Vastu Measurements',
+    'tabParidhi': 'परिधि (फीट)', 'paridhiHint': 'भवन की परिधि फीट में दर्ज करें', 'sqftHintNew': 'क्षेत्रफल वर्ग.फीट में दर्ज करें',
     'ownerNak': 'मकान मालिक का नक्षत्र (Owner\'s Nakshatra)', 'selectNak': 'नक्षत्र चुनें',
     'length': 'लम्बाई / Length (Feet)', 'breadth': 'चौड़ाई / Breadth (Feet)', 'area': 'क्षेत्रफल / Area (Sq Ft)',
     'tabLB': 'लम्बाई × चौड़ाई (L × B)', 'tabSqft': 'क्षेत्रफल (Sq Ft)',
@@ -122,6 +124,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
   },
   'ta': {
     'title': 'வாஸ்து அளவீடுகள்', 'sub': 'Vastu Measurements',
+    'tabParidhi': 'சுற்றளவு (அடி)', 'paridhiHint': 'கட்டிடத்தின் சுற்றளவு அடியில் பதிவு செய்யவும்', 'sqftHintNew': 'பரப்பளவு ச.அடியில் பதிவு செய்யவும்',
     'ownerNak': 'உரிமையாளர் நக்ஷத்திரம் (Owner\'s Nakshatra)', 'selectNak': 'நக்ஷத்திரம் தேர்வு',
     'length': 'நீளம் / Length (Feet)', 'breadth': 'அகலம் / Breadth (Feet)', 'area': 'பரப்பளவு / Area (Sq Ft)',
     'tabLB': 'நீளம் × அகலம் (L × B)', 'tabSqft': 'பரப்பளவு (Sq Ft)',
@@ -154,6 +157,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
   },
   'te': {
     'title': 'వాస్తు కొలతలు', 'sub': 'Vastu Measurements',
+    'tabParidhi': 'చుట్టుకొలత (అడి)', 'paridhiHint': 'భవన చుట్టుకొలత అడులలో నమోదు చేయండి', 'sqftHintNew': 'వైశాల్యం చ.అడులలో నమోదు చేయండి',
     'ownerNak': 'యజమాని నక్షత్రం (Owner\'s Nakshatra)', 'selectNak': 'నక్షత్రం ఎంచుకోండి',
     'length': 'పొడవు / Length (Feet)', 'breadth': 'వెడల్పు / Breadth (Feet)', 'area': 'వైశాల్యం / Area (Sq Ft)',
     'tabLB': 'పొడవు × వెడల్పు (L × B)', 'tabSqft': 'వైశాల్యం (Sq Ft)',
@@ -186,6 +190,7 @@ const Map<String, Map<String, String>> _vastuStrings = {
   },
   'ml': {
     'title': 'വാസ്തു അളവുകൾ', 'sub': 'Vastu Measurements',
+    'tabParidhi': 'ചുറ്റളവ് (അടി)', 'paridhiHint': 'കെട്ടിടത്തിന്റെ ചുറ്റളവ് അടിയിൽ നൽകുക', 'sqftHintNew': 'വിസ്തീർണ്ണം ച.അടിയിൽ നൽകുക',
     'ownerNak': 'ഉടമയുടെ നക്ഷത്രം (Owner\'s Nakshatra)', 'selectNak': 'നക്ഷത്രം തിരഞ്ഞെടുക്കുക',
     'length': 'നീളം / Length (Feet)', 'breadth': 'വീതി / Breadth (Feet)', 'area': 'വിസ്തീർണ്ണം / Area (Sq Ft)',
     'tabLB': 'നീളം × വീതി (L × B)', 'tabSqft': 'വിസ്തീർണ്ണം (Sq Ft)',
@@ -358,8 +363,8 @@ class VastuScreen extends StatefulWidget {
   State<VastuScreen> createState() => _VastuScreenState();
 }
 
-class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabCtrl;
+class _VastuScreenState extends State<VastuScreen> {
+  int _inputMode = 0; // 0 = Paridhi, 1 = SqFt
   int? _ownerNakIndex;
   int _koluIndex = 0; // default: Kishku (24 angula), -1 = custom
   final _customKoluNameCtrl = TextEditingController(text: '');
@@ -375,10 +380,8 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     return _v(_koluTypes[_koluIndex].id);
   }
 
-  final _minLenCtrl = TextEditingController(text: '30');
-  final _maxLenCtrl = TextEditingController(text: '40');
-  final _minBreadthCtrl = TextEditingController(text: '40');
-  final _maxBreadthCtrl = TextEditingController(text: '50');
+  final _minParCtrl = TextEditingController(text: '140');
+  final _maxParCtrl = TextEditingController(text: '180');
 
   final _minSqftCtrl = TextEditingController(text: '1000');
   final _maxSqftCtrl = TextEditingController(text: '1200');
@@ -391,21 +394,12 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 2, vsync: this);
-    _tabCtrl.addListener(() {
-      if (!_tabCtrl.indexIsChanging) {
-        setState(() { _searched = false; _results = []; });
-      }
-    });
   }
 
   @override
   void dispose() {
-    _tabCtrl.dispose();
-    _minLenCtrl.dispose();
-    _maxLenCtrl.dispose();
-    _minBreadthCtrl.dispose();
-    _maxBreadthCtrl.dispose();
+    _minParCtrl.dispose();
+    _maxParCtrl.dispose();
     _minSqftCtrl.dispose();
     _maxSqftCtrl.dispose();
     _customKoluNameCtrl.dispose();
@@ -426,50 +420,40 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     return true;
   }
 
-  /// Hasta-first L×B search: find valid whole-number hastas, then back-calculate L×B
-  void _searchLB() {
+  /// Paridhi-first search: user enters min/max perimeter in feet
+  void _searchParidhi() {
     if (!_validateNak()) return;
-    final minL = int.tryParse(_minLenCtrl.text) ?? 10;
-    final maxL = int.tryParse(_maxLenCtrl.text) ?? 50;
-    final minB = int.tryParse(_minBreadthCtrl.text) ?? 10;
-    final maxB = int.tryParse(_maxBreadthCtrl.text) ?? 50;
+    final minP = int.tryParse(_minParCtrl.text) ?? 100;
+    final maxP = int.tryParse(_maxParCtrl.text) ?? 200;
 
-    if (minL > maxL || minB > maxB) {
+    if (minP > maxP) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_v('errMinMax')), backgroundColor: Colors.red),
       );
       return;
     }
+    if (maxP - minP > 500) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_v('errRange')), backgroundColor: Colors.red),
+      );
+      return;
+    }
 
     final koluCm = _effectiveKoluCm;
-    // Convert feet to cm (1 foot = 30.48 cm)
-    final minLenCm = minL * 30.48;
-    final maxLenCm = maxL * 30.48;
-    final minBreCm = minB * 30.48;
-    final maxBreCm = maxB * 30.48;
+    final minPerimCm = minP * 30.48;
+    final maxPerimCm = maxP * 30.48;
 
-    // Perimeter range in cm
-    final minPerimCm = 2 * (minLenCm + minBreCm);
-    final maxPerimCm = 2 * (maxLenCm + maxBreCm);
-
-    // Valid whole-number hasta range
     final minHasta = (minPerimCm / koluCm).ceil();
     final maxHasta = (maxPerimCm / koluCm).floor();
 
     final results = <_VastuResult>[];
     for (int h = minHasta; h <= maxHasta; h++) {
-      final sumCm = (h * koluCm) / 2;
-      // Check if valid L×B exists within user's range
-      final lMin = max(minLenCm, sumCm - maxBreCm);
-      final lMax = min(maxLenCm, sumCm - minBreCm);
-      if (lMin <= lMax) {
-        results.add(_calcFromHasta(h, koluCm, _ownerNakIndex!,
-            minLenCm, maxLenCm, minBreCm, maxBreCm));
-      }
+      results.add(_calcFromHasta(h, koluCm, _ownerNakIndex!, 0, 0, 0, 0));
     }
     _sortAndSet(results);
   }
 
+  /// SqFt search: for each sqft value, find possible Hasta values
   void _searchSqft() {
     if (!_validateNak()) return;
     final minSq = int.tryParse(_minSqftCtrl.text) ?? 500;
@@ -488,24 +472,21 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
       return;
     }
 
-    final results = <_VastuResult>[];
     final koluCm = _effectiveKoluCm;
-    final seen = <int>{};
-    for (int sq = minSq; sq <= maxSq; sq++) {
-      final pairs = _factorPairs(sq);
-      if (pairs.isEmpty) continue;
-      for (final pair in pairs) {
-        // pair is in feet; calculate perimeter and hasta
-        final perimCm = 2 * (pair[0] + pair[1]) * 30.48;
-        final hastaExact = perimCm / koluCm;
-        final hasta = hastaExact.round();
-        if (seen.add(hasta)) {
-          final lenCm = pair[1] * 30.48; // longer side
-          final breCm = pair[0] * 30.48; // shorter side
-          results.add(_calcFromHasta(hasta, koluCm, _ownerNakIndex!,
-              breCm, lenCm, breCm, lenCm));
-        }
-      }
+    // For a given area, perimeter range depends on L:B ratio.
+    // Square (1:1): P = 4 × sqrt(A) — minimum perimeter
+    // Rectangle (3:1): P = (8/√3) × sqrt(A) ≈ 4.62 × sqrt(A) — practical max
+    final minPerimFt = 4.0 * sqrt(minSq.toDouble());
+    final maxPerimFt = 4.62 * sqrt(maxSq.toDouble());
+    final minPerimCm = minPerimFt * 30.48;
+    final maxPerimCm = maxPerimFt * 30.48;
+
+    final minHasta = (minPerimCm / koluCm).ceil();
+    final maxHasta = (maxPerimCm / koluCm).floor();
+
+    final results = <_VastuResult>[];
+    for (int h = minHasta; h <= maxHasta; h++) {
+      results.add(_calcFromHasta(h, koluCm, _ownerNakIndex!, 0, 0, 0, 0));
     }
     _sortAndSet(results);
   }
@@ -580,22 +561,52 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
         ),
         iconTheme: IconThemeData(color: kText),
         elevation: 0,
-        bottom: TabBar(
-          controller: _tabCtrl,
-          tabs: [
-            Tab(text: _v('tabLB')),
-            Tab(text: _v('tabSqft')),
-          ],
-          labelColor: kPurple2,
-          unselectedLabelColor: kMuted,
-          indicatorColor: kPurple2,
-          labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-        ),
       ),
       body: SafeArea(
         child: Column(
           children: [
+            // ── Input mode toggle: Paridhi vs SqFt ──
+            Container(
+              margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() { _inputMode = 0; _searched = false; _results = []; }),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: _inputMode == 0 ? kPurple2 : kCard,
+                          borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), bottomLeft: Radius.circular(12)),
+                          border: Border.all(color: _inputMode == 0 ? kPurple2 : kBorder),
+                        ),
+                        child: Center(child: Text(_v('tabParidhi'), style: TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w800,
+                          color: _inputMode == 0 ? Colors.white : kMuted,
+                        ))),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() { _inputMode = 1; _searched = false; _results = []; }),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: _inputMode == 1 ? kPurple2 : kCard,
+                          borderRadius: const BorderRadius.only(topRight: Radius.circular(12), bottomRight: Radius.circular(12)),
+                          border: Border.all(color: _inputMode == 1 ? kPurple2 : kBorder),
+                        ),
+                        child: Center(child: Text(_v('tabSqft'), style: TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w800,
+                          color: _inputMode == 1 ? Colors.white : kMuted,
+                        ))),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             // ── Shared: Nakshatra dropdown ──
             Container(
               margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
@@ -698,12 +709,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
               child: CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
-                    child: ListenableBuilder(
-                      listenable: _tabCtrl,
-                      builder: (context, _) {
-                        return _tabCtrl.index == 0 ? _buildLBInputs() : _buildSqftInputs();
-                      },
-                    ),
+                    child: _inputMode == 0 ? _buildParInput() : _buildSqftInputs(),
                   ),
 
                   // Formula info
@@ -751,7 +757,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                       child: SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed: _tabCtrl.index == 0 ? _searchLB : _searchSqft,
+                          onPressed: _inputMode == 0 ? _searchParidhi : _searchSqft,
                           icon: const Icon(Icons.search, size: 20),
                           label: Text(_v('search'), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
                           style: ElevatedButton.styleFrom(
@@ -864,8 +870,8 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
     );
   }
 
-  // ─── Tab 1: L × B inputs ───
-  Widget _buildLBInputs() {
+  // ─── Paridhi (Perimeter) input ───
+  Widget _buildParInput() {
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
       padding: const EdgeInsets.all(14),
@@ -877,21 +883,18 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(_v('length'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
+          Text(_v('peridhi') + ' (' + _v('adi') + ')', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
           const SizedBox(height: 6),
           Row(children: [
-            Expanded(child: _field(_minLenCtrl, _v('minLabel'))),
+            Expanded(child: _field(_minParCtrl, _v('minLabel'))),
             _sep(),
-            Expanded(child: _field(_maxLenCtrl, _v('maxLabel'))),
+            Expanded(child: _field(_maxParCtrl, _v('maxLabel'))),
           ]),
-          const SizedBox(height: 12),
-          Text(_v('breadth'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
-          const SizedBox(height: 6),
-          Row(children: [
-            Expanded(child: _field(_minBreadthCtrl, _v('minLabel'))),
-            _sep(),
-            Expanded(child: _field(_maxBreadthCtrl, _v('maxLabel'))),
-          ]),
+          const SizedBox(height: 8),
+          Text(
+            _v('paridhiHint'),
+            style: TextStyle(fontSize: 10, color: kMuted, fontStyle: FontStyle.italic),
+          ),
         ],
       ),
     );
@@ -919,7 +922,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           ]),
           const SizedBox(height: 8),
           Text(
-            _v('sqftHint'),
+            _v('sqftHintNew'),
             style: TextStyle(fontSize: 10, color: kMuted, fontStyle: FontStyle.italic),
           ),
         ],
@@ -968,7 +971,7 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: L × B with area and shubha badge
+          // Header: Hasta number with perimeter
           Row(
             children: [
               Container(
@@ -982,15 +985,17 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${_cmToFtIn(r.minLenCm)} × ${_cmToFtIn(r.maxBreCm)}',
+                  '${_v('hasta')}: ${r.hasta}',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900,
                     color: isExcellent ? Colors.green.shade700 : kPurple2),
                 ),
               ),
               const SizedBox(width: 8),
-              Text('${(r.minLenCm * r.maxBreCm / (30.48 * 30.48)).toStringAsFixed(1)} ${_v('sqAdi')}',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
-              const Spacer(),
+              Expanded(
+                child: Text('${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)}',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText),
+                  overflow: TextOverflow.ellipsis),
+              ),
               if (isExcellent)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -1008,8 +1013,8 @@ class _VastuScreenState extends State<VastuScreen> with SingleTickerProviderStat
           ),
           const SizedBox(height: 6),
 
-          // Perimeter / Hasta
-          Text('${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)} (${_fmtCm(r.perimeterCm)})  |  ${_v('hasta')}: ${r.hasta}  ($_effectiveKoluName)',
+          // Kolu info
+          Text('$_effectiveKoluName  |  ${_fmtCm(r.perimeterCm)}',
             style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
