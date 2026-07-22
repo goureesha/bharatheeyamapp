@@ -165,7 +165,9 @@ class AppAccessService {
       // Firestore unreachable — use cached value as offline fallback.
       // The 10-day grace period is enforced by needsInternetVerification.
       // After 10 days without successful Firestore check, app locks.
-      isActivated = prefs.getBool(_accessStatusKey) ?? false;
+      // Migration: also check old pref key for users updating from older versions
+      isActivated = prefs.getBool(_accessStatusKey) ??
+                    prefs.getBool('has_active_subscription') ?? false;
       adminAccess = isActivated;
       debugPrint('⚠️ Firestore unreachable — using cached access: $isActivated');
       debugPrint('⚠️ Last online check: $lastOnlineCheck');
