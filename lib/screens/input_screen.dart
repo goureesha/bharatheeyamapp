@@ -55,7 +55,7 @@ class _InputScreenState extends State<InputScreen> {
   bool _showGhatiInput = false;
   final _ghatiCtrl = TextEditingController();
   final _vighatiCtrl = TextEditingController();
-  String? _computedSunrise; // display sunrise for feedback
+
 
 
 
@@ -1043,20 +1043,7 @@ class _InputScreenState extends State<InputScreen> {
                     child: Text(AppLocale.l('applyLabel'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                   ),
                 ]),
-                if (_computedSunrise != null) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      '☀️ ${AppLocale.l('sunriseLabel')}: $_computedSunrise',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.green.shade700),
-                    ),
-                  ),
-                ],
+
               ]),
             ),
           ],
@@ -1410,7 +1397,7 @@ class _InputScreenState extends State<InputScreen> {
       _ampm = h24 >= 12 ? 'PM' : 'AM';
       _hour = h24 % 12 == 0 ? 12 : h24 % 12;
       _minute = min;
-      _computedSunrise = sunriseStr;
+
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
