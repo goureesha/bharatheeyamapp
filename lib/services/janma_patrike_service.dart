@@ -5,6 +5,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:screenshot/screenshot.dart';
 import '../core/calculator.dart';
+import '../core/ashtakavarga.dart';
 import '../constants/strings.dart';
 import 'pdf_theme.dart';
 import '../widgets/common.dart';
@@ -126,6 +127,56 @@ class JanmaPatrikeService {
     return chart;
   }
 
+  static List<List<String>> _horaChart(KundaliResult result) {
+    return _computeChart(result, (deg) {
+      final sign = (deg / 30).floor();
+      final isOdd = sign % 2 != 0;
+      final degInSign = deg % 30;
+      if (isOdd) {
+        return degInSign < 15.0 ? 4 : 3;
+      } else {
+        return degInSign < 15.0 ? 3 : 4;
+      }
+    });
+  }
+
+  static List<List<String>> _drekkanaChart(KundaliResult result) {
+    return _computeChart(result, (deg) {
+      final sign = (deg / 30).floor();
+      final part = ((deg % 30) / 10).floor();
+      return (sign + part * 4) % 12;
+    });
+  }
+
+  static List<List<String>> _dvadashamshaChart(KundaliResult result) {
+    return _computeChart(result, (deg) {
+      final sign = (deg / 30).floor();
+      final part = ((deg % 30) / 2.5).floor();
+      return (sign + part) % 12;
+    });
+  }
+
+  static List<List<String>> _trimshamshaChart(KundaliResult result) {
+    return _computeChart(result, (deg) {
+      final sign = (deg / 30).floor();
+      final isOdd = sign % 2 != 0;
+      final degInSign = deg % 30;
+      if (isOdd) {
+        if (degInSign < 5.0) return 0;
+        if (degInSign < 10.0) return 10;
+        if (degInSign < 18.0) return 8;
+        if (degInSign < 25.0) return 2;
+        return 6;
+      } else {
+        if (degInSign < 5.0) return 1;
+        if (degInSign < 12.0) return 5;
+        if (degInSign < 20.0) return 11;
+        if (degInSign < 25.0) return 9;
+        return 3;
+      }
+    });
+  }
+
   static Future<void> generateAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme}) async {
     theme ??= PdfThemes.traditional;
     final controller = ScreenshotController();
@@ -149,6 +200,34 @@ class JanmaPatrikeService {
       child: _buildPage2Content(user, result, theme),
     );
 
+    final page3Widget = _buildPageWrapper(
+      width: pageWidth,
+      height: pageHeight,
+      theme: theme,
+      child: _buildPage3Content(user, result, theme),
+    );
+
+    final page4Widget = _buildPageWrapper(
+      width: pageWidth,
+      height: pageHeight,
+      theme: theme,
+      child: _buildPage4Content(user, result, theme),
+    );
+
+    final page5Widget = _buildPageWrapper(
+      width: pageWidth,
+      height: pageHeight,
+      theme: theme,
+      child: _buildPage5Content(user, result, theme),
+    );
+
+    final page6Widget = _buildPageWrapper(
+      width: pageWidth,
+      height: pageHeight,
+      theme: theme,
+      child: _buildPage6Content(user, result, theme),
+    );
+
     final targetSize = const Size(pageWidth, pageHeight);
 
     final Uint8List page1Bytes = await controller.captureFromWidget(
@@ -159,6 +238,30 @@ class JanmaPatrikeService {
     );
     final Uint8List page2Bytes = await controller.captureFromWidget(
       page2Widget,
+      targetSize: targetSize,
+      pixelRatio: 3.0,
+      delay: const Duration(milliseconds: 100)
+    );
+    final Uint8List page3Bytes = await controller.captureFromWidget(
+      page3Widget,
+      targetSize: targetSize,
+      pixelRatio: 3.0,
+      delay: const Duration(milliseconds: 100)
+    );
+    final Uint8List page4Bytes = await controller.captureFromWidget(
+      page4Widget,
+      targetSize: targetSize,
+      pixelRatio: 3.0,
+      delay: const Duration(milliseconds: 100)
+    );
+    final Uint8List page5Bytes = await controller.captureFromWidget(
+      page5Widget,
+      targetSize: targetSize,
+      pixelRatio: 3.0,
+      delay: const Duration(milliseconds: 100)
+    );
+    final Uint8List page6Bytes = await controller.captureFromWidget(
+      page6Widget,
       targetSize: targetSize,
       pixelRatio: 3.0,
       delay: const Duration(milliseconds: 100)
@@ -182,6 +285,46 @@ class JanmaPatrikeService {
         margin: pw.EdgeInsets.zero,
         build: (pw.Context context) {
           return pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(page2Bytes), fit: pw.BoxFit.contain));
+        },
+      ),
+    );
+
+    doc.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: pw.EdgeInsets.zero,
+        build: (pw.Context context) {
+          return pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(page3Bytes), fit: pw.BoxFit.contain));
+        },
+      ),
+    );
+
+    doc.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: pw.EdgeInsets.zero,
+        build: (pw.Context context) {
+          return pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(page4Bytes), fit: pw.BoxFit.contain));
+        },
+      ),
+    );
+
+    doc.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: pw.EdgeInsets.zero,
+        build: (pw.Context context) {
+          return pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(page5Bytes), fit: pw.BoxFit.contain));
+        },
+      ),
+    );
+
+    doc.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: pw.EdgeInsets.zero,
+        build: (pw.Context context) {
+          return pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(page6Bytes), fit: pw.BoxFit.contain));
         },
       ),
     );
@@ -633,4 +776,300 @@ class JanmaPatrikeService {
       ),
     );
   }
+
+  // ════════════════════════════════════════════════════════
+  // PAGE 3: Antardasha Details
+  // ════════════════════════════════════════════════════════
+  static Widget _buildPage3Content(UserDetails user, KundaliResult result, PdfThemeConfig t) {
+    String title = AppLocale.l('jpAntardashaTitle');
+    if (title == 'jpAntardashaTitle') title = 'ಅಂತರ್ದಶಾ ವಿವರ';
+
+    List<Widget> tables = [];
+    for (final md in result.dashas) {
+      List<TableRow> rows = [
+        TableRow(
+          decoration: BoxDecoration(color: t.tableHeaderBg),
+          children: [
+            Padding(padding: const EdgeInsets.all(2), child: Text(AppLocale.l('jpAntardasha') != 'jpAntardasha' ? AppLocale.l('jpAntardasha') : 'ಅಂತರ್ದಶಾ', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.tableHeaderText))),
+            Padding(padding: const EdgeInsets.all(2), child: Text(AppLocale.l('jpStart') != 'jpStart' ? AppLocale.l('jpStart') : 'ಆರಂಭ', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.tableHeaderText))),
+            Padding(padding: const EdgeInsets.all(2), child: Text(AppLocale.l('jpEnd') != 'jpEnd' ? AppLocale.l('jpEnd') : 'ಅಂತ್ಯ', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.tableHeaderText))),
+          ],
+        )
+      ];
+      
+      int i = 0;
+      for (final ad in md.antardashas) {
+        final isEven = (i++) % 2 == 0;
+        final startStr = '${ad.start.day.toString().padLeft(2,'0')}-${ad.start.month.toString().padLeft(2,'0')}-${ad.start.year}';
+        final endStr = '${ad.end.day.toString().padLeft(2,'0')}-${ad.end.month.toString().padLeft(2,'0')}-${ad.end.year}';
+        
+        rows.add(
+          TableRow(
+            decoration: BoxDecoration(color: isEven ? Colors.white : t.tableAltRow),
+            children: [
+              Padding(padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2), child: Text(trAll(ad.lord), textAlign: TextAlign.center, style: const TextStyle(fontSize: 9, color: Colors.black))),
+              Padding(padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2), child: Text(startStr, textAlign: TextAlign.center, style: const TextStyle(fontSize: 9, color: Colors.black))),
+              Padding(padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2), child: Text(endStr, textAlign: TextAlign.center, style: const TextStyle(fontSize: 9, color: Colors.black))),
+            ],
+          )
+        );
+      }
+      
+      tables.add(
+        Expanded(
+          child: Container(
+            margin: const EdgeInsets.all(2),
+            decoration: BoxDecoration(border: Border.all(color: t.detailBorder), borderRadius: BorderRadius.circular(4)),
+            child: Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  decoration: BoxDecoration(color: t.sectionTitleBg, borderRadius: const BorderRadius.vertical(top: Radius.circular(3))),
+                  child: Text('${trAll(md.lord)} ${AppLocale.l('jpMahaDasha') != 'jpMahaDasha' ? AppLocale.l('jpMahaDasha') : 'ಮಹಾದಶಾ'}', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.sectionTitleText)),
+                ),
+                Expanded(
+                  child: Table(
+                    border: const TableBorder(
+                      horizontalInside: BorderSide(color: Color(0xFFE0E0E0), width: 0.5),
+                      verticalInside: BorderSide(color: Color(0xFFE0E0E0), width: 0.5),
+                    ),
+                    children: rows,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    
+    // Group into rows of 3
+    List<Widget> gridRows = [];
+    for (int i = 0; i < tables.length; i += 3) {
+      gridRows.add(
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: tables.sublist(i, (i + 3 > tables.length) ? tables.length : i + 3),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(title, '${user.name} — ${user.dateStr}', t),
+        const SizedBox(height: 5),
+        Expanded(child: Column(children: gridRows)),
+        _buildFooter(user.jyotishiName, user.jyotishiPhone, t),
+      ],
+    );
+  }
+
+  // ════════════════════════════════════════════════════════
+  // PAGE 4: Varga Kundalis
+  // ════════════════════════════════════════════════════════
+  static Widget _buildPage4Content(UserDetails user, KundaliResult result, PdfThemeConfig t) {
+    String title = AppLocale.l('jpVargaKundaliTitle');
+    if (title == 'jpVargaKundaliTitle') title = 'ವರ್ಗ ಕುಂಡಲಿಗಳು';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(title, '${user.name} — ${user.dateStr}', t),
+        const SizedBox(height: 5),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D1 ರಾಶಿ'), _rashiChart(result), t))),
+              const SizedBox(width: 8),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D2 ಹೋರಾ'), _horaChart(result), t))),
+              const SizedBox(width: 8),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D3 ದ್ರೇಕ್ಕಾಣ'), _drekkanaChart(result), t))),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D9 ನವಾಂಶ'), _navamshaChart(result), t))),
+              const SizedBox(width: 8),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D12 ದ್ವಾದಶಾಂಶ'), _dvadashamshaChart(result), t))),
+              const SizedBox(width: 8),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D30 ತ್ರಿಂಶಾಂಶ'), _trimshamshaChart(result), t))),
+            ],
+          ),
+        ),
+        _buildFooter(user.jyotishiName, user.jyotishiPhone, t),
+      ],
+    );
+  }
+
+  // ════════════════════════════════════════════════════════
+  // PAGE 5: Ashtakavarga
+  // ════════════════════════════════════════════════════════
+  static Widget _buildPage5Content(UserDetails user, KundaliResult result, PdfThemeConfig t) {
+    String title = AppLocale.l('jpAshtakavargaTitle');
+    if (title == 'jpAshtakavargaTitle') title = 'ಅಷ್ಟಕವರ್ಗ';
+
+    final Map<String, int> rashiPositions = {};
+    for (final p in AshtakaVarga.planetsWithLagna) {
+      final info = result.planets[p];
+      if (info != null) {
+        rashiPositions[p] = (info.longitude / 30).floor() % 12;
+      }
+    }
+    
+    final avResult = AshtakaVarga.computeAll(rashiPositions);
+    
+    List<String> colNames = ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ'];
+    List<Widget> headerCells = [
+      Padding(padding: const EdgeInsets.all(4), child: Text(AppLocale.l('hGraha') != 'hGraha' ? AppLocale.l('hGraha') : 'ಗ್ರಹ', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: t.tableHeaderText)))
+    ];
+    for (String cn in colNames) {
+      headerCells.add(Padding(padding: const EdgeInsets.all(4), child: Text(trAll(cn), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.tableHeaderText))));
+    }
+    headerCells.add(Padding(padding: const EdgeInsets.all(4), child: Text(AppLocale.l('jpTotal') != 'jpTotal' ? AppLocale.l('jpTotal') : 'ಒಟ್ಟು', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: t.tableHeaderText))));
+
+    List<TableRow> rows = [
+      TableRow(decoration: BoxDecoration(color: t.tableHeaderBg), children: headerCells)
+    ];
+
+    int rowIndex = 0;
+    for (String p in AshtakaVarga.planets) {
+      final bindus = avResult[p]!;
+      int total = bindus.fold(0, (sum, val) => sum + val);
+      final isEven = (rowIndex++) % 2 == 0;
+      
+      List<Widget> cells = [
+        Padding(padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4), child: Text(trAll(p), textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.black)))
+      ];
+      for (int b in bindus) {
+        cells.add(Padding(padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4), child: Text(b.toString(), textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: Colors.black))));
+      }
+      cells.add(Padding(padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4), child: Text(total.toString(), textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.black))));
+      
+      rows.add(TableRow(decoration: BoxDecoration(color: isEven ? Colors.white : t.tableAltRow), children: cells));
+    }
+    
+    final sav = avResult['SAV']!;
+    int savTotal = sav.fold(0, (sum, val) => sum + val);
+    
+    List<Widget> savCells = [
+      Padding(padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4), child: Text(AppLocale.l('jpSarvashtaka') != 'jpSarvashtaka' ? AppLocale.l('jpSarvashtaka') : 'ಸರ್ವಾಷ್ಟಕ', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.black)))
+    ];
+    for (int b in sav) {
+      savCells.add(Padding(padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4), child: Text(b.toString(), textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.black))));
+    }
+    savCells.add(Padding(padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4), child: Text(savTotal.toString(), textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.black))));
+    
+    rows.add(TableRow(decoration: BoxDecoration(color: t.tableAltRow.withOpacity(0.5)), children: savCells));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(title, '${user.name} — ${user.dateStr}', t),
+        const SizedBox(height: 20),
+        _buildSectionTitle(AppLocale.l('jpAshtakavargaSection') != 'jpAshtakavargaSection' ? AppLocale.l('jpAshtakavargaSection') : 'ಭಿನ್ನಾಷ್ಟಕ ಮತ್ತು ಸರ್ವಾಷ್ಟಕ ವರ್ಗ', t),
+        const SizedBox(height: 10),
+        Container(
+          decoration: BoxDecoration(border: Border.all(color: t.detailBorder), borderRadius: BorderRadius.circular(6)),
+          child: Table(
+            border: const TableBorder(
+              horizontalInside: BorderSide(color: Color(0xFFE0E0E0), width: 0.5),
+              verticalInside: BorderSide(color: Color(0xFFE0E0E0), width: 0.5),
+            ),
+            children: rows,
+          ),
+        ),
+        const Spacer(),
+        _buildFooter(user.jyotishiName, user.jyotishiPhone, t),
+      ],
+    );
+  }
+
+  // ════════════════════════════════════════════════════════
+  // PAGE 6: Shadbala
+  // ════════════════════════════════════════════════════════
+  static Widget _buildPage6Content(UserDetails user, KundaliResult result, PdfThemeConfig t) {
+    String title = AppLocale.l('jpShadbalaTitle');
+    if (title == 'jpShadbalaTitle') title = 'ಷಡ್ಬಲ ವಿವರ';
+
+    List<String> headers = ['ಗ್ರಹ', 'ಸ್ಥಾನ', 'ದಿಕ್', 'ಕಾಲ', 'ಚೇಷ್ಟಾ', 'ನೈಸರ್ಗಿಕ', 'ದೃಕ್', 'ಒಟ್ಟು (ರೂಪ)', 'ಅಗತ್ಯ', 'ಸ್ಥಿತಿ'];
+    List<TableRow> rows = [
+      TableRow(
+        decoration: BoxDecoration(color: t.tableHeaderBg),
+        children: headers.map((h) => Padding(padding: const EdgeInsets.all(4), child: Text(trAll(h), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: t.tableHeaderText)))).toList(),
+      )
+    ];
+
+    List<String> pNames = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
+    
+    int rowIndex = 0;
+    for (String engName in pNames) {
+      final sb = result.shadbala[engName];
+      if (sb == null) continue;
+      
+      final isEven = (rowIndex++) % 2 == 0;
+      bool isStrong = sb['IsStrong'] ?? false;
+      Color statusColor = isStrong ? Colors.green.shade100 : Colors.red.shade100;
+      String statusStr = isStrong ? 'ಬಲ' : 'ದುರ್ಬಲ';
+      
+      List<String> cells = [
+        trAll(appPlanetNames[engName] ?? engName),
+        (sb['Sthana'] as double).toStringAsFixed(2),
+        (sb['Dik'] as double).toStringAsFixed(2),
+        (sb['Kala'] as double).toStringAsFixed(2),
+        (sb['Cheshta'] as double).toStringAsFixed(2),
+        (sb['Naisargika'] as double).toStringAsFixed(2),
+        (sb['Drik'] as double).toStringAsFixed(2),
+        (sb['Total'] as double).toStringAsFixed(2),
+        (sb['Required'] as double).toStringAsFixed(2),
+        trAll(statusStr),
+      ];
+      
+      rows.add(
+        TableRow(
+          decoration: BoxDecoration(color: isEven ? Colors.white : t.tableAltRow),
+          children: cells.asMap().entries.map((e) {
+            Widget cellText = Text(e.value, textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: Colors.black, fontWeight: e.key == 0 ? FontWeight.bold : FontWeight.normal));
+            if (e.key == 9) {
+              return Container(
+                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                color: statusColor,
+                child: cellText,
+              );
+            }
+            return Padding(padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4), child: cellText);
+          }).toList(),
+        )
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(title, '${user.name} — ${user.dateStr}', t),
+        const SizedBox(height: 20),
+        Container(
+          decoration: BoxDecoration(border: Border.all(color: t.detailBorder), borderRadius: BorderRadius.circular(6)),
+          child: Table(
+            border: const TableBorder(
+              horizontalInside: BorderSide(color: Color(0xFFE0E0E0), width: 0.5),
+              verticalInside: BorderSide(color: Color(0xFFE0E0E0), width: 0.5),
+            ),
+            children: rows,
+          ),
+        ),
+        const Spacer(),
+        _buildFooter(user.jyotishiName, user.jyotishiPhone, t),
+      ],
+    );
+  }
 }
+

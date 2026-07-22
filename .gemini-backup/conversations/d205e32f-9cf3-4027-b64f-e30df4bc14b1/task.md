@@ -1,9 +1,16 @@
-# Tasks
+# Tasks — New Janma Patrike PDF Pages
 
-- [x] Update `android/app/build.gradle` — compileSdk 36, targetSdk 36
-- [x] Update `android/build.gradle` — force subprojects to compileSdk 36
-- [x] Remove billing library (not needed — Firestore controls access)
-- [x] Revert billing changes from `subscription_service.dart`
-- [x] Revert billing changes from `settings_screen.dart`
-- [x] Delete `billing_service.dart`
-- [x] Run `flutter pub get` ✅
+## Research
+- [x] Understand existing PDF generation pattern
+- [x] Verify data availability (Antardasha, Ashtakavarga, Shadbala, Divisional)
+
+## Implementation
+- [ ] Page 3: Antardasha (Bhukti) tables
+- [ ] Page 4: Divisional Charts (D2, D3, D9, D12, D30)
+- [ ] Page 5: Ashtakavarga (BAV + SAV)
+- [ ] Page 6: Shadbala detailed table
+- [ ] Wire all pages into `generate()` method
+
+## Verification
+- [ ] Build verification
+- [ ] Push to GitHub

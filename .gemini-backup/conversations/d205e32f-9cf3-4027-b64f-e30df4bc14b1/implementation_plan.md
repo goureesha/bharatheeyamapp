@@ -1,95 +1,75 @@
-# Add Google Play Billing & Update Target API to 36
+# Add New Pages to Janma Patrike PDF
 
-Your app currently has **no Google Play Billing integration** — the subscription is managed entirely via Firestore (`manualPremium` flag set by admin). This plan adds the official Flutter `in_app_purchase` plugin and updates the Android target to API 36 (Android 16).
+Add 4 new pages (Pages 3–6) to the existing 2-page Janma Patrike PDF, bringing it to a comprehensive 6-page Jataka Patrika.
 
-## User Review Required
+## Current State
 
-> [!IMPORTANT]
-> Your current `SubscriptionService` is **Firestore-only** (admin manually grants premium). Adding Google Play Billing means users can purchase subscriptions directly through the Play Store. The existing Firestore-based premium will continue to work alongside Play Store purchases.
+| Page | Content |
+|---|---|
+| Page 1 | Birth Details + Panchanga + Graha Table + 3 Charts (Rashi, Navamsha, Bhava) |
+| Page 2 | Vimshottari Mahadasha Table + Shishta Dasha Banner |
 
-> [!WARNING]
-> **Google Play deadline**: By **August 31, 2026**, all app updates must target **API 36**. Your current `compileSdk = 35` and `targetSdk = flutter.targetSdkVersion` need to be updated.
+## Proposed New Pages
+
+### Page 3: Antardasha (Bhukti) Tables
+- **Data source:** `DashaEntry.antardashas` (already computed, 5 levels deep)
+- **Layout:** For each of the 9 Mahadashas, show a compact table of its Antardashas (Level 2) with:
+  - Antardasha Lord | Start Date | End Date
+- **Design:** Grouped by Mahadasha with colored headers matching the theme
+- Highlight the **current running** Mahadasha-Antardasha pair
+
+### Page 4: Divisional Charts (Varga Kundalis)
+- **Data source:** `PlanetInfo` fields — `d2` (Hora), `d3` (Drekkana), `d9` (Navamsha), `d12` (Dvadashamsha), `d30` (Trimshamsha) — already computed by `AstroCalculator.getPlanetDetail()`
+- **Layout:** 6 South Indian style charts arranged in a 2×3 grid:
+  - D1 (Rashi) — already drawn on Page 1, included for completeness
+  - D2 (Hora)
+  - D3 (Drekkana)
+  - D9 (Navamsha)
+  - D12 (Dvadashamsha)
+  - D30 (Trimshamsha)
+- **Design:** Smaller chart boxes using the existing `_buildChartWidget()` method, with chart labels
+
+> [!NOTE]
+> D4, D7, D10, D16, D20, D24, D27, D40, D45, D60 charts require new calculation logic and can be added in a future update.
+
+### Page 5: Ashtakavarga Tables
+- **Data source:** `AshtakaVarga.computeAll()` — already computed (BAV for 7 planets + SAV)
+- **Layout:**
+  - **Section 1:** Bhinnashtakavarga (BAV) — 7 individual planet tables showing bindus (0/1) across 12 rashis, with row totals
+  - **Section 2:** Sarvashtakavarga (SAV) — single row showing total bindus per rashi (sum of all 7 planets)
+- **Design:** Compact 12-column grid per planet, rashi names as column headers
+
+### Page 6: Shadbala (Planetary Strength) Table
+- **Data source:** `KundaliResult.shadbala` — already computed (7 planets × 6 components)
+- **Layout:** Single detailed table with columns:
+  - Graha | Sthana | Dik | Kala | Cheshta | Naisargika | Drik | **Total** | Required | Strong?
+- **Design:** Color-coded rows (green for strong planets, red for weak), bar/percentage visualization if space allows
+
+## Proposed Changes
+
+### [MODIFY] [janma_patrike_service.dart](file:///d:/bharatheeyamapp%20sample/lib/services/janma_patrike_service.dart)
+- Add 4 new page builder methods: `_buildPage3Antardasha()`, `_buildPage4VargaCharts()`, `_buildPage5Ashtakavarga()`, `_buildPage6Shadbala()`
+- Update the main `generate()` method to include all 6 pages
+- Each page follows the existing pattern: build widget → screenshot → embed as full-page PDF image
+
+### [MODIFY] [calculator.dart](file:///d:/bharatheeyamapp%20sample/lib/core/calculator.dart) (minor)
+- Ensure `getPlanetDetail()` divisional sign data (d2, d3, d9, d12, d30) is accessible for chart grid computation
+- Add helper to compute divisional chart grid positions from sign names
+
+### No new files needed — all changes are additions to existing services.
 
 ## Open Questions
 
 > [!IMPORTANT]
-> 1. **What products do you want to sell?** Do you want a monthly subscription, yearly subscription, one-time purchase, or a combination? I need the **product IDs** you've configured (or will configure) in the Google Play Console.
-> 2. **Should Play Store purchases replace the Firestore manual premium**, or should both coexist (i.e., admin can still grant free premium via Firestore, AND users can buy via Play Store)?
-> 3. **Do you want to keep the 30-minute trial** as-is, or should it change now that billing is being added?
-
-## Current State
-
-| Setting | Current Value | Target Value |
-|---|---|---|
-| `compileSdk` | 35 | **36** |
-| `targetSdk` | `flutter.targetSdkVersion` | **36** (explicit) |
-| AGP | 8.7.3 | 8.7.3 (compatible with SDK 36) |
-| Gradle | 8.9 | 8.9 (no change needed) |
-| Kotlin | 2.0.0 | 2.0.0 (no change needed) |
-| Billing plugin | ❌ None | **`in_app_purchase: ^3.3.0`** |
-| Billing Library (native) | ❌ None | **Play Billing 7+** (bundled with plugin) |
-
----
-
-## Proposed Changes
-
-### 1. Android Build Configuration
-
-#### [MODIFY] [build.gradle](file:///d:/bharatheeyamapp%20sample/android/app/build.gradle)
-- Update `compileSdk` from `35` → `36`
-- Set `targetSdk = 36` explicitly (instead of relying on `flutter.targetSdkVersion`)
-
-#### [MODIFY] [build.gradle (root)](file:///d:/bharatheeyamapp%20sample/android/build.gradle)
-- Add `afterEvaluate` block to force all subprojects/plugins to compile against SDK 36 (prevents build failures from plugins still targeting SDK 35)
-
----
-
-### 2. Flutter Dependencies
-
-#### [MODIFY] [pubspec.yaml](file:///d:/bharatheeyamapp%20sample/pubspec.yaml)
-- Add `in_app_purchase: ^3.3.0` to dependencies (the official Flutter plugin that wraps Google Play Billing Library 7+)
-
----
-
-### 3. New Billing Service
-
-#### [NEW] billing_service.dart (`lib/services/billing_service.dart`)
-- Initialize `InAppPurchase` instance
-- Define product IDs (subscription/one-time)
-- Query available products from Play Store
-- Handle purchase flow (buy, restore, verify)
-- Listen to purchase stream and acknowledge purchases
-- Integrate with existing `SubscriptionService` (set `hasSubscription = true` on valid purchase)
-
----
-
-### 4. Update Subscription Service
-
-#### [MODIFY] [subscription_service.dart](file:///d:/bharatheeyamapp%20sample/lib/services/subscription_service.dart)
-- In `initialize()`: also call `BillingService.initialize()` to check for existing purchases
-- Update `hasAccess` getter to also check Play Store subscription status
-- Keep Firestore manual premium as a parallel path
-
----
-
-### 5. UI Integration
-
-#### [MODIFY] [settings_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/settings_screen.dart)
-- Add "Subscribe" / "Restore Purchases" buttons in the subscription section
-- Show current subscription status from Play Store
-
----
+> 1. **Antardasha depth:** Should Page 3 show only Level 2 (Antardasha/Bhukti), or also Level 3 (Pratyantardasha)? Level 3 would need an additional page.
+> 2. **Language:** The charts and tables will use the app's current locale (Kannada/Hindi/Tamil/Telugu/Malayalam). Is that correct?
+> 3. **Current Dasha highlighting:** Should the currently running Mahadasha/Antardasha be visually highlighted (e.g., bold border, colored background)?
 
 ## Verification Plan
 
-### Automated Tests
-```bash
-flutter pub get
-flutter analyze
-flutter build appbundle --release
-```
-
 ### Manual Verification
-- Verify `compileSdk 36` and `targetSdk 36` in the built APK/AAB manifest
-- Verify `in_app_purchase` plugin resolves correctly
-- Test billing flow with Play Console test tracks (requires Play Console product setup)
+- Generate the PDF with test birth data
+- Verify all 6 pages render correctly
+- Cross-check Antardasha dates against existing Mahadasha dates
+- Verify Ashtakavarga bindu counts per rashi
+- Verify Shadbala totals match the calculator output
