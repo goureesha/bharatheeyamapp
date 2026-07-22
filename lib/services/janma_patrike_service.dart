@@ -177,157 +177,130 @@ class JanmaPatrikeService {
     });
   }
 
-  static Future<void> generateAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme}) async {
+  static Future<void> generateAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages}) async {
     theme ??= PdfThemes.traditional;
+    final pages = selectedPages ?? [true, true, true, true, true, true];
     final controller = ScreenshotController();
 
     // A4 Dimensions at 96 DPI
     const double pageWidth = 793.0;
     const double pageHeight = 1122.0;
-
-    // Build themed pages
-    final page1Widget = _buildPageWrapper(
-      width: pageWidth,
-      height: pageHeight,
-      theme: theme,
-      child: _buildPage1Content(user, result, theme),
-    );
-
-    final page2Widget = _buildPageWrapper(
-      width: pageWidth,
-      height: pageHeight,
-      theme: theme,
-      child: _buildPage2Content(user, result, theme),
-    );
-
-    final page3Widget = _buildPageWrapper(
-      width: pageWidth,
-      height: pageHeight,
-      theme: theme,
-      child: _buildPage3Content(user, result, theme),
-    );
-
-    final page4Widget = _buildPageWrapper(
-      width: pageWidth,
-      height: pageHeight,
-      theme: theme,
-      child: _buildPage4Content(user, result, theme),
-    );
-
-    final page5Widget = _buildPageWrapper(
-      width: pageWidth,
-      height: pageHeight,
-      theme: theme,
-      child: _buildPage5Content(user, result, theme),
-    );
-
-    final page6Widget = _buildPageWrapper(
-      width: pageWidth,
-      height: pageHeight,
-      theme: theme,
-      child: _buildPage6Content(user, result, theme),
-    );
-
     final targetSize = const Size(pageWidth, pageHeight);
 
-    final Uint8List page1Bytes = await controller.captureFromWidget(
-      page1Widget,
-      targetSize: targetSize,
-      pixelRatio: 3.0,
-      delay: const Duration(milliseconds: 100)
-    );
-    final Uint8List page2Bytes = await controller.captureFromWidget(
-      page2Widget,
-      targetSize: targetSize,
-      pixelRatio: 3.0,
-      delay: const Duration(milliseconds: 100)
-    );
-    final Uint8List page3Bytes = await controller.captureFromWidget(
-      page3Widget,
-      targetSize: targetSize,
-      pixelRatio: 3.0,
-      delay: const Duration(milliseconds: 100)
-    );
-    final Uint8List page4Bytes = await controller.captureFromWidget(
-      page4Widget,
-      targetSize: targetSize,
-      pixelRatio: 3.0,
-      delay: const Duration(milliseconds: 100)
-    );
-    final Uint8List page5Bytes = await controller.captureFromWidget(
-      page5Widget,
-      targetSize: targetSize,
-      pixelRatio: 3.0,
-      delay: const Duration(milliseconds: 100)
-    );
-    final Uint8List page6Bytes = await controller.captureFromWidget(
-      page6Widget,
-      targetSize: targetSize,
-      pixelRatio: 3.0,
-      delay: const Duration(milliseconds: 100)
-    );
+    Uint8List? page1Bytes;
+    if (pages[0]) {
+      final page1Widget = _buildPageWrapper(
+        width: pageWidth,
+        height: pageHeight,
+        theme: theme,
+        child: _buildPage1Content(user, result, theme),
+      );
+      page1Bytes = await controller.captureFromWidget(
+        page1Widget,
+        targetSize: targetSize,
+        pixelRatio: 3.0,
+        delay: const Duration(milliseconds: 100),
+      );
+    }
+
+    Uint8List? page2Bytes;
+    if (pages[1]) {
+      final page2Widget = _buildPageWrapper(
+        width: pageWidth,
+        height: pageHeight,
+        theme: theme,
+        child: _buildPage2Content(user, result, theme),
+      );
+      page2Bytes = await controller.captureFromWidget(
+        page2Widget,
+        targetSize: targetSize,
+        pixelRatio: 3.0,
+        delay: const Duration(milliseconds: 100),
+      );
+    }
+
+    Uint8List? page3Bytes;
+    if (pages[2]) {
+      final page3Widget = _buildPageWrapper(
+        width: pageWidth,
+        height: pageHeight,
+        theme: theme,
+        child: _buildPage3Content(user, result, theme),
+      );
+      page3Bytes = await controller.captureFromWidget(
+        page3Widget,
+        targetSize: targetSize,
+        pixelRatio: 3.0,
+        delay: const Duration(milliseconds: 100),
+      );
+    }
+
+    Uint8List? page4Bytes;
+    if (pages[3]) {
+      final page4Widget = _buildPageWrapper(
+        width: pageWidth,
+        height: pageHeight,
+        theme: theme,
+        child: _buildPage4Content(user, result, theme),
+      );
+      page4Bytes = await controller.captureFromWidget(
+        page4Widget,
+        targetSize: targetSize,
+        pixelRatio: 3.0,
+        delay: const Duration(milliseconds: 100),
+      );
+    }
+
+    Uint8List? page5Bytes;
+    if (pages[4]) {
+      final page5Widget = _buildPageWrapper(
+        width: pageWidth,
+        height: pageHeight,
+        theme: theme,
+        child: _buildPage5Content(user, result, theme),
+      );
+      page5Bytes = await controller.captureFromWidget(
+        page5Widget,
+        targetSize: targetSize,
+        pixelRatio: 3.0,
+        delay: const Duration(milliseconds: 100),
+      );
+    }
+
+    Uint8List? page6Bytes;
+    if (pages[5]) {
+      final page6Widget = _buildPageWrapper(
+        width: pageWidth,
+        height: pageHeight,
+        theme: theme,
+        child: _buildPage6Content(user, result, theme),
+      );
+      page6Bytes = await controller.captureFromWidget(
+        page6Widget,
+        targetSize: targetSize,
+        pixelRatio: 3.0,
+        delay: const Duration(milliseconds: 100),
+      );
+    }
 
     final doc = pw.Document();
 
-    doc.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: pw.EdgeInsets.zero,
-        build: (pw.Context context) {
-          return pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(page1Bytes), fit: pw.BoxFit.contain));
-        },
-      ),
-    );
-
-    doc.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: pw.EdgeInsets.zero,
-        build: (pw.Context context) {
-          return pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(page2Bytes), fit: pw.BoxFit.contain));
-        },
-      ),
-    );
-
-    doc.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: pw.EdgeInsets.zero,
-        build: (pw.Context context) {
-          return pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(page3Bytes), fit: pw.BoxFit.contain));
-        },
-      ),
-    );
-
-    doc.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: pw.EdgeInsets.zero,
-        build: (pw.Context context) {
-          return pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(page4Bytes), fit: pw.BoxFit.contain));
-        },
-      ),
-    );
-
-    doc.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: pw.EdgeInsets.zero,
-        build: (pw.Context context) {
-          return pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(page5Bytes), fit: pw.BoxFit.contain));
-        },
-      ),
-    );
-
-    doc.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: pw.EdgeInsets.zero,
-        build: (pw.Context context) {
-          return pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(page6Bytes), fit: pw.BoxFit.contain));
-        },
-      ),
-    );
+    for (final bytes in [page1Bytes, page2Bytes, page3Bytes, page4Bytes, page5Bytes, page6Bytes]) {
+      if (bytes != null) {
+        doc.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            margin: pw.EdgeInsets.zero,
+            build: (pw.Context context) {
+              return pw.FullPage(
+                ignoreMargins: true,
+                child: pw.Image(pw.MemoryImage(bytes), fit: pw.BoxFit.contain),
+              );
+            },
+          ),
+        );
+      }
+    }
 
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => doc.save(),

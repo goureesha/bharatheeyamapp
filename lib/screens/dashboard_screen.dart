@@ -123,6 +123,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   final _jyotishiNameCtrl = TextEditingController();
   final _jyotishiPhoneCtrl = TextEditingController();
   String _selectedThemeId = 'traditional';
+  List<bool> _pdfPageSelection = [true, true, true, true, true, true]; // 6 pages
 
 
   // Multi-person support
@@ -3433,6 +3434,53 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 16),
 
+          // ── Page Selection ──
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: kCard,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: kBorder),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.checklist, color: kPurple2),
+                    const SizedBox(width: 8),
+                    Text(AppLocale.l('pdfPageSelect'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kText)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                ...List.generate(6, (i) {
+                  final pageNames = [
+                    'ಜನನ ಪತ್ರಿಕಾ (Birth Details)',
+                    'ವಿಂಶೋತ್ತರೀ ದಶಾ (Dasha)',
+                    'ಅಂತರ್ದಶಾ (Antardasha)',
+                    'ವರ್ಗ ಕುಂಡಲಿ (Varga Charts)',
+                    'ಅಷ್ಟಕವರ್ಗ (Ashtakavarga)',
+                    'ಷಡ್ಬಲ (Shadbala)',
+                  ];
+                  return CheckboxListTile(
+                    value: _pdfPageSelection[i],
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    contentPadding: EdgeInsets.zero,
+                    activeColor: kPurple2,
+                    title: Text('${i + 1}. ${pageNames[i]}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: kText)),
+                    onChanged: (v) {
+                      // Don't allow deselecting all pages
+                      if (!v! && _pdfPageSelection.where((p) => p).length <= 1) return;
+                      setState(() => _pdfPageSelection[i] = v);
+                    },
+                  );
+                }),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
           // ── Form Fields ──
           Container(
             padding: const EdgeInsets.all(16),
@@ -3527,7 +3575,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       );
 
                       try {
-                        await JanmaPatrikeService.generateAndPrint(ud, widget.result, theme: selectedTheme);
+                        await JanmaPatrikeService.generateAndPrint(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection);
                       } catch (e) {
                          ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('❌ ${AppLocale.l('errorLabel')}: $e'), backgroundColor: Colors.red)
