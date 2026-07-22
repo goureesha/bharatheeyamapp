@@ -1382,9 +1382,9 @@ class _InputScreenState extends State<InputScreen> {
     final tz = double.tryParse(tzText) ?? 5.5;
 
     // Get sunrise JD for the selected date
-    // Use refraction-corrected sunrise (matching Panchanga section)
+    // Use geometric sunrise (0.0° horizon) — traditional Shuddha Drigganitha
     final srSs = Ephemeris.findSunriseSetForDate(
-      _dob.year, _dob.month, _dob.day, lat, lon, tzOffset: tz,
+      _dob.year, _dob.month, _dob.day, lat, lon,
     );
     final sunriseJd = srSs[0];
 
