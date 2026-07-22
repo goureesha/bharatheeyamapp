@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -3196,34 +3198,83 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  /// Generate and print a PDF from the notes text
+  /// Generate and print a PDF from the notes text using screenshot-to-image
   Future<void> _printNotesPdf(String text) async {
-    final pdf = pw.Document();
-    pdf.addPage(
-      pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(40),
-        build: (pw.Context context) {
-          final lines = text.split('\n');
-          return lines.map((line) {
-            final isSeparator = line.startsWith('═') || line.startsWith('─');
-            final isEmoji = line.startsWith('✨') || line.startsWith('📝');
-            return pw.Padding(
-              padding: const pw.EdgeInsets.only(bottom: 2),
-              child: pw.Text(
-                line,
-                style: pw.TextStyle(
-                  fontSize: isSeparator ? 10 : (isEmoji ? 13 : 11),
-                  fontWeight: (isSeparator || isEmoji) ? pw.FontWeight.bold : pw.FontWeight.normal,
+    final controller = ScreenshotController();
+    const double pageWidth = 793.0;
+    const double pageHeight = 1122.0;
+
+    // Build a styled Flutter widget for the notes page
+    final notesWidget = Directionality(
+      textDirection: TextDirection.ltr,
+      child: MediaQuery(
+        data: const MediaQueryData(),
+        child: Material(
+          color: Colors.white,
+          child: Container(
+            width: pageWidth,
+            height: pageHeight,
+            padding: const EdgeInsets.all(48),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Center(
+                  child: Text(
+                    '📝 ${AppLocale.l('notesLabel')}',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF4A148C),
+                    ),
+                  ),
                 ),
-              ),
-            );
-          }).toList();
+                const SizedBox(height: 8),
+                Divider(color: Color(0xFF6A1B9A), thickness: 2),
+                const SizedBox(height: 16),
+                // Notes content
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Text(
+                      text,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.6,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final Uint8List imageBytes = await controller.captureFromWidget(
+      notesWidget,
+      targetSize: const Size(pageWidth, pageHeight),
+      pixelRatio: 3.0,
+      delay: const Duration(milliseconds: 100),
+    );
+
+    final doc = pw.Document();
+    doc.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: pw.EdgeInsets.zero,
+        build: (pw.Context context) {
+          return pw.FullPage(
+            ignoreMargins: true,
+            child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.contain),
+          );
         },
       ),
     );
+
     await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
+      onLayout: (PdfPageFormat format) async => doc.save(),
       name: 'notes',
     );
   }
