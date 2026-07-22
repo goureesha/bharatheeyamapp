@@ -868,117 +868,119 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
 
   void _exportPdf() async {
     try {
-      // Load Kannada fonts for PDF
-      final regularFont = pw.Font.ttf(await rootBundle.load('assets/fonts/NotoSansKannada-Regular.ttf'));
-      final boldFont = pw.Font.ttf(await rootBundle.load('assets/fonts/NotoSansKannada-Bold.ttf'));
+      final controller = ScreenshotController();
+      const double pageWidth = 793.0;
+      const double pageHeight = 1122.0;
 
-      final purple = PdfColor.fromHex('#4A148C');
-      final blue = PdfColor.fromHex('#1565C0');
-      final grey = PdfColor.fromHex('#757575');
-      final headerBg = PdfColor.fromHex('#F3E5F5');
-      final borderColor = PdfColor.fromHex('#E0E0E0');
-      final altRow = PdfColor.fromHex('#FAFAFA');
+      final purple = const Color(0xFF4A148C);
+      final grey = const Color(0xFF757575);
+      final blue = const Color(0xFF1565C0);
+      final headerBg = const Color(0xFFF3E5F5);
+      final borderColor = const Color(0xFFE0E0E0);
+      final altRow = const Color(0xFFFAFAFA);
 
-      final doc = pw.Document();
-
-      doc.addPage(
-        pw.MultiPage(
-          pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.all(40),
-          header: (pw.Context context) {
-            // Show header only on first page
-            if (context.pageNumber > 1) {
-              return pw.Container(
-                margin: const pw.EdgeInsets.only(bottom: 10),
-                child: pw.Text(_list.name, style: pw.TextStyle(font: boldFont, fontSize: 14, color: purple)),
-              );
-            }
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                // Pooja Name - centered, large
-                pw.Center(child: pw.Text(_list.name, style: pw.TextStyle(font: boldFont, fontSize: 26, color: purple))),
-                pw.SizedBox(height: 4),
-                pw.Center(child: pw.Text('${_list.items.length} items', style: pw.TextStyle(font: regularFont, fontSize: 12, color: grey))),
-                pw.SizedBox(height: 14),
-                // Purohit details box
-                pw.Container(
-                  width: double.infinity,
-                  padding: const pw.EdgeInsets.all(12),
-                  decoration: pw.BoxDecoration(
-                    color: headerBg,
-                    borderRadius: pw.BorderRadius.circular(6),
+      // Build a styled Flutter widget for the pooja list
+      final poojaWidget = Directionality(
+        textDirection: TextDirection.ltr,
+        child: MediaQuery(
+          data: const MediaQueryData(),
+          child: Material(
+            color: Colors.white,
+            child: Container(
+              width: pageWidth,
+              height: pageHeight,
+              padding: const EdgeInsets.all(40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Center(child: Text(_list.name, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: purple))),
+                  const SizedBox(height: 4),
+                  Center(child: Text('${_list.items.length} ${_pl('itemsDone').split(' ').last}', style: TextStyle(fontSize: 12, color: grey))),
+                  const SizedBox(height: 14),
+                  // Purohit details box
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: headerBg,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      if (_list.purohitName.isNotEmpty)
+                        Text('${_pl('purohitName')}: ${_list.purohitName}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: purple)),
+                      if (_list.purohitPhone.isNotEmpty)
+                        Padding(padding: const EdgeInsets.only(top: 4),
+                          child: Text('${_pl('purohitPhone')}: ${_list.purohitPhone}', style: TextStyle(fontSize: 12, color: blue))),
+                      if (_list.purohitName.isEmpty && _list.purohitPhone.isEmpty)
+                        Text(_pl('poojaList'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: purple)),
+                    ]),
                   ),
-                  child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-                    if (_list.purohitName.isNotEmpty)
-                      pw.Text('Purohit: ${_list.purohitName}', style: pw.TextStyle(font: boldFont, fontSize: 13, color: purple)),
-                    if (_list.purohitPhone.isNotEmpty)
-                      pw.Padding(padding: const pw.EdgeInsets.only(top: 4),
-                        child: pw.Text('Phone: ${_list.purohitPhone}', style: pw.TextStyle(font: regularFont, fontSize: 12, color: blue))),
-                    if (_list.purohitName.isEmpty && _list.purohitPhone.isEmpty)
-                      pw.Text('Pooja Samagri List', style: pw.TextStyle(font: boldFont, fontSize: 13, color: purple)),
-                  ]),
-                ),
-                pw.SizedBox(height: 16),
-                pw.Divider(thickness: 0.5, color: borderColor),
-                pw.SizedBox(height: 8),
-              ],
-            );
-          },
-          footer: (pw.Context context) {
-            return pw.Container(
-              alignment: pw.Alignment.centerRight,
-              margin: const pw.EdgeInsets.only(top: 10),
-              child: pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Text('Generated by Bharatheeyam App', style: pw.TextStyle(font: regularFont, fontSize: 9, color: grey)),
-                  pw.Text('Page ${context.pageNumber} / ${context.pagesCount}', style: pw.TextStyle(font: regularFont, fontSize: 9, color: grey)),
-                ],
-              ),
-            );
-          },
-          build: (pw.Context context) {
-            return [
-              // Table with header row + item rows — auto-paginates
-              pw.Table(
-                border: pw.TableBorder.all(color: borderColor, width: 0.5),
-                columnWidths: {
-                  0: const pw.FixedColumnWidth(40),
-                  1: const pw.FlexColumnWidth(3),
-                  2: const pw.FlexColumnWidth(2),
-                },
-                children: [
-                  // Header row
-                  pw.TableRow(
-                    decoration: pw.BoxDecoration(color: headerBg),
-                    children: [
-                      pw.Padding(padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text('#', style: pw.TextStyle(font: boldFont, fontSize: 12))),
-                      pw.Padding(padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text('Item', style: pw.TextStyle(font: boldFont, fontSize: 12))),
-                      pw.Padding(padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text('Quantity', style: pw.TextStyle(font: boldFont, fontSize: 12))),
-                    ],
+                  const SizedBox(height: 16),
+                  Divider(thickness: 0.5, color: borderColor),
+                  const SizedBox(height: 8),
+                  // Table header
+                  Container(
+                    decoration: BoxDecoration(color: headerBg),
+                    child: Row(children: [
+                      SizedBox(width: 40, child: Padding(padding: const EdgeInsets.all(8), child: Text('#', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)))),
+                      Expanded(flex: 3, child: Padding(padding: const EdgeInsets.all(8), child: Text(_pl('itemName'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)))),
+                      Expanded(flex: 2, child: Padding(padding: const EdgeInsets.all(8), child: Text(_pl('quantity'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)))),
+                    ]),
                   ),
                   // Item rows
-                  ...List.generate(_list.items.length, (i) {
-                    final item = _list.items[i];
-                    return pw.TableRow(
-                      decoration: pw.BoxDecoration(color: i % 2 == 0 ? PdfColors.white : altRow),
-                      children: [
-                        pw.Padding(padding: const pw.EdgeInsets.all(8),
-                          child: pw.Text('${i + 1}', style: pw.TextStyle(font: regularFont, fontSize: 11, color: grey))),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8),
-                          child: pw.Text(item.name, style: pw.TextStyle(font: regularFont, fontSize: 11))),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8),
-                          child: pw.Text(item.quantity, style: pw.TextStyle(font: regularFont, fontSize: 11, color: grey))),
-                      ],
-                    );
-                  }),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _list.items.length,
+                      itemBuilder: (_, i) {
+                        final item = _list.items[i];
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: i % 2 == 0 ? Colors.white : altRow,
+                            border: Border(bottom: BorderSide(color: borderColor, width: 0.5)),
+                          ),
+                          child: Row(children: [
+                            SizedBox(width: 40, child: Padding(padding: const EdgeInsets.all(8), child: Text('${i + 1}', style: TextStyle(fontSize: 11, color: grey)))),
+                            Expanded(flex: 3, child: Padding(padding: const EdgeInsets.all(8), child: Text(item.name, style: const TextStyle(fontSize: 11)))),
+                            Expanded(flex: 2, child: Padding(padding: const EdgeInsets.all(8), child: Text(item.quantity, style: TextStyle(fontSize: 11, color: grey)))),
+                          ]),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  // Footer
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('${_pl('itemsDone')}: ${_list.checkedCount} / ${_list.items.length}', style: TextStyle(fontSize: 10, color: grey)),
+                      Text('Bharatheeyam App', style: TextStyle(fontSize: 9, color: grey)),
+                    ],
+                  ),
                 ],
               ),
-            ];
+            ),
+          ),
+        ),
+      );
+
+      final Uint8List imageBytes = await controller.captureFromWidget(
+        poojaWidget,
+        targetSize: const Size(pageWidth, pageHeight),
+        pixelRatio: 3.0,
+        delay: const Duration(milliseconds: 100),
+      );
+
+      final doc = pw.Document();
+      doc.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          margin: pw.EdgeInsets.zero,
+          build: (pw.Context context) {
+            return pw.FullPage(
+              ignoreMargins: true,
+              child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.contain),
+            );
           },
         ),
       );
