@@ -242,6 +242,7 @@ class BharatheeyamApp extends StatefulWidget {
 
 class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingObserver {
   int _rebuildKey = 0; // Incremented only when access is actually revoked
+  bool _webUnlocked = !kIsWeb; // Web starts locked, mobile starts unlocked
 
   @override
   void initState() {
@@ -443,7 +444,9 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   indicatorSize: TabBarIndicatorSize.tab,
                 ),
               ),
-              home: _isVersionOutdated
+              home: (kIsWeb && !_webUnlocked)
+                  ? _WebPasswordScreen(onUnlocked: () => setState(() => _webUnlocked = true))
+                  : _isVersionOutdated
                   ? const _ForceUpdateScreen()
                   : (AppAccessService.isBlocked || DeviceBindingService.isDeviceBlocked)
                   ? _BlockedScreen()
@@ -458,6 +461,105 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
           },
         );
       },
+    );
+  }
+}
+
+// ============================================================
+// WEB PASSWORD GATE — shown on every web load/reload
+// ============================================================
+
+class _WebPasswordScreen extends StatefulWidget {
+  final VoidCallback onUnlocked;
+  const _WebPasswordScreen({required this.onUnlocked});
+
+  @override
+  State<_WebPasswordScreen> createState() => _WebPasswordScreenState();
+}
+
+class _WebPasswordScreenState extends State<_WebPasswordScreen> {
+  final _pinCtrl = TextEditingController();
+  bool _hasError = false;
+  static const _correctPin = '1145';
+
+  void _verify() {
+    if (_pinCtrl.text.trim() == _correctPin) {
+      widget.onUnlocked();
+    } else {
+      setState(() => _hasError = true);
+      _pinCtrl.clear();
+    }
+  }
+
+  @override
+  void dispose() {
+    _pinCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: kBg,
+      body: Center(
+        child: Container(
+          width: 340,
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: kCard,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 8)),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.lock_rounded, size: 48, color: kPurple2),
+              const SizedBox(height: 16),
+              Text(AppLocale.l('appName'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: kPurple2)),
+              const SizedBox(height: 24),
+              TextField(
+                controller: _pinCtrl,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 24, letterSpacing: 8),
+                maxLength: 4,
+                decoration: InputDecoration(
+                  hintText: '••••',
+                  counterText: '',
+                  filled: true,
+                  fillColor: kBg,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _hasError ? Colors.red : kBorder)),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kPurple2, width: 2)),
+                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red, width: 2)),
+                ),
+                onSubmitted: (_) => _verify(),
+              ),
+              if (_hasError)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text('Incorrect PIN', style: TextStyle(color: Colors.red, fontSize: 13, fontWeight: FontWeight.w600)),
+                ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: _verify,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kPurple2,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text('Enter', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
