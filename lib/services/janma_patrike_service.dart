@@ -627,20 +627,38 @@ class JanmaPatrikeService {
 
   static Widget _buildChartWidget(String title, List<List<String>> chart, PdfThemeConfig t) {
     if (chart.isEmpty) chart = List.generate(12, (_) => []);
-    String p(int idx) => chart[idx].join('\n');
-
-    Widget box(String text) {
+    Widget box(int idx) {
+      final items = chart[idx];
+      final count = items.length;
+      final text = items.join('\n');
+      // Dynamic font size: scale down for crowded rashis
+      double fontSize;
+      double lineHeight;
+      if (count <= 3) {
+        fontSize = 11.5;
+        lineHeight = 1.1;
+      } else if (count <= 5) {
+        fontSize = 9.0;
+        lineHeight = 1.0;
+      } else {
+        fontSize = 7.0;
+        lineHeight = 0.95;
+      }
       return Expanded(
         child: Container(
           alignment: Alignment.center,
+          padding: const EdgeInsets.all(1),
           decoration: BoxDecoration(
             border: Border.all(color: t.chartBorder, width: 0.5),
             color: Colors.white,
           ),
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11.5, color: const Color(0xFF1A1A1A), height: 1.1),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: fontSize, color: const Color(0xFF1A1A1A), height: lineHeight),
+            ),
           ),
         ),
       );
@@ -650,7 +668,7 @@ class JanmaPatrikeService {
       return Expanded(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: idxs.map((i) => box(p(i))).toList(),
+          children: idxs.map((i) => box(i)).toList(),
         ),
       );
     }
@@ -671,8 +689,8 @@ class JanmaPatrikeService {
                     children: [
                       Expanded(
                         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                          box(p(10)),
-                          box(p(9)),
+                          box(10),
+                          box(9),
                         ]),
                       ),
                       Expanded(
@@ -691,8 +709,8 @@ class JanmaPatrikeService {
                       ),
                       Expanded(
                         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                          box(p(3)),
-                          box(p(4)),
+                          box(3),
+                          box(4),
                         ]),
                       ),
                     ],
