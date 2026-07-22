@@ -896,7 +896,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                   // Title
                   Center(child: Text(_list.name, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: purple))),
                   const SizedBox(height: 4),
-                  Center(child: Text('${_list.items.length} ${_pl('itemsDone').split(' ').last}', style: TextStyle(fontSize: 12, color: grey))),
+                  Center(child: Text('${_list.items.length} ${_p('itemsDone').split(' ').last}', style: TextStyle(fontSize: 12, color: grey))),
                   const SizedBox(height: 14),
                   // Purohit details box
                   Container(
@@ -908,12 +908,12 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                     ),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       if (_list.purohitName.isNotEmpty)
-                        Text('${_pl('purohitName')}: ${_list.purohitName}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: purple)),
+                        Text('${_p('purohitName')}: ${_list.purohitName}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: purple)),
                       if (_list.purohitPhone.isNotEmpty)
                         Padding(padding: const EdgeInsets.only(top: 4),
-                          child: Text('${_pl('purohitPhone')}: ${_list.purohitPhone}', style: TextStyle(fontSize: 12, color: blue))),
+                          child: Text('${_p('purohitPhone')}: ${_list.purohitPhone}', style: TextStyle(fontSize: 12, color: blue))),
                       if (_list.purohitName.isEmpty && _list.purohitPhone.isEmpty)
-                        Text(_pl('poojaList'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: purple)),
+                        Text(_p('poojaList'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: purple)),
                     ]),
                   ),
                   const SizedBox(height: 16),
@@ -924,8 +924,8 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                     decoration: BoxDecoration(color: headerBg),
                     child: Row(children: [
                       SizedBox(width: 40, child: Padding(padding: const EdgeInsets.all(8), child: Text('#', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)))),
-                      Expanded(flex: 3, child: Padding(padding: const EdgeInsets.all(8), child: Text(_pl('itemName'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)))),
-                      Expanded(flex: 2, child: Padding(padding: const EdgeInsets.all(8), child: Text(_pl('quantity'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)))),
+                      Expanded(flex: 3, child: Padding(padding: const EdgeInsets.all(8), child: Text(_p('itemName'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)))),
+                      Expanded(flex: 2, child: Padding(padding: const EdgeInsets.all(8), child: Text(_p('quantity'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)))),
                     ]),
                   ),
                   // Item rows
@@ -953,7 +953,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('${_pl('itemsDone')}: ${_list.checkedCount} / ${_list.items.length}', style: TextStyle(fontSize: 10, color: grey)),
+                      Text('${_p('itemsDone')}: ${_list.checkedCount} / ${_list.items.length}', style: TextStyle(fontSize: 10, color: grey)),
                       Text('Bharatheeyam App', style: TextStyle(fontSize: 9, color: grey)),
                     ],
                   ),
