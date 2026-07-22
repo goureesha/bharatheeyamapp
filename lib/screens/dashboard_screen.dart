@@ -10,6 +10,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../services/export_service.dart';
 import '../core/calculator.dart';
+import '../core/yoga_engine.dart';
 import '../constants/strings.dart';
 import '../widgets/common.dart';
 import '../widgets/kundali_chart.dart';
@@ -166,11 +167,11 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   static List<String> get _tabs {
     switch (AppLocale.current) {
-      case 'hi': return ['पंचांग', 'कुंडली', 'स्फुट', 'आरूढ', 'दशा', 'भाव', 'ग्रह षड्वर्ग', 'षड्बल', 'अष्टक', 'टिप्पणी', 'पत्रिका'];
-      case 'ta': return ['பஞ்சாங்கம்', 'ஜாதகம்', 'ஸ்புடம்', 'ஆரூடம்', 'தசை', 'பாவம்', 'ஷட்வர்கம்', 'ஷட்பலம்', 'அஷ்டகம்', 'குறிப்பு', 'பத்ரிகை'];
-      case 'te': return ['పంచాంగం', 'కుండలి', 'స్ఫుటం', 'ఆరూఢం', 'దశ', 'భావం', 'షడ్వర్గం', 'షడ్బలం', 'అష్టకం', 'గమనికలు', 'పత్రిక'];
-      case 'ml': return ['പഞ്ചാംഗം', 'ജാതകം', 'സ്ഫുടം', 'ആരൂഢം', 'ദശ', 'ഭാവം', 'ഷഡ്വർഗം', 'ഷഡ്ബലം', 'അഷ്ടകം', 'കുറിപ്പുകൾ', 'പത്രിക'];
-      default: return ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಆರೂಢ', 'ದಶ', 'ಭಾವ', 'ಗ್ರಹ ಷಡ್ವರ್ಗ', 'ಷಡ್ಬಲ', 'ಅಷ್ಟಕ', 'ಟಿಪ್ಪಣಿ', 'ಪತ್ರಿಕೆ'];
+      case 'hi': return ['पंचांग', 'कुंडली', 'स्फुट', 'आरूढ', 'दशा', 'भाव', 'ग्रह षड्वर्ग', 'षड्बल', 'अष्टक', 'योग', 'टिप्पणी', 'पत्रिका'];
+      case 'ta': return ['பஞ்சாங்கம்', 'ஜாதகம்', 'ஸ்புடம்', 'ஆரூடம்', 'தசை', 'பாவம்', 'ஷட்வர்கம்', 'ஷட்பலம்', 'அஷ்டகம்', 'யோகம்', 'குறிப்பு', 'பத்ரிகை'];
+      case 'te': return ['పంచాంగం', 'కుండలి', 'స్ఫుటం', 'ఆరూఢం', 'దశ', 'భావం', 'షడ్వర్గం', 'షడ్బలం', 'అష్టకం', 'యోగం', 'గమనికలు', 'పత్రిక'];
+      case 'ml': return ['പഞ്ചാംഗം', 'ജാതകം', 'സ്ഫുടം', 'ആരൂഢം', 'ദശ', 'ഭാവം', 'ഷഡ്വർഗം', 'ഷഡ്ബലം', 'അഷ്ടകം', 'യോഗം', 'കുറിപ്പുകൾ', 'പത്രിക'];
+      default: return ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಆರೂಢ', 'ದಶ', 'ಭಾವ', 'ಗ್ರಹ ಷಡ್ವರ್ಗ', 'ಷಡ್ಬಲ', 'ಅಷ್ಟಕ', 'ಯೋಗ', 'ಟಿಪ್ಪಣಿ', 'ಪತ್ರಿಕೆ'];
     }
   }
 
@@ -1510,6 +1511,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   _buildGrahaShadvargaTab(),
                   _buildShadbalaTab(),
                   _buildAshtakaTab(),
+                  _buildYogaTab(),
                   _buildNotesTab(),
                   _buildJanmaPatrikeTab(),
                 ],
@@ -3301,6 +3303,193 @@ class _DashboardScreenState extends State<DashboardScreen>
 
 
 
+
+
+  // ─────────────────────────────────────────────
+  // TAB: YOGA (Planetary Yogas)
+  // ─────────────────────────────────────────────
+  Widget _buildYogaTab() {
+    var allPersons = <Map<String, dynamic>>[
+      {'name': _primaryName, 'result': _primaryResult, 'dob': _primaryDob, 'hour': _primaryHour, 'minute': _primaryMinute, 'ampm': _primaryAmpm, 'place': _primaryPlace},
+      ..._extraPersons.map((p) => {'name': p.name, 'result': p.result, 'dob': p.dob, 'hour': p.hour, 'minute': p.minute, 'ampm': p.ampm, 'place': p.place}),
+    ];
+    allPersons = _filterPersons(allPersons);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      child: Column(
+        children: allPersons.map((person) {
+          final r = person['result'] as KundaliResult;
+          final pName = person['name'] as String;
+          final yogas = YogaEngine.evaluate(r);
+
+          // Separate positive and negative yogas
+          final shubha = yogas.where((y) => y.isPositive).toList();
+          final ashubha = yogas.where((y) => !y.isPositive).toList();
+
+          // Category icons and colors
+          IconData _catIcon(String cat) {
+            switch (cat) {
+              case 'raja': return Icons.military_tech;
+              case 'dhana': return Icons.account_balance;
+              case 'pancha': return Icons.stars;
+              case 'chandra': return Icons.nightlight_round;
+              case 'graha': return Icons.wb_sunny;
+              default: return Icons.auto_awesome;
+            }
+          }
+          Color _catColor(String cat) {
+            switch (cat) {
+              case 'raja': return Colors.deepPurple;
+              case 'dhana': return Colors.amber.shade700;
+              case 'pancha': return Colors.indigo;
+              case 'chandra': return Colors.blue;
+              case 'graha': return Colors.orange;
+              default: return Colors.teal;
+            }
+          }
+          String _catLabel(String cat) {
+            switch (cat) {
+              case 'raja': return 'ರಾಜಯೋಗ';
+              case 'dhana': return 'ಧನಯೋಗ';
+              case 'pancha': return 'ಪಂಚ ಮಹಾಪುರುಷ';
+              case 'chandra': return 'ಚಂದ್ರ ಯೋಗ';
+              case 'graha': return 'ಗ್ರಹ ಯೋಗ';
+              default: return 'ಇತರ ಯೋಗ';
+            }
+          }
+
+          Widget yogaCard(YogaResult y) {
+            final isPos = y.isPositive;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: kCard,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isPos ? _catColor(y.category).withOpacity(0.3) : Colors.red.withOpacity(0.3),
+                  width: 1.5,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(_catIcon(y.category), size: 18, color: isPos ? _catColor(y.category) : Colors.red),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(y.nameKn, style: TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.w900,
+                          color: isPos ? _catColor(y.category) : Colors.red,
+                        )),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: (isPos ? Colors.green : Colors.red).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          isPos ? 'ಶುಭಕರ' : 'ಅಶುಭಕರ',
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
+                            color: isPos ? Colors.green.shade700 : Colors.red.shade700),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(y.nameEn, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kMuted)),
+                  const SizedBox(height: 2),
+                  Text(_catLabel(y.category), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _catColor(y.category).withOpacity(0.7))),
+                  const SizedBox(height: 6),
+                  Text(y.descKn, style: TextStyle(fontSize: 12, color: kText, height: 1.4)),
+                  const SizedBox(height: 2),
+                  Text(y.descEn, style: TextStyle(fontSize: 11, color: kMuted, fontStyle: FontStyle.italic, height: 1.3)),
+                ],
+              ),
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (allPersons.length > 1)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 4),
+                  child: Text(pName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kTeal)),
+                ),
+
+              // Summary card
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: kCard,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: kPurple2.withOpacity(0.3)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(children: [
+                      Text('${yogas.length}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: kPurple2)),
+                      Text('ಒಟ್ಟು ಯೋಗ', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                    ]),
+                    Column(children: [
+                      Text('${shubha.length}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.green)),
+                      Text('ಶುಭ', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                    ]),
+                    Column(children: [
+                      Text('${ashubha.length}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.red)),
+                      Text('ಅಶുഭ', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                    ]),
+                  ],
+                ),
+              ),
+
+              // Shubha yogas
+              if (shubha.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(children: [
+                    Icon(Icons.check_circle, size: 16, color: Colors.green),
+                    const SizedBox(width: 6),
+                    Text('ಶುಭ ಯೋಗಗಳು (${shubha.length})', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.green.shade700)),
+                  ]),
+                ),
+                ...shubha.map(yogaCard),
+              ],
+
+              // Ashubha yogas
+              if (ashubha.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(children: [
+                    Icon(Icons.warning_amber, size: 16, color: Colors.red),
+                    const SizedBox(width: 6),
+                    Text('ಅಶുഭ ಯೋಗಗಳು (${ashubha.length})', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.red.shade700)),
+                  ]),
+                ),
+                ...ashubha.map(yogaCard),
+              ],
+
+              if (yogas.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: Center(child: Text('ಯಾವ ಯೋಗವೂ ಕಂಡುಬಂದಿಲ್ಲ', style: TextStyle(color: kMuted, fontSize: 14))),
+                ),
+
+              if (allPersons.length > 1) Divider(thickness: 2, color: kBorder),
+              const SizedBox(height: 12),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
 
 
   // ─────────────────────────────────────────────
