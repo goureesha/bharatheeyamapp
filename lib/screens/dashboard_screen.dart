@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import '../services/export_service.dart';
 import '../core/calculator.dart';
 import '../constants/strings.dart';
@@ -3176,10 +3179,52 @@ class _DashboardScreenState extends State<DashboardScreen>
             },
             icon: const Icon(Icons.copy, size: 18),
             label: Text(AppLocale.l('copyAndPrint')),
+            style: ElevatedButton.styleFrom(backgroundColor: kMuted, foregroundColor: Colors.white),
+          ),
+          const SizedBox(width: 4),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _printNotesPdf(text);
+            },
+            icon: const Icon(Icons.print, size: 18),
+            label: Text(AppLocale.l('printLabel')),
             style: ElevatedButton.styleFrom(backgroundColor: kTeal, foregroundColor: Colors.white),
           ),
         ],
       ),
+    );
+  }
+
+  /// Generate and print a PDF from the notes text
+  Future<void> _printNotesPdf(String text) async {
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(40),
+        build: (pw.Context context) {
+          final lines = text.split('\n');
+          return lines.map((line) {
+            final isSeparator = line.startsWith('═') || line.startsWith('─');
+            final isEmoji = line.startsWith('✨') || line.startsWith('📝');
+            return pw.Padding(
+              padding: const pw.EdgeInsets.only(bottom: 2),
+              child: pw.Text(
+                line,
+                style: pw.TextStyle(
+                  fontSize: isSeparator ? 10 : (isEmoji ? 13 : 11),
+                  fontWeight: (isSeparator || isEmoji) ? pw.FontWeight.bold : pw.FontWeight.normal,
+                ),
+              ),
+            );
+          }).toList();
+        },
+      ),
+    );
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+      name: 'notes',
     );
   }
 
