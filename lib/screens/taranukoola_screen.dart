@@ -978,6 +978,16 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         final guruBala = mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null;
         if (guruBala != null && guruBala.score <= 0) continue;
 
+        // 4. No muhurta during Guru Asta (Jupiter combust)
+        final guruCombust = kr.planets['ಗುರು']?.isCombust ?? false;
+        if (guruCombust) continue;
+
+        // 5. No Vivaha muhurta during Shukra Asta (Venus combust)
+        if (_mfEvent == MuhurtaEvent.vivaha) {
+          final shukraCombust = kr.planets['ಶುಕ್ರ']?.isCombust ?? false;
+          if (shukraCombust) continue;
+        }
+
         {
           // Compute avoidance times
           final rahuKala = _rahuKalaTime(date, pan.sunrise, pan.sunset);
