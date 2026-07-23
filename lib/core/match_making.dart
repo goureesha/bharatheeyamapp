@@ -161,6 +161,72 @@ class MatchMakingLogic {
     return points[getNadi(brideNak)][getNadi(groomNak)];
   }
 
+  // ── DVADASHA KOOTA: 4 additional kootas ──
+
+  // 9. Mahendra (1 Point)
+  // Count nakshatras from bride to groom. If (count-1) % 9 ∈ {0,3,6} → 1 pt
+  static double getMahendraScore(int brideNak, int groomNak) {
+    final count = ((groomNak - brideNak + 27) % 27);
+    final mod = count % 9;
+    return (mod == 0 || mod == 3 || mod == 6) ? 1.0 : 0.0;
+  }
+
+  // 10. Stree Deergha (1 Point)
+  // If groom nakshatra is >= 13 nakshatras away from bride → 1 pt
+  static double getStreeDeerghaScore(int brideNak, int groomNak) {
+    final diff = ((groomNak - brideNak + 27) % 27);
+    return diff >= 13 ? 1.0 : 0.0;
+  }
+
+  // 11. Rajju (1 Point)
+  // Body part mapping. Same rajju group = 0 (bad), different = 1 (good)
+  static double getRajjuScore(int brideNak, int groomNak) {
+    // Rajju groups: 0=Paada(feet), 1=Kati(hip), 2=Nabhi(navel), 3=Kantha(neck), 4=Shira(head)
+    int getRajju(int nak) {
+      const map = [
+        4, 3, 2, 1, 0, // Ashwini..Mrigashira (ascending)
+        1, 2, 3, 4,     // Ardra..Pushya (descending)
+        4, 3, 2, 1, 0, // Ashlesha..Hasta (ascending)
+        1, 2, 3, 4,     // Chitra..Anuradha (descending)
+        4, 3, 2, 1, 0, // Jyeshtha..Shravana (ascending)
+        1, 2, 3, 4,     // Dhanishtha..Revati (descending)
+      ];
+      return map[nak % 27];
+    }
+    return getRajju(brideNak) == getRajju(groomNak) ? 0.0 : 1.0;
+  }
+
+  // 12. Vedha (1 Point)
+  // Specific nakshatra pairs cause vedha. No vedha = 1 pt
+  static double getVedhaScore(int brideNak, int groomNak) {
+    // Vedha pairs (0-indexed nakshatras)
+    const vedhaPairs = <List<int>>[
+      [0, 17],  // Ashwini - Jyeshtha
+      [1, 16],  // Bharani - Anuradha
+      [2, 18],  // Krittika - Moola (based on some texts: Dhanishtha)
+      [3, 19],  // Rohini - Shravana → Swati
+      [4, 22],  // Mrigashira - Dhanishtha
+      [5, 21],  // Ardra - Shravana
+      [6, 20],  // Punarvasu - Purvashadha
+      [7, 19],  // Pushya - Uttarashadha
+      [8, 18],  // Ashlesha - Moola
+      [9, 26],  // Magha - Revati
+      [10, 25], // P.Phalguni - U.Bhadrapada
+      [11, 24], // U.Phalguni - P.Bhadrapada
+      [12, 23], // Hasta - Shatabhisha
+      [13, 22], // Chitra - Dhanishtha  (duplicate intentional for reverse)
+      [14, 21], // Swati - Shravana
+      [15, 20], // Vishakha - Purvashadha
+    ];
+    for (final pair in vedhaPairs) {
+      if ((brideNak == pair[0] && groomNak == pair[1]) ||
+          (brideNak == pair[1] && groomNak == pair[0])) {
+        return 0.0; // Vedha present
+      }
+    }
+    return 1.0; // No vedha
+  }
+
   static Map<String, dynamic> calculateCompatibility(int bRashi, int bNak, int gRashi, int gNak) {
     double varna = getVarnaScore(bRashi, gRashi);
     double vashya = getVashyaScore(bRashi, gRashi);
@@ -182,6 +248,41 @@ class MatchMakingLogic {
       'gana': gana,
       'bhakoot': bhakoot,
       'nadi': nadi,
+      'total': total,
+    };
+  }
+
+  /// Dvadasha Koota: 12 kootas, max 40 points
+  static Map<String, dynamic> calculateDvadashaKoota(int bRashi, int bNak, int gRashi, int gNak) {
+    double varna = getVarnaScore(bRashi, gRashi);
+    double vashya = getVashyaScore(bRashi, gRashi);
+    double tara = getTaraScore(bNak, gNak);
+    double yoni = getYoniScore(bNak, gNak);
+    double graha = getGrahaMaitriScore(bRashi, gRashi);
+    double gana = getGanaScore(bNak, gNak);
+    double bhakoot = getBhakootScore(bRashi, gRashi);
+    double nadi = getNadiScore(bNak, gNak);
+    double mahendra = getMahendraScore(bNak, gNak);
+    double streeDeergha = getStreeDeerghaScore(bNak, gNak);
+    double rajju = getRajjuScore(bNak, gNak);
+    double vedha = getVedhaScore(bNak, gNak);
+
+    double total = varna + vashya + tara + yoni + graha + gana + bhakoot + nadi +
+        mahendra + streeDeergha + rajju + vedha;
+
+    return {
+      'varna': varna,
+      'vashya': vashya,
+      'tara': tara,
+      'yoni': yoni,
+      'graha': graha,
+      'gana': gana,
+      'bhakoot': bhakoot,
+      'nadi': nadi,
+      'mahendra': mahendra,
+      'streeDeergha': streeDeergha,
+      'rajju': rajju,
+      'vedha': vedha,
       'total': total,
     };
   }
@@ -398,6 +499,7 @@ class MatchMakingLogic {
     final gBhava = groomBhavaHouses ?? groomPlanetRashis;
     return {
       'ashtaKoota': calculateCompatibility(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
+      'dvadashaKoota': calculateDvadashaKoota(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
       'brideKujaDosha': calculateKujaDosha(bBhava),
       'groomKujaDosha': calculateKujaDosha(gBhava),
       'bridePapaDosha': calculatePapaDosha(bBhava),

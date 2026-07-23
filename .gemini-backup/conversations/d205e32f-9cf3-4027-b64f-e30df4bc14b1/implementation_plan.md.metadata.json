@@ -1,6 +1,6 @@
 {
-  "summary": "Implementation plan to add 4 new pages to the Janma Patrike PDF: Antardasha tables, Divisional charts (using available D2/D3/D9/D12/D30), Ashtakavarga (BAV + SAV), and Shadbala detailed table. All data is already computed — only PDF rendering logic needed.",
-  "updatedAt": "2026-07-22T06:30:33.763021500Z",
+  "summary": "Implementation plan for adding Dvadasha Koota (12-point matchmaking) alongside existing Ashta Koota (8-point), with a toggle to switch between them. Covers backend logic (4 new koota calculations), frontend UI (segmented toggle, new table), and localization.",
+  "updatedAt": "2026-07-23T05:55:59.530310400Z",
   "requestFeedback": true,
   "userFacing": true
 }

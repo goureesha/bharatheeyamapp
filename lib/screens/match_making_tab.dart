@@ -48,6 +48,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
   KundaliResult? _brideResult;
   KundaliResult? _groomResult;
   Map<String, dynamic>? _fullResult;
+  int _kootaMode = 0; // 0 = Ashta Koota, 1 = Dvadasha Koota
 
   Future<void> _calculate() async {
     setState(() => _loading = true);
@@ -636,9 +637,52 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
       _sectionHeader('${AppLocale.l('shathaAshtaka')} & ${AppLocale.l('dvirdvadasha')}', Icons.compare_arrows, Colors.indigo),
       _buildShathaAshtakaDvirdvadashaSection(fr),
 
-      // ── ASHTA KOOTA ──
+      // ── KOOTA TOGGLE + TABLE ──
       _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
-      _buildAshtaKootaTable(fr['ashtaKoota']),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        child: Row(children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _kootaMode = 0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: _kootaMode == 0 ? kPurple1 : kCard,
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
+                  border: Border.all(color: kPurple1),
+                ),
+                alignment: Alignment.center,
+                child: Text(AppLocale.l('ashtaKootaLabel'), style: TextStyle(
+                  fontWeight: FontWeight.w800, fontSize: 13,
+                  color: _kootaMode == 0 ? Colors.white : kPurple1,
+                )),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _kootaMode = 1),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: _kootaMode == 1 ? kPurple1 : kCard,
+                  borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
+                  border: Border.all(color: kPurple1),
+                ),
+                alignment: Alignment.center,
+                child: Text(AppLocale.l('dvadashaKootaLabel'), style: TextStyle(
+                  fontWeight: FontWeight.w800, fontSize: 13,
+                  color: _kootaMode == 1 ? Colors.white : kPurple1,
+                )),
+              ),
+            ),
+          ),
+        ]),
+      ),
+      _kootaMode == 0
+        ? _buildAshtaKootaTable(fr['ashtaKoota'])
+        : _buildDvadashaKootaTable(fr['dvadashaKoota']),
 
       // ── DASHA SANDHI ──
       _sectionHeader(AppLocale.l('dashaSandhi'), Icons.swap_horiz, Colors.deepPurple),
@@ -1054,6 +1098,69 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
             Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('totalGuna'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
             Padding(padding: const EdgeInsets.all(10), child: Text(total.toStringAsFixed(1), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: kPurple1))),
             Padding(padding: const EdgeInsets.all(10), child: Text('36', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: kMuted))),
+          ],
+        ),
+      ]),
+      const SizedBox(height: 16),
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        decoration: BoxDecoration(color: verdictColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: verdictColor.withOpacity(0.3))),
+        child: Column(children: [
+          Text('${AppLocale.l('result')}:', style: TextStyle(fontSize: 13, color: verdictColor, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 4),
+          Text(verdict, textAlign: TextAlign.center, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: verdictColor)),
+        ]),
+      ),
+    ]));
+  }
+
+  Widget _buildDvadashaKootaTable(Map<String, dynamic> result) {
+    final total = result['total'] as double;
+    String verdict;
+    Color verdictColor;
+    if (total <= 20) { verdict = AppLocale.l('matchPoor'); verdictColor = Colors.red.shade700; }
+    else if (total <= 28) { verdict = AppLocale.l('matchMedium'); verdictColor = Colors.orange.shade700; }
+    else { verdict = AppLocale.l('matchGood'); verdictColor = Colors.green.shade700; }
+
+    TableRow row(String name, double pts, int max) {
+      return TableRow(
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder))),
+        children: [
+          Padding(padding: const EdgeInsets.all(10), child: Text(name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13))),
+          Padding(padding: const EdgeInsets.all(10), child: Text(pts.toStringAsFixed(1), textAlign: TextAlign.center, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
+          Padding(padding: const EdgeInsets.all(10), child: Text(max.toString(), textAlign: TextAlign.center, style: TextStyle(color: kMuted, fontSize: 13))),
+        ],
+      );
+    }
+
+    return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Table(columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1)}, children: [
+        TableRow(
+          decoration: BoxDecoration(color: kPurple2.withOpacity(0.1), borderRadius: const BorderRadius.vertical(top: Radius.circular(8))),
+          children: [
+            Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('koota'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
+            Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('padeGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
+            Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('garishThaGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
+          ],
+        ),
+        row(AppLocale.l('varna'), result['varna'], 1),
+        row(AppLocale.l('vashya'), result['vashya'], 2),
+        row(AppLocale.l('tara'), result['tara'], 3),
+        row(AppLocale.l('yoni'), result['yoni'], 4),
+        row(AppLocale.l('grahaMaitri'), result['graha'], 5),
+        row(AppLocale.l('gana'), result['gana'], 6),
+        row(AppLocale.l('bhakoot'), result['bhakoot'], 7),
+        row(AppLocale.l('naadi'), result['nadi'], 8),
+        row(AppLocale.l('mahendra'), result['mahendra'], 1),
+        row(AppLocale.l('streeDeergha'), result['streeDeergha'], 1),
+        row(AppLocale.l('rajju'), result['rajju'], 1),
+        row(AppLocale.l('vedha'), result['vedha'], 1),
+        TableRow(
+          decoration: BoxDecoration(color: kPurple1.withOpacity(0.05)),
+          children: [
+            Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('totalGuna'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+            Padding(padding: const EdgeInsets.all(10), child: Text(total.toStringAsFixed(1), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: kPurple1))),
+            Padding(padding: const EdgeInsets.all(10), child: Text('40', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: kMuted))),
           ],
         ),
       ]),

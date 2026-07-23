@@ -1,16 +1,13 @@
-# Tasks — New Janma Patrike PDF Pages
+# Dvadasha Koota Implementation Tasks
 
-## Research
-- [x] Understand existing PDF generation pattern
-- [x] Verify data availability (Antardasha, Ashtakavarga, Shadbala, Divisional)
-
-## Implementation
-- [ ] Page 3: Antardasha (Bhukti) tables
-- [ ] Page 4: Divisional Charts (D2, D3, D9, D12, D30)
-- [ ] Page 5: Ashtakavarga (BAV + SAV)
-- [ ] Page 6: Shadbala detailed table
-- [ ] Wire all pages into `generate()` method
-
-## Verification
-- [ ] Build verification
-- [ ] Push to GitHub
+- [/] Backend: Add 4 new koota methods to match_making.dart
+  - [ ] Mahendra koota
+  - [ ] Stree Deergha koota
+  - [ ] Rajju koota
+  - [ ] Vedha koota
+- [ ] Backend: Add calculateDvadashaKoota() method
+- [ ] Backend: Add to calculateFullCompatibility() return
+- [ ] Frontend: Add localization strings
+- [ ] Frontend: Add toggle state & segmented button
+- [ ] Frontend: Add _buildDvadashaKootaTable()
+- [ ] Git commit & push
