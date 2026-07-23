@@ -2197,24 +2197,62 @@ class _DashboardScreenState extends State<DashboardScreen>
           final pName = person['name'] as String;
           final pan = r.panchang;
 
-          // ── Sandhi definitions: {dashaLord → [sandhiName, nextLord, shantiText]} ──
-          const sandhiMap = <String, List<String>>{
-            'ಕುಜ': ['ಕುಜ-ರಾಹು ಸಂಧಿ', 'ರಾಹು', 'ಕುಜ-ರಾಹು ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
-            'ಶುಕ್ರ': ['ಶುಕ್ರ-ಆದಿತ್ಯ ಸಂಧಿ', 'ರವಿ', 'ಶುಕ್ರ-ಆದಿತ್ಯ ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
-            'ರಾಹು': ['ರಾಹು-ಬೃಹಸ್ಪತಿ ಸಂಧಿ', 'ಗುರು', 'ರಾಹು-ಬೃಹಸ್ಪತಿ ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
+          // ── Sandhi definitions: {dashaLord → [sandhiName, shantiText]} ──
+          // Dasha lords come in Kannada from calculator, so keys stay Kannada
+          final _sandhiNames = <String, Map<String, List<String>>>{
+            'ಕುಜ': {
+              'kn': ['ಕುಜ-ರಾಹು ಸಂಧಿ', 'ಕುಜ-ರಾಹು ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
+              'hi': ['कुज-राहु संधि', 'कुज-राहु संधि शांति करवाएं'],
+              'ta': ['குஜ-ராகு சந்தி', 'குஜ-ராகு சந்தி சாந்தி செய்யுங்கள்'],
+              'te': ['కుజ-రాహు సంధి', 'కుజ-రాహు సంధి శాంతి చేయించండి'],
+              'ml': ['കുജ-രാഹു സന്ധി', 'കുജ-രാഹു സന്ധി ശാന്തി ചെയ്യിക്കുക'],
+            },
+            'ಶುಕ್ರ': {
+              'kn': ['ಶುಕ್ರ-ಆದಿತ್ಯ ಸಂಧಿ', 'ಶುಕ್ರ-ಆದಿತ್ಯ ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
+              'hi': ['शुक्र-आदित्य संधि', 'शुक्र-आदित्य संधि शांति करवाएं'],
+              'ta': ['சுக்ர-ஆதித்ய சந்தி', 'சுக்ர-ஆதித்ய சந்தி சாந்தி செய்யுங்கள்'],
+              'te': ['శుక్ర-ఆదిత్య సంధి', 'శుక్ర-ఆదిత్య సంధి శాంతి చేయించండి'],
+              'ml': ['ശുക്ര-ആദിത്യ സന്ധി', 'ശുക്ര-ആദിത്യ സന്ധി ശാന്തി ചെയ്യിക്കുക'],
+            },
+            'ರಾಹು': {
+              'kn': ['ರಾಹು-ಬೃಹಸ್ಪತಿ ಸಂಧಿ', 'ರಾಹು-ಬೃಹಸ್ಪತಿ ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
+              'hi': ['राहु-बृहस्पति संधि', 'राहु-बृहस्पति संधि शांति करवाएं'],
+              'ta': ['ராகு-பிருஹஸ்பதி சந்தி', 'ராகு-பிருஹஸ்பதி சந்தி சாந்தி செய்யுங்கள்'],
+              'te': ['రాహు-బృహస్పతి సంధి', 'రాహు-బృహస్పతి సంధి శాంతి చేయించండి'],
+              'ml': ['രാഹു-ബൃഹസ്പതി സന്ധി', 'രാഹു-ബൃഹസ്പതി സന്ധി ശാന്തി ചെയ്യിക്കുക'],
+            },
           };
+
+          // Localized UI labels
+          final _loc = AppLocale.current;
+          final _sandhiTitle = {
+            'kn': 'ದಶಾ ಸಂಧಿ ಸೂಚನೆ', 'hi': 'दशा संधि सूचना', 'ta': 'தசா சந்தி அறிவிப்பு',
+            'te': 'దశా సంధి సూచన', 'ml': 'ദശാ സന്ധി സൂചന',
+          }[_loc] ?? 'ದಶಾ ಸಂಧಿ ಸೂಚನೆ';
+          final _activeLbl = {
+            'kn': 'ಸಕ್ರಿಯ', 'hi': 'सक्रिय', 'ta': 'செயலில்', 'te': 'సక్రియం', 'ml': 'സജീവം',
+          }[_loc] ?? 'ಸಕ್ರಿಯ';
+          final _dashaEndLbl = {
+            'kn': 'ದಶಾ ಅಂತ್ಯ', 'hi': 'दशा अंत', 'ta': 'தசா முடிவு', 'te': 'దశా అంతం', 'ml': 'ദശാ അവസാനം',
+          }[_loc] ?? 'ದಶಾ ಅಂತ್ಯ';
+          final _sandhiKalaLbl = {
+            'kn': 'ಸಂಧಿ ಕಾಲ', 'hi': 'संधि काल', 'ta': 'சந்தி காலம்', 'te': 'సంధి కాలం', 'ml': 'സന്ധി കാലം',
+          }[_loc] ?? 'ಸಂಧಿ ಕಾಲ';
+          final _fromLbl = {
+            'kn': 'ರಿಂದ', 'hi': 'से', 'ta': 'முதல்', 'te': 'నుండి', 'ml': 'മുതൽ',
+          }[_loc] ?? 'ರಿಂದ';
 
           // ── Collect sandhi notices ──
           final sandhiNotices = <Map<String, dynamic>>[];
           for (final md in r.dashas) {
-            final info = sandhiMap[md.lord];
-            if (info == null) continue;
+            final locData = _sandhiNames[md.lord];
+            if (locData == null) continue;
+            final texts = locData[_loc] ?? locData['kn']!;
             final sandhiStart = md.end.subtract(const Duration(days: 182)); // ~6 months before
             sandhiNotices.add({
-              'sandhiName': info[0],
+              'sandhiName': texts[0],
               'dashaLord': md.lord,
-              'nextLord': info[1],
-              'shantiText': info[2],
+              'shantiText': texts[1],
               'dashaEnd': md.end,
               'sandhiStart': sandhiStart,
             });
@@ -2250,7 +2288,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   child: Row(children: [
                     Icon(Icons.notifications_active, size: 16, color: Colors.deepOrange),
                     const SizedBox(width: 6),
-                    Text('ದಶಾ ಸಂಧಿ ಸೂಚನೆ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.deepOrange)),
+                    Text(_sandhiTitle, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.deepOrange)),
                   ]),
                 ),
                 const SizedBox(height: 6),
@@ -2298,13 +2336,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 color: Colors.red.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child: Text('ಸಕ್ರಿಯ', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.red)),
+                              child: Text(_activeLbl, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.red)),
                             ),
                         ]),
                         const SizedBox(height: 6),
-                        Text('${trAll(s['dashaLord'] as String)} ದಶಾ ಅಂತ್ಯ: $endStr', style: TextStyle(fontSize: 12, color: kText)),
+                        Text('${trAll(s['dashaLord'] as String)} $_dashaEndLbl: $endStr', style: TextStyle(fontSize: 12, color: kText)),
                         const SizedBox(height: 2),
-                        Text('ಸಂಧಿ ಕಾಲ: $startStr ರಿಂದ $endStr', style: TextStyle(fontSize: 12, color: kText)),
+                        Text('$_sandhiKalaLbl: $startStr $_fromLbl $endStr', style: TextStyle(fontSize: 12, color: kText)),
                         const SizedBox(height: 6),
                         Container(
                           padding: const EdgeInsets.all(8),
