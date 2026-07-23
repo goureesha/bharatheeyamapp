@@ -2197,64 +2197,51 @@ class _DashboardScreenState extends State<DashboardScreen>
           final pName = person['name'] as String;
           final pan = r.panchang;
 
-          // ── Sandhi definitions: {dashaLord → [sandhiName, shantiText]} ──
-          // Dasha lords come in Kannada from calculator, so keys stay Kannada
-          final _sandhiNames = <String, Map<String, List<String>>>{
+          // ── Sandhi definitions: {dashaLord → {planet1, planet2 per lang}} ──
+          const _sandhiDef = <String, Map<String, List<String>>>{
+            // key=dasha lord (Kannada), value={lang: [planet1, planet2]}
             'ಕುಜ': {
-              'kn': ['ಕುಜ-ರಾಹು ಸಂಧಿ', 'ಕುಜ-ರಾಹು ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
-              'hi': ['कुज-राहु संधि', 'कुज-राहु संधि शांति करवाएं'],
-              'ta': ['குஜ-ராகு சந்தி', 'குஜ-ராகு சந்தி சாந்தி செய்யுங்கள்'],
-              'te': ['కుజ-రాహు సంధి', 'కుజ-రాహు సంధి శాంతి చేయించండి'],
-              'ml': ['കുജ-രാഹു സന്ധി', 'കുജ-രാഹു സന്ധി ശാന്തി ചെയ്യിക്കുക'],
+              'kn': ['ಕುಜ', 'ರಾಹು'], 'hi': ['कुज', 'राहु'], 'ta': ['குஜ', 'ராகு'],
+              'te': ['కుజ', 'రాహు'], 'ml': ['കുജ', 'രാഹു'],
             },
             'ಶುಕ್ರ': {
-              'kn': ['ಶುಕ್ರ-ಆದಿತ್ಯ ಸಂಧಿ', 'ಶುಕ್ರ-ಆದಿತ್ಯ ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
-              'hi': ['शुक्र-आदित्य संधि', 'शुक्र-आदित्य संधि शांति करवाएं'],
-              'ta': ['சுக்ர-ஆதித்ய சந்தி', 'சுக்ர-ஆதித்ய சந்தி சாந்தி செய்யுங்கள்'],
-              'te': ['శుక్ర-ఆదిత్య సంధి', 'శుక్ర-ఆదిత్య సంధి శాంతి చేయించండి'],
-              'ml': ['ശുക്ര-ആദിത്യ സന്ധി', 'ശുക്ര-ആദിത്യ സന്ധി ശാന്തി ചെയ്യിക്കുക'],
+              'kn': ['ಶುಕ್ರ', 'ಆದಿತ್ಯ'], 'hi': ['शुक्र', 'आदित्य'], 'ta': ['சுக்ர', 'ஆதித்ய'],
+              'te': ['శుక్ర', 'ఆదిత్య'], 'ml': ['ശുക്ര', 'ആദിത്യ'],
             },
             'ರಾಹು': {
-              'kn': ['ರಾಹು-ಬೃಹಸ್ಪತಿ ಸಂಧಿ', 'ರಾಹು-ಬೃಹಸ್ಪತಿ ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
-              'hi': ['राहु-बृहस्पति संधि', 'राहु-बृहस्पति संधि शांति करवाएं'],
-              'ta': ['ராகு-பிருஹஸ்பதி சந்தி', 'ராகு-பிருஹஸ்பதி சந்தி சாந்தி செய்யுங்கள்'],
-              'te': ['రాహు-బృహస్పతి సంధి', 'రాహు-బృహస్పతి సంధి శాంతి చేయించండి'],
-              'ml': ['രാഹു-ബൃഹസ്പതി സന്ധി', 'രാഹു-ബൃഹസ്പതി സന്ധി ശാന്തി ചെയ്യിക്കുക'],
+              'kn': ['ರಾಹು', 'ಬೃಹಸ್ಪತಿ'], 'hi': ['राहु', 'बृहस्पति'], 'ta': ['ராகு', 'பிருஹஸ்பதி'],
+              'te': ['రాహు', 'బృహస్పతి'], 'ml': ['രാഹു', 'ബൃഹസ്പതി'],
             },
           };
 
-          // Localized UI labels
+          // Localized templates
           final _loc = AppLocale.current;
-          final _sandhiTitle = {
-            'kn': 'ದಶಾ ಸಂಧಿ ಸೂಚನೆ', 'hi': 'दशा संधि सूचना', 'ta': 'தசா சந்தி அறிவிப்பு',
-            'te': 'దశా సంధి సూచన', 'ml': 'ദശാ സന്ധി സൂചന',
-          }[_loc] ?? 'ದಶಾ ಸಂಧಿ ಸೂಚನೆ';
-          final _activeLbl = {
-            'kn': 'ಸಕ್ರಿಯ', 'hi': 'सक्रिय', 'ta': 'செயலில்', 'te': 'సక్రియం', 'ml': 'സജീവം',
-          }[_loc] ?? 'ಸಕ್ರಿಯ';
-          final _dashaEndLbl = {
-            'kn': 'ದಶಾ ಅಂತ್ಯ', 'hi': 'दशा अंत', 'ta': 'தசா முடிவு', 'te': 'దశా అంతం', 'ml': 'ദശാ അവസാനം',
-          }[_loc] ?? 'ದಶಾ ಅಂತ್ಯ';
-          final _sandhiKalaLbl = {
-            'kn': 'ಸಂಧಿ ಕಾಲ', 'hi': 'संधि काल', 'ta': 'சந்தி காலம்', 'te': 'సంధి కాలం', 'ml': 'സന്ധി കാലം',
-          }[_loc] ?? 'ಸಂಧಿ ಕಾಲ';
-          final _fromLbl = {
-            'kn': 'ರಿಂದ', 'hi': 'से', 'ta': 'முதல்', 'te': 'నుండి', 'ml': 'മുതൽ',
-          }[_loc] ?? 'ರಿಂದ';
+          // {0}=p1, {1}=p2
+          String _sandhiTitle(String p1, String p2) => {
+            'kn': '$p1 $p2 ಸಂಧಿ ಕಾಲ', 'hi': '$p1 $p2 संधि काल', 'ta': '$p1 $p2 சந்தி காலம்',
+            'te': '$p1 $p2 సంధి కాలం', 'ml': '$p1 $p2 സന്ധി കാലം',
+          }[_loc] ?? '$p1 $p2 ಸಂಧಿ ಕಾಲ';
+          String _dashaEnd(String p1, String dt) => {
+            'kn': '$p1 ದಶಾ ಅಂತ್ಯ $dt', 'hi': '$p1 दशा अंत $dt', 'ta': '$p1 தசா முடிவு $dt',
+            'te': '$p1 దశా అంతం $dt', 'ml': '$p1 ദശാ അവസാനം $dt',
+          }[_loc] ?? '$p1 ದಶಾ ಅಂತ್ಯ $dt';
+          String _sandhiDesc(String p1, String p2) => {
+            'kn': 'ಈ ಸಮಯವು $p1 $p2 ದಶ ಸಂಧಿ ಆಗಿರುವುದರಿಂದ ಮೇಲೆ ತಿಳಿಸಿದ ಸಮಯಕ್ಕಿಂತ 6 ತಿಂಗಳ ಪೂರ್ವದಲ್ಲಿ\n$p1 $p2 ಶಾಂತಿ ಅಥವಾ ತತ್ಸಮಾನ ಕರ್ಮಗಳನ್ನು ಆಚರಿಸುವುದು ಉತ್ತಮ.',
+            'hi': 'यह समय $p1 $p2 दशा संधि होने के कारण ऊपर बताए गए समय से 6 महीने पहले\n$p1 $p2 शांति अथवा तत्समान कर्म करना उचित है।',
+            'ta': 'இது $p1 $p2 தசா சந்தி காலமாக இருப்பதால் மேற்கூறிய நேரத்திற்கு 6 மாதங்களுக்கு முன்\n$p1 $p2 சாந்தி அல்லது அதற்கு இணையான கர்மங்களை செய்வது நல்லது.',
+            'te': 'ఈ సమయం $p1 $p2 దశా సంధి అయినందున పై సమయానికి 6 నెలల ముందు\n$p1 $p2 శాంతి లేదా తత్సమాన కర్మలు చేయడం మంచిది.',
+            'ml': 'ഈ സമയം $p1 $p2 ദശാ സന്ധി ആയതിനാൽ മേൽ പറഞ്ഞ സമയത്തിന് 6 മാസം മുമ്പ്\n$p1 $p2 ശാന്തി അല്ലെങ്കിൽ തത്തുല്യ കർമ്മങ്ങൾ ആചരിക്കുന്നത് ഉത്തമം.',
+          }[_loc] ?? 'ಈ ಸಮಯವು $p1 $p2 ದಶ ಸಂಧಿ ಆಗಿರುವುದರಿಂದ ಮೇಲೆ ತಿಳಿಸಿದ ಸಮಯಕ್ಕಿಂತ 6 ತಿಂಗಳ ಪೂರ್ವದಲ್ಲಿ\n$p1 $p2 ಶಾಂತಿ ಅಥವಾ ತತ್ಸಮಾನ ಕರ್ಮಗಳನ್ನು ಆಚರಿಸುವುದು ಉತ್ತಮ.';
 
           // ── Collect sandhi notices ──
           final sandhiNotices = <Map<String, dynamic>>[];
           for (final md in r.dashas) {
-            final locData = _sandhiNames[md.lord];
-            if (locData == null) continue;
-            final texts = locData[_loc] ?? locData['kn']!;
-            final sandhiStart = md.end.subtract(const Duration(days: 182)); // ~6 months before
+            final def = _sandhiDef[md.lord];
+            if (def == null) continue;
+            final names = def[_loc] ?? def['kn']!;
             sandhiNotices.add({
-              'sandhiName': texts[0],
-              'dashaLord': md.lord,
-              'shantiText': texts[1],
+              'p1': names[0], 'p2': names[1],
               'dashaEnd': md.end,
-              'sandhiStart': sandhiStart,
             });
           }
           // Sort by nearest date first
@@ -2283,84 +2270,37 @@ class _DashboardScreenState extends State<DashboardScreen>
               // ── Sandhi Soochane ──
               if (sandhiNotices.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Row(children: [
-                    Icon(Icons.notifications_active, size: 16, color: Colors.deepOrange),
-                    const SizedBox(width: 6),
-                    Text(_sandhiTitle, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.deepOrange)),
-                  ]),
-                ),
-                const SizedBox(height: 6),
                 ...sandhiNotices.map((s) {
                   final dashaEnd = s['dashaEnd'] as DateTime;
-                  final sandhiStart = s['sandhiStart'] as DateTime;
-                  final endStr = '${dashaEnd.day.toString().padLeft(2,"0")}-${dashaEnd.month.toString().padLeft(2,"0")}-${dashaEnd.year}';
-                  final startStr = '${sandhiStart.day.toString().padLeft(2,"0")}-${sandhiStart.month.toString().padLeft(2,"0")}-${sandhiStart.year}';
-                  final now = DateTime.now();
-                  final isActive = now.isAfter(sandhiStart) && now.isBefore(dashaEnd);
-                  final isPast = now.isAfter(dashaEnd);
+                  final endStr = '${dashaEnd.day.toString().padLeft(2,"0")}/${dashaEnd.month.toString().padLeft(2,"0")}/${dashaEnd.year}';
+                  final p1 = s['p1'] as String;
+                  final p2 = s['p2'] as String;
 
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
-                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 10, left: 4, right: 4),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: kCard,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isActive ? Colors.red.withOpacity(0.6) : isPast ? kBorder : Colors.orange.withOpacity(0.4),
-                        width: isActive ? 2 : 1.5,
-                      ),
+                      border: Border.all(color: Colors.orange.withOpacity(0.4), width: 1.5),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(children: [
-                          Icon(
-                            isActive ? Icons.warning_amber : isPast ? Icons.check_circle_outline : Icons.schedule,
-                            size: 18,
-                            color: isActive ? Colors.red : isPast ? Colors.green : Colors.orange,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              s['sandhiName'] as String,
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900,
-                                color: isActive ? Colors.red : isPast ? Colors.green.shade700 : Colors.orange.shade800),
-                            ),
-                          ),
-                          if (isActive)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(_activeLbl, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.red)),
-                            ),
-                        ]),
-                        const SizedBox(height: 6),
-                        Text('${trAll(s['dashaLord'] as String)} $_dashaEndLbl: $endStr', style: TextStyle(fontSize: 12, color: kText)),
-                        const SizedBox(height: 2),
-                        Text('$_sandhiKalaLbl: $startStr $_fromLbl $endStr', style: TextStyle(fontSize: 12, color: kText)),
-                        const SizedBox(height: 6),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(children: [
-                            Icon(Icons.temple_hindu, size: 14, color: Colors.deepOrange),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                '⚠ ${s['shantiText']}',
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.deepOrange.shade700),
-                              ),
-                            ),
-                          ]),
-                        ),
+                        // Title: ರಾಹು ಬೃಹಸ್ಪತಿ ಸಂಧಿ ಕಾಲ
+                        Text(_sandhiTitle(p1, p2), style: TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.w900, color: Colors.deepOrange,
+                        )),
+                        const SizedBox(height: 8),
+                        // Date: ರಾಹು ದಶಾ ಅಂತ್ಯ DD/MM/YYYY
+                        Text(_dashaEnd(p1, endStr), style: TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w700, color: kText,
+                        )),
+                        const SizedBox(height: 10),
+                        // Description paragraph
+                        Text(_sandhiDesc(p1, p2), style: TextStyle(
+                          fontSize: 12.5, color: kText, height: 1.5,
+                        )),
                       ],
                     ),
                   );
