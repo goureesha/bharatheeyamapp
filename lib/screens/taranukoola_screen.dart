@@ -973,6 +973,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'vishaGhati': vishaGhati,
             'doshas': mResult.doshas,
             'doshaBhangas': mResult.doshaBhangas,
+            'checks': mResult.checks,
           });
         }
       } catch (_) {}
@@ -1188,6 +1189,38 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                       ],
                     ),
                   ),
+                ],
+
+                // Panchanga Shuddhi checks from engine
+                if (r['checks'] != null) ...[
+                  const SizedBox(height: 8),
+                  Wrap(spacing: 6, runSpacing: 4, children: [
+                    for (final c in (r['checks'] as List<MuhurtaCheckItem>))
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: (c.passed ? Colors.green : Colors.red).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: (c.passed ? Colors.green : Colors.red).withOpacity(0.3), width: 0.5),
+                        ),
+                        child: Text(
+                          '${c.label} ${c.passed ? "✓" : "✗"}',
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: (c.passed ? Colors.green : Colors.red).shade700),
+                        ),
+                      ),
+                  ]),
+                ],
+
+                // Doshas
+                if ((r['doshas'] as List).isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  ...((r['doshas'] as List<String>).map((d) => Text('❌ $d', style: TextStyle(fontSize: 11, color: Colors.red.shade700)))),
+                ],
+
+                // Dosha Bhangas (cancellations)
+                if ((r['doshaBhangas'] as List).isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  ...((r['doshaBhangas'] as List<String>).map((d) => Text('✅ $d', style: TextStyle(fontSize: 11, color: Colors.green.shade700)))),
                 ],
               ],
             ),
