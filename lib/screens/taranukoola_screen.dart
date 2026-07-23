@@ -41,6 +41,15 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   bool _mfSearching = false;
   List<Map<String, dynamic>> _mfResults = [];
 
+  /// Returns nakshatra indices belonging to a rashi (each rashi spans ~2.25 nakshatras)
+  List<int> _naksForRashi(int rashiIdx) {
+    final start = (rashiIdx * 9) ~/ 4;        // floor(rashiIdx * 2.25)
+    final end = ((rashiIdx + 1) * 9) ~/ 4;    // floor((rashiIdx+1) * 2.25)
+    final naks = <int>{};
+    for (int i = start; i <= end && i < 27; i++) naks.add(i);
+    return naks.toList();
+  }
+
   List<String> get _taras => List.generate(9, (i) => AppLocale.l('tara$i'));
 
   @override
@@ -1099,7 +1108,13 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                   isExpanded: true, value: _mfRashiIdx, dropdownColor: kCard,
                   style: TextStyle(color: kText, fontSize: 14),
                   items: List.generate(12, (i) => DropdownMenuItem(value: i, child: Text(rashiNames[i]))),
-                  onChanged: (v) => setState(() => _mfRashiIdx = v!),
+                  onChanged: (v) {
+                    final naks = _naksForRashi(v!);
+                    setState(() {
+                      _mfRashiIdx = v;
+                      if (!naks.contains(_mfNakIdx)) _mfNakIdx = naks.first;
+                    });
+                  },
                 )),
               ),
               const SizedBox(height: 10),
@@ -1113,7 +1128,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                 child: DropdownButtonHideUnderline(child: DropdownButton<int>(
                   isExpanded: true, value: _mfNakIdx, dropdownColor: kCard,
                   style: TextStyle(color: kText, fontSize: 14),
-                  items: List.generate(27, (i) => DropdownMenuItem(value: i, child: Text(nakNames[i]))),
+                  items: _naksForRashi(_mfRashiIdx).map((i) => DropdownMenuItem(value: i, child: Text(nakNames[i]))).toList(),
                   onChanged: (v) => setState(() => _mfNakIdx = v!),
                 )),
               ),
@@ -1312,33 +1327,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               ),
             ),
 
-          // ── Shubha Muhurta Timings ──
-          if (r['shubhaMuhurtas'] != null && (r['shubhaMuhurtas'] as List).isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.withOpacity(0.2)),
-                ),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('🕐 ಶುಭ ಮುಹೂರ್ತ:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.green.shade700)),
-                  const SizedBox(height: 4),
-                  ...(r['shubhaMuhurtas'] as List<Map<String, String>>).map((m) =>
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 2),
-                      child: Row(children: [
-                        Text('● ', style: TextStyle(fontSize: 10, color: Colors.green.shade600)),
-                        Expanded(child: Text('${m['name']} (${m['en']})', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kText))),
-                        Text(m['time']!, style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
-                      ]),
-                    ),
-                  ),
-                ]),
-              ),
-            ),
 
           // ── Lagna Windows (only shuddhi-passed) ──
           if (r['lagnaWindows'] != null && (r['lagnaWindows'] as List<LagnaWindow>).any((w) => w.isPerfect))
