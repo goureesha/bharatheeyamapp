@@ -11,6 +11,8 @@ import '../core/calculator.dart';
 import '../services/location_service.dart';
 import '../services/storage_service.dart';
 import '../services/client_service.dart';
+import '../core/ephemeris.dart';
+import 'package:sweph/sweph.dart';
 
 class MatchMakingTab extends StatefulWidget {
   const MatchMakingTab({super.key});
@@ -19,7 +21,7 @@ class MatchMakingTab extends StatefulWidget {
   State<MatchMakingTab> createState() => _MatchMakingTabState();
 }
 
-class _MatchMakingTabState extends State<MatchMakingTab> {
+class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStateMixin {
   // Bride input
   final _bNameCtrl = TextEditingController();
   final _bPlaceCtrl = TextEditingController();
@@ -49,6 +51,22 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
   KundaliResult? _groomResult;
   Map<String, dynamic>? _fullResult;
   int _kootaMode = 0; // 0 = Ashta Koota, 1 = Dvadasha Koota
+
+  // Quick Koota tab state
+  int _qBrideRashi = 0;
+  int _qBrideNak = 0;
+  int _qGroomRashi = 0;
+  int _qGroomNak = 0;
+  Map<String, dynamic>? _qResult;
+  List<Map<String, dynamic>> _guruTransits = [];
+
+  List<int> _naksForRashi(int rashiIdx) {
+    final start = (rashiIdx * 9) ~/ 4;
+    final end = ((rashiIdx + 1) * 9) ~/ 4;
+    final naks = <int>{};
+    for (int i = start; i <= end && i < 27; i++) naks.add(i);
+    return naks.toList();
+  }
 
   Future<void> _calculate() async {
     setState(() => _loading = true);
@@ -157,6 +175,81 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
       }
     }
     setState(() => _loading = false);
+  }
+
+  void _calculateQuickKoota() {
+    final ashta = MatchMaking.calculateCompatibility(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
+    final dvadasha = MatchMaking.calculateDvadashaKoota(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
+    
+    // Calculate Guru Bala transit windows for both bride and groom
+    final transits = _computeGuruTransits(_qBrideRashi, _qGroomRashi);
+    
+    setState(() {
+      _qResult = {'ashtaKoota': ashta, 'dvadashaKoota': dvadasha};
+      _guruTransits = transits;
+    });
+  }
+
+  List<Map<String, dynamic>> _computeGuruTransits(int brideRashi, int groomRashi) {
+    final List<Map<String, dynamic>> windows = [];
+    final now = DateTime.now();
+    
+    // Scan monthly for ~13 years (full Jupiter cycle + buffer)
+    int prevJupRashi = -1;
+    DateTime? periodStart;
+    bool prevBrideBala = false;
+    bool prevGroomBala = false;
+    
+    for (int m = 0; m <= 156; m++) {
+      final dt = DateTime(now.year, now.month + m, 15);
+      try {
+        final jd = Ephemeris.dateToJd(dt.year, dt.month, dt.day, 12.0);
+        Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+        final ayn = Sweph.swe_get_ayanamsa(jd);
+        final positions = Ephemeris.calcAll(jd, 'lahiri', true);
+        final jupLon = positions['Jupiter']?[0] ?? 0.0;
+        final jupRashi = (jupLon / 30.0).floor() % 12;
+        
+        final bCount = ((jupRashi - brideRashi + 12) % 12) + 1;
+        final gCount = ((jupRashi - groomRashi + 12) % 12) + 1;
+        final brideBala = const [1,2,4,5,7,9,10,11].contains(bCount);
+        final groomBala = const [1,2,4,5,7,9,10,11].contains(gCount);
+        
+        if (jupRashi != prevJupRashi && prevJupRashi >= 0) {
+          // Jupiter changed rashi — record the previous period
+          windows.add({
+            'rashi': prevJupRashi,
+            'rashiName': knRashi[prevJupRashi],
+            'start': periodStart ?? now,
+            'end': dt,
+            'brideBala': prevBrideBala,
+            'groomBala': prevGroomBala,
+            'brideHouse': ((prevJupRashi - brideRashi + 12) % 12) + 1,
+            'groomHouse': ((prevJupRashi - groomRashi + 12) % 12) + 1,
+          });
+          periodStart = dt;
+        }
+        if (prevJupRashi < 0) periodStart = now;
+        prevJupRashi = jupRashi;
+        prevBrideBala = brideBala;
+        prevGroomBala = groomBala;
+      } catch (_) {}
+    }
+    // Add last period
+    if (prevJupRashi >= 0 && periodStart != null) {
+      final endDt = DateTime(now.year, now.month + 156, 15);
+      windows.add({
+        'rashi': prevJupRashi,
+        'rashiName': knRashi[prevJupRashi],
+        'start': periodStart,
+        'end': endDt,
+        'brideBala': prevBrideBala,
+        'groomBala': prevGroomBala,
+        'brideHouse': ((prevJupRashi - brideRashi + 12) % 12) + 1,
+        'groomHouse': ((prevJupRashi - groomRashi + 12) % 12) + 1,
+      });
+    }
+    return windows;
   }
 
   // Geocode helper
@@ -1177,13 +1270,193 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
     ]));
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildQuickKootaTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: Column(children: [
-        // Groom input
-        _buildPersonInput(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Icon(Icons.female, color: kOrange, size: 20),
+            const SizedBox(width: 8),
+            Text(AppLocale.l('brideDetails'), style: TextStyle(color: kOrange, fontWeight: FontWeight.w900, fontSize: 16)),
+          ]),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<int>(
+            decoration: InputDecoration(labelText: AppLocale.l('chandraRashiLabel'), isDense: true),
+            value: _qBrideRashi,
+            items: List.generate(12, (i) => DropdownMenuItem(value: i, child: Text(trAll(knRashi[i])))),
+            onChanged: (v) { if (v != null) setState(() { _qBrideRashi = v; _qBrideNak = _naksForRashi(v).first; }); },
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<int>(
+            decoration: InputDecoration(labelText: AppLocale.l('chandraNakshatra'), isDense: true),
+            value: _qBrideNak,
+            items: _naksForRashi(_qBrideRashi).map((i) => DropdownMenuItem(value: i, child: Text(trAll(knNak[i])))).toList(),
+            onChanged: (v) { if (v != null) setState(() => _qBrideNak = v); },
+          ),
+        ])),
+        const SizedBox(height: 12),
+        AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Icon(Icons.male, color: kTeal, size: 20),
+            const SizedBox(width: 8),
+            Text(AppLocale.l('groomDetails'), style: TextStyle(color: kTeal, fontWeight: FontWeight.w900, fontSize: 16)),
+          ]),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<int>(
+            decoration: InputDecoration(labelText: AppLocale.l('chandraRashiLabel'), isDense: true),
+            value: _qGroomRashi,
+            items: List.generate(12, (i) => DropdownMenuItem(value: i, child: Text(trAll(knRashi[i])))),
+            onChanged: (v) { if (v != null) setState(() { _qGroomRashi = v; _qGroomNak = _naksForRashi(v).first; }); },
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<int>(
+            decoration: InputDecoration(labelText: AppLocale.l('chandraNakshatra'), isDense: true),
+            value: _qGroomNak,
+            items: _naksForRashi(_qGroomRashi).map((i) => DropdownMenuItem(value: i, child: Text(trAll(knNak[i])))).toList(),
+            onChanged: (v) { if (v != null) setState(() => _qGroomNak = v); },
+          ),
+        ])),
+        const SizedBox(height: 16),
+        ElevatedButton.icon(
+          onPressed: _calculateQuickKoota,
+          icon: const Icon(Icons.calculate),
+          label: Text('⚡ ತ್ವರಿತ ಕೂಟ', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: kPurple1, foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+        if (_qResult != null) ...[
+          const SizedBox(height: 16),
+          _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+            child: Row(children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _kootaMode = 0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: _kootaMode == 0 ? kPurple1 : kCard,
+                      borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
+                      border: Border.all(color: kPurple1),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(AppLocale.l('ashtaKootaLabel'), style: TextStyle(
+                      fontWeight: FontWeight.w800, fontSize: 13,
+                      color: _kootaMode == 0 ? Colors.white : kPurple1,
+                    )),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _kootaMode = 1),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: _kootaMode == 1 ? kPurple1 : kCard,
+                      borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
+                      border: Border.all(color: kPurple1),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(AppLocale.l('dvadashaKootaLabel'), style: TextStyle(
+                      fontWeight: FontWeight.w800, fontSize: 13,
+                      color: _kootaMode == 1 ? Colors.white : kPurple1,
+                    )),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+          _kootaMode == 0
+            ? _buildAshtaKootaTable(_qResult!['ashtaKoota'])
+            : _buildDvadashaKootaTable(_qResult!['dvadashaKoota']),
+          const SizedBox(height: 16),
+          _sectionHeader('Guru Bala Transit Timeline', Icons.timeline, Colors.deepPurple),
+          ..._guruTransits.map((t) {
+            final start = t['start'] as DateTime;
+            final end = t['end'] as DateTime;
+            final brideBala = t['brideBala'] as bool;
+            final groomBala = t['groomBala'] as bool;
+            final both = brideBala && groomBala;
+            final now = DateTime.now();
+            final isCurrent = now.isAfter(start) && now.isBefore(end);
+            
+            return AppCard(
+              padding: const EdgeInsets.all(12),
+              child: Container(
+                decoration: both ? BoxDecoration(
+                  border: Border.all(color: Colors.green, width: 2),
+                  borderRadius: BorderRadius.circular(8),
+                ) : null,
+                padding: both ? const EdgeInsets.all(8) : null,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Text(trAll(t['rashiName']), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: isCurrent ? Colors.deepPurple : kText)),
+                    if (isCurrent) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(color: Colors.deepPurple.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                        child: Text('Current', style: TextStyle(fontSize: 10, color: Colors.deepPurple, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                    const Spacer(),
+                    Text('${start.day.toString().padLeft(2, '0')}/${start.month.toString().padLeft(2, '0')}/${start.year} - ${end.day.toString().padLeft(2, '0')}/${end.month.toString().padLeft(2, '0')}/${end.year}', style: TextStyle(fontSize: 12, color: kMuted)),
+                  ]),
+                  const SizedBox(height: 8),
+                  Row(children: [
+                    Expanded(child: Row(children: [
+                      Icon(Icons.female, size: 16, color: kOrange),
+                      const SizedBox(width: 4),
+                      Icon(brideBala ? Icons.check_circle : Icons.cancel, size: 14, color: brideBala ? Colors.green : Colors.red),
+                      const SizedBox(width: 4),
+                      Text('House ${t['brideHouse']}', style: TextStyle(fontSize: 12, color: kMuted)),
+                    ])),
+                    Expanded(child: Row(children: [
+                      Icon(Icons.male, size: 16, color: kTeal),
+                      const SizedBox(width: 4),
+                      Icon(groomBala ? Icons.check_circle : Icons.cancel, size: 14, color: groomBala ? Colors.green : Colors.red),
+                      const SizedBox(width: 4),
+                      Text('House ${t['groomHouse']}', style: TextStyle(fontSize: 12, color: kMuted)),
+                    ])),
+                  ]),
+                ]),
+              ),
+            );
+          }).toList(),
+        ],
+      ]),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          TabBar(
+            labelColor: kPurple1,
+            unselectedLabelColor: kMuted,
+            indicatorColor: kPurple1,
+            tabs: const [
+              Tab(text: '📝 ಸಂಪೂರ್ಣ ಹೊಂದಾಣಿಕೆ'),
+              Tab(text: '⚡ ತ್ವರಿತ ಕೂಟ'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(children: [
+                    // Groom input
+                    _buildPersonInput(
           title: AppLocale.l('groomDetails'), color: kTeal,
           nameCtrl: _gNameCtrl, placeCtrl: _gPlaceCtrl, latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
           dob: _gDob, hour: _gHour, minute: _gMinute, ampm: _gAmpm,
@@ -1247,7 +1520,14 @@ class _MatchMakingTabState extends State<MatchMakingTab> {
         ),
         const SizedBox(height: 8),
         _buildResults(),
-      ]),
+                  ]),
+                ),
+                _buildQuickKootaTab(),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

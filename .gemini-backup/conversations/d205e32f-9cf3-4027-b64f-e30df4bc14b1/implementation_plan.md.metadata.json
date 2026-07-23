@@ -1,6 +1,6 @@
 {
-  "summary": "Implementation plan for adding a Muhurta Finder tab to the Taranukoola screen. Tab 1 keeps the existing calendar. Tab 2 lets users input rashi/nakshatra, select month/event, and find valid muhurta dates with taranukoola, guru bala checks, visha ghati and rahu kala avoidance, showing only daytime muhurtas.",
-  "updatedAt": "2026-07-23T06:14:47.241152600Z",
+  "summary": "Plan for Quick Koota Match tab with rashi/nakshatra selection and guru bala transit timeline",
+  "updatedAt": "2026-07-23T14:06:45.036455800Z",
   "requestFeedback": true,
   "userFacing": true
 }
