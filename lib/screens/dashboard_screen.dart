@@ -2196,6 +2196,37 @@ class _DashboardScreenState extends State<DashboardScreen>
           final r = person['result'] as KundaliResult;
           final pName = person['name'] as String;
           final pan = r.panchang;
+
+          // ── Sandhi definitions: {dashaLord → [sandhiName, nextLord, shantiText]} ──
+          const sandhiMap = <String, List<String>>{
+            'ಕುಜ': ['ಕುಜ-ರಾಹು ಸಂಧಿ', 'ರಾಹು', 'ಕುಜ-ರಾಹು ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
+            'ಶುಕ್ರ': ['ಶುಕ್ರ-ಆದಿತ್ಯ ಸಂಧಿ', 'ರವಿ', 'ಶುಕ್ರ-ಆದಿತ್ಯ ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
+            'ರಾಹು': ['ರಾಹು-ಬೃಹಸ್ಪತಿ ಸಂಧಿ', 'ಗುರು', 'ರಾಹು-ಬೃಹಸ್ಪತಿ ಸಂಧಿ ಶಾಂತಿ ಮಾಡಿಸಿ'],
+          };
+
+          // ── Collect sandhi notices ──
+          final sandhiNotices = <Map<String, dynamic>>[];
+          for (final md in r.dashas) {
+            final info = sandhiMap[md.lord];
+            if (info == null) continue;
+            final sandhiStart = md.end.subtract(const Duration(days: 182)); // ~6 months before
+            sandhiNotices.add({
+              'sandhiName': info[0],
+              'dashaLord': md.lord,
+              'nextLord': info[1],
+              'shantiText': info[2],
+              'dashaEnd': md.end,
+              'sandhiStart': sandhiStart,
+            });
+          }
+          // Sort by nearest date first
+          sandhiNotices.sort((a, b) {
+            final now = DateTime.now();
+            final diffA = (a['dashaEnd'] as DateTime).difference(now).inDays.abs();
+            final diffB = (b['dashaEnd'] as DateTime).difference(now).inDays.abs();
+            return diffA.compareTo(diffB);
+          });
+
           return Column(
             children: [
               if (allPersons.length > 1)
@@ -2210,6 +2241,94 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
               ),
               DashaWidget(dashas: r.dashas),
+
+              // ── Sandhi Soochane ──
+              if (sandhiNotices.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Row(children: [
+                    Icon(Icons.notifications_active, size: 16, color: Colors.deepOrange),
+                    const SizedBox(width: 6),
+                    Text('ದಶಾ ಸಂಧಿ ಸೂಚನೆ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.deepOrange)),
+                  ]),
+                ),
+                const SizedBox(height: 6),
+                ...sandhiNotices.map((s) {
+                  final dashaEnd = s['dashaEnd'] as DateTime;
+                  final sandhiStart = s['sandhiStart'] as DateTime;
+                  final endStr = '${dashaEnd.day.toString().padLeft(2,"0")}-${dashaEnd.month.toString().padLeft(2,"0")}-${dashaEnd.year}';
+                  final startStr = '${sandhiStart.day.toString().padLeft(2,"0")}-${sandhiStart.month.toString().padLeft(2,"0")}-${sandhiStart.year}';
+                  final now = DateTime.now();
+                  final isActive = now.isAfter(sandhiStart) && now.isBefore(dashaEnd);
+                  final isPast = now.isAfter(dashaEnd);
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: kCard,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isActive ? Colors.red.withOpacity(0.6) : isPast ? kBorder : Colors.orange.withOpacity(0.4),
+                        width: isActive ? 2 : 1.5,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(children: [
+                          Icon(
+                            isActive ? Icons.warning_amber : isPast ? Icons.check_circle_outline : Icons.schedule,
+                            size: 18,
+                            color: isActive ? Colors.red : isPast ? Colors.green : Colors.orange,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              s['sandhiName'] as String,
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900,
+                                color: isActive ? Colors.red : isPast ? Colors.green.shade700 : Colors.orange.shade800),
+                            ),
+                          ),
+                          if (isActive)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text('ಸಕ್ರಿಯ', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.red)),
+                            ),
+                        ]),
+                        const SizedBox(height: 6),
+                        Text('${trAll(s['dashaLord'] as String)} ದಶಾ ಅಂತ್ಯ: $endStr', style: TextStyle(fontSize: 12, color: kText)),
+                        const SizedBox(height: 2),
+                        Text('ಸಂಧಿ ಕಾಲ: $startStr ರಿಂದ $endStr', style: TextStyle(fontSize: 12, color: kText)),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(children: [
+                            Icon(Icons.temple_hindu, size: 14, color: Colors.deepOrange),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                '⚠ ${s['shantiText']}',
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.deepOrange.shade700),
+                              ),
+                            ),
+                          ]),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ],
+
               if (allPersons.length > 1) Divider(thickness: 1, color: kBorder),
             ],
           );
