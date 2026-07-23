@@ -178,8 +178,8 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   }
 
   void _calculateQuickKoota() {
-    final ashta = MatchMaking.calculateCompatibility(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
-    final dvadasha = MatchMaking.calculateDvadashaKoota(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
+    final ashta = MatchMakingLogic.calculateCompatibility(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
+    final dvadasha = MatchMakingLogic.calculateDvadashaKoota(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
     
     // Calculate Guru Bala transit windows for both bride and groom
     final transits = _computeGuruTransits(_qBrideRashi, _qGroomRashi);
@@ -203,7 +203,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     for (int m = 0; m <= 156; m++) {
       final dt = DateTime(now.year, now.month + m, 15);
       try {
-        final jd = Ephemeris.dateToJd(dt.year, dt.month, dt.day, 12.0);
+        final jd = Sweph.swe_julday(dt.year, dt.month, dt.day, 12.0, CalendarType.SE_GREG_CAL);
         Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
         final ayn = Sweph.swe_get_ayanamsa(jd);
         final positions = Ephemeris.calcAll(jd, 'lahiri', true);
