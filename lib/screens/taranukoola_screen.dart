@@ -1023,13 +1023,12 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             final double mandiSr = mandiSrSs[0];
             final double mandiSs = mandiSrSs[1];
 
-            final vedWday = (date.weekday % 7);
-            final dayMandiJd = Ephemeris.calcMandi(vedWday, mandiSr, mandiSs, isDayBirth: true);
-            if (dayMandiJd != null) {
-              final mandiPos = Ephemeris.calcAll(dayMandiJd, 'lahiri', true);
-              final mandiLon = mandiPos['Mandi']?[0] ?? 0.0;
-              basePlanetRashis['ಮಾಂದಿ'] = (mandiLon / 30.0).floor() % 12;
-            }
+            final vedWday = ((date.weekday - 1) + 1) % 7; // Sun=0..Sat=6
+            final dayDuration = mandiSs - mandiSr;
+            const dayFactors = [26, 22, 18, 14, 10, 6, 2];
+            final dayMandiJd = mandiSr + (dayDuration * dayFactors[vedWday] / 30.0);
+            final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
+            if (dayMandiRashi >= 0) basePlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
 
             dayLagnaWindows = _scanLagnaRange(srJd2, ssJd2, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
           } catch (_) {}
