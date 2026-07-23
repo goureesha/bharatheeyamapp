@@ -1158,11 +1158,10 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     final score = r['score'] as int;
     final verdict = r['verdict'] as String;
     final Color scoreColor = score >= 80 ? Colors.green : score >= 60 ? Colors.orange : Colors.red;
-
     final dateStr = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: kCard, borderRadius: BorderRadius.circular(12),
         border: Border.all(color: scoreColor.withOpacity(0.4), width: 1.5),
@@ -1170,7 +1169,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header with date, vara, score
+          // ── Header: Date + Score ──
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
@@ -1189,153 +1188,235 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             ]),
           ),
 
-          // Details
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _detailRow(AppLocale.l('tithiLabel'), '${trAll(r['tithi'])}  (→ ${r['tithiEnd']})'),
-                _detailRow(AppLocale.l('chandraNakLabel'), '${trAll(r['nakshatra'])} — ${AppLocale.l('padaLabel')} ${r['pada']}  (→ ${r['nakEnd']})'),
-                _detailRow(AppLocale.l('yogaLabel'), trAll(r['yoga'])),
-                _detailRow(AppLocale.l('karanaLabel'), trAll(r['karana'])),
-                _detailRow(AppLocale.l('sunrise'), r['sunrise']),
-                _detailRow(AppLocale.l('sunset'), r['sunset']),
-
-                // Tara & Guru & Chandra Bala
-                if (r['taraBala'] != null) ...[
-                  const SizedBox(height: 6),
-                  Wrap(spacing: 6, runSpacing: 4, children: [
-                    _balaBadge('ತಾರಾ', (r['taraBala'] as TaraResult).taraName, (r['taraBala'] as TaraResult).isGood),
-                    if (r['guruBala'] != null)
-                      _balaBadge('ಗುರು (${trAll(knRashi[r['jupRashi'] as int])})', (r['guruBala'] as BalaScore).label, (r['guruBala'] as BalaScore).score > 0),
-                    if (r['chandraBala'] != null)
-                      _balaBadge('ಚಂದ್ರ', (r['chandraBala'] as bool) ? 'ಶುಭ' : 'ಅಶುಭ', r['chandraBala'] as bool),
-                  ]),
-                ],
-
-                // Avoidance times
-                if ((r['rahuKala'] as String).isNotEmpty || (r['vishaGhati'] as String).isNotEmpty) ...[
-                  const SizedBox(height: 8),
+          // ── Panchanga Shuddhi Table ──
+          if (r['checks'] != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: kBorder),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.red.withOpacity(0.2)),
+                      color: kPurple1.withOpacity(0.08),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('⚠ ${AppLocale.l('avoidTime')}:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.red.shade700)),
-                        const SizedBox(height: 4),
-                        if ((r['rahuKala'] as String).isNotEmpty)
-                          Text('${AppLocale.l('rahuKala')}: ${r['rahuKala']}', style: TextStyle(fontSize: 12, color: kText)),
-                        if ((r['vishaGhati'] as String).isNotEmpty)
-                          Text('${AppLocale.l('vishaGhati')}: ${r['vishaGhati']}', style: TextStyle(fontSize: 12, color: kText)),
-                      ],
-                    ),
+                    child: Text(AppLocale.l('panchaShuddhi'), style: TextStyle(fontWeight: FontWeight.w800, color: kPurple1, fontSize: 13)),
                   ),
-                ],
-
-                // Shubha Muhurta Timings
-                if (r['shubhaMuhurtas'] != null && (r['shubhaMuhurtas'] as List).isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.04),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.green.withOpacity(0.2)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('🕐 ಶುಭ ಮುಹೂರ್ತ:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.green.shade700)),
-                        const SizedBox(height: 4),
-                        ...(r['shubhaMuhurtas'] as List<Map<String, String>>).map((m) =>
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 2),
-                            child: Row(children: [
-                              Text('● ', style: TextStyle(fontSize: 10, color: Colors.green.shade600)),
-                              Expanded(child: Text('${m['name']} (${m['en']})', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kText))),
-                              Text(m['time']!, style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
-                            ]),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-
-                // Lagna Windows (show only shuddhi-passed lagnas)
-                if (r['lagnaWindows'] != null && (r['lagnaWindows'] as List).isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: kPurple1.withOpacity(0.04),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: kPurple1.withOpacity(0.2)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('🏠 ಲಗ್ನ ಕಾಲ:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: kPurple1)),
-                        const SizedBox(height: 4),
-                        ...(r['lagnaWindows'] as List<LagnaWindow>).where((w) => w.isAllowed && w.lagnaShuddhi).map((w) =>
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 2),
-                            child: Row(children: [
-                              Text('✓ ', style: TextStyle(fontSize: 10, color: Colors.green.shade600)),
-                              Expanded(child: Text(trAll(w.rashiName), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kText))),
-                              Text('${w.startTime} - ${w.endTime}', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
-                            ]),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-
-                // Panchanga Shuddhi checks from engine
-                if (r['checks'] != null) ...[
-                  const SizedBox(height: 8),
-                  Wrap(spacing: 6, runSpacing: 4, children: [
-                    for (final c in (r['checks'] as List<MuhurtaCheckItem>))
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: (c.passed ? Colors.green : Colors.red).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: (c.passed ? Colors.green : Colors.red).withOpacity(0.3), width: 0.5),
-                        ),
-                        child: Text(
-                          '${c.label} ${c.passed ? "✓" : "✗"}',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: (c.passed ? Colors.green : Colors.red).shade700),
-                        ),
-                      ),
-                  ]),
-                ],
-
-                // Doshas
-                if ((r['doshas'] as List).isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  ...((r['doshas'] as List<String>).map((d) => Text('❌ $d', style: TextStyle(fontSize: 11, color: Colors.red.shade700)))),
-                ],
-
-                // Dosha Bhangas (cancellations)
-                if ((r['doshaBhangas'] as List).isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  ...((r['doshaBhangas'] as List<String>).map((d) => Text('✅ $d', style: TextStyle(fontSize: 11, color: Colors.green.shade700)))),
-                ],
-              ],
+                  ...(r['checks'] as List<MuhurtaCheckItem>).map((c) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder.withOpacity(0.5)))),
+                    child: Row(children: [
+                      Icon(c.passed ? Icons.check_circle : Icons.cancel,
+                          color: c.passed ? Colors.green : Colors.red, size: 16),
+                      const SizedBox(width: 8),
+                      Text(c.label, style: TextStyle(fontWeight: FontWeight.w700, color: kText, fontSize: 12)),
+                      const Spacer(),
+                      Flexible(child: Text(c.value, style: TextStyle(color: kMuted, fontSize: 12), textAlign: TextAlign.end, overflow: TextOverflow.ellipsis)),
+                    ]),
+                  )),
+                ]),
+              ),
             ),
-          ),
+
+          // ── Nimma Balagalu ──
+          if (r['taraBala'] != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: kBorder),
+                  borderRadius: BorderRadius.circular(10),
+                  color: kCard,
+                ),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('👤 ${AppLocale.l('yourBalas')}', style: TextStyle(fontWeight: FontWeight.w800, color: kPurple1, fontSize: 13)),
+                  const SizedBox(height: 6),
+                  _balaChipRow(AppLocale.l('taraBala'),
+                    '${(r['taraBala'] as TaraResult).taraName} (${(r['taraBala'] as TaraResult).isGood ? AppLocale.l('shubha') : AppLocale.l('ashubha')})',
+                    (r['taraBala'] as TaraResult).isGood),
+                  if (r['chandraBala'] != null)
+                    _balaChipRow(AppLocale.l('chandraBala'),
+                      (r['chandraBala'] as bool) ? AppLocale.l('anukoola') : AppLocale.l('pratikoola'),
+                      r['chandraBala'] as bool),
+                  if (r['guruBala'] != null)
+                    _balaChipRow('ಗುರು ಬಲ (${trAll(knRashi[r['jupRashi'] as int])})',
+                      (r['guruBala'] as BalaScore).label,
+                      (r['guruBala'] as BalaScore).score > 0),
+                ]),
+              ),
+            ),
+
+          // ── Avoidance Times ──
+          if ((r['rahuKala'] as String).isNotEmpty || (r['vishaGhati'] as String).isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.withOpacity(0.2)),
+                ),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('⚠ ${AppLocale.l('avoidTime')}:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.red.shade700)),
+                  const SizedBox(height: 4),
+                  if ((r['rahuKala'] as String).isNotEmpty)
+                    Text('${AppLocale.l('rahuKala')}: ${r['rahuKala']}', style: TextStyle(fontSize: 12, color: kText)),
+                  if ((r['vishaGhati'] as String).isNotEmpty)
+                    Text('${AppLocale.l('vishaGhati')}: ${r['vishaGhati']}', style: TextStyle(fontSize: 12, color: kText)),
+                ]),
+              ),
+            ),
+
+          // ── Shubha Muhurta Timings ──
+          if (r['shubhaMuhurtas'] != null && (r['shubhaMuhurtas'] as List).isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.04),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green.withOpacity(0.2)),
+                ),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('🕐 ಶುಭ ಮುಹೂರ್ತ:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.green.shade700)),
+                  const SizedBox(height: 4),
+                  ...(r['shubhaMuhurtas'] as List<Map<String, String>>).map((m) =>
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Row(children: [
+                        Text('● ', style: TextStyle(fontSize: 10, color: Colors.green.shade600)),
+                        Expanded(child: Text('${m['name']} (${m['en']})', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kText))),
+                        Text(m['time']!, style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                      ]),
+                    ),
+                  ),
+                ]),
+              ),
+            ),
+
+          // ── Lagna Windows with Shuddhi Chips ──
+          if (r['lagnaWindows'] != null && (r['lagnaWindows'] as List).isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: kBorder),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2E86AB).withOpacity(0.08),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                    ),
+                    child: Text('🏠 ${AppLocale.l('dayLagnaLabel')}', style: TextStyle(fontWeight: FontWeight.w800, color: const Color(0xFF2E86AB), fontSize: 13)),
+                  ),
+                  ...(r['lagnaWindows'] as List<LagnaWindow>).asMap().entries.map((entry) {
+                    final lw = entry.value;
+                    Color rowBg;
+                    IconData rowIcon;
+                    Color iconColor;
+                    if (lw.isPerfect) {
+                      rowBg = Colors.green.withOpacity(0.1);
+                      rowIcon = Icons.star;
+                      iconColor = Colors.amber.shade700;
+                    } else if (lw.isShubha) {
+                      rowBg = Colors.green.withOpacity(0.05);
+                      rowIcon = Icons.check_circle;
+                      iconColor = Colors.green;
+                    } else if (lw.isAllowed) {
+                      rowBg = Colors.orange.withOpacity(0.05);
+                      rowIcon = Icons.warning_amber_rounded;
+                      iconColor = Colors.orange;
+                    } else {
+                      rowBg = Colors.red.withOpacity(0.03);
+                      rowIcon = Icons.remove_circle_outline;
+                      iconColor = Colors.red.shade300;
+                    }
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: rowBg,
+                        border: entry.key < (r['lagnaWindows'] as List).length - 1 ? Border(bottom: BorderSide(color: kBorder.withOpacity(0.4))) : null,
+                      ),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Row(children: [
+                          Icon(rowIcon, color: iconColor, size: 14),
+                          const SizedBox(width: 6),
+                          Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(
+                            fontWeight: lw.isShubha ? FontWeight.w800 : FontWeight.w500,
+                            color: lw.isShubha ? kText : kMuted, fontSize: 12,
+                          ))),
+                          Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(
+                            fontSize: 11, color: lw.isShubha ? Colors.green.shade700 : kMuted, fontWeight: FontWeight.w600,
+                          )),
+                        ]),
+                        const SizedBox(height: 3),
+                        Wrap(spacing: 4, runSpacing: 3, children: [
+                          _shuddhiChip(AppLocale.l('lagnaLabel'), lw.lagnaShuddhi, lw.lagnaGrahas,
+                              required: lw.requiredShuddhis.contains(ShuddhiType.lagna)),
+                          _shuddhiChip(AppLocale.l('saptamaShort'), lw.saptamaShuddhi, lw.saptamaGrahas,
+                              required: lw.requiredShuddhis.contains(ShuddhiType.saptama)),
+                          _shuddhiChip(AppLocale.l('ashtamaShort'), lw.ashtamaShuddhi, lw.ashtamaGrahas,
+                              required: lw.requiredShuddhis.contains(ShuddhiType.ashtama)),
+                          _shuddhiChip(AppLocale.l('dashamaShort'), lw.dashamaShuddhi, lw.dashamaGrahas,
+                              required: lw.requiredShuddhis.contains(ShuddhiType.dashama)),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: lw.guruAnukoola ? Colors.amber.withOpacity(0.15) : Colors.grey.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: lw.guruAnukoola ? Colors.amber.shade600 : Colors.grey.shade300, width: 0.5),
+                            ),
+                            child: Text(
+                              lw.guruAnukoola ? 'ಗುರು ✓ (${lw.guruFromLagna})' : 'ಗುರು ✗ (${lw.guruFromLagna})',
+                              style: TextStyle(fontSize: 9, color: lw.guruAnukoola ? Colors.amber.shade800 : kMuted, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ]),
+                      ]),
+                    );
+                  }),
+                ]),
+              ),
+            ),
+
+          // ── Doshas ──
+          if ((r['doshas'] as List).isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                ...((r['doshas'] as List<String>).map((d) => Text('❌ $d', style: TextStyle(fontSize: 11, color: Colors.red.shade700)))),
+              ]),
+            ),
+
+          // ── Dosha Bhangas ──
+          if ((r['doshaBhangas'] as List).isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                ...((r['doshaBhangas'] as List<String>).map((d) => Text('✅ $d', style: TextStyle(fontSize: 11, color: Colors.green.shade700)))),
+              ]),
+            ),
+
+          const SizedBox(height: 12),
         ],
       ),
     );
   }
+
+
+
 
   Widget _detailRow(String label, String value) {
     return Padding(
