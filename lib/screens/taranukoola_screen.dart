@@ -16,7 +16,8 @@ class TaranukoolaScreen extends StatefulWidget {
   State<TaranukoolaScreen> createState() => _TaranukoolaScreenState();
 }
 
-class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
+class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabCtrl;
   bool _isTwoPersonMode = false;
   bool _excludeNakshatras = false;
   bool _includeAgniVasa = false;
@@ -32,14 +33,29 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
   bool _showTaraCharts = false;
   MuhurtaEvent _selectedMuhurtaEvent = MuhurtaEvent.vivaha;
 
+  // ── Muhurta Finder state (Tab 2) ──
+  int _mfRashiIdx = 0;
+  int _mfNakIdx = 0;
+  MuhurtaEvent _mfEvent = MuhurtaEvent.grihaPrevesha;
+  DateTime _mfMonth = DateTime(DateTime.now().year, DateTime.now().month);
+  bool _mfSearching = false;
+  List<Map<String, dynamic>> _mfResults = [];
+
   List<String> get _taras => List.generate(9, (i) => AppLocale.l('tara$i'));
 
   @override
   void initState() {
     super.initState();
+    _tabCtrl = TabController(length: 2, vsync: this);
     _selectedDay = _focusedDay;
     _loadNakshatra();
     _calculatePanchangForSelectedDay();
+  }
+
+  @override
+  void dispose() {
+    _tabCtrl.dispose();
+    super.dispose();
   }
 
   Future<void> _calculatePanchangForSelectedDay() async {
@@ -316,17 +332,44 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
             style: TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.w800)),
         iconTheme: IconThemeData(color: kText),
         elevation: 0,
+        bottom: TabBar(
+          controller: _tabCtrl,
+          labelColor: kPurple1,
+          unselectedLabelColor: kMuted,
+          indicatorColor: kPurple1,
+          labelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+          tabs: [
+            Tab(text: AppLocale.l('taranukoola')),
+            Tab(text: AppLocale.l('muhurtaShodhane')),
+          ],
+        ),
       ),
-      body: Column(
+      body: TabBarView(
+        controller: _tabCtrl,
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: ResponsiveCenter(child: AppCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(AppLocale.l('taraResults'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1)),
+          // ════ TAB 1: Existing Taranukoola Calendar ════
+          _buildTaranukoolaTab(),
+          // ════ TAB 2: Muhurta Finder ════
+          _buildMuhurtaFinderTab(),
+        ],
+      ),
+    );
+  }
+
+  // ════════════════════════════════════════════════
+  // TAB 1: Existing Taranukoola Calendar
+  // ════════════════════════════════════════════════
+  Widget _buildTaranukoolaTab() {
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: ResponsiveCenter(child: AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(AppLocale.l('taraResults'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1)),
                     const SizedBox(height: 16),
                     ToggleButtons(
                       isSelected: [!_isTwoPersonMode, _isTwoPersonMode],
@@ -813,7 +856,366 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> {
           ),
 
         ],
+      );
+  }
+
+  // ════════════════════════════════════════════════
+  // TAB 2: Muhurta Finder
+  // ════════════════════════════════════════════════
+
+  // Rahu Kala muhurta indices per weekday (Sun=0..Sat=6)
+  static const _rahuKalaMuhurta = [8, 2, 7, 5, 6, 4, 3];
+
+  String _rahuKalaTime(DateTime date, String sunrise, String sunset) {
+    final srMins = _parseTimeToMins(sunrise);
+    final ssMins = _parseTimeToMins(sunset);
+    if (srMins < 0 || ssMins < 0) return '';
+    final dayLen = ssMins - srMins;
+    final kalaLen = dayLen ~/ 8;
+    final idx = _rahuKalaMuhurta[date.weekday % 7];
+    final start = srMins + (idx - 1) * kalaLen;
+    final end = start + kalaLen;
+    return '${_minsToTime(start)} - ${_minsToTime(end)}';
+  }
+
+  int _parseTimeToMins(String t) {
+    try {
+      final parts = t.replaceAll(RegExp(r'[APMapm\s]'), '').split(':');
+      int h = int.parse(parts[0]);
+      int m = int.parse(parts[1]);
+      if (t.toUpperCase().contains('PM') && h != 12) h += 12;
+      if (t.toUpperCase().contains('AM') && h == 12) h = 0;
+      return h * 60 + m;
+    } catch (_) { return -1; }
+  }
+
+  String _minsToTime(int mins) {
+    final h = mins ~/ 60;
+    final m = mins % 60;
+    final ampm = h >= 12 ? 'PM' : 'AM';
+    final h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h);
+    return '${h12.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $ampm';
+  }
+
+  Future<void> _searchMuhurtas() async {
+    setState(() { _mfSearching = true; _mfResults = []; });
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    final results = <Map<String, dynamic>>[];
+    final daysInMonth = DateTime(_mfMonth.year, _mfMonth.month + 1, 0).day;
+
+    await Ephemeris.initSweph();
+    for (int d = 1; d <= daysInMonth; d++) {
+      try {
+        final date = DateTime(_mfMonth.year, _mfMonth.month, d);
+        final srSs = Ephemeris.findSunriseSetForDate(
+          date.year, date.month, date.day,
+          LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
+        );
+        final srJd = srSs[0];
+        final srLocalFrac = ((srJd + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
+        final hour24 = (srLocalFrac * 24.0) + (1.0 / 60.0);
+
+        final r = await AstroCalculator.calculate(
+          year: date.year, month: date.month, day: date.day,
+          hourUtcOffset: LocationService.tzOffset,
+          hour24: hour24,
+          lat: LocationService.lat, lon: LocationService.lon,
+          ayanamsaMode: 'lahiri', trueNode: true,
+        );
+        final pan = r.panchang;
+
+        // Get Jupiter rashi
+        final jupDeg = r.planets['ಗುರು']?.longitude ?? 0;
+        final jupRashi = (jupDeg / 30).floor() % 12;
+
+        // Evaluate muhurta using existing engine
+        final mResult = evaluateMuhurta(
+          event: _mfEvent,
+          tithiIndex: pan.tithiIndex,
+          tithiName: pan.tithi,
+          nakshatraIndex: pan.nakshatraIndex,
+          nakshatraName: pan.nakshatra,
+          varaIndex: pan.varaIndex,
+          varaName: pan.vara,
+          yogaIndex: pan.yogaIndex,
+          yogaName: pan.yoga,
+          karanaName: pan.karana,
+          moonRashiIndex: pan.chandraRashiIndex,
+          jupiterRashiIndex: jupRashi,
+          sunRashiIndex: (r.planets['ರವಿ']!.longitude / 30).floor() % 12,
+          janmaNakIdx1: _mfNakIdx,
+          janmaRashiIdx1: _mfRashiIdx,
+        );
+
+        if (mResult.score >= 55) {
+          // Compute avoidance times
+          final rahuKala = _rahuKalaTime(date, pan.sunrise, pan.sunset);
+          final vishaGhati = pan.vishaPraghati ?? '';
+
+          results.add({
+            'date': date,
+            'vara': pan.vara,
+            'tithi': pan.tithi,
+            'tithiEnd': pan.tithiEndTime,
+            'nakshatra': pan.nakshatra,
+            'nakEnd': pan.nakEndTime,
+            'pada': () { final mp = r.planets['ಚಂದ್ರ']?.pada; return mp ?? ((pan.nakPercent * 4).floor() + 1); }(),
+            'yoga': pan.yoga,
+            'karana': pan.karana,
+            'sunrise': pan.sunrise,
+            'sunset': pan.sunset,
+            'score': mResult.score,
+            'verdict': mResult.verdict,
+            'taraBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null,
+            'guruBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null,
+            'rahuKala': rahuKala,
+            'vishaGhati': vishaGhati,
+            'doshas': mResult.doshas,
+            'doshaBhangas': mResult.doshaBhangas,
+          });
+        }
+      } catch (_) {}
+    }
+
+    // Sort by score descending
+    results.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+
+    if (mounted) setState(() { _mfResults = results; _mfSearching = false; });
+  }
+
+  Widget _buildMuhurtaFinderTab() {
+    final rashiNames = List.generate(12, (i) => trAll(knRashi[i]));
+    final nakNames = List.generate(27, (i) => trAll(knNak[i]));
+    final months = List.generate(4, (i) {
+      final m = DateTime(DateTime.now().year, DateTime.now().month + i);
+      return m;
+    });
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: ResponsiveCenter(child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // ── Inputs ──
+          AppCard(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(AppLocale.l('muhurtaShodhane'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kPurple1)),
+              const SizedBox(height: 12),
+
+              // Rashi
+              Text(AppLocale.l('selectRashi'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
+                child: DropdownButtonHideUnderline(child: DropdownButton<int>(
+                  isExpanded: true, value: _mfRashiIdx, dropdownColor: kCard,
+                  style: TextStyle(color: kText, fontSize: 14),
+                  items: List.generate(12, (i) => DropdownMenuItem(value: i, child: Text(rashiNames[i]))),
+                  onChanged: (v) => setState(() => _mfRashiIdx = v!),
+                )),
+              ),
+              const SizedBox(height: 10),
+
+              // Nakshatra
+              Text(AppLocale.l('nakshatra'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
+                child: DropdownButtonHideUnderline(child: DropdownButton<int>(
+                  isExpanded: true, value: _mfNakIdx, dropdownColor: kCard,
+                  style: TextStyle(color: kText, fontSize: 14),
+                  items: List.generate(27, (i) => DropdownMenuItem(value: i, child: Text(nakNames[i]))),
+                  onChanged: (v) => setState(() => _mfNakIdx = v!),
+                )),
+              ),
+              const SizedBox(height: 10),
+
+              // Event
+              Text(AppLocale.l('selectEvent'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
+                child: DropdownButtonHideUnderline(child: DropdownButton<MuhurtaEvent>(
+                  isExpanded: true, value: _mfEvent, dropdownColor: kCard,
+                  style: TextStyle(color: kText, fontSize: 14),
+                  items: MuhurtaEvent.values.map((e) {
+                    final info = muhurtaEventNames[e]!;
+                    return DropdownMenuItem(value: e, child: Text('${AppLocale.l(info.localeKey)} (${info.englishName})'));
+                  }).toList(),
+                  onChanged: (v) => setState(() => _mfEvent = v!),
+                )),
+              ),
+              const SizedBox(height: 10),
+
+              // Month
+              Text(AppLocale.l('selectMonth'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
+                child: DropdownButtonHideUnderline(child: DropdownButton<DateTime>(
+                  isExpanded: true, value: _mfMonth, dropdownColor: kCard,
+                  style: TextStyle(color: kText, fontSize: 14),
+                  items: months.map((m) {
+                    final mNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    return DropdownMenuItem(value: m, child: Text('${mNames[m.month]} ${m.year}'));
+                  }).toList(),
+                  onChanged: (v) => setState(() => _mfMonth = v!),
+                )),
+              ),
+              const SizedBox(height: 14),
+
+              // Search button
+              ElevatedButton.icon(
+                onPressed: _mfSearching ? null : _searchMuhurtas,
+                icon: _mfSearching ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Icon(Icons.search),
+                label: Text(_mfSearching ? '...' : AppLocale.l('searchMuhurta'), style: TextStyle(fontWeight: FontWeight.w800)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPurple1, foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ],
+          )),
+
+          const SizedBox(height: 12),
+
+          // ── Results ──
+          if (_mfResults.isEmpty && !_mfSearching && _mfResults is List)
+            ...[],
+          if (_mfSearching)
+            Padding(
+              padding: const EdgeInsets.all(32),
+              child: Center(child: CircularProgressIndicator(color: kPurple1)),
+            ),
+          if (!_mfSearching && _mfResults.isNotEmpty) ...[
+            Text('${_mfResults.length} ${AppLocale.l('result')}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
+            const SizedBox(height: 8),
+            ..._mfResults.map((r) => _buildMuhurtaResultCard(r)),
+          ],
+          if (!_mfSearching && _mfResults.isEmpty && _mfResults is List && _mfResults.hashCode != [].hashCode)
+            ...[],
+        ],
+      )),
+    );
+  }
+
+  Widget _buildMuhurtaResultCard(Map<String, dynamic> r) {
+    final date = r['date'] as DateTime;
+    final score = r['score'] as int;
+    final verdict = r['verdict'] as String;
+    final Color scoreColor = score >= 80 ? Colors.green : score >= 60 ? Colors.orange : Colors.red;
+
+    final dateStr = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: kCard, borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: scoreColor.withOpacity(0.4), width: 1.5),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header with date, vara, score
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: scoreColor.withOpacity(0.08),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+            ),
+            child: Row(children: [
+              Icon(Icons.calendar_today, size: 16, color: scoreColor),
+              const SizedBox(width: 8),
+              Expanded(child: Text('$dateStr  ${trAll(r['vara'])}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kText))),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(color: scoreColor.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                child: Text('$score — $verdict', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: scoreColor)),
+              ),
+            ]),
+          ),
+
+          // Details
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _detailRow(AppLocale.l('tithiLabel'), '${trAll(r['tithi'])}  (→ ${r['tithiEnd']})'),
+                _detailRow(AppLocale.l('chandraNakLabel'), '${trAll(r['nakshatra'])} — ${AppLocale.l('padaLabel')} ${r['pada']}  (→ ${r['nakEnd']})'),
+                _detailRow(AppLocale.l('yogaLabel'), trAll(r['yoga'])),
+                _detailRow(AppLocale.l('karanaLabel'), trAll(r['karana'])),
+                _detailRow(AppLocale.l('sunrise'), r['sunrise']),
+                _detailRow(AppLocale.l('sunset'), r['sunset']),
+
+                // Tara & Guru Bala
+                if (r['taraBala'] != null) ...[
+                  const SizedBox(height: 6),
+                  Row(children: [
+                    _balaBadge('ತಾರಾ', (r['taraBala'] as TaraResult).taraName, (r['taraBala'] as TaraResult).isGood),
+                    const SizedBox(width: 8),
+                    if (r['guruBala'] != null)
+                      _balaBadge('ಗುರು', (r['guruBala'] as BalaScore).label, (r['guruBala'] as BalaScore).score > 0),
+                  ]),
+                ],
+
+                // Avoidance times
+                if ((r['rahuKala'] as String).isNotEmpty || (r['vishaGhati'] as String).isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red.withOpacity(0.2)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('⚠ ${AppLocale.l('avoidTime')}:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.red.shade700)),
+                        const SizedBox(height: 4),
+                        if ((r['rahuKala'] as String).isNotEmpty)
+                          Text('${AppLocale.l('rahuKala')}: ${r['rahuKala']}', style: TextStyle(fontSize: 12, color: kText)),
+                        if ((r['vishaGhati'] as String).isNotEmpty)
+                          Text('${AppLocale.l('vishaGhati')}: ${r['vishaGhati']}', style: TextStyle(fontSize: 12, color: kText)),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _detailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 90, child: Text(label, style: TextStyle(fontSize: 12, color: kMuted, fontWeight: FontWeight.w600))),
+          Expanded(child: Text(value, style: TextStyle(fontSize: 12, color: kText, fontWeight: FontWeight.w700))),
+        ],
+      ),
+    );
+  }
+
+  Widget _balaBadge(String label, String value, bool isGood) {
+    final color = isGood ? Colors.green : Colors.red;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(6), border: Border.all(color: color.withOpacity(0.3))),
+      child: Text('$label: $value', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color.shade700)),
     );
   }
 

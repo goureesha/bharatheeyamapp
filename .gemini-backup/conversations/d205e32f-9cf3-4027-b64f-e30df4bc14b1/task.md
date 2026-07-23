@@ -1,13 +1,10 @@
-# Dvadasha Koota Implementation Tasks
+# Muhurta Finder Implementation Tasks
 
-- [/] Backend: Add 4 new koota methods to match_making.dart
-  - [ ] Mahendra koota
-  - [ ] Stree Deergha koota
-  - [ ] Rajju koota
-  - [ ] Vedha koota
-- [ ] Backend: Add calculateDvadashaKoota() method
-- [ ] Backend: Add to calculateFullCompatibility() return
-- [ ] Frontend: Add localization strings
-- [ ] Frontend: Add toggle state & segmented button
-- [ ] Frontend: Add _buildDvadashaKootaTable()
+- [ ] Research: Read taranukoola_screen.dart structure (class, state, build)
+- [ ] Add locale strings (5 languages)
+- [ ] Convert taranukoola_screen to TabBar layout
+- [ ] Build Tab 2 UI (inputs: rashi, nakshatra, month, event)
+- [ ] Build _scanMonthMuhurtas() engine method
+- [ ] Build result cards UI
+- [ ] Add visha ghati & rahu kala avoidance display
 - [ ] Git commit & push

@@ -1,6 +1,6 @@
 {
-  "summary": "Implementation plan for adding Dvadasha Koota (12-point matchmaking) alongside existing Ashta Koota (8-point), with a toggle to switch between them. Covers backend logic (4 new koota calculations), frontend UI (segmented toggle, new table), and localization.",
-  "updatedAt": "2026-07-23T05:55:59.530310400Z",
+  "summary": "Implementation plan for adding a Muhurta Finder tab to the Taranukoola screen. Tab 1 keeps the existing calendar. Tab 2 lets users input rashi/nakshatra, select month/event, and find valid muhurta dates with taranukoola, guru bala checks, visha ghati and rahu kala avoidance, showing only daytime muhurtas.",
+  "updatedAt": "2026-07-23T06:14:47.241152600Z",
   "requestFeedback": true,
   "userFacing": true
 }
