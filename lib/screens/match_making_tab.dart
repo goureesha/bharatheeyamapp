@@ -200,7 +200,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     bool prevBrideBala = false;
     bool prevGroomBala = false;
     
-    for (int m = 0; m <= 156; m++) {
+    for (int m = 0; m <= 24; m++) {
       final dt = DateTime(now.year, now.month + m, 15);
       try {
         final jd = Sweph.swe_julday(dt.year, dt.month, dt.day, 12.0, CalendarType.SE_GREG_CAL);
@@ -237,7 +237,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     }
     // Add last period
     if (prevJupRashi >= 0 && periodStart != null) {
-      final endDt = DateTime(now.year, now.month + 156, 15);
+      final endDt = DateTime(now.year, now.month + 24, 15);
       windows.add({
         'rashi': prevJupRashi,
         'rashiName': knRashi[prevJupRashi],
