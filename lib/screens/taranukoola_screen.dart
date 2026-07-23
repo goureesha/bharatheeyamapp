@@ -1107,7 +1107,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   Widget _buildMuhurtaFinderTab() {
     final rashiNames = List.generate(12, (i) => trAll(knRashi[i]));
     final nakNames = List.generate(27, (i) => trAll(knNak[i]));
-    final months = List.generate(4, (i) {
+    final months = List.generate(12, (i) {
       final m = DateTime(DateTime.now().year, DateTime.now().month + i);
       return m;
     });

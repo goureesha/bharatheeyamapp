@@ -994,22 +994,7 @@ MuhurtaDayResult evaluateMuhurta({
     note: hasAmritaSiddhi ? 'ಅಮೃತ ಸಿದ್ಧಿ: $varaName + $cleanNakName ನಕ್ಷತ್ರ' : null,
   ));
 
-  // ── 2B. AYANA CHECK (10 points) ──
-  if (rules.requireUttarayana) {
-    maxPoints += 10;
-    // sidereal sun in Makara, Kumbha, Meena, Mesha, Vrishabha, Mithuna (indices 9,10,11,0,1,2)
-    bool isUttarayana = (sunRashiIndex >= 9 || sunRashiIndex <= 2);
-    if (!isUttarayana) {
-      doshas.add('ಅಯನ ದೋಷ (ದಕ್ಷಿಣಾಯನ)');
-      hasAyanaDosha = true;
-    }
-    if (isUttarayana) totalPoints += 10;
-    checks.add(MuhurtaCheckItem(
-      label: 'ಅಯನ (ಉತ್ತರಾಯಣ ಮಾತ್ರ)',
-      value: isUttarayana ? 'ಉತ್ತರಾಯಣ' : 'ದಕ್ಷಿಣಾಯನ',
-      passed: isUttarayana,
-    ));
-  }
+
 
   // ── 3. VARA CHECK (10 points) ──
   maxPoints += 10;
