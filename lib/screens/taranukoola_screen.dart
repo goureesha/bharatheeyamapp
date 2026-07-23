@@ -1012,6 +1012,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'taraBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null,
             'guruBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null,
             'chandraBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].chandraBala : null,
+            'jupRashi': jupRashi,
             'rahuKala': rahuKala,
             'vishaGhati': vishaGhati,
             'doshas': mResult.doshas,
@@ -1207,7 +1208,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                   Wrap(spacing: 6, runSpacing: 4, children: [
                     _balaBadge('ತಾರಾ', (r['taraBala'] as TaraResult).taraName, (r['taraBala'] as TaraResult).isGood),
                     if (r['guruBala'] != null)
-                      _balaBadge('ಗುರು', (r['guruBala'] as BalaScore).label, (r['guruBala'] as BalaScore).score > 0),
+                      _balaBadge('ಗುರು (${trAll(knRashi[r['jupRashi'] as int])})', (r['guruBala'] as BalaScore).label, (r['guruBala'] as BalaScore).score > 0),
                     if (r['chandraBala'] != null)
                       _balaBadge('ಚಂದ್ರ', (r['chandraBala'] as bool) ? 'ಶುಭ' : 'ಅಶುಭ', r['chandraBala'] as bool),
                   ]),
