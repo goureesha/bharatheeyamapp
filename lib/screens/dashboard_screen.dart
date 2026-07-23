@@ -3335,6 +3335,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               case 'pancha': return Icons.stars;
               case 'chandra': return Icons.nightlight_round;
               case 'graha': return Icons.wb_sunny;
+              case 'sanyasa': return Icons.temple_hindu;
               default: return Icons.auto_awesome;
             }
           }
@@ -3345,6 +3346,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               case 'pancha': return Colors.indigo;
               case 'chandra': return Colors.blue;
               case 'graha': return Colors.orange;
+              case 'sanyasa': return Colors.deepOrange;
               default: return Colors.teal;
             }
           }
@@ -3355,6 +3357,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               case 'pancha': return 'ಪಂಚ ಮಹಾಪುರುಷ';
               case 'chandra': return 'ಚಂದ್ರ ಯೋಗ';
               case 'graha': return 'ಗ್ರಹ ಯೋಗ';
+              case 'sanyasa': return 'ಸಂನ್ಯಾಸ ಯೋಗ';
               default: return 'ಇತರ ಯೋಗ';
             }
           }
