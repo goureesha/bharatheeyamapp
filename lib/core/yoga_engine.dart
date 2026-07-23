@@ -624,6 +624,193 @@ class YogaEngine {
       }
     }
 
+    // ═══════════════════════════════════════
+    // 26. DHARMA-KARMADHIPATI YOGA
+    // Lords of 9th and 10th conjunct
+    // ═══════════════════════════════════════
+    {
+      final lord9 = lordOfHouse(9);
+      final lord10 = lordOfHouse(10);
+      if (lord9 != lord10 && conjunct(lord9, lord10)) {
+        yogas.add(const YogaResult(
+          nameKn: 'ಧರ್ಮ-ಕರ್ಮಾಧಿಪತಿ ಯೋಗ',
+          nameEn: 'Dharma-Karmadhipati Yoga',
+          category: 'raja',
+          descKn: '೯ ಮತ್ತು ೧೦ನೇ ಅಧಿಪತಿಗಳ ಸಂಯೋಗ. ಧರ್ಮ-ಕರ್ಮ ಸಮನ್ವಯ, ಉನ್ನತ ಪದವಿ ಮತ್ತು ಯಶಸ್ಸು.',
+          descEn: 'Lords of 9th and 10th conjunct. Righteous career, high position and success.',
+        ));
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // 27. VASUMATHI YOGA
+    // Benefics in upachaya houses (3,6,10,11) from Moon
+    // ═══════════════════════════════════════
+    {
+      final upachayas = {3, 6, 10, 11};
+      final count = _benefics.where((p) {
+        final h = houseFromMoon(p);
+        return upachayas.contains(h);
+      }).length;
+      if (count >= 3) {
+        yogas.add(const YogaResult(
+          nameKn: 'ವಸುಮತಿ ಯೋಗ',
+          nameEn: 'Vasumathi Yoga',
+          category: 'dhana',
+          descKn: 'ಚಂದ್ರನಿಂದ ಉಪಚಯ ಸ್ಥಾನಗಳಲ್ಲಿ ಶುಭ ಗ್ರಹಗಳಿದ್ದರೆ. ಅಪಾರ ಸಂಪತ್ತು ಮತ್ತು ಸಮೃದ್ಧಿ.',
+          descEn: 'Benefics in upachaya from Moon. Immense wealth and prosperity.',
+        ));
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // 28. SHUBHA KARTARI YOGA
+    // Benefics in 2nd and 12th from Lagna
+    // ═══════════════════════════════════════
+    {
+      final in2 = _benefics.any((p) => houseOf(p) == 2);
+      final in12 = _benefics.any((p) => houseOf(p) == 12);
+      if (in2 && in12) {
+        yogas.add(const YogaResult(
+          nameKn: 'ಶುಭ ಕರ್ತರಿ ಯೋಗ',
+          nameEn: 'Shubha Kartari Yoga',
+          category: 'other',
+          descKn: 'ಲಗ್ನದ ೨ ಮತ್ತು ೧೨ನೇ ಮನೆಯಲ್ಲಿ ಶುಭ ಗ್ರಹಗಳಿದ್ದರೆ. ಸುಖ, ಆರೋಗ್ಯ ಮತ್ತು ರಕ್ಷಣೆ.',
+          descEn: 'Benefics hemming the Ascendant. Happiness, health and protection.',
+        ));
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // 29. KALANIDHI YOGA
+    // Jupiter in 2nd or 5th with Mercury or Venus
+    // ═══════════════════════════════════════
+    {
+      final jupH = houseOf(_jup);
+      if ((jupH == 2 || jupH == 5) && (conjunct(_jup, _merc) || conjunct(_jup, _ven))) {
+        yogas.add(const YogaResult(
+          nameKn: 'ಕಲಾನಿಧಿ ಯೋಗ',
+          nameEn: 'Kalanidhi Yoga',
+          category: 'other',
+          descKn: 'ಗುರು ೨/೫ನೇ ಮನೆಯಲ್ಲಿ ಬುಧ/ಶುಕ್ರನೊಂದಿಗೆ ಇದ್ದರೆ. ಕಲೆ, ವಿದ್ಯೆ ಮತ್ತು ಸಂಸ್ಕೃತಿಯಲ್ಲಿ ಪ್ರಸಿದ್ಧಿ.',
+          descEn: 'Jupiter in 2nd/5th with Mercury/Venus. Fame in arts, learning and culture.',
+        ));
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // 30. PARVATA YOGA
+    // Benefics in Kendras and no malefics in 6/8
+    // ═══════════════════════════════════════
+    {
+      final beneficsInKendra = _benefics.any((p) => _kendras.contains(houseOf(p)));
+      final malefics = [_sun, _mars, _sat];
+      final maleficIn68 = malefics.any((p) => houseOf(p) == 6 || houseOf(p) == 8);
+      if (beneficsInKendra && !maleficIn68) {
+        yogas.add(const YogaResult(
+          nameKn: 'ಪರ್ವತ ಯೋಗ',
+          nameEn: 'Parvata Yoga',
+          category: 'raja',
+          descKn: 'ಕೇಂದ್ರದಲ್ಲಿ ಶುಭಗ್ರಹ ಮತ್ತು ೬/೮ರಲ್ಲಿ ಪಾಪಗ್ರಹ ಇಲ್ಲದಿದ್ದರೆ. ಕೀರ್ತಿ, ಧರ್ಮ ಮತ್ತು ಅಧಿಕಾರ.',
+          descEn: 'Benefics in Kendra, no malefics in 6/8. Fame, virtue and authority.',
+        ));
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // 31. PUSHKALA YOGA
+    // Lagna lord and Moon's rashi lord in Kendra, aspected by/conjunct a strong planet
+    // ═══════════════════════════════════════
+    {
+      final lagnaLord = lordOfHouse(1);
+      final moonRashi = planets[_moon]?.rashiIndex ?? 0;
+      final moonLord = _rashiLord[moonRashi];
+      final lagnaLordH = houseOf(lagnaLord);
+      final moonLordH = houseOf(moonLord);
+      if (_kendras.contains(lagnaLordH) && _kendras.contains(moonLordH)) {
+        yogas.add(const YogaResult(
+          nameKn: 'ಪುಷ್ಕಳ ಯೋಗ',
+          nameEn: 'Pushkala Yoga',
+          category: 'dhana',
+          descKn: 'ಲಗ್ನಾಧಿಪತಿ ಮತ್ತು ಚಂದ್ರ ರಾಶಿ ಅಧಿಪತಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದರೆ. ಸಂಪತ್ತು, ಪ್ರಸಿದ್ಧಿ ಮತ್ತು ಸುಖ.',
+          descEn: 'Lagna lord and Moon sign lord in Kendras. Wealth, fame and comfort.',
+        ));
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // 32. CHAMARA YOGA
+    // Lagna lord exalted in Kendra, aspected by Jupiter
+    // ═══════════════════════════════════════
+    {
+      final lagnaLord = lordOfHouse(1);
+      final lagnaLordH = houseOf(lagnaLord);
+      if (_kendras.contains(lagnaLordH) && isExalted(lagnaLord)) {
+        yogas.add(const YogaResult(
+          nameKn: 'ಚಾಮರ ಯೋಗ',
+          nameEn: 'Chamara Yoga',
+          category: 'raja',
+          descKn: 'ಲಗ್ನಾಧಿಪತಿ ಉಚ್ಚದಲ್ಲಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದರೆ. ರಾಜ ಗೌರವ, ವಿದ್ಯೆ ಮತ್ತು ವಾಕ್ಶಕ್ತಿ.',
+          descEn: 'Lagna lord exalted in Kendra. Royal honour, learning and eloquence.',
+        ));
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // 33. SHRINATHA YOGA
+    // Lord of 7th exalted in 10th
+    // ═══════════════════════════════════════
+    {
+      final lord7 = lordOfHouse(7);
+      if (houseOf(lord7) == 10 && isExalted(lord7)) {
+        yogas.add(const YogaResult(
+          nameKn: 'ಶ್ರೀನಾಥ ಯೋಗ',
+          nameEn: 'Shrinatha Yoga',
+          category: 'raja',
+          descKn: '೭ನೇ ಅಧಿಪತಿ ಉಚ್ಚದಲ್ಲಿ ೧೦ನೇ ಮನೆಯಲ್ಲಿದ್ದರೆ. ಸಮಾಜದಲ್ಲಿ ಉನ್ನತ ಸ್ಥಾನ ಮತ್ತು ಗೌರವ.',
+          descEn: 'Lord of 7th exalted in 10th. High status and respect in society.',
+        ));
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // 34. BHERI YOGA
+    // Lord of 9th strong, Jupiter in Kendra, lord of Lagna with Venus
+    // ═══════════════════════════════════════
+    {
+      final lord9 = lordOfHouse(9);
+      final jupH = houseOf(_jup);
+      if (_kendras.contains(jupH) && (isInOwnSign(lord9) || isExalted(lord9))) {
+        yogas.add(const YogaResult(
+          nameKn: 'ಭೇರಿ ಯೋಗ',
+          nameEn: 'Bheri Yoga',
+          category: 'dhana',
+          descKn: '೯ನೇ ಅಧಿಪತಿ ಬಲಿಷ್ಠ, ಗುರು ಕೇಂದ್ರದಲ್ಲಿದ್ದರೆ. ಧನ, ಧರ್ಮ ಮತ್ತು ದೀರ್ಘಾಯುಷ್ಯ.',
+          descEn: 'Lord of 9th strong, Jupiter in Kendra. Wealth, virtue and longevity.',
+        ));
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // 35. CHATURMUKHA YOGA
+    // Jupiter in Kendra, Venus in Kendra, Lagna lord strong
+    // ═══════════════════════════════════════
+    {
+      final jupH = houseOf(_jup);
+      final venH = houseOf(_ven);
+      final lagnaLord = lordOfHouse(1);
+      if (_kendras.contains(jupH) && _kendras.contains(venH) &&
+          (isInOwnSign(lagnaLord) || isExalted(lagnaLord))) {
+        yogas.add(const YogaResult(
+          nameKn: 'ಚತುರ್ಮುಖ ಯೋಗ',
+          nameEn: 'Chaturmukha Yoga',
+          category: 'raja',
+          descKn: 'ಗುರು ಮತ್ತು ಶುಕ್ರ ಕೇಂದ್ರದಲ್ಲಿ, ಲಗ್ನಾಧಿಪತಿ ಬಲಿಷ್ಠವಾಗಿದ್ದರೆ. ಸರ್ವ ಸುಖ, ವಿದ್ಯೆ ಮತ್ತು ಪ್ರಸಿದ್ಧಿ.',
+          descEn: 'Jupiter and Venus in Kendras, Lagna lord strong. All comforts, learning and fame.',
+        ));
+      }
+    }
+
     return yogas;
   }
 }
