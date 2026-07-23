@@ -995,6 +995,45 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             }
           }
 
+          // Compute lagna windows for this day
+          final rules = muhurtaRules[_mfEvent];
+          final allowedLagnas = rules?.allowedLagnas;
+          final Map<String, int> basePlanetRashis = {};
+          for (final entry in kr.planets.entries) {
+            if (entry.key == 'ಮಾಂದಿ') continue;
+            basePlanetRashis[entry.key] = entry.value.rashiIndex;
+          }
+          final guruRashiIdx2 = basePlanetRashis['ಗುರು'] ?? -1;
+
+          List<LagnaWindow> dayLagnaWindows = [];
+          try {
+            final srSs = Ephemeris.findSunriseSetForDate(
+              date.year, date.month, date.day,
+              LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
+            );
+            final double srJd2 = srSs[0];
+            final double ssJd2 = srSs[1];
+            Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+            final ayn = Sweph.swe_get_ayanamsa(srJd2);
+
+            final mandiSrSs = Ephemeris.findSunriseSetForDate(
+              date.year, date.month, date.day,
+              LocationService.lat, LocationService.lon,
+            );
+            final double mandiSr = mandiSrSs[0];
+            final double mandiSs = mandiSrSs[1];
+
+            final vedWday = (date.weekday % 7);
+            final dayMandiJd = Ephemeris.calcMandi(vedWday, mandiSr, mandiSs, isDayBirth: true);
+            if (dayMandiJd != null) {
+              final mandiPos = Ephemeris.calcAll(dayMandiJd, 'lahiri', true);
+              final mandiLon = mandiPos['Mandi']?[0] ?? 0.0;
+              basePlanetRashis['ಮಾಂದಿ'] = (mandiLon / 30.0).floor() % 12;
+            }
+
+            dayLagnaWindows = _scanLagnaRange(srJd2, ssJd2, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
+          } catch (_) {}
+
           results.add({
             'date': date,
             'vara': pan.vara,
@@ -1019,7 +1058,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'doshaBhangas': mResult.doshaBhangas,
             'checks': mResult.checks,
             'shubhaMuhurtas': shubhaMuhurtas,
-            'lagnaWindows': mResult.lagnaWindows,
+            'lagnaWindows': dayLagnaWindows,
           });
         }
       } catch (_) {}
