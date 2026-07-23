@@ -715,11 +715,11 @@ class BalaScore {
 /// Shubha: 2, 5, 7, 9, 11. Poojya: 1, 3, 6, 10. Ashubha: 4, 8, 12.
 BalaScore calculateGuruBala(int janmaRashiIdx, int jupiterRashiIdx) {
   final count = ((jupiterRashiIdx - janmaRashiIdx + 12) % 12) + 1; // 1-indexed
-  if (const [2, 5, 7, 9, 11].contains(count)) {
+  // Anukoola: Kendra(1,4,7,10) + Trikona(5,9) + Dhana/Labha(2,11)
+  if (const [1, 2, 4, 5, 7, 9, 10, 11].contains(count)) {
     return BalaScore(2, 'ಶುಭ');
-  } else if (const [1, 3, 6, 10].contains(count)) {
-    return BalaScore(1, 'ಪೂಜ್ಯ (ಶಾಂತಿ ಅಗತ್ಯ)');
   } else {
+    // Pratikoola: 3,6,8,12
     return BalaScore(0, 'ಅಶುಭ');
   }
 }

@@ -965,7 +965,20 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           janmaRashiIdx1: _mfRashiIdx,
         );
 
-        if (mResult.score >= 55) {
+        // ── Hard filters: ALL checks must pass ──
+        // 1. All panchanga shuddhi checks must pass
+        final allChecksPassed = mResult.checks.every((c) => c.passed);
+        if (!allChecksPassed) continue;
+
+        // 2. Tara bala must be good
+        final taraBala = mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null;
+        if (taraBala != null && !taraBala.isGood) continue;
+
+        // 3. Guru bala must not be ashubha
+        final guruBala = mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null;
+        if (guruBala != null && guruBala.score <= 0) continue;
+
+        {
           // Compute avoidance times
           final rahuKala = _rahuKalaTime(date, pan.sunrise, pan.sunset);
           final vishaGhati = pan.vishaPraghati;
