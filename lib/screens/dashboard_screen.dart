@@ -3405,8 +3405,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                   Text(_catLabel(y.category), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _catColor(y.category).withOpacity(0.7))),
                   const SizedBox(height: 6),
                   Text(y.descKn, style: TextStyle(fontSize: 12, color: kText, height: 1.4)),
-                  const SizedBox(height: 2),
-                  Text(y.descEn, style: TextStyle(fontSize: 11, color: kMuted, fontStyle: FontStyle.italic, height: 1.3)),
                 ],
               ),
             );

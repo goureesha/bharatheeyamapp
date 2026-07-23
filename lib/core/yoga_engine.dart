@@ -189,7 +189,7 @@ class YogaEngine {
           nameKn: 'ಗಜಕೇಸರಿ ಯೋಗ',
           nameEn: 'Gaja Kesari Yoga',
           category: 'raja',
-          descKn: 'ಗುರು ಚಂದ್ರನಿಂದ ಕೇಂದ್ರದಲ್ಲಿದ್ದಾರೆ. ಕೀರ್ತಿ, ಬುದ್ಧಿ ಮತ್ತು ಸಂಪತ್ತು ಲಭಿಸುತ್ತದೆ.',
+          descKn: 'ಗುರು ಚಂದ್ರನಿಂದ ಕೇಂದ್ರದಲ್ಲಿದ್ದರೆ. ಕೀರ್ತಿ, ಬುದ್ಧಿ ಮತ್ತು ಸಂಪತ್ತು ಲಭಿಸುತ್ತದೆ.',
           descEn: 'Jupiter in Kendra from Moon. Bestows fame, wisdom and wealth.',
         ));
       }
@@ -206,7 +206,7 @@ class YogaEngine {
           nameKn: 'ಬುಧಾದಿತ್ಯ ಯೋಗ',
           nameEn: 'Budhaditya Yoga',
           category: 'graha',
-          descKn: 'ರವಿ ಮತ್ತು ಬುಧ ಒಂದೇ ರಾಶಿಯಲ್ಲಿದ್ದಾರೆ. ಬುದ್ಧಿಶಕ್ತಿ, ವಾಕ್ಚಾತುರ್ಯ ಮತ್ತು ವಿದ್ಯೆಯಲ್ಲಿ ಉನ್ನತಿ.',
+          descKn: 'ರವಿ ಮತ್ತು ಬುಧ ಒಂದೇ ರಾಶಿಯಲ್ಲಿದ್ದರೆ. ಬುದ್ಧಿಶಕ್ತಿ, ವಾಕ್ಚಾತುರ್ಯ ಮತ್ತು ವಿದ್ಯೆಯಲ್ಲಿ ಉನ್ನತಿ.',
           descEn: 'Sun and Mercury conjunct. Intelligence, eloquence and learning.',
         ));
       }
@@ -221,7 +221,7 @@ class YogaEngine {
         nameKn: 'ಚಂದ್ರ-ಮಂಗಳ ಯೋಗ',
         nameEn: 'Chandra-Mangal Yoga',
         category: 'dhana',
-        descKn: 'ಚಂದ್ರ ಮತ್ತು ಕುಜ ಒಂದೇ ರಾಶಿಯಲ್ಲಿದ್ದಾರೆ. ಧನಪ್ರಾಪ್ತಿ ಮತ್ತು ಸಾಹಸ ಪ್ರವೃತ್ತಿ.',
+        descKn: 'ಚಂದ್ರ ಮತ್ತು ಕುಜ ಒಂದೇ ರಾಶಿಯಲ್ಲಿದ್ದರೆ. ಧನಪ್ರಾಪ್ತಿ ಮತ್ತು ಸಾಹಸ ಪ್ರವೃತ್ತಿ.',
         descEn: 'Moon and Mars conjunct. Wealth through courage and enterprise.',
       ));
     }
@@ -231,15 +231,15 @@ class YogaEngine {
     // Planet in own/exalted sign in Kendra from Lagna
     // ═══════════════════════════════════════
     final _mahapurushaData = [
-      [_mars, 'ರುಚಕ ಯೋಗ', 'Ruchaka Yoga', 'ಕುಜ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಚದಲ್ಲಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದಾರೆ. ಶೌರ್ಯ, ನಾಯಕತ್ವ ಮತ್ತು ಭೂಸಂಪತ್ತು.',
+      [_mars, 'ರುಚಕ ಯೋಗ', 'Ruchaka Yoga', 'ಕುಜ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಚದಲ್ಲಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದರೆ. ಶೌರ್ಯ, ನಾಯಕತ್ವ ಮತ್ತು ಭೂಸಂಪತ್ತು.',
         'Mars in own/exalted sign in Kendra. Valor, leadership and landed property.'],
-      [_merc, 'ಭದ್ರ ಯೋಗ', 'Bhadra Yoga', 'ಬುಧ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಚದಲ್ಲಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದಾರೆ. ವಿದ್ಯೆ, ವಾಣಿಜ್ಯ ಮತ್ತು ವಾಕ್ಶಕ್ತಿ.',
+      [_merc, 'ಭದ್ರ ಯೋಗ', 'Bhadra Yoga', 'ಬುಧ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಚದಲ್ಲಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದರೆ. ವಿದ್ಯೆ, ವಾಣಿಜ್ಯ ಮತ್ತು ವಾಕ್ಶಕ್ತಿ.',
         'Mercury in own/exalted sign in Kendra. Learning, commerce and eloquence.'],
-      [_jup, 'ಹಂಸ ಯೋಗ', 'Hamsa Yoga', 'ಗುರು ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಚದಲ್ಲಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದಾರೆ. ಧಾರ್ಮಿಕತೆ, ಜ್ಞಾನ ಮತ್ತು ಉನ್ನತ ಪದವಿ.',
+      [_jup, 'ಹಂಸ ಯೋಗ', 'Hamsa Yoga', 'ಗುರು ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಚದಲ್ಲಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದರೆ. ಧಾರ್ಮಿಕತೆ, ಜ್ಞಾನ ಮತ್ತು ಉನ್ನತ ಪದವಿ.',
         'Jupiter in own/exalted sign in Kendra. Spirituality, wisdom and high status.'],
-      [_ven, 'ಮಾಲವ್ಯ ಯೋಗ', 'Malavya Yoga', 'ಶುಕ್ರ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಚದಲ್ಲಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದಾರೆ. ಸೌಂದರ್ಯ, ಕಲೆ ಮತ್ತು ಭೋಗಸುಖ.',
+      [_ven, 'ಮಾಲವ್ಯ ಯೋಗ', 'Malavya Yoga', 'ಶುಕ್ರ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಚದಲ್ಲಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದರೆ. ಸೌಂದರ್ಯ, ಕಲೆ ಮತ್ತು ಭೋಗಸುಖ.',
         'Venus in own/exalted sign in Kendra. Beauty, art and luxuries.'],
-      [_sat, 'ಶಶ ಯೋಗ', 'Shasha Yoga', 'ಶನಿ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಚದಲ್ಲಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದಾರೆ. ಅಧಿಕಾರ, ಶಿಸ್ತು ಮತ್ತು ದೀರ್ಘಾಯುಷ್ಯ.',
+      [_sat, 'ಶಶ ಯೋಗ', 'Shasha Yoga', 'ಶನಿ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಚದಲ್ಲಿ ಕೇಂದ್ರದಲ್ಲಿದ್ದರೆ. ಅಧಿಕಾರ, ಶಿಸ್ತು ಮತ್ತು ದೀರ್ಘಾಯುಷ್ಯ.',
         'Saturn in own/exalted sign in Kendra. Authority, discipline and longevity.'],
     ];
     for (final data in _mahapurushaData) {
@@ -342,7 +342,7 @@ class YogaEngine {
           nameKn: 'ಶಕಟ ಯೋಗ',
           nameEn: 'Shakata Yoga',
           category: 'chandra',
-          descKn: 'ಗುರು ಚಂದ್ರನಿಂದ ೬/೮/೧೨ನೇ ಮನೆಯಲ್ಲಿದ್ದಾರೆ. ಅಸ್ಥಿರ ಅದೃಷ್ಟ, ಏರಿಳಿತಗಳು.',
+          descKn: 'ಗುರು ಚಂದ್ರನಿಂದ ೬/೮/೧೨ನೇ ಮನೆಯಲ್ಲಿದ್ದರೆ. ಅಸ್ಥಿರ ಅದೃಷ್ಟ, ಏರಿಳಿತಗಳು.',
           descEn: 'Jupiter in 6/8/12 from Moon. Fluctuating fortune and ups-downs.',
           isPositive: false,
         ));
@@ -380,7 +380,7 @@ class YogaEngine {
             nameKn: 'ವಿಪರೀತ ರಾಜಯೋಗ',
             nameEn: 'Vipareetha Raja Yoga',
             category: 'raja',
-            descKn: '${dh}ನೇ ಮನೆಯ ಅಧಿಪತಿ ${lordH}ನೇ ಮನೆಯಲ್ಲಿದ್ದಾರೆ. ಕಷ್ಟಗಳ ಮೂಲಕ ಉನ್ನತಿ.',
+            descKn: '${dh}ನೇ ಮನೆಯ ಅಧಿಪತಿ ${lordH}ನೇ ಮನೆಯಲ್ಲಿದ್ದರೆ. ಕಷ್ಟಗಳ ಮೂಲಕ ಉನ್ನತಿ.',
             descEn: 'Lord of house $dh in house $lordH. Rise through adversity.',
           ));
           break; // Show only once
@@ -432,7 +432,7 @@ class YogaEngine {
           nameKn: 'ಲಕ್ಷ್ಮೀ ಯೋಗ',
           nameEn: 'Lakshmi Yoga',
           category: 'dhana',
-          descKn: '೯ನೇ ಅಧಿಪತಿ ಕೇಂದ್ರ/ತ್ರಿಕೋಣದಲ್ಲಿ ಬಲಿಷ್ಠವಾಗಿದ್ದಾರೆ. ಮಹಾ ಸಂಪತ್ತು ಮತ್ತು ಸೌಭಾಗ್ಯ.',
+          descKn: '೯ನೇ ಅಧಿಪತಿ ಕೇಂದ್ರ/ತ್ರಿಕೋಣದಲ್ಲಿ ಬಲಿಷ್ಠವಾಗಿದ್ದರೆ. ಮಹಾ ಸಂಪತ್ತು ಮತ್ತು ಸೌಭಾಗ್ಯ.',
           descEn: 'Lord of 9th strong in Kendra/Trikona. Great wealth and fortune.',
         ));
       }
@@ -488,7 +488,7 @@ class YogaEngine {
           nameKn: 'ಸರಸ್ವತಿ ಯೋಗ',
           nameEn: 'Saraswati Yoga',
           category: 'other',
-          descKn: 'ಗುರು, ಶುಕ್ರ, ಬುಧ ಕೇಂದ್ರ/ತ್ರಿಕೋಣ/೨ನೇ ಮನೆಯಲ್ಲಿದ್ದಾರೆ. ವಿದ್ಯೆ, ಕಲೆ ಮತ್ತು ವಾಗ್ಮಿತ್ವ.',
+          descKn: 'ಗುರು, ಶುಕ್ರ, ಬುಧ ಕೇಂದ್ರ/ತ್ರಿಕೋಣ/೨ನೇ ಮನೆಯಲ್ಲಿದ್ದರೆ. ವಿದ್ಯೆ, ಕಲೆ ಮತ್ತು ವಾಗ್ಮಿತ್ವ.',
           descEn: 'Jupiter, Venus, Mercury in Kendra/Trikona/2nd. Learning, arts and eloquence.',
         ));
       }
@@ -509,7 +509,7 @@ class YogaEngine {
           nameKn: 'ಧನ ಯೋಗ',
           nameEn: 'Dhana Yoga',
           category: 'dhana',
-          descKn: '೨ ಮತ್ತು ೧೧ನೇ ಅಧಿಪತಿಗಳು ಕೇಂದ್ರ/ತ್ರಿಕೋಣದಲ್ಲಿದ್ದಾರೆ. ಧನ ಪ್ರಾಪ್ತಿ ಮತ್ತು ಆರ್ಥಿಕ ಸ್ಥಿರತೆ.',
+          descKn: '೨ ಮತ್ತು ೧೧ನೇ ಅಧಿಪತಿಗಳು ಕೇಂದ್ರ/ತ್ರಿಕೋಣದಲ್ಲಿದ್ದರೆ. ಧನ ಪ್ರಾಪ್ತಿ ಮತ್ತು ಆರ್ಥಿಕ ಸ್ಥಿರತೆ.',
           descEn: 'Lords of 2nd and 11th in Kendra/Trikona. Wealth acquisition and financial stability.',
         ));
       }
@@ -617,7 +617,7 @@ class YogaEngine {
             nameKn: 'ಕಹಳ ಯೋಗ',
             nameEn: 'Kahala Yoga',
             category: 'other',
-            descKn: '೪ನೇ ಅಧಿಪತಿ ಮತ್ತು ಗುರು ಪರಸ್ಪರ ಕೇಂದ್ರದಲ್ಲಿದ್ದಾರೆ. ಧೈರ್ಯ ಮತ್ತು ಸಾಹಸ.',
+            descKn: '೪ನೇ ಅಧಿಪತಿ ಮತ್ತು ಗುರು ಪರಸ್ಪರ ಕೇಂದ್ರದಲ್ಲಿದ್ದರೆ. ಧೈರ್ಯ ಮತ್ತು ಸಾಹಸ.',
             descEn: 'Lord of 4th and Jupiter in mutual Kendra. Courage and adventurous spirit.',
           ));
         }
