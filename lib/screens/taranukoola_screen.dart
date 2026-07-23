@@ -923,6 +923,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           lat: LocationService.lat, lon: LocationService.lon,
           ayanamsaMode: 'lahiri', trueNode: true,
         );
+        if (kr == null) continue;
         final pan = kr.panchang;
 
         // Derive indices from string names
