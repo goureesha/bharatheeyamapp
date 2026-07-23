@@ -181,7 +181,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
     avoidVishti: true,
     requireUttarayana: true,
     requireShukla: true,
-    allowedLagnas: [1, 4, 7, 10], // Sthira rashis
+    allowedLagnas: [1, 2, 3, 5, 6, 8, 11], // Vrishabha, Mithuna, Karkataka, Kanya, Tula, Dhanu, Meena
     requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.ashtama, ShuddhiType.chandraSaptama},
     tithiShloka: 'ದ್ವಿತೀಯಾ ತೃತೀಯಾ ಪಂಚಮೀ ಸಪ್ತಮೀ ದಶಮೀ ತಥಾ ।\nಏಕಾದಶೀ ದ್ವಾದಶೀ ಚ ತ್ರಯೋದಶೀ ಶುಕ್ಲಪಕ್ಷೇ ಶುಭಪ್ರದಾಃ ॥',
     varaShloka: 'ಸೋಮ-ಬುಧ-ಗುರು-ಶುಕ್ರೇಷು ಗೃಹಪ್ರವೇಶಃ ಸಿದ್ಧಿದಃ ।\nಕುಜ-ಶನಿ-ಅರ್ಕವಾರೇಷು ಗೃಹಂ ಪ್ರವಿಶೇನ್ನ ಕದಾಚನ ॥',
@@ -319,7 +319,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
     allowedVaras: [1, 3, 4, 5],
     avoidVishti: true,
     requireShukla: true,
-    allowedLagnas: null,
+    allowedLagnas: [1, 2, 3, 5, 6, 8, 11], // Vrishabha, Mithuna, Karkataka, Kanya, Tula, Dhanu, Meena
     requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.ashtama},
     tithiShloka: 'ದ್ವಿತೀಯಾ ಪಂಚಮೀ ಸಪ್ತಮೀ ದಶಮೀ ತಥಾ ।\nರಿಕ್ತಾ-ಅಮಾವಾಸ್ಯಾ-ಪರ್ವ ನಾಮಕರ್ಮ ವಿವರ್ಜಯೇತ್ ॥',
     varaShloka: 'ಸೋಮ-ಬುಧ-ಗುರು-ಶುಕ್ರೇಷು ನಾಮಕರಣಂ ಶುಭಮ್ ।\nಶಿಶೂನಾಂ ನಾಮಕರ್ಮ ಶುಭವಾರೇ ಪ್ರಶಸ್ಯತೇ ॥',
