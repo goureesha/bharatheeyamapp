@@ -916,18 +916,25 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         final srLocalFrac = ((srJd + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
         final hour24 = (srLocalFrac * 24.0) + (1.0 / 60.0);
 
-        final r = await AstroCalculator.calculate(
+        final kr = await AstroCalculator.calculate(
           year: date.year, month: date.month, day: date.day,
           hourUtcOffset: LocationService.tzOffset,
           hour24: hour24,
           lat: LocationService.lat, lon: LocationService.lon,
           ayanamsaMode: 'lahiri', trueNode: true,
         );
-        final pan = r.panchang;
+        final pan = kr.panchang;
 
-        // Get Jupiter rashi
-        final jupDeg = r.planets['ಗುರು']?.longitude ?? 0;
+        // Derive indices from string names
+        final varaIdx = knVara.indexOf(pan.vara);
+        final yogaIdx = knYoga.indexOf(pan.yoga);
+        final moonRashiIdx = knRashi.indexOf(pan.chandraRashi);
+
+        // Get Jupiter & Sun rashi
+        final jupDeg = kr.planets['ಗುರು']?.longitude ?? 0;
         final jupRashi = (jupDeg / 30).floor() % 12;
+        final sunDeg = kr.planets['ರವಿ']?.longitude ?? 0;
+        final sunRashi = (sunDeg / 30).floor() % 12;
 
         // Evaluate muhurta using existing engine
         final mResult = evaluateMuhurta(
@@ -936,14 +943,14 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           tithiName: pan.tithi,
           nakshatraIndex: pan.nakshatraIndex,
           nakshatraName: pan.nakshatra,
-          varaIndex: pan.varaIndex,
+          varaIndex: varaIdx,
           varaName: pan.vara,
-          yogaIndex: pan.yogaIndex,
+          yogaIndex: yogaIdx,
           yogaName: pan.yoga,
           karanaName: pan.karana,
-          moonRashiIndex: pan.chandraRashiIndex,
+          moonRashiIndex: moonRashiIdx,
           jupiterRashiIndex: jupRashi,
-          sunRashiIndex: (r.planets['ರವಿ']!.longitude / 30).floor() % 12,
+          sunRashiIndex: sunRashi,
           janmaNakIdx1: _mfNakIdx,
           janmaRashiIdx1: _mfRashiIdx,
         );
@@ -951,7 +958,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         if (mResult.score >= 55) {
           // Compute avoidance times
           final rahuKala = _rahuKalaTime(date, pan.sunrise, pan.sunset);
-          final vishaGhati = pan.vishaPraghati ?? '';
+          final vishaGhati = pan.vishaPraghati;
 
           results.add({
             'date': date,
@@ -960,7 +967,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'tithiEnd': pan.tithiEndTime,
             'nakshatra': pan.nakshatra,
             'nakEnd': pan.nakEndTime,
-            'pada': () { final mp = r.planets['ಚಂದ್ರ']?.pada; return mp ?? ((pan.nakPercent * 4).floor() + 1); }(),
+            'pada': () { final mp = kr.planets['ಚಂದ್ರ']?.pada; return mp ?? ((pan.nakPercent * 4).floor() + 1); }(),
             'yoga': pan.yoga,
             'karana': pan.karana,
             'sunrise': pan.sunrise,
