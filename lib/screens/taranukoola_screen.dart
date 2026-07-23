@@ -1329,7 +1329,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
 
           // ── Lagna Windows (only shuddhi-passed) ──
-          if (r['lagnaWindows'] != null && (r['lagnaWindows'] as List<LagnaWindow>).any((w) => w.isPerfect))
+          if (r['lagnaWindows'] != null && (r['lagnaWindows'] as List<LagnaWindow>).any((w) => w.isShubha))
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
               child: Container(
@@ -1347,7 +1347,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     ),
                     child: Text('🏠 ${AppLocale.l('dayLagnaLabel')}', style: TextStyle(fontWeight: FontWeight.w800, color: const Color(0xFF2E86AB), fontSize: 13)),
                   ),
-                  ...(r['lagnaWindows'] as List<LagnaWindow>).where((w) => w.isPerfect).toList().asMap().entries.map((entry) {
+                  ...(r['lagnaWindows'] as List<LagnaWindow>).where((w) => w.isShubha).toList().asMap().entries.map((entry) {
                     final lw = entry.value;
                     final rowBg = lw.isPerfect ? Colors.green.withOpacity(0.1) : Colors.green.withOpacity(0.05);
                     final rowIcon = lw.isPerfect ? Icons.star : Icons.check_circle;
@@ -1356,7 +1356,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
                         color: rowBg,
-                        border: entry.key < (r['lagnaWindows'] as List<LagnaWindow>).where((w) => w.isPerfect).length - 1 ? Border(bottom: BorderSide(color: kBorder.withOpacity(0.4))) : null,
+                        border: entry.key < (r['lagnaWindows'] as List<LagnaWindow>).where((w) => w.isShubha).length - 1 ? Border(bottom: BorderSide(color: kBorder.withOpacity(0.4))) : null,
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Row(children: [
