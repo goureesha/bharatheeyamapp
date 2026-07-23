@@ -1302,8 +1302,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               ),
             ),
 
-          // ── Lagna Windows with Shuddhi Chips ──
-          if (r['lagnaWindows'] != null && (r['lagnaWindows'] as List).isNotEmpty)
+          // ── Lagna Windows (only shuddhi-passed) ──
+          if (r['lagnaWindows'] != null && (r['lagnaWindows'] as List<LagnaWindow>).any((w) => w.isShubha))
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
               child: Container(
@@ -1321,45 +1321,23 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     ),
                     child: Text('🏠 ${AppLocale.l('dayLagnaLabel')}', style: TextStyle(fontWeight: FontWeight.w800, color: const Color(0xFF2E86AB), fontSize: 13)),
                   ),
-                  ...(r['lagnaWindows'] as List<LagnaWindow>).asMap().entries.map((entry) {
+                  ...(r['lagnaWindows'] as List<LagnaWindow>).where((w) => w.isShubha).toList().asMap().entries.map((entry) {
                     final lw = entry.value;
-                    Color rowBg;
-                    IconData rowIcon;
-                    Color iconColor;
-                    if (lw.isPerfect) {
-                      rowBg = Colors.green.withOpacity(0.1);
-                      rowIcon = Icons.star;
-                      iconColor = Colors.amber.shade700;
-                    } else if (lw.isShubha) {
-                      rowBg = Colors.green.withOpacity(0.05);
-                      rowIcon = Icons.check_circle;
-                      iconColor = Colors.green;
-                    } else if (lw.isAllowed) {
-                      rowBg = Colors.orange.withOpacity(0.05);
-                      rowIcon = Icons.warning_amber_rounded;
-                      iconColor = Colors.orange;
-                    } else {
-                      rowBg = Colors.red.withOpacity(0.03);
-                      rowIcon = Icons.remove_circle_outline;
-                      iconColor = Colors.red.shade300;
-                    }
+                    final rowBg = lw.isPerfect ? Colors.green.withOpacity(0.1) : Colors.green.withOpacity(0.05);
+                    final rowIcon = lw.isPerfect ? Icons.star : Icons.check_circle;
+                    final iconColor = lw.isPerfect ? Colors.amber.shade700 : Colors.green;
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
                         color: rowBg,
-                        border: entry.key < (r['lagnaWindows'] as List).length - 1 ? Border(bottom: BorderSide(color: kBorder.withOpacity(0.4))) : null,
+                        border: entry.key < (r['lagnaWindows'] as List<LagnaWindow>).where((w) => w.isShubha).length - 1 ? Border(bottom: BorderSide(color: kBorder.withOpacity(0.4))) : null,
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Row(children: [
                           Icon(rowIcon, color: iconColor, size: 14),
                           const SizedBox(width: 6),
-                          Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(
-                            fontWeight: lw.isShubha ? FontWeight.w800 : FontWeight.w500,
-                            color: lw.isShubha ? kText : kMuted, fontSize: 12,
-                          ))),
-                          Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(
-                            fontSize: 11, color: lw.isShubha ? Colors.green.shade700 : kMuted, fontWeight: FontWeight.w600,
-                          )),
+                          Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(fontWeight: FontWeight.w800, color: kText, fontSize: 12))),
+                          Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(fontSize: 11, color: Colors.green.shade700, fontWeight: FontWeight.w600)),
                         ]),
                         const SizedBox(height: 3),
                         Wrap(spacing: 4, runSpacing: 3, children: [
