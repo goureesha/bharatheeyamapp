@@ -961,6 +961,40 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           final rahuKala = _rahuKalaTime(date, pan.sunrise, pan.sunset);
           final vishaGhati = pan.vishaPraghati;
 
+          // Compute shubha muhurta timings (15 day muhurtas)
+          final srMins = _parseTimeToMins(pan.sunrise).toDouble();
+          final ssMins = _parseTimeToMins(pan.sunset).toDouble();
+          final muhDuration = (ssMins - srMins) / 15.0;
+          final shubhaMuhurtas = <Map<String, String>>[];
+          const muhNames = [
+            {'kn': 'ರುದ್ರ', 'en': 'Rudra', 'n': 'A'},
+            {'kn': 'ಅಹಿ', 'en': 'Ahi', 'n': 'A'},
+            {'kn': 'ಮಿತ್ರ', 'en': 'Mitra', 'n': 'S'},
+            {'kn': 'ಪಿತೃ', 'en': 'Pitru', 'n': 'A'},
+            {'kn': 'ವಸು', 'en': 'Vasu', 'n': 'S'},
+            {'kn': 'ವರಾಹ', 'en': 'Varaha', 'n': 'S'},
+            {'kn': 'ವಿಶ್ವೇದೇವ', 'en': 'Vishwedeva', 'n': 'S'},
+            {'kn': 'ವಿಧಿ', 'en': 'Vidhi', 'n': 'M'},
+            {'kn': 'ಸತ್ಮುಖಿ', 'en': 'Satmukhi', 'n': 'S'},
+            {'kn': 'ಪುರುಹೂತ', 'en': 'Puruhuta', 'n': 'A'},
+            {'kn': 'ವಾಹಿನಿ', 'en': 'Vahini', 'n': 'A'},
+            {'kn': 'ನಕ್ತನಕರ', 'en': 'Naktanakara', 'n': 'M'},
+            {'kn': 'ವರುಣ', 'en': 'Varuna', 'n': 'S'},
+            {'kn': 'ಅರ್ಯಮ', 'en': 'Aryama', 'n': 'S'},
+            {'kn': 'ಭಗ', 'en': 'Bhaga', 'n': 'A'},
+          ];
+          for (int mi = 0; mi < 15; mi++) {
+            if (muhNames[mi]['n'] == 'S') {
+              final s = srMins + mi * muhDuration;
+              final e = s + muhDuration;
+              shubhaMuhurtas.add({
+                'name': trAll(muhNames[mi]['kn']!),
+                'en': muhNames[mi]['en']!,
+                'time': '${_minsToTime(s.round())} - ${_minsToTime(e.round())}',
+              });
+            }
+          }
+
           results.add({
             'date': date,
             'vara': pan.vara,
@@ -977,11 +1011,14 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'verdict': mResult.verdict,
             'taraBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null,
             'guruBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null,
+            'chandraBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].chandraBala : null,
             'rahuKala': rahuKala,
             'vishaGhati': vishaGhati,
             'doshas': mResult.doshas,
             'doshaBhangas': mResult.doshaBhangas,
             'checks': mResult.checks,
+            'shubhaMuhurtas': shubhaMuhurtas,
+            'lagnaWindows': mResult.lagnaWindows,
           });
         }
       } catch (_) {}
@@ -1164,14 +1201,15 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                 _detailRow(AppLocale.l('sunrise'), r['sunrise']),
                 _detailRow(AppLocale.l('sunset'), r['sunset']),
 
-                // Tara & Guru Bala
+                // Tara & Guru & Chandra Bala
                 if (r['taraBala'] != null) ...[
                   const SizedBox(height: 6),
-                  Row(children: [
+                  Wrap(spacing: 6, runSpacing: 4, children: [
                     _balaBadge('ತಾರಾ', (r['taraBala'] as TaraResult).taraName, (r['taraBala'] as TaraResult).isGood),
-                    const SizedBox(width: 8),
                     if (r['guruBala'] != null)
                       _balaBadge('ಗುರು', (r['guruBala'] as BalaScore).label, (r['guruBala'] as BalaScore).score > 0),
+                    if (r['chandraBala'] != null)
+                      _balaBadge('ಚಂದ್ರ', (r['chandraBala'] as bool) ? 'ಶುಭ' : 'ಅಶುಭ', r['chandraBala'] as bool),
                   ]),
                 ],
 
@@ -1194,6 +1232,66 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                           Text('${AppLocale.l('rahuKala')}: ${r['rahuKala']}', style: TextStyle(fontSize: 12, color: kText)),
                         if ((r['vishaGhati'] as String).isNotEmpty)
                           Text('${AppLocale.l('vishaGhati')}: ${r['vishaGhati']}', style: TextStyle(fontSize: 12, color: kText)),
+                      ],
+                    ),
+                  ),
+                ],
+
+                // Shubha Muhurta Timings
+                if (r['shubhaMuhurtas'] != null && (r['shubhaMuhurtas'] as List).isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.04),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.green.withOpacity(0.2)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('🕐 ಶುಭ ಮುಹೂರ್ತ:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.green.shade700)),
+                        const SizedBox(height: 4),
+                        ...(r['shubhaMuhurtas'] as List<Map<String, String>>).map((m) =>
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 2),
+                            child: Row(children: [
+                              Text('● ', style: TextStyle(fontSize: 10, color: Colors.green.shade600)),
+                              Expanded(child: Text('${m['name']} (${m['en']})', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kText))),
+                              Text(m['time']!, style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                            ]),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                // Lagna Windows (show only shuddhi-passed lagnas)
+                if (r['lagnaWindows'] != null && (r['lagnaWindows'] as List).isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: kPurple1.withOpacity(0.04),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: kPurple1.withOpacity(0.2)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('🏠 ಲಗ್ನ ಕಾಲ:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: kPurple1)),
+                        const SizedBox(height: 4),
+                        ...(r['lagnaWindows'] as List<LagnaWindow>).where((w) => w.isAllowed && w.lagnaShuddhi).map((w) =>
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 2),
+                            child: Row(children: [
+                              Text('✓ ', style: TextStyle(fontSize: 10, color: Colors.green.shade600)),
+                              Expanded(child: Text(trAll(w.rashiName), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kText))),
+                              Text('${w.startTime} - ${w.endTime}', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                            ]),
+                          ),
+                        ),
                       ],
                     ),
                   ),
