@@ -137,7 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themes = [AppLocale.l('themeLight'), AppLocale.l('themeDark'), AppLocale.l('themeGold'), AppLocale.l('themeOcean'), AppLocale.l('themeGreen')];
+    final themes = [AppLocale.l('themeLight'), AppLocale.l('themeDark'), AppLocale.l('themeGold'), AppLocale.l('themeOcean'), AppLocale.l('themeGreen'), AppLocale.l('themeTanjore')];
 
     return Scaffold(
       backgroundColor: kBg,

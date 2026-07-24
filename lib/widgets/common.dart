@@ -53,6 +53,15 @@ class AppThemes {
       'text': Color(0xFF064E3B),
       'border': Color(0xFFBBF7D0),
       'muted': Color(0xFF166534),
+    },
+    { // Tanjore Gold (Royal Dark)
+      'purple1': Color(0xFFC9A84C), // Antique gold
+      'purple2': Color(0xFFA8882F), // Dark gold
+      'bg': Color(0xFF1A0A0E),      // Deep maroon
+      'card': Color(0xFF2A1118),     // Dark burgundy
+      'text': Color(0xFFF5E6C8),     // Ivory cream
+      'border': Color(0xFF5C3D2E),   // Warm brown border
+      'muted': Color(0xFF9B8E6E),    // Faded gold
     }
   ];
 
@@ -253,7 +262,7 @@ class AppLocale {
       'referenceShloka': 'ಆಧಾರ ಶ್ಲೋಕ:', 'rule': 'ನಿಯಮ:', 'source': 'ಆಕರ: ',
       'themeSettings': 'ಥೀಮ್ ಸೆಟ್ಟಿಂಗ್ಸ್', 'defaultLocation': 'ಡೀಫಾಲ್ಟ್ ಸ್ಥಳ',
       'locationHint': 'ಪಂಚಾಂಗ ಮತ್ತು ವೈದಿಕ ಗಡಿಯಾರ ಲೆಕ್ಕಾಚಾರಕ್ಕೆ ಬಳಸಲಾಗುತ್ತದೆ',
-      'themeLight': 'ಸ್ಟ್ಯಾಂಡರ್ಡ್ ಲೈಟ್', 'themeDark': 'ಡಾರ್ಕ್ ಮೋಡ್', 'themeGold': 'ಸ್ವರ್ಣ', 'themeOcean': 'ಸಾಗರ', 'themeGreen': 'ಹಸಿರು',
+      'themeLight': 'ಸ್ಟ್ಯಾಂಡರ್ಡ್ ಲೈಟ್', 'themeDark': 'ಡಾರ್ಕ್ ಮೋಡ್', 'themeGold': 'ಸ್ವರ್ಣ', 'themeOcean': 'ಸಾಗರ', 'themeGreen': 'ಹಸಿರು', 'themeTanjore': '🏛️ ತಂಜಾವೂರ್ ಚಿನ್ನ',
       'chartStyle': 'ಕುಂಡಲಿ ಶೈಲಿ', 'southIndian': 'ದಕ್ಷಿಣ ಭಾರತ', 'northIndian': 'ಉತ್ತರ ಭಾರತ',
       'southDesc': '4×4 ಗ್ರಿಡ್ - ರಾಶಿ ಸ್ಥಿರ, ಗ್ರಹಗಳು ಚಲಿಸುವವು', 'northDesc': 'ವಜ್ರ (Diamond) - ಭಾವ ಸ್ಥಿರ, ರಾಶಿಗಳು ಚಲಿಸುವವು',
       'samshakaTitle': 'ಸಂಶಕ ಕುಂಡಲಿ', 'samshakaLabel': 'ನವಾಂಶ ಸಂಖ್ಯೆ ತೋರಿಸಿ', 'samshakaDesc': 'ಡಿಗ್ರಿ ಬದಲು ನವಾಂಶ ರಾಶಿ ಸಂಖ್ಯೆ (1-12) ತೋರಿಸುತ್ತದೆ. ಉದಾ: ರವಿ 5 (ಸಿಂಹ)',
@@ -749,7 +758,7 @@ class AppLocale {
       'referenceShloka': 'आधार श्लोक:', 'rule': 'नियम:', 'source': 'स्रोत: ',
       'themeSettings': 'थीम सेटिंग्स', 'defaultLocation': 'डिफॉल्ट स्थान',
       'locationHint': 'पंचांग और वैदिक घड़ी गणना के लिए उपयोग',
-      'themeLight': 'स्टैंडर्ड लाइट', 'themeDark': 'डार्क मोड', 'themeGold': 'स्वर्ण', 'themeOcean': 'सागर', 'themeGreen': 'हरा',
+      'themeLight': 'स्टैंडर्ड लाइट', 'themeDark': 'डार्क मोड', 'themeGold': 'स्वर्ण', 'themeOcean': 'सागर', 'themeGreen': 'हरा', 'themeTanjore': '🏛️ तंजावूर स्वर्ण',
       'chartStyle': 'कुंडली शैली', 'southIndian': 'दक्षिण भारत', 'northIndian': 'उत्तर भारत',
       'southDesc': '4×4 ग्रिड - राशि स्थिर, ग्रह चलते हैं', 'northDesc': 'हीरा (Diamond) - भाव स्थिर, राशियाँ चलती हैं',
       'samshakaTitle': 'संशक कुंडली', 'samshakaLabel': 'नवांश संख्या दिखाएं', 'samshakaDesc': 'डिग्री के बदले नवांश राशि संख्या (1-12) दिखाता है. उदा: रवि 5 (सिंह)',
@@ -1273,7 +1282,7 @@ class AppLocale {
       'referenceShloka': 'ஆதார ஸ்லோகம்:', 'rule': 'விதி:', 'source': 'மூலம்: ',
       'themeSettings': 'தீம் அமைப்புகள்', 'defaultLocation': 'இயல்பு இடம்',
       'locationHint': 'பஞ்சாங்கம் மற்றும் வைதிக கடிகாரத்திற்கு பயன்படுத்தப்படும்',
-      'themeLight': 'ஸ்டாண்டர்ட் லைட்', 'themeDark': 'டார்க் மோட்', 'themeGold': 'ஸ்வர்ண', 'themeOcean': 'சாகர', 'themeGreen': 'பச்சை',
+      'themeLight': 'ஸ்டாண்டர்ட் லைட்', 'themeDark': 'டார்க் மோட்', 'themeGold': 'ஸ்வர்ண', 'themeOcean': 'சாகர', 'themeGreen': 'பச்சை', 'themeTanjore': '🏛️ தஞ்சாவூர் தங்கம்',
       'chartStyle': 'ஜாதக பாணி', 'southIndian': 'தென் இந்திய', 'northIndian': 'வட இந்திய',
       'southDesc': '4×4 கட்டம் - ராசி நிலையான, கிரகங்கள் நகரும்', 'northDesc': 'வைரம் - பாவம் நிலையான, ராசிகள் நகரும்',
       'samshakaTitle': 'சம்சக ஜாதகம்', 'samshakaLabel': 'நவாம்ச எண் காட்டு', 'samshakaDesc': 'டிகிரிக்கு பதிலாக நவாம்ச ராசி எண் (1-12) காட்டும். உதா: ரவி 5 (சிம்மம்)',
@@ -1793,7 +1802,7 @@ class AppLocale {
       'referenceShloka': 'ఆధార శ్లోకం:', 'rule': 'నియమం:', 'source': 'మూలం: ',
       'themeSettings': 'థీమ్ సెట్టింగ్స్', 'defaultLocation': 'డీఫాల్ట్ ప్రదేశం',
       'locationHint': 'పంచాంగ మరియు వైదిక గడియారం లెక్కకు వాడతారు',
-      'themeLight': 'స్టాండర్డ్ లైట్', 'themeDark': 'డార్క్ మోడ్', 'themeGold': 'స్వర్ణ', 'themeOcean': 'సాగర', 'themeGreen': 'ఆకుపచ్చ',
+      'themeLight': 'స్టాండర్డ్ లైట్', 'themeDark': 'డార్క్ మోడ్', 'themeGold': 'స్వర్ణ', 'themeOcean': 'సాగర', 'themeGreen': 'ఆకుపచ్చ', 'themeTanjore': '🏛️ తంజావూర్ బంగారం',
       'chartStyle': 'కుండలి శైలి', 'southIndian': 'దక్షిణ భారతం', 'northIndian': 'ఉత్తర భారతం',
       'southDesc': '4×4 గ్రిడ్ - రాశి స్థిరం, గ్రహాలు కదులుతాయి', 'northDesc': 'వజ్రం (Diamond) - భావం స్థిరం, రాశులు కదులుతాయి',
       'samshakaTitle': 'సంశక కుండలి', 'samshakaLabel': 'నవాంశ సంఖ్య చూపండి', 'samshakaDesc': 'డిగ్రీ బదులు నవాంశ రాశి సంఖ్య (1-12) చూపిస్తుంది. ఉదా: రవి 5 (సింహం)',
@@ -2313,7 +2322,7 @@ class AppLocale {
       'referenceShloka': 'ആധാര ശ്ലോകം:', 'rule': 'നിയമം:', 'source': 'മൂലം: ',
       'themeSettings': 'തീം സെറ്റിങ്ങ്സ്', 'defaultLocation': 'ഇയൽപ്പു സ്ഥലം',
       'locationHint': 'പഞ്ചാംഗ മറ്റും വൈദിക ഘടികാരത്തിനു ഉപയോഗിക്കുന്നു',
-      'themeLight': 'സ്റ്റാൻഡേർഡ് ലൈറ്റ്', 'themeDark': 'ഡാർക്ക് മോഡ്', 'themeGold': 'സ്വർണ', 'themeOcean': 'സാഗർ', 'themeGreen': 'പച്ച',
+      'themeLight': 'സ്റ്റാൻഡേർഡ് ലൈറ്റ്', 'themeDark': 'ഡാർക്ക് മോഡ്', 'themeGold': 'സ്വർണ', 'themeOcean': 'സാഗർ', 'themeGreen': 'പച്ച', 'themeTanjore': '🏛️ തഞ്ചാവൂർ സ്വർണം',
       'chartStyle': 'ജാതക ശൈലി', 'southIndian': 'ദക്ഷിണ ഭാരതം', 'northIndian': 'ഉത്തര ഭാരതം',
       'southDesc': '4×4 ഗ്രിഡ് - രാശി സ്ഥിരം, ഗ്രഹങ്ങൾ ചലിക്കുന്നു', 'northDesc': 'വജ്രം (Diamond) - ഭാവം സ്ഥിരം, രാശികൾ ചലിക്കുന്നു',
       'samshakaTitle': 'സംശക ജാതകം', 'samshakaLabel': 'നവാംശ നമ്പർ കാണിക്കുക', 'samshakaDesc': 'ഡിഗ്രിക്കു പകരം നവാംശ രാശി നമ്പർ (1-12) കാണിക്കും. ഉദാ: രവി 5 (ചിംഹം)',
