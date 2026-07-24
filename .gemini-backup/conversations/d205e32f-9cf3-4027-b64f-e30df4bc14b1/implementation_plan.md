@@ -1,36 +1,52 @@
-# Quick Koota Match Tab in Matchmaking Screen
+# Ready Muhoorta — Pre-computed Event Muhurtas
 
-Add a new tab to the matchmaking screen that lets users quickly check koota compatibility by selecting rashi + nakshatra (without needing full birth details).
+## Concept
+Pre-calculate ALL event muhurtas (panchanga + lagna + guru anukoola + guru asta) once and store them.  
+When user enters rashi + nakshatra → just filter by **tara bala + chandra bala + guru bala (from janma rashi)** = instant results.
 
-## Proposed Changes
+## What's Pre-computed (same for everyone)
+- ✅ Tithi allowed
+- ✅ Nakshatra allowed  
+- ✅ Vara allowed
+- ✅ Vishti (Bhadra) check
+- ✅ Shukla Paksha check
+- ✅ Lagna windows with shuddhi (malefics in lagna/ashtama/saptama/dashama)
+- ✅ Guru anukoola from lagna
+- ✅ Guru asta / Shukra asta
 
-### [MODIFY] [match_making_tab.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/match_making_tab.dart)
+## What's Filtered Per-User (fast)
+- 🔍 Tara bala (from user's janma nakshatra)
+- 🔍 Chandra bala (from user's janma rashi)
+- 🔍 Guru bala (from user's janma rashi)
 
-Add a tab bar with 2 tabs:
-- **Tab 1** (existing): Full kundali-based matchmaking with birth details
-- **Tab 2** (new): Quick Koota Match — select bride/groom rashi + nakshatra only
+## Implementation
 
-#### Tab 2 UI:
-1. **Bride Section**: Rashi dropdown + Nakshatra dropdown (filtered by rashi using `_naksForRashi`)
-2. **Groom Section**: Same
-3. **Calculate Button**
-4. **Results**:
-   - Ashta Koota table (reuse `_buildAshtaKootaTable`)
-   - Dvadasha Koota table (reuse `_buildDvadashaKootaTable`)
-   - **Guru Bala Section**: 
-     - Current guru bala status for both bride & groom
-     - Jupiter transit timeline showing:
-       - If guru bala present: "ಗುರು ಬಲ ಇದೆ — [current rashi] — [end date] ವರೆಗೆ"
-       - If guru bala absent: "ಗುರು ಬಲ ಇಲ್ಲ — [start date] ರಿಂದ [end date] ವರೆಗೆ ಬರುತ್ತದೆ"
-       - Show next 3-4 guru bala windows with dates
+### [MODIFY] [taranukoola_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/taranukoola_screen.dart)
 
-### Jupiter Transit Calculation:
-- Use `Ephemeris.calcAll()` to find Jupiter's sidereal longitude at monthly intervals
-- Detect rashi transitions (when Jupiter crosses 30° boundaries)
-- For each rashi, check `calculateGuruBala()` to determine if guru bala is present
-- Scan next ~12 years (one full Jupiter cycle) to find all bala windows
+1. **Add Tab 3**: "⚡ ರೆಡಿ ಮುಹೂರ್ತ" (Ready Muhoorta)
+2. **Pre-compute on tab open**: Scan next 12 months for ALL events, store valid days with lagna windows
+3. **User input**: Just rashi + nakshatra + event dropdown
+4. **Filter**: Apply tara/chandra/guru bala → instant display
 
-## Verification Plan
-- Build the app and test with different rashi/nakshatra combinations
-- Verify koota points match existing full matchmaking results
-- Verify guru bala transit dates are reasonable (~1 year per rashi)
+### Data Structure
+```dart
+// Pre-computed per event
+Map<MuhurtaEvent, List<PrecomputedDay>> _precomputedDays;
+
+class PrecomputedDay {
+  DateTime date;
+  PanchangData panchang;
+  List<LagnaWindow> lagnaWindows; // already filtered by isPerfect
+  List<MuhurtaCheckItem> checks;
+  int score;
+}
+```
+
+### Flow
+1. When tab opens → background compute for selected event (show progress)
+2. User picks rashi + nakshatra → instant filter
+3. Results show same cards as current muhurta finder
+
+## Verification
+- Compare results with existing muhurta finder for same inputs
+- Verify speed improvement

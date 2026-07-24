@@ -10,8 +10,8 @@
 - [x] Chunk and translate Chapters 15 & 16
 - [x] Chunk and translate Chapters 17 & 18
 - [x] Chunk and translate Chapters 19 & 20
-- [ ] Chunk and translate Chapters 21 & 22
-- [ ] Chunk and translate Chapters 23 & 24
+- [x] Chunk and translate Chapters 21 & 22
+- [x] Chunk and translate Chapters 23 & 24
 - [ ] Chunk and translate Chapters 25 & 26
 - [ ] Chunk and translate Chapters 27 & 28
 - [ ] Chunk and translate Chapters 29 & 30

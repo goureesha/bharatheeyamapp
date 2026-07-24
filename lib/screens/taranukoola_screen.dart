@@ -41,6 +41,17 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   bool _mfSearching = false;
   List<Map<String, dynamic>> _mfResults = [];
 
+  // ── Ready Muhurta state (Tab 3) ──
+  MuhurtaEvent _rmEvent = MuhurtaEvent.vivaha;
+  int _rmRashiIdx = 0;
+  int _rmNakIdx = 0;
+  bool _rmPrecomputing = false;
+  bool _rmFiltering = false;
+  int _rmProgress = 0;
+  int _rmTotal = 0;
+  List<Map<String, dynamic>> _rmPrecomputed = []; // pre-computed valid days
+  List<Map<String, dynamic>> _rmResults = []; // filtered results for display
+
   /// Returns nakshatra indices belonging to a rashi (each rashi spans ~2.25 nakshatras)
   List<int> _naksForRashi(int rashiIdx) {
     final start = (rashiIdx * 9) ~/ 4;        // floor(rashiIdx * 2.25)
@@ -55,7 +66,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 2, vsync: this);
+    _tabCtrl = TabController(length: 3, vsync: this);
     _selectedDay = _focusedDay;
     _loadNakshatra();
     _calculatePanchangForSelectedDay();
@@ -350,6 +361,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           tabs: [
             Tab(text: AppLocale.l('taranukoola')),
             Tab(text: AppLocale.l('muhurtaShodhane')),
+            Tab(text: '⚡ ರೆಡಿ ಮುಹೂರ್ತ'),
           ],
         ),
       ),
@@ -360,6 +372,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           _buildTaranukoolaTab(),
           // ════ TAB 2: Muhurta Finder ════
           _buildMuhurtaFinderTab(),
+          // ════ TAB 3: Ready Muhurta ════
+          _buildReadyMuhurtaTab(),
         ],
       ),
     );
@@ -2194,6 +2208,345 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       child: Text(text, style: TextStyle(fontSize: 10, color: color.shade700, fontWeight: FontWeight.w700), softWrap: true),
     );
   }
+
+  Widget _buildReadyMuhurtaTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: ResponsiveCenter(child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('⚡ ರೆಡಿ ಮುಹೂರ್ತ (Ready Muhurta)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPurple1)),
+          const SizedBox(height: 16),
+          
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(AppLocale.l('selectEvent'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kText)),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(8), color: kCard),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<MuhurtaEvent>(
+                      isExpanded: true,
+                      value: _rmEvent,
+                      dropdownColor: kCard,
+                      items: MuhurtaEvent.values.map((e) {
+                        final info = muhurtaEventNames[e]!;
+                        return DropdownMenuItem(
+                          value: e,
+                          child: Text('${AppLocale.l(info.localeKey)} — ${info.englishName}', style: TextStyle(fontSize: 15, color: kText, fontWeight: FontWeight.w600)),
+                        );
+                      }).toList(),
+                      onChanged: (e) { 
+                        if (e != null) {
+                          setState(() { 
+                            _rmEvent = e; 
+                            _rmPrecomputed = [];
+                            _rmResults = [];
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                ElevatedButton.icon(
+                  onPressed: _rmPrecomputing ? null : _precomputeForEvent,
+                  icon: _rmPrecomputing ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Icon(Icons.flash_on),
+                  label: Text(_rmPrecomputing ? 'Scanning $_rmProgress/365 days...' : 'Pre-compute 1 Year', style: TextStyle(fontWeight: FontWeight.w800)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kOrange, foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          if (_rmPrecomputed.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(children: [
+                    Icon(Icons.check_circle, color: Colors.green, size: 18),
+                    const SizedBox(width: 8),
+                    Text('✅ ${_rmPrecomputed.length} valid days found!', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.green.shade700)),
+                  ]),
+                  const SizedBox(height: 16),
+                  
+                  Row(
+                    children: [
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(AppLocale.l('janmaRashiLabel'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kText)),
+                        const SizedBox(height: 8),
+                        Container(
+                          decoration: BoxDecoration(border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(8), color: kCard),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int>(
+                              isExpanded: true,
+                              value: _rmRashiIdx,
+                              dropdownColor: kCard,
+                              items: List.generate(12, (i) => DropdownMenuItem(value: i, child: Text(trAll(knRashi[i]), style: TextStyle(fontSize: 14, color: kText)))),
+                              onChanged: (val) {
+                                if (val != null) {
+                                  setState(() {
+                                    _rmRashiIdx = val;
+                                    final naks = _naksForRashi(val);
+                                    if (!naks.contains(_rmNakIdx)) _rmNakIdx = naks.first;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ])),
+                      const SizedBox(width: 12),
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(AppLocale.l('janmaNakLabel'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kText)),
+                        const SizedBox(height: 8),
+                        Container(
+                          decoration: BoxDecoration(border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(8), color: kCard),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int>(
+                              isExpanded: true,
+                              value: _rmNakIdx,
+                              dropdownColor: kCard,
+                              items: _naksForRashi(_rmRashiIdx).map((i) => DropdownMenuItem(value: i, child: Text(trAll(knNak[i]), style: TextStyle(fontSize: 14, color: kText)))).toList(),
+                              onChanged: (val) {
+                                if (val != null) setState(() => _rmNakIdx = val);
+                              },
+                            ),
+                          ),
+                        ),
+                      ])),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  ElevatedButton.icon(
+                    onPressed: _rmFiltering ? null : _filterByUser,
+                    icon: _rmFiltering ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Icon(Icons.filter_alt),
+                    label: Text(_rmFiltering ? 'Filtering...' : 'Filter (Instant)', style: TextStyle(fontWeight: FontWeight.w800)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kTeal, foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          
+          if (_rmResults.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Text('${_rmResults.length} ${AppLocale.l('result')}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
+            const SizedBox(height: 8),
+            ..._rmResults.map((r) => _buildMuhurtaResultCard(r)),
+          ] else if (_rmPrecomputed.isNotEmpty && !_rmFiltering && !_rmPrecomputing) ...[
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Center(child: Text('No muhurtas found for this Rashi/Nakshatra combination.', style: TextStyle(color: kMuted))),
+            ),
+          ],
+          
+          const SizedBox(height: 32),
+        ],
+      ))),
+    );
+  }
+
+  Future<void> _precomputeForEvent() async {
+    setState(() {
+      _rmPrecomputing = true;
+      _rmProgress = 0;
+      _rmTotal = 365;
+      _rmPrecomputed = [];
+      _rmResults = [];
+    });
+
+    final startDate = DateTime.now();
+    final precomputed = <Map<String, dynamic>>[];
+
+    await Ephemeris.initSweph();
+
+    for (int i = 0; i < 365; i++) {
+      final date = startDate.add(Duration(days: i));
+      
+      // Let UI update
+      if (i % 5 == 0) {
+        setState(() => _rmProgress = i);
+        await Future.delayed(Duration.zero);
+      }
+
+      try {
+        final srSs = Ephemeris.findSunriseSetForDate(
+          date.year, date.month, date.day,
+          LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
+        );
+        final srJd = srSs[0];
+        final srLocalFrac = ((srJd + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
+        final hour24 = (srLocalFrac * 24.0) + (1.0 / 60.0);
+
+        final kr = await AstroCalculator.calculate(
+          year: date.year, month: date.month, day: date.day,
+          hourUtcOffset: LocationService.tzOffset,
+          hour24: hour24,
+          lat: LocationService.lat, lon: LocationService.lon,
+          ayanamsaMode: 'lahiri', trueNode: true,
+        );
+        if (kr == null) continue;
+        final pan = kr.panchang;
+
+        final varaIdx = knVara.indexOf(pan.vara);
+        final yogaIdx = knYoga.indexOf(pan.yoga);
+        final moonRashiIdx = knRashi.indexOf(pan.chandraRashi);
+
+        final jupDeg = kr.planets['ಗುರು']?.longitude ?? 0;
+        final jupRashi = (jupDeg / 30).floor() % 12;
+        final sunDeg = kr.planets['ರವಿ']?.longitude ?? 0;
+        final sunRashi = (sunDeg / 30).floor() % 12;
+
+        final mResult = evaluateMuhurta(
+          event: _rmEvent,
+          tithiIndex: pan.tithiIndex,
+          tithiName: pan.tithi,
+          nakshatraIndex: pan.nakshatraIndex,
+          nakshatraName: pan.nakshatra,
+          varaIndex: varaIdx,
+          varaName: pan.vara,
+          yogaIndex: yogaIdx,
+          yogaName: pan.yoga,
+          karanaName: pan.karana,
+          moonRashiIndex: moonRashiIdx,
+          jupiterRashiIndex: jupRashi,
+          sunRashiIndex: sunRashi,
+          janmaNakIdx1: 0, janmaRashiIdx1: 0,
+        );
+
+        // Check all panchanga checks passed
+        if (!mResult.checks.every((c) => c.passed)) continue;
+
+        // Check guru and shukra asta
+        final guruCombust = kr.planets['ಗುರು']?.isCombust ?? false;
+        if (guruCombust) continue;
+
+        if (_rmEvent == MuhurtaEvent.vivaha) {
+          final shukraCombust = kr.planets['ಶುಕ್ರ']?.isCombust ?? false;
+          if (shukraCombust) continue;
+        }
+
+        final rules = muhurtaRules[_rmEvent];
+        final allowedLagnas = rules?.allowedLagnas;
+        final Map<String, int> basePlanetRashis = {};
+        for (final entry in kr.planets.entries) {
+          if (entry.key == 'ಮಾಂದಿ') continue;
+          basePlanetRashis[entry.key] = entry.value.rashiIndex;
+        }
+        final guruRashiIdx2 = basePlanetRashis['ಗುರು'] ?? -1;
+
+        List<LagnaWindow> dayLagnaWindows = [];
+        try {
+          final double ssJd2 = srSs[1];
+          Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+          final ayn = Sweph.swe_get_ayanamsa(srJd);
+
+          final mandiSrSs = Ephemeris.findSunriseSetForDate(
+            date.year, date.month, date.day,
+            LocationService.lat, LocationService.lon,
+          );
+          final double mandiSr = mandiSrSs[0];
+          final double mandiSs = mandiSrSs[1];
+
+          final vedWday = ((date.weekday - 1) + 1) % 7; 
+          final dayDuration = mandiSs - mandiSr;
+          const dayFactors = [26, 22, 18, 14, 10, 6, 2];
+          final dayMandiJd = mandiSr + (dayDuration * dayFactors[vedWday] / 30.0);
+          final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
+          if (dayMandiRashi >= 0) basePlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
+
+          dayLagnaWindows = _scanLagnaRange(srJd, ssJd2, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
+        } catch (_) {}
+
+        if (dayLagnaWindows.isEmpty || !dayLagnaWindows.any((w) => w.isPerfect)) continue;
+
+        precomputed.add({
+          'date': date,
+          'vara': pan.vara,
+          'tithi': pan.tithi,
+          'tithiEnd': pan.tithiEndTime,
+          'nakshatra': pan.nakshatra,
+          'nakEnd': pan.nakEndTime,
+          'pada': () { final mp = kr.planets['ಚಂದ್ರ']?.pada; return mp ?? ((pan.nakPercent * 4).floor() + 1); }(),
+          'yoga': pan.yoga,
+          'karana': pan.karana,
+          'sunrise': pan.sunrise,
+          'sunset': pan.sunset,
+          'score': mResult.score,
+          'verdict': mResult.verdict,
+          'taraBala': null,
+          'guruBala': null,
+          'chandraBala': null,
+          'jupRashi': jupRashi,
+          'moonRashiIdx': moonRashiIdx,
+          'rahuKala': _rahuKalaTime(date, pan.sunrise, pan.sunset),
+          'vishaGhati': pan.vishaPraghati,
+          'doshas': mResult.doshas,
+          'doshaBhangas': mResult.doshaBhangas,
+          'checks': mResult.checks,
+          'shubhaMuhurtas': <Map<String, String>>[],
+          'lagnaWindows': dayLagnaWindows,
+        });
+      } catch (_) {}
+    }
+
+    setState(() {
+      _rmPrecomputed = precomputed;
+      _rmPrecomputing = false;
+    });
+    
+    _filterByUser();
+  }
+
+  void _filterByUser() {
+    setState(() => _rmFiltering = true);
+    final filtered = <Map<String, dynamic>>[];
+    for (final day in _rmPrecomputed) {
+      final nakIdx = knNak.indexOf(day['nakshatra']);
+      if (nakIdx == -1) continue;
+
+      final taraBala = calculateTaraBala(_rmNakIdx, nakIdx);
+      if (!taraBala.isGood) continue;
+      
+      final moonRashiIdx = day['moonRashiIdx'] as int;
+      final chandraBala = calculateChandraBala(_rmRashiIdx, moonRashiIdx);
+      
+      final jupRashi = day['jupRashi'] as int;
+      final guruBala = calculateGuruBala(_rmRashiIdx, jupRashi);
+      if (guruBala.score <= 0) continue;
+      
+      filtered.add({
+        ...day,
+        'taraBala': taraBala,
+        'chandraBala': chandraBala,
+        'guruBala': guruBala,
+      });
+    }
+    setState(() {
+      _rmResults = filtered;
+      _rmFiltering = false;
+    });
+  }
+
 }
 
 class _AscSample {
