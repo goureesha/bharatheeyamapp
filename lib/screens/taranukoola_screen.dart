@@ -2506,7 +2506,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           
           const SizedBox(height: 32),
         ],
-      ))),
+      )),
     );
   }
 
