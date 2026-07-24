@@ -135,11 +135,16 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   }
 
   List<int> _naksForRashi(int rashiIdx) {
-    final start = (rashiIdx * 9) ~/ 4;
-    final end = ((rashiIdx + 1) * 9) ~/ 4;
-    final naks = <int>{};
-    for (int i = start; i <= end && i < 27; i++) naks.add(i);
-    return naks.toList();
+    final naks = <int>[];
+    for (int n = 0; n < 27; n++) {
+      for (int p = 0; p < 4; p++) {
+        if ((n * 4 + p) ~/ 9 == rashiIdx) {
+          naks.add(n);
+          break;
+        }
+      }
+    }
+    return naks;
   }
 
   Future<void> _calculate() async {

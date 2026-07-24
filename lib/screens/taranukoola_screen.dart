@@ -49,11 +49,16 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
   /// Returns nakshatra indices belonging to a rashi (each rashi spans ~2.25 nakshatras)
   List<int> _naksForRashi(int rashiIdx) {
-    final start = (rashiIdx * 9) ~/ 4;        // floor(rashiIdx * 2.25)
-    final end = ((rashiIdx + 1) * 9) ~/ 4;    // floor((rashiIdx+1) * 2.25)
-    final naks = <int>{};
-    for (int i = start; i <= end && i < 27; i++) naks.add(i);
-    return naks.toList();
+    final naks = <int>[];
+    for (int n = 0; n < 27; n++) {
+      for (int p = 0; p < 4; p++) {
+        if ((n * 4 + p) ~/ 9 == rashiIdx) {
+          naks.add(n);
+          break;
+        }
+      }
+    }
+    return naks;
   }
 
   List<String> get _taras => List.generate(9, (i) => AppLocale.l('tara$i'));
