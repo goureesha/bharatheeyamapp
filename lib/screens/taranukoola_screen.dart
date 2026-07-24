@@ -18,6 +18,7 @@ class TaranukoolaScreen extends StatefulWidget {
 
 // Static cache: survives screen navigations within the same app session
 Map<MuhurtaEvent, List<Map<String, dynamic>>> _muhurtaCache = {};
+DateTime? _muhurtaCacheDate; // when cache was created
 
 class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTickerProviderStateMixin {
   late TabController _tabCtrl;
@@ -78,6 +79,12 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   }
 
   Future<void> _autoPrecompute() async {
+    // Check if cache expired (150 days old) — clear and recompute
+    if (_muhurtaCacheDate != null && DateTime.now().difference(_muhurtaCacheDate!).inDays >= 150) {
+      _muhurtaCache.clear();
+      _muhurtaCacheDate = null;
+    }
+
     // Check if we already have cached data for all events
     final allEvents = MuhurtaEvent.values;
     final missingEvents = allEvents.where((e) => !_muhurtaCache.containsKey(e)).toList();
@@ -197,6 +204,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               } catch (_) {}
             }
             _muhurtaCache[event] = precomputed;
+            _muhurtaCacheDate ??= DateTime.now();
           }
         },
       ),
@@ -2662,6 +2670,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     });
     // Store in cache for instant access next time
     _muhurtaCache[_rmEvent] = precomputed;
+    _muhurtaCacheDate ??= DateTime.now();
     
     _filterByUser();
   }
