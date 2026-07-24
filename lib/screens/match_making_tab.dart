@@ -60,6 +60,80 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   Map<String, dynamic>? _qResult;
   List<Map<String, dynamic>> _guruTransits = [];
 
+  // ── Namaakshara (Letter-based) tab state ──
+  String _nBrideInput = '';
+  String _nGroomInput = '';
+  int? _nBrideNak;
+  int? _nBridePada;
+  int? _nGroomNak;
+  int? _nGroomPada;
+  Map<String, dynamic>? _nResult;
+  List<Map<String, dynamic>> _nGuruTransits = [];
+
+  // Nakshatra pada syllables (27 nakshatras × 4 padas each)
+  static const List<List<String>> _nakSyllables = [
+    ['ಚು', 'ಚೇ', 'ಚೋ', 'ಲಾ'],       // 0 Ashwini
+    ['ಲೀ', 'ಲೂ', 'ಲೇ', 'ಲೋ'],       // 1 Bharani
+    ['ಅ', 'ಈ', 'ಉ', 'ಏ'],           // 2 Krittika
+    ['ಓ', 'ವಾ', 'ವೀ', 'ವೂ'],       // 3 Rohini
+    ['ವೇ', 'ವೋ', 'ಕಾ', 'ಕೀ'],       // 4 Mrigashira
+    ['ಕೂ', 'ಘ', 'ಙ', 'ಛ'],           // 5 Ardra
+    ['ಕೇ', 'ಕೋ', 'ಹಾ', 'ಹೀ'],       // 6 Punarvasu
+    ['ಹೂ', 'ಹೇ', 'ಹೋ', 'ಡಾ'],       // 7 Pushya
+    ['ಡೀ', 'ಡೂ', 'ಡೇ', 'ಡೋ'],       // 8 Ashlesha
+    ['ಮಾ', 'ಮೀ', 'ಮೂ', 'ಮೇ'],       // 9 Magha
+    ['ಮೋ', 'ಟಾ', 'ಟೀ', 'ಟೂ'],       // 10 Purva Phalguni
+    ['ಟೇ', 'ಟೋ', 'ಪಾ', 'ಪೀ'],       // 11 Uttara Phalguni
+    ['ಪೂ', 'ಷ', 'ಣ', 'ಠ'],           // 12 Hasta
+    ['ಪೇ', 'ಪೋ', 'ರಾ', 'ರೀ'],       // 13 Chitra
+    ['ರೂ', 'ರೇ', 'ರೋ', 'ತಾ'],       // 14 Swati
+    ['ತೀ', 'ತೂ', 'ತೇ', 'ತೋ'],       // 15 Vishakha
+    ['ನಾ', 'ನೀ', 'ನೂ', 'ನೇ'],       // 16 Anuradha
+    ['ನೋ', 'ಯಾ', 'ಯೀ', 'ಯೂ'],       // 17 Jyeshtha
+    ['ಯೇ', 'ಯೋ', 'ಭಾ', 'ಭೀ'],       // 18 Moola
+    ['ಭೂ', 'ಧಾ', 'ಫಾ', 'ಢಾ'],       // 19 Purva Ashadha
+    ['ಭೇ', 'ಭೋ', 'ಜಾ', 'ಜೀ'],       // 20 Uttara Ashadha
+    ['ಖೀ', 'ಖೂ', 'ಖೇ', 'ಖೋ'],       // 21 Shravana
+    ['ಗಾ', 'ಗೀ', 'ಗೂ', 'ಗೇ'],       // 22 Dhanishtha
+    ['ಗೋ', 'ಸಾ', 'ಸೀ', 'ಸೂ'],       // 23 Shatabhisha
+    ['ಸೇ', 'ಸೋ', 'ದಾ', 'ದೀ'],       // 24 Purva Bhadrapada
+    ['ದೂ', 'ಥ', 'ಝ', 'ಞ'],           // 25 Uttara Bhadrapada
+    ['ದೇ', 'ದೋ', 'ಚಾ', 'ಚೀ'],       // 26 Revati
+  ];
+
+  /// Find matching syllables for a given input string
+  List<Map<String, dynamic>> _findMatchingSyllables(String input) {
+    if (input.isEmpty) return [];
+    final results = <Map<String, dynamic>>[];
+    final lower = input.toLowerCase();
+    for (int n = 0; n < 27; n++) {
+      for (int p = 0; p < 4; p++) {
+        final syl = _nakSyllables[n][p];
+        if (syl.startsWith(lower) || lower.startsWith(syl)) {
+          final rashiIdx = (n * 4 + p) ~/ 9;
+          results.add({'nakIdx': n, 'padaIdx': p, 'syllable': syl, 'rashiIdx': rashiIdx});
+        }
+      }
+    }
+    return results;
+  }
+
+  /// Get rashi index from nakshatra + pada
+  int _rashiFromNakPada(int nakIdx, int padaIdx) => (nakIdx * 4 + padaIdx) ~/ 9;
+
+  void _calculateNamaaksharaKoota() {
+    if (_nBrideNak == null || _nGroomNak == null) return;
+    final bRashi = _rashiFromNakPada(_nBrideNak!, _nBridePada ?? 0);
+    final gRashi = _rashiFromNakPada(_nGroomNak!, _nGroomPada ?? 0);
+    final ashta = MatchMakingLogic.calculateCompatibility(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
+    final dvadasha = MatchMakingLogic.calculateDvadashaKoota(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
+    final transits = _computeGuruTransits(bRashi, gRashi);
+    setState(() {
+      _nResult = {'ashtaKoota': ashta, 'dvadashaKoota': dvadasha, 'brideRashi': bRashi, 'groomRashi': gRashi};
+      _nGuruTransits = transits;
+    });
+  }
+
   List<int> _naksForRashi(int rashiIdx) {
     final start = (rashiIdx * 9) ~/ 4;
     final end = ((rashiIdx + 1) * 9) ~/ 4;
@@ -1459,19 +1533,293 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     );
   }
 
+  // ─────────────────────────────────────────────
+  // NAMAAKSHARA (Letter-based) TAB
+  // ─────────────────────────────────────────────
+  Widget _buildNamaaksharaTab() {
+    final brideMatches = _findMatchingSyllables(_nBrideInput);
+    final groomMatches = _findMatchingSyllables(_nGroomInput);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        // ── Bride Letter Input ──
+        AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Icon(Icons.female, color: kOrange, size: 20),
+            const SizedBox(width: 8),
+            Text('ವಧು ನಾಮಾಕ್ಷರ', style: TextStyle(color: kOrange, fontWeight: FontWeight.w900, fontSize: 16)),
+          ]),
+          const SizedBox(height: 12),
+          TextField(
+            decoration: InputDecoration(
+              labelText: 'ಹೆಸರಿನ ಮೊದಲ ಅಕ್ಷರ ಟೈಪ್ ಮಾಡಿ',
+              hintText: 'ಉದಾ: ಚ, ಮ, ಸ ...',
+              prefixIcon: Icon(Icons.text_fields, color: kOrange),
+              isDense: true,
+            ),
+            onChanged: (v) => setState(() { _nBrideInput = v; _nBrideNak = null; _nBridePada = null; _nResult = null; }),
+          ),
+          if (brideMatches.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text('ಅಕ್ಷರ ಆಯ್ಕೆ ಮಾಡಿ:', style: TextStyle(fontSize: 12, color: kMuted, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 6),
+            Wrap(spacing: 8, runSpacing: 8, children: brideMatches.map((m) {
+              final nakIdx = m['nakIdx'] as int;
+              final padaIdx = m['padaIdx'] as int;
+              final syl = m['syllable'] as String;
+              final isSelected = _nBrideNak == nakIdx && _nBridePada == padaIdx;
+              return GestureDetector(
+                onTap: () => setState(() { _nBrideNak = nakIdx; _nBridePada = padaIdx; _nResult = null; }),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected ? kOrange : kCard,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: isSelected ? kOrange : kBorder, width: isSelected ? 2 : 1),
+                  ),
+                  child: Column(children: [
+                    Text(syl, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: isSelected ? Colors.white : kText)),
+                    Text(trAll(knNak[nakIdx]), style: TextStyle(fontSize: 9, color: isSelected ? Colors.white70 : kMuted)),
+                  ]),
+                ),
+              );
+            }).toList()),
+          ],
+          if (_nBrideNak != null) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: kOrange.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+              child: Row(children: [
+                Icon(Icons.check_circle, color: kOrange, size: 16),
+                const SizedBox(width: 8),
+                Text('${trAll(knNak[_nBrideNak!])} — ${trAll(knRashi[_rashiFromNakPada(_nBrideNak!, _nBridePada ?? 0)])}',
+                  style: TextStyle(fontWeight: FontWeight.w800, color: kOrange, fontSize: 13)),
+              ]),
+            ),
+          ],
+        ])),
+        const SizedBox(height: 12),
+
+        // ── Groom Letter Input ──
+        AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Icon(Icons.male, color: kTeal, size: 20),
+            const SizedBox(width: 8),
+            Text('ವರ ನಾಮಾಕ್ಷರ', style: TextStyle(color: kTeal, fontWeight: FontWeight.w900, fontSize: 16)),
+          ]),
+          const SizedBox(height: 12),
+          TextField(
+            decoration: InputDecoration(
+              labelText: 'ಹೆಸರಿನ ಮೊದಲ ಅಕ್ಷರ ಟೈಪ್ ಮಾಡಿ',
+              hintText: 'ಉದಾ: ಕ, ರ, ಗ ...',
+              prefixIcon: Icon(Icons.text_fields, color: kTeal),
+              isDense: true,
+            ),
+            onChanged: (v) => setState(() { _nGroomInput = v; _nGroomNak = null; _nGroomPada = null; _nResult = null; }),
+          ),
+          if (groomMatches.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text('ಅಕ್ಷರ ಆಯ್ಕೆ ಮಾಡಿ:', style: TextStyle(fontSize: 12, color: kMuted, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 6),
+            Wrap(spacing: 8, runSpacing: 8, children: groomMatches.map((m) {
+              final nakIdx = m['nakIdx'] as int;
+              final padaIdx = m['padaIdx'] as int;
+              final syl = m['syllable'] as String;
+              final isSelected = _nGroomNak == nakIdx && _nGroomPada == padaIdx;
+              return GestureDetector(
+                onTap: () => setState(() { _nGroomNak = nakIdx; _nGroomPada = padaIdx; _nResult = null; }),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected ? kTeal : kCard,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: isSelected ? kTeal : kBorder, width: isSelected ? 2 : 1),
+                  ),
+                  child: Column(children: [
+                    Text(syl, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: isSelected ? Colors.white : kText)),
+                    Text(trAll(knNak[nakIdx]), style: TextStyle(fontSize: 9, color: isSelected ? Colors.white70 : kMuted)),
+                  ]),
+                ),
+              );
+            }).toList()),
+          ],
+          if (_nGroomNak != null) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: kTeal.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+              child: Row(children: [
+                Icon(Icons.check_circle, color: kTeal, size: 16),
+                const SizedBox(width: 8),
+                Text('${trAll(knNak[_nGroomNak!])} — ${trAll(knRashi[_rashiFromNakPada(_nGroomNak!, _nGroomPada ?? 0)])}',
+                  style: TextStyle(fontWeight: FontWeight.w800, color: kTeal, fontSize: 13)),
+              ]),
+            ),
+          ],
+        ])),
+        const SizedBox(height: 16),
+
+        // ── Calculate Button ──
+        ElevatedButton.icon(
+          onPressed: (_nBrideNak != null && _nGroomNak != null) ? _calculateNamaaksharaKoota : null,
+          icon: const Icon(Icons.calculate),
+          label: Text('🔤 ನಾಮಾಕ್ಷರ ಕೂಟ ನೋಡಿ', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: kPurple1, foregroundColor: Colors.white,
+            disabledBackgroundColor: kBorder,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+
+        // ── Results ──
+        if (_nResult != null) ...[
+          const SizedBox(height: 16),
+          _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+            child: Row(children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _kootaMode = 0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: _kootaMode == 0 ? kPurple1 : kCard,
+                      borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
+                      border: Border.all(color: kPurple1),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(AppLocale.l('ashtaKootaLabel'), style: TextStyle(
+                      fontWeight: FontWeight.w800, fontSize: 13,
+                      color: _kootaMode == 0 ? Colors.white : kPurple1,
+                    )),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _kootaMode = 1),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: _kootaMode == 1 ? kPurple1 : kCard,
+                      borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
+                      border: Border.all(color: kPurple1),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(AppLocale.l('dvadashaKootaLabel'), style: TextStyle(
+                      fontWeight: FontWeight.w800, fontSize: 13,
+                      color: _kootaMode == 1 ? Colors.white : kPurple1,
+                    )),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+          _kootaMode == 0
+            ? _buildAshtaKootaTable(_nResult!['ashtaKoota'])
+            : _buildDvadashaKootaTable(_nResult!['dvadashaKoota']),
+          const SizedBox(height: 16),
+
+          // Guru Bala for Bride
+          _sectionHeader('🔸 ವಧು ಗುರು ಬಲ (${trAll(knRashi[_nResult!['brideRashi'] as int])})', Icons.female, kOrange),
+          ..._nGuruTransits.map((t) {
+            final start = t['start'] as DateTime;
+            final end = t['end'] as DateTime;
+            final brideBala = t['brideBala'] as bool;
+            final now = DateTime.now();
+            final isCurrent = now.isAfter(start) && now.isBefore(end);
+            final dateFmt = '${start.day.toString().padLeft(2, '0')}/${start.month.toString().padLeft(2, '0')}/${start.year} - ${end.day.toString().padLeft(2, '0')}/${end.month.toString().padLeft(2, '0')}/${end.year}';
+            return Container(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: brideBala ? Colors.green.withOpacity(0.08) : Colors.red.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: isCurrent ? kOrange : (brideBala ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.15)), width: isCurrent ? 2 : 1),
+              ),
+              child: Row(children: [
+                Icon(brideBala ? Icons.check_circle : Icons.cancel, size: 18, color: brideBala ? Colors.green : Colors.red),
+                const SizedBox(width: 8),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Text('ಗುರು ${trAll(t['rashiName'])}ದಲ್ಲಿ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: isCurrent ? kOrange : kText)),
+                    const SizedBox(width: 6),
+                    Text('(${t['brideHouse']} ನೇ ಮನೆ)', style: TextStyle(fontSize: 11, color: kMuted)),
+                    if (isCurrent) ...[
+                      const SizedBox(width: 6),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: kOrange.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+                        child: Text('ಈಗ', style: TextStyle(fontSize: 9, color: kOrange, fontWeight: FontWeight.bold))),
+                    ],
+                  ]),
+                  Text(dateFmt, style: TextStyle(fontSize: 11, color: kMuted)),
+                ])),
+                Text(brideBala ? 'ಶುಭ' : 'ಅಶುಭ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: brideBala ? Colors.green : Colors.red)),
+              ]),
+            );
+          }).toList(),
+
+          const SizedBox(height: 16),
+          // Guru Bala for Groom
+          _sectionHeader('🔹 ವರ ಗುರು ಬಲ (${trAll(knRashi[_nResult!['groomRashi'] as int])})', Icons.male, kTeal),
+          ..._nGuruTransits.map((t) {
+            final start = t['start'] as DateTime;
+            final end = t['end'] as DateTime;
+            final groomBala = t['groomBala'] as bool;
+            final now = DateTime.now();
+            final isCurrent = now.isAfter(start) && now.isBefore(end);
+            final dateFmt = '${start.day.toString().padLeft(2, '0')}/${start.month.toString().padLeft(2, '0')}/${start.year} - ${end.day.toString().padLeft(2, '0')}/${end.month.toString().padLeft(2, '0')}/${end.year}';
+            return Container(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: groomBala ? Colors.green.withOpacity(0.08) : Colors.red.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: isCurrent ? kTeal : (groomBala ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.15)), width: isCurrent ? 2 : 1),
+              ),
+              child: Row(children: [
+                Icon(groomBala ? Icons.check_circle : Icons.cancel, size: 18, color: groomBala ? Colors.green : Colors.red),
+                const SizedBox(width: 8),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Text('ಗುರು ${trAll(t['rashiName'])}ದಲ್ಲಿ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: isCurrent ? kTeal : kText)),
+                    const SizedBox(width: 6),
+                    Text('(${t['groomHouse']} ನೇ ಮನೆ)', style: TextStyle(fontSize: 11, color: kMuted)),
+                    if (isCurrent) ...[
+                      const SizedBox(width: 6),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: kTeal.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+                        child: Text('ಈಗ', style: TextStyle(fontSize: 9, color: kTeal, fontWeight: FontWeight.bold))),
+                    ],
+                  ]),
+                  Text(dateFmt, style: TextStyle(fontSize: 11, color: kMuted)),
+                ])),
+                Text(groomBala ? 'ಶುಭ' : 'ಅಶುಭ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: groomBala ? Colors.green : Colors.red)),
+              ]),
+            );
+          }).toList(),
+        ],
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Column(
         children: [
           TabBar(
             labelColor: kPurple1,
             unselectedLabelColor: kMuted,
             indicatorColor: kPurple1,
+            isScrollable: true,
             tabs: const [
-              Tab(text: '📝 ಸಂಪೂರ್ಣ ಹೊಂದಾಣಿಕೆ'),
+              Tab(text: '📝 ಸಂಪೂರ್ಣ'),
               Tab(text: '⚡ ತ್ವರಿತ ಕೂಟ'),
+              Tab(text: '🔤 ನಾಮಾಕ್ಷರ'),
             ],
           ),
           Expanded(
@@ -1548,6 +1896,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                   ]),
                 ),
                 _buildQuickKootaTab(),
+                _buildNamaaksharaTab(),
               ],
             ),
           ),
