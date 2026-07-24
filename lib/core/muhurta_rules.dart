@@ -1009,8 +1009,30 @@ MuhurtaDayResult evaluateMuhurta({
     passed: varaPassed,
   ));
 
-  // ── 4. YOGA CHECK — SKIPPED (removed per user) ──
-  // ── 5. KARANA CHECK — SKIPPED (removed per user) ──
+  // ── 4. YOGA CHECK (5 points) ──
+  maxPoints += 5;
+  bool yogaPassed = !blockedYogaIndices.contains(yogaIndex);
+  if (yogaPassed) totalPoints += 5;
+  checks.add(MuhurtaCheckItem(
+    label: 'ಯೋಗ',
+    value: yogaName,
+    passed: yogaPassed,
+    note: yogaPassed ? null : 'ಅಶುಭ ಯೋಗ',
+  ));
+
+  // ── 5. KARANA CHECK (5 points) ──
+  maxPoints += 5;
+  bool karanaPassed = true;
+  if (rules.avoidVishti && karanaName.contains('ವಿಷ್ಟಿ') || karanaName.contains('ಭದ್ರಾ')) {
+    karanaPassed = false;
+    doshas.add('ವಿಷ್ಟಿ (ಭದ್ರಾ) ಕರಣ');
+  }
+  if (karanaPassed) totalPoints += 5;
+  checks.add(MuhurtaCheckItem(
+    label: 'ಕರಣ',
+    value: karanaName,
+    passed: karanaPassed,
+  ));
 
   // ── 6. DAGDHA YOGA CHECK (5 points — HARD BLOCK) ──
   maxPoints += 5;
