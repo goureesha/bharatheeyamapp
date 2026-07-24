@@ -16,6 +16,9 @@ class TaranukoolaScreen extends StatefulWidget {
   State<TaranukoolaScreen> createState() => _TaranukoolaScreenState();
 }
 
+// Static cache: survives screen navigations within the same app session
+Map<MuhurtaEvent, List<Map<String, dynamic>>> _muhurtaCache = {};
+
 class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTickerProviderStateMixin {
   late TabController _tabCtrl;
   bool _isTwoPersonMode = false;
@@ -70,6 +73,140 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     _selectedDay = _focusedDay;
     _loadNakshatra();
     _calculatePanchangForSelectedDay();
+    // Auto-trigger precomputation on first open
+    WidgetsBinding.instance.addPostFrameCallback((_) => _autoPrecompute());
+  }
+
+  Future<void> _autoPrecompute() async {
+    // Check if we already have cached data for all events
+    final allEvents = MuhurtaEvent.values;
+    final missingEvents = allEvents.where((e) => !_muhurtaCache.containsKey(e)).toList();
+    if (missingEvents.isEmpty) {
+      // All cached — load current event from cache
+      _rmPrecomputed = _muhurtaCache[_rmEvent] ?? [];
+      return;
+    }
+
+    // Show dialog
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => _MuhurtaComputeDialog(
+        events: allEvents.toList(),
+        onCompute: (event, progress, total) {
+          // progress callback for UI update
+        },
+        computeFunc: (progressCallback) async {
+          await Ephemeris.initSweph();
+          final startDate = DateTime.now();
+          for (final event in allEvents) {
+            if (_muhurtaCache.containsKey(event)) continue;
+            final precomputed = <Map<String, dynamic>>[];
+            for (int i = 0; i < 365; i++) {
+              final date = startDate.add(Duration(days: i));
+              if (i % 5 == 0) {
+                progressCallback(event, i, 365);
+                await Future.delayed(Duration.zero);
+              }
+              try {
+                final srSs = Ephemeris.findSunriseSetForDate(
+                  date.year, date.month, date.day,
+                  LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
+                );
+                final srJd = srSs[0];
+                final srLocalFrac = ((srJd + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
+                final hour24 = (srLocalFrac * 24.0) + (1.0 / 60.0);
+                final kr = await AstroCalculator.calculate(
+                  year: date.year, month: date.month, day: date.day,
+                  hourUtcOffset: LocationService.tzOffset,
+                  hour24: hour24,
+                  lat: LocationService.lat, lon: LocationService.lon,
+                  ayanamsaMode: 'lahiri', trueNode: true,
+                );
+                if (kr == null) continue;
+                final pan = kr.panchang;
+                final varaIdx = knVara.indexOf(pan.vara);
+                final yogaIdx = knYoga.indexOf(pan.yoga);
+                final moonRashiIdx = knRashi.indexOf(pan.chandraRashi);
+                final jupDeg = kr.planets['ಗುರು']?.longitude ?? 0;
+                final jupRashi = (jupDeg / 30).floor() % 12;
+                final sunDeg = kr.planets['ರವಿ']?.longitude ?? 0;
+                final sunRashi = (sunDeg / 30).floor() % 12;
+                final mResult = evaluateMuhurta(
+                  event: event,
+                  tithiIndex: pan.tithiIndex, tithiName: pan.tithi,
+                  nakshatraIndex: pan.nakshatraIndex, nakshatraName: pan.nakshatra,
+                  varaIndex: varaIdx, varaName: pan.vara,
+                  yogaIndex: yogaIdx, yogaName: pan.yoga,
+                  karanaName: pan.karana, moonRashiIndex: moonRashiIdx,
+                  jupiterRashiIndex: jupRashi, sunRashiIndex: sunRashi,
+                  janmaNakIdx1: 0, janmaRashiIdx1: 0,
+                );
+                if (!mResult.checks.every((c) => c.passed)) continue;
+                final guruCombust = kr.planets['ಗುರು']?.isCombust ?? false;
+                if (guruCombust) continue;
+                if (event == MuhurtaEvent.vivaha) {
+                  final shukraCombust = kr.planets['ಶುಕ್ರ']?.isCombust ?? false;
+                  if (shukraCombust) continue;
+                }
+                final rules = muhurtaRules[event];
+                final allowedLagnas = rules?.allowedLagnas;
+                final Map<String, int> basePlanetRashis = {};
+                for (final entry in kr.planets.entries) {
+                  if (entry.key == 'ಮಾಂದಿ') continue;
+                  basePlanetRashis[entry.key] = entry.value.rashiIndex;
+                }
+                final guruRashiIdx2 = basePlanetRashis['ಗುರು'] ?? -1;
+                List<LagnaWindow> dayLagnaWindows = [];
+                try {
+                  final double ssJd2 = srSs[1];
+                  Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+                  final ayn = Sweph.swe_get_ayanamsa(srJd);
+                  final mandiSrSs = Ephemeris.findSunriseSetForDate(
+                    date.year, date.month, date.day,
+                    LocationService.lat, LocationService.lon,
+                  );
+                  final double mandiSr = mandiSrSs[0];
+                  final double mandiSs = mandiSrSs[1];
+                  final vedWday = ((date.weekday - 1) + 1) % 7;
+                  final dayDuration = mandiSs - mandiSr;
+                  const dayFactors = [26, 22, 18, 14, 10, 6, 2];
+                  final dayMandiJd = mandiSr + (dayDuration * dayFactors[vedWday] / 30.0);
+                  final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
+                  if (dayMandiRashi >= 0) basePlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
+                  dayLagnaWindows = _scanLagnaRange(srJd, ssJd2, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
+                } catch (_) {}
+                if (dayLagnaWindows.isEmpty || !dayLagnaWindows.any((w) => w.isPerfect)) continue;
+                precomputed.add({
+                  'date': date, 'vara': pan.vara, 'tithi': pan.tithi,
+                  'tithiEnd': pan.tithiEndTime, 'nakshatra': pan.nakshatra,
+                  'nakEnd': pan.nakEndTime,
+                  'pada': () { final mp = kr.planets['ಚಂದ್ರ']?.pada; return mp ?? ((pan.nakPercent * 4).floor() + 1); }(),
+                  'yoga': pan.yoga, 'karana': pan.karana,
+                  'sunrise': pan.sunrise, 'sunset': pan.sunset,
+                  'score': mResult.score, 'verdict': mResult.verdict,
+                  'taraBala': null, 'guruBala': null, 'chandraBala': null,
+                  'jupRashi': jupRashi, 'moonRashiIdx': moonRashiIdx,
+                  'rahuKala': _rahuKalaTime(date, pan.sunrise, pan.sunset),
+                  'vishaGhati': pan.vishaPraghati,
+                  'doshas': mResult.doshas, 'doshaBhangas': mResult.doshaBhangas,
+                  'checks': mResult.checks, 'shubhaMuhurtas': <Map<String, String>>[],
+                  'lagnaWindows': dayLagnaWindows,
+                });
+              } catch (_) {}
+            }
+            _muhurtaCache[event] = precomputed;
+          }
+        },
+      ),
+    ).then((_) {
+      if (mounted) {
+        setState(() {
+          _rmPrecomputed = _muhurtaCache[_rmEvent] ?? [];
+        });
+      }
+    });
   }
 
   @override
@@ -2366,6 +2503,16 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   }
 
   Future<void> _precomputeForEvent() async {
+    // Check cache first — instant load if available
+    if (_muhurtaCache.containsKey(_rmEvent)) {
+      setState(() {
+        _rmPrecomputed = _muhurtaCache[_rmEvent]!;
+        _rmPrecomputing = false;
+      });
+      _filterByUser();
+      return;
+    }
+
     setState(() {
       _rmPrecomputing = true;
       _rmProgress = 0;
@@ -2513,6 +2660,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       _rmPrecomputed = precomputed;
       _rmPrecomputing = false;
     });
+    // Store in cache for instant access next time
+    _muhurtaCache[_rmEvent] = precomputed;
     
     _filterByUser();
   }
@@ -2554,4 +2703,108 @@ class _AscSample {
   final int rashiIdx;
   final double localMins;
   _AscSample({required this.jd, required this.rashiIdx, required this.localMins});
+}
+
+/// Dialog that shows muhurta computation progress
+class _MuhurtaComputeDialog extends StatefulWidget {
+  final List<MuhurtaEvent> events;
+  final void Function(MuhurtaEvent event, int progress, int total) onCompute;
+  final Future<void> Function(void Function(MuhurtaEvent event, int progress, int total) progressCallback) computeFunc;
+
+  const _MuhurtaComputeDialog({
+    required this.events,
+    required this.onCompute,
+    required this.computeFunc,
+  });
+
+  @override
+  State<_MuhurtaComputeDialog> createState() => _MuhurtaComputeDialogState();
+}
+
+class _MuhurtaComputeDialogState extends State<_MuhurtaComputeDialog> {
+  MuhurtaEvent? _currentEvent;
+  int _progress = 0;
+  int _total = 365;
+  bool _done = false;
+  int _eventIdx = 0;
+
+  static const _eventNames = {
+    MuhurtaEvent.vivaha: 'ವಿವಾಹ',
+    MuhurtaEvent.grihaPrevesha: 'ಗೃಹ ಪ್ರವೇಶ',
+    MuhurtaEvent.namakarana: 'ನಾಮಕರಣ',
+    MuhurtaEvent.upanayana: 'ಉಪನಯನ',
+    MuhurtaEvent.seemanta: 'ಸೀಮಂತ',
+    MuhurtaEvent.annaprasana: 'ಅನ್ನಪ್ರಾಶನ',
+    MuhurtaEvent.choula: 'ಚೌಲ',
+    MuhurtaEvent.vidyarambha: 'ವಿದ್ಯಾರಂಭ',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _startComputation();
+  }
+
+  Future<void> _startComputation() async {
+    await widget.computeFunc((event, progress, total) {
+      if (mounted) {
+        setState(() {
+          _currentEvent = event;
+          _progress = progress;
+          _total = total;
+          _eventIdx = widget.events.indexOf(event);
+        });
+      }
+    });
+    if (mounted) {
+      setState(() => _done = true);
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (mounted) Navigator.of(context).pop();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final eventName = _currentEvent != null ? (_eventNames[_currentEvent] ?? '') : '';
+    final overallProgress = (_eventIdx * 365 + _progress) / (widget.events.length * 365);
+
+    return AlertDialog(
+      backgroundColor: kCard,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      content: Column(mainAxisSize: MainAxisSize.min, children: [
+        Icon(_done ? Icons.check_circle : Icons.auto_awesome, size: 48, color: _done ? Colors.green : kPurple1),
+        const SizedBox(height: 16),
+        Text(
+          _done ? '✅ ಮುಹೂರ್ತ ಲೆಕ್ಕಾಚಾರ ಪೂರ್ಣ!' : '🔮 ಮುಹೂರ್ತ ಲೆಕ್ಕ ಹಾಕಲಾಗುತ್ತಿದೆ...',
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: kText),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        if (!_done) ...[
+          Text('$eventName — ದಿನ $_progress / $_total', style: TextStyle(fontSize: 12, color: kMuted)),
+          const SizedBox(height: 4),
+          Text('ಕಾರ್ಯಕ್ರಮ ${_eventIdx + 1} / ${widget.events.length}', style: TextStyle(fontSize: 11, color: kMuted)),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: overallProgress,
+              minHeight: 8,
+              backgroundColor: kBg,
+              valueColor: AlwaysStoppedAnimation(kPurple1),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text('${(overallProgress * 100).toInt()}%', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Text('ಮೊದಲ ಬಾರಿಗೆ ಮಾತ್ರ. ಮುಂದೆ ತಕ್ಷಣ ತೋರಿಸುತ್ತದೆ.',
+            style: TextStyle(fontSize: 10, color: kMuted, fontStyle: FontStyle.italic),
+            textAlign: TextAlign.center,
+          ),
+        ],
+        if (_done)
+          Text('ಮುಂದಿನ ಬಾರಿ ತಕ್ಷಣ ತೋರಿಸುತ್ತದೆ!', style: TextStyle(fontSize: 12, color: Colors.green)),
+      ]),
+    );
+  }
 }
