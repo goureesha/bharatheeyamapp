@@ -2743,9 +2743,9 @@ class _MuhurtaComputeDialogState extends State<_MuhurtaComputeDialog> {
     MuhurtaEvent.namakarana: 'ನಾಮಕರಣ',
     MuhurtaEvent.upanayana: 'ಉಪನಯನ',
     MuhurtaEvent.seemanta: 'ಸೀಮಂತ',
-    MuhurtaEvent.annaprasana: 'ಅನ್ನಪ್ರಾಶನ',
-    MuhurtaEvent.choula: 'ಚೌಲ',
-    MuhurtaEvent.vidyarambha: 'ವಿದ್ಯಾರಂಭ',
+    MuhurtaEvent.annaprashana: 'ಅನ್ನಪ್ರಾಶನ',
+    MuhurtaEvent.chowla: 'ಚೌಲ',
+    MuhurtaEvent.aksharabhyasa: 'ವಿದ್ಯಾರಂಭ',
   };
 
   @override
