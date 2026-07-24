@@ -2238,11 +2238,51 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 // ── Helper classes ──
 class LagnaWindow {
   final int rashiIdx;
+  final int rashiIndex; // alias
+  final String rashiName;
   final String startTime;
   final String endTime;
-  final bool isPerfect;
+  final bool isAllowed;
+  final bool lagnaShuddhi;
+  final bool saptamaShuddhi;
+  final bool ashtamaShuddhi;
+  final bool dashamaShuddhi;
+  final bool chandraSaptamaShuddhi;
+  final bool guruAnukoola;
+  final List<String> lagnaGrahas;
+  final List<String> saptamaGrahas;
+  final List<String> ashtamaGrahas;
+  final List<String> dashamaGrahas;
+  final List<String> chandraSaptamaGrahas;
+  final int guruFromLagna;
+  final Set<ShuddhiType> requiredShuddhis;
   final List<String> issues;
-  LagnaWindow({required this.rashiIdx, required this.startTime, required this.endTime, required this.isPerfect, this.issues = const []});
+
+  bool get isPerfect => lagnaShuddhi && saptamaShuddhi && ashtamaShuddhi && dashamaShuddhi && guruAnukoola && isAllowed;
+  bool get isShubha => lagnaShuddhi && saptamaShuddhi && isAllowed;
+
+  LagnaWindow({
+    int? rashiIdx,
+    required this.rashiIndex,
+    required this.rashiName,
+    required this.startTime,
+    required this.endTime,
+    this.isAllowed = true,
+    required this.lagnaShuddhi,
+    required this.saptamaShuddhi,
+    required this.ashtamaShuddhi,
+    required this.dashamaShuddhi,
+    this.chandraSaptamaShuddhi = true,
+    required this.guruAnukoola,
+    this.lagnaGrahas = const [],
+    this.saptamaGrahas = const [],
+    this.ashtamaGrahas = const [],
+    this.dashamaGrahas = const [],
+    this.chandraSaptamaGrahas = const [],
+    this.guruFromLagna = 0,
+    this.requiredShuddhis = const {ShuddhiType.lagna},
+    this.issues = const [],
+  }) : rashiIdx = rashiIdx ?? rashiIndex;
 }
 
 class _AscSample {
