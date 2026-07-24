@@ -3228,32 +3228,21 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget _buildGocharTab() {
     final moonRashi = _primaryResult.planets['ಚಂದ್ರ']?.rashiIndex ?? 0;
     final rashiNames = List.generate(12, (i) => trAll(knRashi[i]));
-    // Approximate Jupiter & Saturn rashi for each month of the selected year
-    // We use the birth chart's planet data if year == birth year, else we estimate
-    // by knowing Jupiter moves ~1 rashi/year, Saturn ~1 rashi/2.5 years
 
-    // Compute guru & shani positions for each month of the selected year
-    final List<Map<String, dynamic>> monthlyTransits = [];
-    for (int m = 1; m <= 12; m++) {
-      try {
-        final jd = Sweph.swe_julday(_gocharYear, m, 15, 12.0, CalendarType.SE_GREG_CAL);
-        Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
-        final jupPos = Sweph.swe_calc_ut(jd, HeavenlyBody.SE_JUPITER, SwephFlag.SEFLG_SWIEPH);
-        final satPos = Sweph.swe_calc_ut(jd, HeavenlyBody.SE_SATURN, SwephFlag.SEFLG_SWIEPH);
-        final ayn = Sweph.swe_get_ayanamsa(jd);
-        final jupSid = (jupPos.longitude - ayn + 360) % 360;
-        final satSid = (satPos.longitude - ayn + 360) % 360;
-        monthlyTransits.add({
-          'month': m,
-          'jupRashi': (jupSid / 30).floor() % 12,
-          'satRashi': (satSid / 30).floor() % 12,
-          'jupDeg': jupSid,
-          'satDeg': satSid,
-        });
-      } catch (_) {
-        monthlyTransits.add({'month': m, 'jupRashi': -1, 'satRashi': -1, 'jupDeg': 0.0, 'satDeg': 0.0});
-      }
-    }
+    // Compute guru & shani positions once for mid-year
+    int jupRashi = -1, satRashi = -1;
+    double jupDeg = 0, satDeg = 0;
+    try {
+      final jd = Sweph.swe_julday(_gocharYear, 7, 1, 12.0, CalendarType.SE_GREG_CAL);
+      Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+      final jupPos = Sweph.swe_calc_ut(jd, HeavenlyBody.SE_JUPITER, SwephFlag.SEFLG_SWIEPH);
+      final satPos = Sweph.swe_calc_ut(jd, HeavenlyBody.SE_SATURN, SwephFlag.SEFLG_SWIEPH);
+      final ayn = Sweph.swe_get_ayanamsa(jd);
+      jupDeg = (jupPos.longitude - ayn + 360) % 360;
+      satDeg = (satPos.longitude - ayn + 360) % 360;
+      jupRashi = (jupDeg / 30).floor() % 12;
+      satRashi = (satDeg / 30).floor() % 12;
+    } catch (_) {}
 
     // Helper: house from moon
     int houseFromMoon(int planetRashi) => ((planetRashi - moonRashi) % 12) + 1;
@@ -3261,21 +3250,12 @@ class _DashboardScreenState extends State<DashboardScreen>
     // Guru anukoola houses: {1,2,4,5,7,9,10,11}
     const guruGoodHouses = {1, 2, 4, 5, 7, 9, 10, 11};
 
-    // Current month transit for summary
-    final nowMonth = DateTime.now().month;
-    final currentTransit = monthlyTransits.isNotEmpty
-        ? monthlyTransits[(_gocharYear == DateTime.now().year ? nowMonth - 1 : 0).clamp(0, 11)]
-        : {'jupRashi': -1, 'satRashi': -1};
-    final curJupRashi = currentTransit['jupRashi'] as int;
-    final curSatRashi = currentTransit['satRashi'] as int;
-    final curJupHouse = curJupRashi >= 0 ? houseFromMoon(curJupRashi) : 0;
-    final curSatHouse = curSatRashi >= 0 ? houseFromMoon(curSatRashi) : 0;
-    final isGuruAnukoola = guruGoodHouses.contains(curJupHouse);
-    final isSadeSati = curSatHouse == 12 || curSatHouse == 1 || curSatHouse == 2;
-    final isAshtamaShani = curSatHouse == 8;
-    final isPanchamaShani = curSatHouse == 5;
-
-    final mNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final jupHouse = jupRashi >= 0 ? houseFromMoon(jupRashi) : 0;
+    final satHouse = satRashi >= 0 ? houseFromMoon(satRashi) : 0;
+    final isGuruAnukoola = guruGoodHouses.contains(jupHouse);
+    final isSadeSati = satHouse == 12 || satHouse == 1 || satHouse == 2;
+    final isAshtamaShani = satHouse == 8;
+    final isPanchamaShani = satHouse == 5;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -3297,88 +3277,45 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 16),
 
-          // Summary Cards
+          // Summary Card
           AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Text('🔮 ${trAll('ಗೋಚಾರ ಸಾರಾಂಶ')}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kPurple1)),
+            Text('🔮 ${trAll('ಗೋಚಾರ ಸಾರಾಂಶ')} — $_gocharYear', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kPurple1)),
             Text('${trAll('ಜನ್ಮ ರಾಶಿ')}: ${rashiNames[moonRashi]}', style: TextStyle(fontSize: 13, color: kMuted)),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
 
             // Guru Bala
             _gocharStatusRow(
               '🪐 ${trAll('ಗುರು ಬಲ')}',
-              curJupRashi >= 0 ? '${rashiNames[curJupRashi]} (${trAll('ಭಾವ')} $curJupHouse)' : '—',
+              jupRashi >= 0 ? '${rashiNames[jupRashi]} (${trAll('ಭಾವ')} $jupHouse)' : '—',
               isGuruAnukoola,
               isGuruAnukoola ? trAll('ಅನುಕೂಲ') : trAll('ಪ್ರತಿಕೂಲ'),
             ),
-            const Divider(height: 20),
+            const Divider(height: 24),
 
             // Sade Sati
             _gocharStatusRow(
               '🪨 ${trAll('ಸಾಡೇ ಸಾತಿ')}',
-              curSatRashi >= 0 ? '${rashiNames[curSatRashi]} (${trAll('ಭಾವ')} $curSatHouse)' : '—',
+              satRashi >= 0 ? '${rashiNames[satRashi]} (${trAll('ಭಾವ')} $satHouse)' : '—',
               !isSadeSati,
               isSadeSati ? '⚠️ ${trAll('ಸಕ್ರಿಯ')}' : '✅ ${trAll('ಇಲ್ಲ')}',
             ),
-            const Divider(height: 20),
+            const Divider(height: 24),
 
             // Ashtama Shani
             _gocharStatusRow(
               '💀 ${trAll('ಅಷ್ಟಮ ಶನಿ')}',
-              curSatRashi >= 0 ? '${rashiNames[curSatRashi]} (${trAll('ಭಾವ')} $curSatHouse)' : '—',
+              satRashi >= 0 ? '${rashiNames[satRashi]} (${trAll('ಭಾವ')} $satHouse)' : '—',
               !isAshtamaShani,
               isAshtamaShani ? '⚠️ ${trAll('ಸಕ್ರಿಯ')}' : '✅ ${trAll('ಇಲ್ಲ')}',
             ),
-            const Divider(height: 20),
+            const Divider(height: 24),
 
             // Panchama Shani
             _gocharStatusRow(
               '⚡ ${trAll('ಪಂಚಮ ಶನಿ')}',
-              curSatRashi >= 0 ? '${rashiNames[curSatRashi]} (${trAll('ಭಾವ')} $curSatHouse)' : '—',
+              satRashi >= 0 ? '${rashiNames[satRashi]} (${trAll('ಭಾವ')} $satHouse)' : '—',
               !isPanchamaShani,
               isPanchamaShani ? '⚠️ ${trAll('ಸಕ್ರಿಯ')}' : '✅ ${trAll('ಇಲ್ಲ')}',
-            ),
-          ])),
-          const SizedBox(height: 16),
-
-          // Monthly Transit Table
-          AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Text('📅 ${trAll('ತಿಂಗಳವಾರು ಗೋಚಾರ')}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kPurple1)),
-            const SizedBox(height: 8),
-            Table(
-              border: TableBorder.all(color: kBorder, width: 0.5),
-              columnWidths: const {0: FlexColumnWidth(1.2), 1: FlexColumnWidth(2), 2: FlexColumnWidth(2)},
-              children: [
-                TableRow(
-                  decoration: BoxDecoration(color: kPurple1.withOpacity(0.1)),
-                  children: [
-                    _tCell(trAll('ತಿಂಗಳು'), bold: true),
-                    _tCell('🪐 ${trAll('ಗುರು')}', bold: true),
-                    _tCell('🪨 ${trAll('ಶನಿ')}', bold: true),
-                  ],
-                ),
-                ...monthlyTransits.map((t) {
-                  final jr = t['jupRashi'] as int;
-                  final sr = t['satRashi'] as int;
-                  final jh = jr >= 0 ? houseFromMoon(jr) : 0;
-                  final sh = sr >= 0 ? houseFromMoon(sr) : 0;
-                  final jGood = guruGoodHouses.contains(jh);
-                  final sSadeSati = sh == 12 || sh == 1 || sh == 2;
-                  final sAshtama = sh == 8;
-                  return TableRow(children: [
-                    _tCell(mNames[t['month'] as int]),
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      color: jGood ? Colors.green.withOpacity(0.08) : Colors.red.withOpacity(0.08),
-                      child: Text('${jr >= 0 ? rashiNames[jr] : '—'} (H$jh)', style: TextStyle(fontSize: 11, color: jGood ? Colors.green.shade700 : Colors.red.shade700, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      color: (sSadeSati || sAshtama) ? Colors.red.withOpacity(0.08) : Colors.green.withOpacity(0.08),
-                      child: Text('${sr >= 0 ? rashiNames[sr] : '—'} (H$sh)', style: TextStyle(fontSize: 11, color: (sSadeSati || sAshtama) ? Colors.red.shade700 : Colors.green.shade700, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
-                    ),
-                  ]);
-                }),
-              ],
             ),
           ])),
           const SizedBox(height: 32),
@@ -3405,10 +3342,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     ]);
   }
 
-  Padding _tCell(String t, {bool bold = false}) => Padding(
-    padding: const EdgeInsets.all(6),
-    child: Text(t, style: TextStyle(fontSize: 11, fontWeight: bold ? FontWeight.w800 : FontWeight.w500, color: kText), textAlign: TextAlign.center),
-  );
 
   Widget _buildNotesTab() {
     var allPersons = <Map<String, dynamic>>[
