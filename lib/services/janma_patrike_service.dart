@@ -603,7 +603,18 @@ class JanmaPatrikeService {
     Widget box(int idx) {
       final items = chart[idx];
       final count = items.length;
-      final text = items.join('\n');
+      // Group planet names into rows of 3 to prevent tiny text when many planets in one rashi
+      String text;
+      if (count <= 3) {
+        text = items.join('\n');
+      } else {
+        final rows = <String>[];
+        for (int i = 0; i < count; i += 3) {
+          final end = (i + 3 > count) ? count : i + 3;
+          rows.add(items.sublist(i, end).join(' '));
+        }
+        text = rows.join('\n');
+      }
       // Dynamic font size: scale down for crowded rashis
       double fontSize;
       double lineHeight;
@@ -611,11 +622,11 @@ class JanmaPatrikeService {
         fontSize = 11.5;
         lineHeight = 1.1;
       } else if (count <= 5) {
-        fontSize = 9.0;
-        lineHeight = 1.0;
+        fontSize = 9.5;
+        lineHeight = 1.05;
       } else {
-        fontSize = 7.0;
-        lineHeight = 0.95;
+        fontSize = 8.0;
+        lineHeight = 1.0;
       }
       return Expanded(
         child: Container(
