@@ -1376,57 +1376,82 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
             ? _buildAshtaKootaTable(_qResult!['ashtaKoota'])
             : _buildDvadashaKootaTable(_qResult!['dvadashaKoota']),
           const SizedBox(height: 16),
-          _sectionHeader('Guru Bala Transit Timeline', Icons.timeline, Colors.deepPurple),
+          // ── Vadhu (Bride) Guru Bala ──
+          _sectionHeader('🔸 ವಧು ಗುರು ಬಲ (${trAll(knRashi[_qBrideRashi])})', Icons.female, kOrange),
           ..._guruTransits.map((t) {
             final start = t['start'] as DateTime;
             final end = t['end'] as DateTime;
             final brideBala = t['brideBala'] as bool;
-            final groomBala = t['groomBala'] as bool;
-            final both = brideBala && groomBala;
             final now = DateTime.now();
             final isCurrent = now.isAfter(start) && now.isBefore(end);
+            final dateFmt = '${start.day.toString().padLeft(2, '0')}/${start.month.toString().padLeft(2, '0')}/${start.year} - ${end.day.toString().padLeft(2, '0')}/${end.month.toString().padLeft(2, '0')}/${end.year}';
             
-            return AppCard(
-              padding: const EdgeInsets.all(12),
-              child: Container(
-                decoration: both ? BoxDecoration(
-                  border: Border.all(color: Colors.green, width: 2),
-                  borderRadius: BorderRadius.circular(8),
-                ) : null,
-                padding: both ? const EdgeInsets.all(8) : null,
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Text(trAll(t['rashiName']), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: isCurrent ? Colors.deepPurple : kText)),
-                    if (isCurrent) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(color: Colors.deepPurple.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
-                        child: Text('Current', style: TextStyle(fontSize: 10, color: Colors.deepPurple, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                    const Spacer(),
-                    Text('${start.day.toString().padLeft(2, '0')}/${start.month.toString().padLeft(2, '0')}/${start.year} - ${end.day.toString().padLeft(2, '0')}/${end.month.toString().padLeft(2, '0')}/${end.year}', style: TextStyle(fontSize: 12, color: kMuted)),
-                  ]),
-                  const SizedBox(height: 8),
-                  Row(children: [
-                    Expanded(child: Row(children: [
-                      Icon(Icons.female, size: 16, color: kOrange),
-                      const SizedBox(width: 4),
-                      Icon(brideBala ? Icons.check_circle : Icons.cancel, size: 14, color: brideBala ? Colors.green : Colors.red),
-                      const SizedBox(width: 4),
-                      Text('House ${t['brideHouse']}', style: TextStyle(fontSize: 12, color: kMuted)),
-                    ])),
-                    Expanded(child: Row(children: [
-                      Icon(Icons.male, size: 16, color: kTeal),
-                      const SizedBox(width: 4),
-                      Icon(groomBala ? Icons.check_circle : Icons.cancel, size: 14, color: groomBala ? Colors.green : Colors.red),
-                      const SizedBox(width: 4),
-                      Text('House ${t['groomHouse']}', style: TextStyle(fontSize: 12, color: kMuted)),
-                    ])),
-                  ]),
-                ]),
+            return Container(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: brideBala ? Colors.green.withOpacity(0.08) : Colors.red.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: isCurrent ? kOrange : (brideBala ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.15)), width: isCurrent ? 2 : 1),
               ),
+              child: Row(children: [
+                Icon(brideBala ? Icons.check_circle : Icons.cancel, size: 18, color: brideBala ? Colors.green : Colors.red),
+                const SizedBox(width: 8),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Text('ಗುರು ${trAll(t['rashiName'])}ದಲ್ಲಿ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: isCurrent ? kOrange : kText)),
+                    const SizedBox(width: 6),
+                    Text('(${t['brideHouse']} ನೇ ಮನೆ)', style: TextStyle(fontSize: 11, color: kMuted)),
+                    if (isCurrent) ...[
+                      const SizedBox(width: 6),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: kOrange.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+                        child: Text('ಈಗ', style: TextStyle(fontSize: 9, color: kOrange, fontWeight: FontWeight.bold))),
+                    ],
+                  ]),
+                  Text(dateFmt, style: TextStyle(fontSize: 11, color: kMuted)),
+                ])),
+                Text(brideBala ? 'ಶುಭ' : 'ಅಶುಭ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: brideBala ? Colors.green : Colors.red)),
+              ]),
+            );
+          }).toList(),
+
+          const SizedBox(height: 16),
+          // ── Vara (Groom) Guru Bala ──
+          _sectionHeader('🔹 ವರ ಗುರು ಬಲ (${trAll(knRashi[_qGroomRashi])})', Icons.male, kTeal),
+          ..._guruTransits.map((t) {
+            final start = t['start'] as DateTime;
+            final end = t['end'] as DateTime;
+            final groomBala = t['groomBala'] as bool;
+            final now = DateTime.now();
+            final isCurrent = now.isAfter(start) && now.isBefore(end);
+            final dateFmt = '${start.day.toString().padLeft(2, '0')}/${start.month.toString().padLeft(2, '0')}/${start.year} - ${end.day.toString().padLeft(2, '0')}/${end.month.toString().padLeft(2, '0')}/${end.year}';
+            
+            return Container(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: groomBala ? Colors.green.withOpacity(0.08) : Colors.red.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: isCurrent ? kTeal : (groomBala ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.15)), width: isCurrent ? 2 : 1),
+              ),
+              child: Row(children: [
+                Icon(groomBala ? Icons.check_circle : Icons.cancel, size: 18, color: groomBala ? Colors.green : Colors.red),
+                const SizedBox(width: 8),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Text('ಗುರು ${trAll(t['rashiName'])}ದಲ್ಲಿ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: isCurrent ? kTeal : kText)),
+                    const SizedBox(width: 6),
+                    Text('(${t['groomHouse']} ನೇ ಮನೆ)', style: TextStyle(fontSize: 11, color: kMuted)),
+                    if (isCurrent) ...[
+                      const SizedBox(width: 6),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: kTeal.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+                        child: Text('ಈಗ', style: TextStyle(fontSize: 9, color: kTeal, fontWeight: FontWeight.bold))),
+                    ],
+                  ]),
+                  Text(dateFmt, style: TextStyle(fontSize: 11, color: kMuted)),
+                ])),
+                Text(groomBala ? 'ಶುಭ' : 'ಅಶುಭ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: groomBala ? Colors.green : Colors.red)),
+              ]),
             );
           }).toList(),
         ],
