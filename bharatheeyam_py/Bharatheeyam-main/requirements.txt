@@ -1,6 +1,0 @@
-streamlit
-pyswisseph
-geopy
-pandas
-
-
