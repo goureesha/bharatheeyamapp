@@ -3538,7 +3538,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ]),
                     Column(children: [
                       Text('${ashubha.length}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.red)),
-                      Text('ಅಶുഭ', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                      Text('ಅಶುಭ', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
                     ]),
                   ],
                 ),
@@ -3565,7 +3565,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   child: Row(children: [
                     Icon(Icons.warning_amber, size: 16, color: Colors.red),
                     const SizedBox(width: 6),
-                    Text('ಅಶുഭ ಯೋಗಗಳು (${ashubha.length})', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.red.shade700)),
+                    Text('ಅಶುಭ ಯೋಗಗಳು (${ashubha.length})', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.red.shade700)),
                   ]),
                 ),
                 ...ashubha.map(yogaCard),
