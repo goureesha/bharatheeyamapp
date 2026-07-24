@@ -33,7 +33,7 @@ import '../services/janma_patrike_service.dart'; // NEW
 import '../services/pdf_theme.dart';
 import '../constants/places.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sweph/sweph.dart';
+import 'package:sweph/sweph.dart' hide kIsWeb;
 import '../core/ephemeris.dart';
 import '../core/transit_cache.dart';
 import '../core/transit_calculator.dart';
