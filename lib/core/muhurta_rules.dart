@@ -239,7 +239,6 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
     allowedNakshatras: [0, 3, 4, 6, 7, 11, 12, 13, 14, 20, 21, 22, 25, 26],
     allowedVaras: [3, 4],
     avoidVishti: true,
-    requireUttarayana: true,
     requireShukla: true,
     allowedLagnas: null,
     requiredShuddhis: {ShuddhiType.lagna},
@@ -374,7 +373,6 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
     allowedNakshatras: [0, 4, 6, 7, 12, 13, 14, 21, 26],
     allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
-    requireUttarayana: true,
     requireShukla: true,
     allowedLagnas: null,
     requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.ashtama},
@@ -403,7 +401,6 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
     allowedNakshatras: [0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 25, 26],
     allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
-    requireUttarayana: true,
     requireShukla: true,
     allowedLagnas: [1, 4, 7, 10], // Sthira
     requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.ashtama},
