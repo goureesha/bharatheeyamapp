@@ -119,11 +119,11 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.vivaha: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [3, 4, 9, 11, 12, 14, 16, 18, 20, 25, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireShukla: true,
     allowedLagnas: null,
-    requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.saptama, ShuddhiType.ashtama, ShuddhiType.chandraSaptama},
+    requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.saptama, ShuddhiType.ashtama},
     tithiShloka: 'ದ್ವಿತೀಯಾ ತೃತೀಯಾ ಚೈವ ಪಂಚಮೀ ಸಪ್ತಮೀ ತಥಾ ।\nದಶಮ್ಯೇಕಾದಶೀ ಚೈವ ದ್ವಾದಶೀ ತ್ರಯೋದಶೀ ಶುಭಾ ।\nವಿವಾಹೇ ಶುಕ್ಲಪಕ್ಷೇ ತು ಏತಾಃ ತಿಥಯಃ ಪ್ರಶಸ್ಯಂತೇ ॥',
     varaShloka: 'ಸೋಮೋ ಬುಧೋ ಗುರುಶ್ಚೈವ ಭೃಗುಃ ಶುಭಕರಃ ಸದಾ ।\nವಿವಾಹೇ ವಾರಚತುಷ್ಟಯಂ ಪ್ರೋಕ್ತಂ ಸರ್ವಸಿದ್ಧಿಕರಮ್ ॥',
     nakshatraShloka: 'ರೋಹಿಣೀಮೃಗಶೀರ್ಷಂ ಚ ಉತ್ತರಾತ್ರಯಮೇವ ಚ ।\nರೇವತೀ ಹಸ್ತಮೂಲಂ ಚ ಸ್ವಾತೀ ಮಾಘಮನುರಾಧಕಾಃ ॥\nಏತೇ ವಿವಾಹೇ ಶುಭದಾಃ ತಾರಾಃ ಪ್ರೋಕ್ತಾ ಮನೀಷಿಭಿಃ ।',
@@ -148,7 +148,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.upanayana: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 9, 10, 11, 16, 17, 19],
     allowedNakshatras: [0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 23, 25, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireUttarayana: true,
     allowedLagnas: null,
@@ -177,12 +177,12 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.grihaPrevesha: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [3, 4, 11, 13, 16, 20, 25, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireUttarayana: true,
     requireShukla: true,
     allowedLagnas: [1, 2, 3, 5, 6, 8, 11], // Vrishabha, Mithuna, Karkataka, Kanya, Tula, Dhanu, Meena
-    requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.ashtama, ShuddhiType.chandraSaptama},
+    requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.ashtama},
     tithiShloka: 'ದ್ವಿತೀಯಾ ತೃತೀಯಾ ಪಂಚಮೀ ಸಪ್ತಮೀ ದಶಮೀ ತಥಾ ।\nಏಕಾದಶೀ ದ್ವಾದಶೀ ಚ ತ್ರಯೋದಶೀ ಶುಕ್ಲಪಕ್ಷೇ ಶುಭಪ್ರದಾಃ ॥',
     varaShloka: 'ಸೋಮ-ಬುಧ-ಗುರು-ಶುಕ್ರೇಷು ಗೃಹಪ್ರವೇಶಃ ಸಿದ್ಧಿದಃ ।\nಕುಜ-ಶನಿ-ಅರ್ಕವಾರೇಷು ಗೃಹಂ ಪ್ರವಿಶೇನ್ನ ಕದಾಚನ ॥',
     nakshatraShloka: 'ರೋಹಿಣೀ ಮೃಗಶೀರ್ಷಂ ಚ ಉತ್ತರಾತ್ರಯಮೇವ ಚ ।\nಪುಷ್ಯೋ ಧನಿಷ್ಠಾ ಶತತಾರಾ ನಕ್ಷತ್ರಾಣಿ ಶುಭಾನಿ ಚ ॥',
@@ -206,7 +206,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.devaPratishtha: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 7, 9, 10, 11, 12, 13],
     allowedNakshatras: [3, 4, 11, 12, 13, 14, 16, 20, 21, 25, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireUttarayana: true,
     requireShukla: true,
@@ -256,10 +256,10 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.yatra: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [0, 4, 7, 12, 16, 21, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     allowedLagnas: null,
-    requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.ashtama, ShuddhiType.chandraSaptama},
+    requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.ashtama},
     tithiShloka: 'ದ್ವಿತೀಯಾ ಪಂಚಮೀ ಸಪ್ತಮೀ ದಶಮೀ ತಥಾ ।\nಯಾತ್ರಾಯಾಂ ಶುಭದಾಃ ಪ್ರೋಕ್ತಾ ರಿಕ್ತಾಮಾವಾಸ್ಯಾಂ ವಿವರ್ಜಯೇತ್ ॥',
     varaShloka: 'ಸೋಮ-ಬುಧ-ಗುರು-ಶುಕ್ರೇಷು ಯಾತ್ರಾಯಾಂ ಶುಭದಾಯಕಾಃ ।\nಕುಜ-ಶನಿ-ಅರ್ಕವಾರೇ ಯಾತ್ರಾಂ ನ ಸಮಾಚರೇತ್ ॥',
     nakshatraShloka: 'ಅಶ್ವಿನಿ ಪುಷ್ಯ ಹಸ್ತೇಷು ಚಿತ್ರಾ ಸ್ವಾತೀ ಪುನರ್ವಸು ।\nಮೃಗಶಿರೋ ರೇವತೀ ಚ ಯಾತ್ರಾಯಾಂ ಶುಭದಾಯಕಾಃ ॥',
@@ -273,7 +273,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.vyapara: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 12],
     allowedNakshatras: [0, 3, 6, 7, 11, 12, 13, 14, 16, 21, 22, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireShukla: true,
     allowedLagnas: null,
@@ -292,7 +292,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.annaprashana: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 25, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireShukla: true,
     allowedLagnas: null,
@@ -316,7 +316,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.namakarana: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 25, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireShukla: true,
     allowedLagnas: [1, 2, 3, 5, 6, 8, 11], // Vrishabha, Mithuna, Karkataka, Kanya, Tula, Dhanu, Meena
@@ -344,7 +344,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.seemanta: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [3, 4, 11, 13, 16, 20, 25, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireShukla: true,
     allowedLagnas: null,
@@ -372,12 +372,12 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.chowla: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [0, 4, 6, 7, 12, 13, 14, 21, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireUttarayana: true,
     requireShukla: true,
     allowedLagnas: null,
-    requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.ashtama, ShuddhiType.chandraSaptama},
+    requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.ashtama},
     tithiShloka: 'ದ್ವಿತೀಯಾ ಪಂಚಮೀ ಸಪ್ತಮೀ ದಶಮೀ ತಥಾ ।\nಶುಕ್ಲಪಕ್ಷೇ ಚೌಲಕರ್ಮ ಶುಭದಾಃ ಸ್ಮೃತಾಃ ॥',
     varaShloka: 'ಸೋಮ-ಬುಧ-ಗುರು-ಶುಕ್ರೇ ಚ ಚೌಲಕರ್ಮ ಪ್ರಶಸ್ಯತೇ ।\nಉತ್ತರಾಯಣೇ ಶುಭದಂ ಪ್ರೋಕ್ತಂ ಬಾಲಾಯುಷ್ಕರಮ್ ॥',
     nakshatraShloka: 'ಪುನರ್ವಸು-ಪುಷ್ಯ-ಶ್ರವಣೇ ಅಶ್ವಿನೀ ಹಸ್ತ ರೇವತೀ ।\nರಿಕ್ತಾ-ಚತುರ್ದಶೀ-ಅಮಾವಾಸ್ಯಾಂ ಚೈವ ವಿವರ್ಜಯೇತ್ ॥',
@@ -401,7 +401,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.vastuShilanyas: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 25, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireUttarayana: true,
     requireShukla: true,
@@ -430,7 +430,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.aushadha: MuhurtaEventRules(
     allowedTithis: [0, 1, 2, 4, 5, 6, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, 21, 24, 25, 26, 29],
     allowedNakshatras: [0, 3, 4, 7, 12, 16, 21, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     allowedLagnas: null,
     requiredShuddhis: {ShuddhiType.lagna, ShuddhiType.ashtama},
@@ -457,7 +457,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.krishi: MuhurtaEventRules(
     allowedTithis: [0, 1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [3, 4, 11, 12, 13, 14, 16, 20, 21, 25, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     allowedLagnas: null,
     requiredShuddhis: {ShuddhiType.lagna},
@@ -484,7 +484,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.vahanaKraya: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [0, 4, 6, 12, 13, 14, 21, 22, 26], // Chara & Mridu
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireShukla: true,
     allowedLagnas: null,
@@ -512,7 +512,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.aasthiKraya: MuhurtaEventRules(
     allowedTithis: [1, 4, 9, 10, 11],
     allowedNakshatras: [3, 4, 11, 13, 16, 20, 25, 26], // Sthira & Mridu
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireShukla: true,
     allowedLagnas: null,
@@ -540,7 +540,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.swarnaKraya: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [0, 3, 4, 6, 7, 11, 12, 13, 16, 21, 22, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireShukla: true,
     allowedLagnas: null,
@@ -568,7 +568,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.udyoga: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 9, 10, 11],
     allowedNakshatras: [3, 4, 7, 11, 13, 16, 20, 21, 25, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireShukla: true,
     allowedLagnas: null,
@@ -596,7 +596,7 @@ const Map<MuhurtaEvent, MuhurtaEventRules> muhurtaRules = {
   MuhurtaEvent.karnavedha: MuhurtaEventRules(
     allowedTithis: [1, 2, 4, 6, 9, 10, 11, 12],
     allowedNakshatras: [0, 4, 6, 7, 12, 13, 21, 26],
-    allowedVaras: [1, 3, 4, 5],
+    allowedVaras: [0, 1, 3, 4, 5],
     avoidVishti: true,
     requireShukla: true,
     allowedLagnas: null,
