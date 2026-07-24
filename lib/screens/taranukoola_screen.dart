@@ -43,6 +43,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   DateTime _mfMonthEnd = DateTime(DateTime.now().year, DateTime.now().month + 2);
   bool _mfSearching = false;
   List<Map<String, dynamic>> _mfResults = [];
+  Map<String, int>? _mfStats;
 
   // ── Ready Muhurta state (Tab 3) ──
 
@@ -921,10 +922,17 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   }
 
   Future<void> _searchMuhurtas() async {
-    setState(() { _mfSearching = true; _mfResults = []; });
+    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; });
     await Future.delayed(const Duration(milliseconds: 50));
 
     final results = <Map<String, dynamic>>[];
+    int totalDays = 0;
+    int countTaraFailed = 0;
+    int countGuruFailed = 0;
+    int countGuruCombust = 0;
+    int countShukraCombust = 0;
+    int countPanchangaFailed = 0;
+    int countNoLagnaShuddhi = 0;
 
     await Ephemeris.initSweph();
     // Loop through each month in the range
@@ -934,79 +942,74 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       final daysInMonth = DateTime(curMonth.year, curMonth.month + 1, 0).day;
       for (int d = 1; d <= daysInMonth; d++) {
         try {
+          totalDays++;
           final date = DateTime(curMonth.year, curMonth.month, d);
-        final srSs = Ephemeris.findSunriseSetForDate(
-          date.year, date.month, date.day,
-          LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
-        );
-        final srJd = srSs[0];
-        final srLocalFrac = ((srJd + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
-        final hour24 = (srLocalFrac * 24.0) + (1.0 / 60.0);
+          final srSs = Ephemeris.findSunriseSetForDate(
+            date.year, date.month, date.day,
+            LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
+          );
+          final srJd = srSs[0];
+          final srLocalFrac = ((srJd + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
+          final hour24 = (srLocalFrac * 24.0) + (1.0 / 60.0);
 
-        final kr = await AstroCalculator.calculate(
-          year: date.year, month: date.month, day: date.day,
-          hourUtcOffset: LocationService.tzOffset,
-          hour24: hour24,
-          lat: LocationService.lat, lon: LocationService.lon,
-          ayanamsaMode: 'lahiri', trueNode: true,
-        );
-        if (kr == null) continue;
-        final pan = kr.panchang;
+          final kr = await AstroCalculator.calculate(
+            year: date.year, month: date.month, day: date.day,
+            hourUtcOffset: LocationService.tzOffset,
+            hour24: hour24,
+            lat: LocationService.lat, lon: LocationService.lon,
+            ayanamsaMode: 'lahiri', trueNode: true,
+          );
+          if (kr == null) continue;
+          final pan = kr.panchang;
 
-        // Derive indices from string names
-        final varaIdx = knVara.indexOf(pan.vara);
-        final yogaIdx = knYoga.indexOf(pan.yoga);
-        final moonRashiIdx = knRashi.indexOf(pan.chandraRashi);
+          // Derive indices from string names
+          final varaIdx = knVara.indexOf(pan.vara);
+          final yogaIdx = knYoga.indexOf(pan.yoga);
+          final moonRashiIdx = knRashi.indexOf(pan.chandraRashi);
 
-        // Get Jupiter & Sun rashi
-        final jupDeg = kr.planets['ಗುರು']?.longitude ?? 0;
-        final jupRashi = (jupDeg / 30).floor() % 12;
-        final sunDeg = kr.planets['ರವಿ']?.longitude ?? 0;
-        final sunRashi = (sunDeg / 30).floor() % 12;
+          // Get Jupiter & Sun rashi
+          final jupDeg = kr.planets['ಗುರು']?.longitude ?? 0;
+          final jupRashi = (jupDeg / 30).floor() % 12;
+          final sunDeg = kr.planets['ರವಿ']?.longitude ?? 0;
+          final sunRashi = (sunDeg / 30).floor() % 12;
 
-        // Evaluate muhurta using existing engine
-        final mResult = evaluateMuhurta(
-          event: _mfEvent,
-          tithiIndex: pan.tithiIndex,
-          tithiName: pan.tithi,
-          nakshatraIndex: pan.nakshatraIndex,
-          nakshatraName: pan.nakshatra,
-          varaIndex: varaIdx,
-          varaName: pan.vara,
-          yogaIndex: yogaIdx,
-          yogaName: pan.yoga,
-          karanaName: pan.karana,
-          moonRashiIndex: moonRashiIdx,
-          jupiterRashiIndex: jupRashi,
-          sunRashiIndex: sunRashi,
-          janmaNakIdx1: _mfNakIdx,
-          janmaRashiIdx1: _mfRashiIdx,
-        );
+          // Evaluate muhurta using existing engine
+          final mResult = evaluateMuhurta(
+            event: _mfEvent,
+            tithiIndex: pan.tithiIndex,
+            tithiName: pan.tithi,
+            nakshatraIndex: pan.nakshatraIndex,
+            nakshatraName: pan.nakshatra,
+            varaIndex: varaIdx,
+            varaName: pan.vara,
+            yogaIndex: yogaIdx,
+            yogaName: pan.yoga,
+            karanaName: pan.karana,
+            moonRashiIndex: moonRashiIdx,
+            jupiterRashiIndex: jupRashi,
+            sunRashiIndex: sunRashi,
+            janmaNakIdx1: _mfNakIdx,
+            janmaRashiIdx1: _mfRashiIdx,
+          );
 
-        // ── Hard filters: ALL checks must pass ──
-        // 1. All panchanga shuddhi checks must pass
-        final allChecksPassed = mResult.checks.every((c) => c.passed);
-        if (!allChecksPassed) continue;
+          // Evaluate individual checks
+          final allChecksPassed = mResult.checks.every((c) => c.passed);
+          final taraBala = mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null;
+          final isTaraOk = (taraBala == null || taraBala.isGood);
 
-        // 2. Tara bala must be good
-        final taraBala = mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null;
-        if (taraBala != null && !taraBala.isGood) continue;
+          final guruBala = mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null;
+          final isGuruOk = (guruBala == null || guruBala.score > 0);
 
-        // 3. Guru bala must not be ashubha
-        final guruBala = mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null;
-        if (guruBala != null && guruBala.score <= 0) continue;
+          final guruCombust = kr.planets['ಗುರು']?.isCombust ?? false;
+          final shukraCombust = (_mfEvent == MuhurtaEvent.vivaha) ? (kr.planets['ಶುಕ್ರ']?.isCombust ?? false) : false;
+          final isAstaOk = !guruCombust && !shukraCombust;
 
-        // 4. No muhurta during Guru Asta (Jupiter combust)
-        final guruCombust = kr.planets['ಗುರು']?.isCombust ?? false;
-        if (guruCombust) continue;
+          if (!isTaraOk) countTaraFailed++;
+          if (!isGuruOk) countGuruFailed++;
+          if (guruCombust) countGuruCombust++;
+          if (shukraCombust) countShukraCombust++;
+          if (!allChecksPassed) countPanchangaFailed++;
 
-        // 5. No Vivaha muhurta during Shukra Asta (Venus combust)
-        if (_mfEvent == MuhurtaEvent.vivaha) {
-          final shukraCombust = kr.planets['ಶುಕ್ರ']?.isCombust ?? false;
-          if (shukraCombust) continue;
-        }
-
-        {
           // Compute avoidance times
           final rahuKala = _rahuKalaTime(date, pan.sunrise, pan.sunset);
           final vishaGhati = pan.vishaPraghati;
@@ -1057,12 +1060,12 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
           List<LagnaWindow> dayLagnaWindows = [];
           try {
-            final srSs = Ephemeris.findSunriseSetForDate(
+            final srSs2 = Ephemeris.findSunriseSetForDate(
               date.year, date.month, date.day,
               LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
             );
-            final double srJd2 = srSs[0];
-            final double ssJd2 = srSs[1];
+            final double srJd2 = srSs2[0];
+            final double ssJd2 = srSs2[1];
             Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
             final ayn = Sweph.swe_get_ayanamsa(srJd2);
 
@@ -1073,7 +1076,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             final double mandiSr = mandiSrSs[0];
             final double mandiSs = mandiSrSs[1];
 
-            final vedWday = ((date.weekday - 1) + 1) % 7; // Sun=0..Sat=6
+            final vedWday = ((date.weekday - 1) + 1) % 7;
             final dayDuration = mandiSs - mandiSr;
             const dayFactors = [26, 22, 18, 14, 10, 6, 2];
             final dayMandiJd = mandiSr + (dayDuration * dayFactors[vedWday] / 30.0);
@@ -1083,10 +1086,31 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             dayLagnaWindows = _scanLagnaRange(srJd2, ssJd2, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
           } catch (_) {}
 
-          // Skip day if no lagna passes all shuddhis + guru anukoola
-          if (dayLagnaWindows.isEmpty || !dayLagnaWindows.any((w) => w.isPerfect)) continue;
+          final hasPerfectLagna = dayLagnaWindows.any((w) => w.isPerfect);
+          final hasShubhaLagna = dayLagnaWindows.any((w) => w.isShubha || w.isAllowed);
 
-          results.add({
+          if (!hasPerfectLagna) countNoLagnaShuddhi++;
+
+          final is100PercentPerfect = allChecksPassed && isTaraOk && isGuruOk && isAstaOk && hasPerfectLagna;
+
+          final partialReasons = <String>[];
+          if (!isTaraOk) partialReasons.add('ತಾರಾನುಕೂಲ ಮಧ್ಯಮ/ಅಶುಭ');
+          if (!isGuruOk) partialReasons.add('ಗುರು ಬಲ ಕೊರತೆ');
+          if (guruCombust) partialReasons.add('ಗುರು ಅಸ್ತ ದೋಷ');
+          if (shukraCombust) partialReasons.add('ಶುಕ್ರ ಅಸ್ತ ದೋಷ');
+          if (!allChecksPassed) {
+            final failedList = mResult.checks.where((c) => !c.passed).map((c) => c.label).join(', ');
+            partialReasons.add('ಪಂಚಾಂಗ ದೋಷ ($failedList)');
+          }
+          if (!hasPerfectLagna) {
+            if (hasShubhaLagna) {
+              partialReasons.add('ಲಗ್ನ ಶುದ್ಧಿ ಭಾಗಶಃ');
+            } else {
+              partialReasons.add('ಲಗ್ನ ಶುದ್ಧಿ ಲಭ್ಯವಿಲ್ಲ');
+            }
+          }
+
+          final dayData = {
             'date': date,
             'vara': pan.vara,
             'tithi': pan.tithi,
@@ -1098,8 +1122,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'karana': pan.karana,
             'sunrise': pan.sunrise,
             'sunset': pan.sunset,
-            'score': mResult.score,
-            'verdict': mResult.verdict,
             'taraBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null,
             'guruBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null,
             'chandraBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].chandraBala : null,
@@ -1111,17 +1133,51 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'checks': mResult.checks,
             'shubhaMuhurtas': shubhaMuhurtas,
             'lagnaWindows': dayLagnaWindows,
-          });
-        }
-      } catch (_) {}
+          };
+
+          if (is100PercentPerfect) {
+            results.add({
+              ...dayData,
+              'isPerfect': true,
+              'isCandidate': false,
+              'partialReasons': <String>[],
+              'score': mResult.score,
+              'verdict': mResult.verdict,
+            });
+          } else if (hasShubhaLagna || (allChecksPassed && isAstaOk)) {
+            results.add({
+              ...dayData,
+              'isPerfect': false,
+              'isCandidate': true,
+              'partialReasons': partialReasons,
+              'score': (mResult.score * 0.75).round(),
+              'verdict': 'ಷರತ್ತುಬದ್ಧ',
+            });
+          }
+        } catch (_) {}
       }
       curMonth = DateTime(curMonth.year, curMonth.month + 1);
     }
 
-    // Sort by score descending
-    results.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+    // Sort: 100% perfect first, then by score descending
+    results.sort((a, b) {
+      final aPerf = a['isPerfect'] == true ? 1 : 0;
+      final bPerf = b['isPerfect'] == true ? 1 : 0;
+      if (aPerf != bPerf) return bPerf.compareTo(aPerf);
+      return (b['score'] as int).compareTo(a['score'] as int);
+    });
 
-    if (mounted) setState(() { _mfResults = results; _mfSearching = false; });
+    final stats = {
+      'totalDays': totalDays,
+      'countTaraFailed': countTaraFailed,
+      'countGuruFailed': countGuruFailed,
+      'countGuruCombust': countGuruCombust,
+      'countShukraCombust': countShukraCombust,
+      'countPanchangaFailed': countPanchangaFailed,
+      'countNoLagnaShuddhi': countNoLagnaShuddhi,
+    };
+
+    if (mounted) setState(() { _mfResults = results; _mfStats = stats; _mfSearching = false; });
   }
 
   Widget _buildMuhurtaFinderTab() {
@@ -1254,30 +1310,129 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           const SizedBox(height: 12),
 
           // ── Results ──
-          if (_mfResults.isEmpty && !_mfSearching && _mfResults is List)
-            ...[],
           if (_mfSearching)
             Padding(
               padding: const EdgeInsets.all(32),
               child: Center(child: CircularProgressIndicator(color: kPurple1)),
             ),
-          if (!_mfSearching && _mfResults.isNotEmpty) ...[
-            Text('${_mfResults.length} ${AppLocale.l('result')}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
-            const SizedBox(height: 8),
-            ..._mfResults.map((r) => _buildMuhurtaResultCard(r)),
+          if (!_mfSearching && _mfStats != null) ...[
+            _buildSearchDiagnosticsCard(),
+            if (_mfResults.isNotEmpty) ...[
+              Row(
+                children: [
+                  Text('${_mfResults.length} ದಿನಗಳು ಸಿಕ್ಕಿವೆ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
+                  const SizedBox(width: 8),
+                  Text('(${_mfResults.where((r) => r['isPerfect'] == true).length} ಪರಿಪೂರ್ಣ, ${_mfResults.where((r) => r['isCandidate'] == true).length} ಷರತ್ತುಬದ್ಧ)',
+                    style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ..._mfResults.map((r) => _buildMuhurtaResultCard(r)),
+            ],
           ],
-          if (!_mfSearching && _mfResults.isEmpty && _mfResults is List && _mfResults.hashCode != [].hashCode)
-            ...[],
         ],
       )),
     );
   }
 
+  Widget _buildSearchDiagnosticsCard() {
+    if (_mfStats == null) return const SizedBox();
+    final stats = _mfStats!;
+    final totalDays = stats['totalDays'] ?? 0;
+    final perfectCount = _mfResults.where((r) => r['isPerfect'] == true).length;
+    final candidateCount = _mfResults.where((r) => r['isCandidate'] == true).length;
+
+    final countTara = stats['countTaraFailed'] ?? 0;
+    final countGuru = stats['countGuruFailed'] ?? 0;
+    final countCombust = (stats['countGuruCombust'] ?? 0) + (stats['countShukraCombust'] ?? 0);
+    final countPanchanga = stats['countPanchangaFailed'] ?? 0;
+    final countLagna = stats['countNoLagnaShuddhi'] ?? 0;
+
+    final isNoPerfect = perfectCount == 0;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isNoPerfect ? Colors.orange.withOpacity(0.06) : kPurple1.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: isNoPerfect ? Colors.orange.withOpacity(0.4) : kPurple1.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Icon(isNoPerfect ? Icons.warning_amber_rounded : Icons.analytics_outlined,
+              color: isNoPerfect ? Colors.orange.shade800 : kPurple1, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                isNoPerfect ? 'ಆಯ್ದ ಅವಧಿಯಲ್ಲಿ ಪರಿಪೂರ್ಣ ಮುಹೂರ್ತ ಸಿಗಲಿಲ್ಲ' : 'ಮುಹೂರ್ತ ಶೋಧನೆ ಸಾರಾಂಶ',
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: isNoPerfect ? Colors.orange.shade900 : kText),
+              ),
+            ),
+          ]),
+          const SizedBox(height: 6),
+          Text(
+            'ಒಟ್ಟು ಪರಿಶೀಲಿಸಿದ ದಿನಗಳು: $totalDays | ಪರಿಪೂರ್ಣ ಮುಹೂರ್ತ: $perfectCount | ಷರತ್ತುಬದ್ಧ ದಿನಗಳು: $candidateCount',
+            style: TextStyle(fontSize: 12, color: kMuted, fontWeight: FontWeight.w600),
+          ),
+          const Divider(height: 16),
+          Text('ಮುಹೂರ್ತ ಸಿಗದಿರಲು/ತಿರಸ್ಕರಿಸಲು ಕಾರಣಗಳ ವಿವರ:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kText)),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8, runSpacing: 6,
+            children: [
+              if (countTara > 0) _diagChip('ತಾರಾನುಕೂಲ ಕೊರತೆ', countTara, Colors.deepOrange),
+              if (countGuru > 0) _diagChip('ಗುರು ಬಲ ಕೊರತೆ', countGuru, Colors.amber.shade900),
+              if (countCombust > 0) _diagChip('ಗುರು/ಶುಕ್ರ ಅಸ್ತ ದೋಷ', countCombust, Colors.purple),
+              if (countPanchanga > 0) _diagChip('ಪಂಚಾಂಗ ದೋಷ', countPanchanga, Colors.red),
+              if (countLagna > 0) _diagChip('ಲಗ್ನ ಶುದ್ಧಿ ಕೊರತೆ', countLagna, Colors.blueGrey),
+            ],
+          ),
+          if (isNoPerfect && candidateCount > 0) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: Colors.amber.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+              child: Row(children: [
+                Icon(Icons.lightbulb, color: Colors.amber.shade900, size: 16),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'ಕೆಳಗೆ ನೀಡಲಾದ ಷರತ್ತುಬದ್ಧ ಮುಹೂರ್ತ ದಿನಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ನಿಮ್ಮ ಅನುಕೂಲಕ್ಕೆ ತಕ್ಕಂತೆ ಆಯ್ಕೆ ಮಾಡಿಕೊಳ್ಳಬಹುದು.',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.amber.shade900),
+                  ),
+                ),
+              ]),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _diagChip(String label, int count, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text('$label: $count ದಿನ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+    );
+  }
+
   Widget _buildMuhurtaResultCard(Map<String, dynamic> r) {
+    final isCandidate = r['isCandidate'] == true;
+    final isPerfect = r['isPerfect'] == true;
+    final partialReasons = (r['partialReasons'] as List<String>?) ?? [];
+
     final date = r['date'] as DateTime;
     final score = r['score'] as int;
-    final verdict = r['verdict'] as String;
-    final Color scoreColor = score >= 80 ? Colors.green : score >= 60 ? Colors.orange : Colors.red;
+    final verdict = isCandidate ? 'ಷರತ್ತುಬದ್ಧ' : (r['verdict'] as String);
+    final Color scoreColor = isCandidate ? Colors.amber.shade800 : (score >= 80 ? Colors.green : score >= 60 ? Colors.orange : Colors.red);
     final dateStr = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
 
     return Container(
@@ -1297,7 +1452,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
             ),
             child: Row(children: [
-              Icon(Icons.calendar_today, size: 16, color: scoreColor),
+              Icon(isPerfect ? Icons.stars : (isCandidate ? Icons.warning_amber_rounded : Icons.calendar_today), size: 16, color: scoreColor),
               const SizedBox(width: 8),
               Expanded(child: Text('$dateStr  ${trAll(r['vara'])}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kText))),
               Container(
@@ -1307,6 +1462,27 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               ),
             ]),
           ),
+
+          // Candidate Warning Banner
+          if (isCandidate)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              color: Colors.amber.withOpacity(0.12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    Icon(Icons.info_outline, size: 14, color: Colors.amber.shade900),
+                    const SizedBox(width: 6),
+                    Text('ಷರತ್ತುಬದ್ಧ ಮುಹೂರ್ತ (Candidate Muhurta)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.amber.shade900)),
+                  ]),
+                  if (partialReasons.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text('ಕಾರಣಗಳು: ${partialReasons.join(" • ")}', style: TextStyle(fontSize: 11, color: Colors.amber.shade900, fontWeight: FontWeight.w600)),
+                  ],
+                ],
+              ),
+            ),
 
           // ── Panchanga Shuddhi Table ──
           if (r['checks'] != null)
@@ -1394,73 +1570,81 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               ),
             ),
 
+          // ── Lagna Windows (shows perfect, shubha & allowed windows) ──
+          if (r['lagnaWindows'] != null) ...[
+            () {
+              final allLws = (r['lagnaWindows'] as List<LagnaWindow>);
+              final displayLws = allLws.where((w) => w.isPerfect || w.isShubha || w.isAllowed).toList();
+              if (displayLws.isEmpty) return const SizedBox();
 
-          // ── Lagna Windows (only shuddhi-passed) ──
-          if (r['lagnaWindows'] != null && (r['lagnaWindows'] as List<LagnaWindow>).any((w) => w.isPerfect))
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: kBorder),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2E86AB).withOpacity(0.08),
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-                    ),
-                    child: Text('🏠 ${AppLocale.l('dayLagnaLabel')}', style: TextStyle(fontWeight: FontWeight.w800, color: const Color(0xFF2E86AB), fontSize: 13)),
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: kBorder),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  ...(r['lagnaWindows'] as List<LagnaWindow>).where((w) => w.isPerfect).toList().asMap().entries.map((entry) {
-                    final lw = entry.value;
-                    final rowBg = lw.isPerfect ? Colors.green.withOpacity(0.1) : Colors.green.withOpacity(0.05);
-                    final rowIcon = lw.isPerfect ? Icons.star : Icons.check_circle;
-                    final iconColor = lw.isPerfect ? Colors.amber.shade700 : Colors.green;
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  child: Column(children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: rowBg,
-                        border: entry.key < (r['lagnaWindows'] as List<LagnaWindow>).where((w) => w.isPerfect).length - 1 ? Border(bottom: BorderSide(color: kBorder.withOpacity(0.4))) : null,
+                        color: const Color(0xFF2E86AB).withOpacity(0.08),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                       ),
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Row(children: [
-                          Icon(rowIcon, color: iconColor, size: 14),
-                          const SizedBox(width: 6),
-                          Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(fontWeight: FontWeight.w800, color: kText, fontSize: 12))),
-                          Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(fontSize: 11, color: Colors.green.shade700, fontWeight: FontWeight.w600)),
-                        ]),
-                        const SizedBox(height: 3),
-                        Wrap(spacing: 4, runSpacing: 3, children: [
-                          _shuddhiChip(AppLocale.l('lagnaLabel'), lw.lagnaShuddhi, lw.lagnaGrahas,
-                              required: lw.requiredShuddhis.contains(ShuddhiType.lagna)),
-                          _shuddhiChip(AppLocale.l('saptamaShort'), lw.saptamaShuddhi, lw.saptamaGrahas,
-                              required: lw.requiredShuddhis.contains(ShuddhiType.saptama)),
-                          _shuddhiChip(AppLocale.l('ashtamaShort'), lw.ashtamaShuddhi, lw.ashtamaGrahas,
-                              required: lw.requiredShuddhis.contains(ShuddhiType.ashtama)),
-                          _shuddhiChip(AppLocale.l('dashamaShort'), lw.dashamaShuddhi, lw.dashamaGrahas,
-                              required: lw.requiredShuddhis.contains(ShuddhiType.dashama)),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: lw.guruAnukoola ? Colors.amber.withOpacity(0.15) : Colors.grey.withOpacity(0.08),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: lw.guruAnukoola ? Colors.amber.shade600 : Colors.grey.shade300, width: 0.5),
+                      child: Text('🏠 ${AppLocale.l('dayLagnaLabel')}', style: TextStyle(fontWeight: FontWeight.w800, color: const Color(0xFF2E86AB), fontSize: 13)),
+                    ),
+                    ...displayLws.asMap().entries.map((entry) {
+                      final lw = entry.value;
+                      final rowBg = lw.isPerfect
+                          ? Colors.green.withOpacity(0.1)
+                          : (lw.isShubha ? Colors.amber.withOpacity(0.08) : Colors.blue.withOpacity(0.04));
+                      final rowIcon = lw.isPerfect ? Icons.star : (lw.isShubha ? Icons.check_circle_outline : Icons.info_outline);
+                      final iconColor = lw.isPerfect ? Colors.amber.shade700 : (lw.isShubha ? Colors.green : Colors.blue);
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: rowBg,
+                          border: entry.key < displayLws.length - 1 ? Border(bottom: BorderSide(color: kBorder.withOpacity(0.4))) : null,
+                        ),
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Row(children: [
+                            Icon(rowIcon, color: iconColor, size: 14),
+                            const SizedBox(width: 6),
+                            Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(fontWeight: FontWeight.w800, color: kText, fontSize: 12))),
+                            Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(fontSize: 11, color: iconColor, fontWeight: FontWeight.w600)),
+                          ]),
+                          const SizedBox(height: 3),
+                          Wrap(spacing: 4, runSpacing: 3, children: [
+                            _shuddhiChip(AppLocale.l('lagnaLabel'), lw.lagnaShuddhi, lw.lagnaGrahas,
+                                required: lw.requiredShuddhis.contains(ShuddhiType.lagna)),
+                            _shuddhiChip(AppLocale.l('saptamaShort'), lw.saptamaShuddhi, lw.saptamaGrahas,
+                                required: lw.requiredShuddhis.contains(ShuddhiType.saptama)),
+                            _shuddhiChip(AppLocale.l('ashtamaShort'), lw.ashtamaShuddhi, lw.ashtamaGrahas,
+                                required: lw.requiredShuddhis.contains(ShuddhiType.ashtama)),
+                            _shuddhiChip(AppLocale.l('dashamaShort'), lw.dashamaShuddhi, lw.dashamaGrahas,
+                                required: lw.requiredShuddhis.contains(ShuddhiType.dashama)),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: lw.guruAnukoola ? Colors.amber.withOpacity(0.15) : Colors.grey.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: lw.guruAnukoola ? Colors.amber.shade600 : Colors.grey.shade300, width: 0.5),
+                              ),
+                              child: Text(
+                                lw.guruAnukoola ? 'ಗುರು ✓ (${lw.guruFromLagna})' : 'ಗುರು ✗ (${lw.guruFromLagna})',
+                                style: TextStyle(fontSize: 9, color: lw.guruAnukoola ? Colors.amber.shade800 : kMuted, fontWeight: FontWeight.w700),
+                              ),
                             ),
-                            child: Text(
-                              lw.guruAnukoola ? 'ಗುರು ✓ (${lw.guruFromLagna})' : 'ಗುರು ✗ (${lw.guruFromLagna})',
-                              style: TextStyle(fontSize: 9, color: lw.guruAnukoola ? Colors.amber.shade800 : kMuted, fontWeight: FontWeight.w700),
-                            ),
-                          ),
+                          ]),
                         ]),
-                      ]),
-                    );
-                  }),
-                ]),
-              ),
-            ),
+                      );
+                    }),
+                  ]),
+                ),
+              );
+            }(),
+          ],
 
           // ── Doshas ──
           if ((r['doshas'] as List).isNotEmpty)
