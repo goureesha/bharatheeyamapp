@@ -1009,30 +1009,8 @@ MuhurtaDayResult evaluateMuhurta({
     passed: varaPassed,
   ));
 
-  // ── 4. YOGA CHECK (5 points) ──
-  maxPoints += 5;
-  bool yogaPassed = !blockedYogaIndices.contains(yogaIndex);
-  if (yogaPassed) totalPoints += 5;
-  checks.add(MuhurtaCheckItem(
-    label: 'ಯೋಗ',
-    value: yogaName,
-    passed: yogaPassed,
-    note: yogaPassed ? null : 'ಅಶುಭ ಯೋಗ',
-  ));
-
-  // ── 5. KARANA CHECK (5 points) ──
-  maxPoints += 5;
-  bool karanaPassed = true;
-  if (rules.avoidVishti && karanaName.contains('ವಿಷ್ಟಿ') || karanaName.contains('ಭದ್ರಾ')) {
-    karanaPassed = false;
-    doshas.add('ವಿಷ್ಟಿ (ಭದ್ರಾ) ಕರಣ');
-  }
-  if (karanaPassed) totalPoints += 5;
-  checks.add(MuhurtaCheckItem(
-    label: 'ಕರಣ',
-    value: karanaName,
-    passed: karanaPassed,
-  ));
+  // ── 4. YOGA CHECK — SKIPPED (removed per user) ──
+  // ── 5. KARANA CHECK — SKIPPED (removed per user) ──
 
   // ── 6. DAGDHA YOGA CHECK (5 points — HARD BLOCK) ──
   maxPoints += 5;
@@ -1069,9 +1047,7 @@ MuhurtaDayResult evaluateMuhurta({
   }
   if (tara1Passed) totalPoints += 10;
 
-  // Chandra Bala (Person 1) — 10 pts
-  maxPoints += 10;
-  if (chandra1) totalPoints += 10;
+  // Chandra Bala — SKIPPED (removed per user)
 
   // Guru Bala (Person 1) — 10 pts
   maxPoints += 10;
@@ -1083,7 +1059,7 @@ MuhurtaDayResult evaluateMuhurta({
   }
 
   checks.add(MuhurtaCheckItem(label: 'ತಾರಾ ಬಲ', value: tara1.taraName, passed: tara1Passed));
-  checks.add(MuhurtaCheckItem(label: 'ಚಂದ್ರ ಬಲ', value: chandra1 ? '✓' : '✗', passed: chandra1));
+  // Chandra Bala check item removed
   checks.add(MuhurtaCheckItem(label: 'ಗುರು ಬಲ', value: guru1.label, passed: guru1.score > 0));
 
   // Person 2 (if provided)
@@ -1093,7 +1069,7 @@ MuhurtaDayResult evaluateMuhurta({
     final guru2 = calculateGuruBala(janmaRashiIdx2, jupiterRashiIndex);
     personResults.add(PersonBalaResult(taraBala: tara2, chandraBala: chandra2, guruBala: guru2));
 
-    maxPoints += 30; // 10 tara + 10 chandra + 10 guru for person 2
+    maxPoints += 20; // 10 tara + 10 guru for person 2 (chandra removed)
 
     bool tara2Passed = tara2.isGood;
     if (!tara2Passed && hasAmritaSiddhi) {
@@ -1101,7 +1077,7 @@ MuhurtaDayResult evaluateMuhurta({
       doshaBhangas.add('ಅಮೃತ ಸಿದ್ಧಿ — ತಾರಾ ದೋಷ ಭಂಗ (ವ್ಯಕ್ತಿ 2)');
     }
     if (tara2Passed) totalPoints += 10;
-    if (chandra2) totalPoints += 10;
+    // chandra2 scoring removed
     
     if (guru2.score == 2) {
       totalPoints += 10;
