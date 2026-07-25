@@ -436,11 +436,9 @@ class PanchangaCache {
       }
 
       processed++;
-      // Yield to UI every 5 days
-      if (processed % 5 == 0) {
-        onProgress?.call(processed, totalDays);
-        await Future.delayed(Duration.zero);
-      }
+      // Yield to UI every day to keep UI responsive
+      onProgress?.call(processed, totalDays);
+      await Future.delayed(Duration.zero);
 
       cur = cur.add(const Duration(days: 1));
     }

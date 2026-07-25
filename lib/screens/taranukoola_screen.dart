@@ -52,6 +52,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
   // Cache state
   bool _cacheGenerating = false;
+  bool _cacheComplete = false;
   int _cacheProgress = 0;
   int _cacheTotal = 0;
 
@@ -941,7 +942,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   /// Generate 2-year panchanga cache
   Future<void> _generateCache() async {
     if (_cacheGenerating) return;
-    setState(() { _cacheGenerating = true; _cacheProgress = 0; _cacheTotal = 0; });
+    setState(() { _cacheGenerating = true; _cacheComplete = false; _cacheProgress = 0; _cacheTotal = 0; });
+    await Future.delayed(const Duration(milliseconds: 50));
 
     final now = DateTime.now();
     final startDate = DateTime(now.year, 1, 1);
@@ -958,7 +960,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       },
     );
 
-    if (mounted) setState(() { _cacheGenerating = false; });
+    if (mounted) {
+      setState(() { _cacheGenerating = false; _cacheComplete = true; });
+    }
   }
 
   /// INSTANT search using pre-computed cache
@@ -1522,7 +1526,11 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                       border: Border.all(color: const Color(0x40FF9800)),
                     ),
                     child: Column(children: [
-                      Text('ಪಂಚಾಂಗ ದತ್ತಾಂಶ ತಯಾರಿಸಲಾಗುತ್ತಿದೆ...', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                      Row(children: [
+                        SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: kPurple1)),
+                        const SizedBox(width: 8),
+                        Text('ಪಂಚಾಂಗ ದತ್ತಾಂಶ ತಯಾರಿಸಲಾಗುತ್ತಿದೆ... ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                      ]),
                       const SizedBox(height: 8),
                       LinearProgressIndicator(
                         value: _cacheTotal > 0 ? _cacheProgress / _cacheTotal : null,
