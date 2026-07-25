@@ -1492,35 +1492,107 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
               ),
 
-            // Tab bar
-            Container(
-              color: kCard,
-              child: TabBar(
-                controller: _tabCtrl,
-                isScrollable: true,
-                tabs: _tabs.map((t) => Tab(text: t)).toList(),
-              ),
-            ),
-
-            // Tab content
+            // ── Orientation-aware body ──
             Expanded(
-              child: TabBarView(
-                controller: _tabCtrl,
-                children: [
-                  _buildPanchangTab(),
-                  _buildKundaliTab(),
-                  _buildSphutas(),
-                  _buildAroodhaTab(),
-                  _buildDashaTab(),
-                  _buildBhavaTab(),
-                  _buildGrahaShadvargaTab(),
-                  _buildShadbalaTab(),
-                  _buildAshtakaTab(),
-                  _buildYogaTab(),
-                  _buildGocharTab(),
-                  _buildNotesTab(),
-                  _buildJanmaPatrikeTab(),
-                ],
+              child: OrientationBuilder(
+                builder: (context, orientation) {
+                  final isLandscape = orientation == Orientation.landscape;
+
+                  if (!isLandscape) {
+                    // ── PORTRAIT: existing layout ──
+                    return Column(
+                      children: [
+                        Container(
+                          color: kCard,
+                          child: TabBar(
+                            controller: _tabCtrl,
+                            isScrollable: true,
+                            tabs: _tabs.map((t) => Tab(text: t)).toList(),
+                          ),
+                        ),
+                        Expanded(
+                          child: TabBarView(
+                            controller: _tabCtrl,
+                            children: [
+                              _buildPanchangTab(),
+                              _buildKundaliTab(),
+                              _buildSphutas(),
+                              _buildAroodhaTab(),
+                              _buildDashaTab(),
+                              _buildBhavaTab(),
+                              _buildGrahaShadvargaTab(),
+                              _buildShadbalaTab(),
+                              _buildAshtakaTab(),
+                              _buildYogaTab(),
+                              _buildGocharTab(),
+                              _buildNotesTab(),
+                              _buildJanmaPatrikeTab(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    // ── LANDSCAPE: Panchanga left, tabs right ──
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Left panel: Panchanga details (fixed)
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.32,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                color: kCard,
+                                width: double.infinity,
+                                child: Text(_tabs[0], style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kPurple1)),
+                              ),
+                              Expanded(child: _buildPanchangTab()),
+                            ],
+                          ),
+                        ),
+                        const VerticalDivider(width: 1),
+                        // Right panel: All tabs
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Container(
+                                color: kCard,
+                                child: TabBar(
+                                  controller: _tabCtrl,
+                                  isScrollable: true,
+                                  tabs: _tabs.map((t) => Tab(text: t)).toList(),
+                                ),
+                              ),
+                              Expanded(
+                                child: TabBarView(
+                                  controller: _tabCtrl,
+                                  children: [
+                                    _buildPanchangTab(),
+                                    _buildKundaliTab(),
+                                    _buildSphutas(),
+                                    _buildAroodhaTab(),
+                                    _buildDashaTab(),
+                                    _buildBhavaTab(),
+                                    _buildGrahaShadvargaTab(),
+                                    _buildShadbalaTab(),
+                                    _buildAshtakaTab(),
+                                    _buildYogaTab(),
+                                    _buildGocharTab(),
+                                    _buildNotesTab(),
+                                    _buildJanmaPatrikeTab(),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
               ),
             ),
 
@@ -4157,58 +4229,111 @@ class _KundaliPageView extends StatefulWidget {
 class _KundaliPageViewState extends State<_KundaliPageView> {
   int _page = 0;
 
+  Widget _buildChart(int chartIdx) {
+    final chart = widget.charts[chartIdx];
+    final isBhava = chart['isBhava'] as bool;
+    final label = chart['label'] as String;
+    return KundaliChart(
+      result: widget.personResult,
+      varga: chart['varga'] as int,
+      isBhava: isBhava,
+      showSphutas: false,
+      centerLabel: label,
+      onPlanetTap: widget.onPlanetTap,
+      selectedPlanet: isBhava ? widget.bhavaPlanet : null,
+      onPlanetLongPress: isBhava ? widget.onBhavaPlanetToggle : null,
+      bhavaFromPlanet: isBhava ? widget.bhavaPlanet : null,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final chartSize = screenWidth - 32; // 16px padding each side
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-    return SizedBox(
-      height: chartSize + 40, // chart + label + dots
-      child: Column(
-        children: [
-          Expanded(
-            child: PageView.builder(
-              onPageChanged: (i) => setState(() => _page = i),
-              itemCount: widget.charts.length,
-              itemBuilder: (context, i) {
-                final chart = widget.charts[i];
-                final isBhava = chart['isBhava'] as bool;
-                final label = chart['label'] as String;
-                return Padding(
+    if (!isLandscape) {
+      // ── PORTRAIT: single chart per page ──
+      final screenWidth = MediaQuery.of(context).size.width;
+      final chartSize = screenWidth - 32;
+      return SizedBox(
+        height: chartSize + 40,
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView.builder(
+                onPageChanged: (i) => setState(() => _page = i),
+                itemCount: widget.charts.length,
+                itemBuilder: (context, i) => Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: KundaliChart(
-                    result: widget.personResult,
-                    varga: chart['varga'] as int,
-                    isBhava: isBhava,
-                    showSphutas: false,
-                    centerLabel: label,
-                    onPlanetTap: widget.onPlanetTap,
-                    selectedPlanet: isBhava ? widget.bhavaPlanet : null,
-                    onPlanetLongPress: isBhava ? widget.onBhavaPlanetToggle : null,
-                    bhavaFromPlanet: isBhava ? widget.bhavaPlanet : null,
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 4),
-          // Dot indicators
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(widget.charts.length, (i) => Container(
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: _page == i ? 18 : 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: _page == i ? kPurple2 : kBorder,
-                borderRadius: BorderRadius.circular(4),
+                  child: _buildChart(i),
+                ),
               ),
-            )),
-          ),
-          const SizedBox(height: 6),
-        ],
-      ),
-    );
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(widget.charts.length, (i) => Container(
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: _page == i ? 18 : 8, height: 8,
+                decoration: BoxDecoration(
+                  color: _page == i ? kPurple2 : kBorder,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              )),
+            ),
+            const SizedBox(height: 6),
+          ],
+        ),
+      );
+    } else {
+      // ── LANDSCAPE: 2 charts per page, swipe in pairs ──
+      final pairCount = (widget.charts.length / 2).ceil();
+      final screenHeight = MediaQuery.of(context).size.height;
+      final chartSize = (screenHeight * 0.6).clamp(200.0, 400.0);
+
+      return SizedBox(
+        height: chartSize + 40,
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView.builder(
+                onPageChanged: (i) => setState(() => _page = i),
+                itemCount: pairCount,
+                itemBuilder: (context, pairIdx) {
+                  final leftIdx = pairIdx * 2;
+                  final rightIdx = leftIdx + 1;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
+                      children: [
+                        Expanded(child: _buildChart(leftIdx)),
+                        const SizedBox(width: 8),
+                        if (rightIdx < widget.charts.length)
+                          Expanded(child: _buildChart(rightIdx))
+                        else
+                          const Expanded(child: SizedBox()),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(pairCount, (i) => Container(
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: _page == i ? 18 : 8, height: 8,
+                decoration: BoxDecoration(
+                  color: _page == i ? kPurple2 : kBorder,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              )),
+            ),
+            const SizedBox(height: 6),
+          ],
+        ),
+      );
+    }
   }
 }
 
