@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'client_service.dart';
 import 'appointment_service.dart';
+import '../core/user_muhurta_rules.dart';
 
 // Conditional imports for platform-specific file operations
 import 'backup_service_stub.dart'
@@ -19,6 +20,26 @@ class BackupService {
     'cached_appointments',
     'cached_slots',
     'bharatheeyam_profiles_v1',
+    // Muhurta user rules (per event type)
+    'user_muhurta_rules_vivaha',
+    'user_muhurta_rules_upanayana',
+    'user_muhurta_rules_grihaPrevesha',
+    'user_muhurta_rules_devaPratishtha',
+    'user_muhurta_rules_aksharabhyasa',
+    'user_muhurta_rules_yatra',
+    'user_muhurta_rules_vyapara',
+    'user_muhurta_rules_annaprashana',
+    'user_muhurta_rules_namakarana',
+    'user_muhurta_rules_seemanta',
+    'user_muhurta_rules_chowla',
+    'user_muhurta_rules_vastuShilanyas',
+    'user_muhurta_rules_aushadha',
+    'user_muhurta_rules_krishi',
+    'user_muhurta_rules_vahanaKraya',
+    'user_muhurta_rules_aasthiKraya',
+    'user_muhurta_rules_swarnaKraya',
+    'user_muhurta_rules_udyoga',
+    'user_muhurta_rules_karnavedha',
   };
 
   /// Exports all relevant app data to a JSON file.
@@ -96,6 +117,7 @@ class BackupService {
       // Reload in-memory cache
       await ClientService.loadAll();
       await AppointmentService.loadAll();
+      await UserRulesManager.instance.loadAll();
 
       return null; // Success!
     } catch (e) {

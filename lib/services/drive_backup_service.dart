@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'google_auth_service.dart';
 import 'client_service.dart';
 import 'appointment_service.dart';
+import '../core/user_muhurta_rules.dart';
 
 /// Google Drive backup service — stores app data in the user's
 /// hidden appDataFolder (not visible to the user in Drive UI).
@@ -24,6 +25,26 @@ class DriveBackupService {
     'cached_appointments',
     'cached_slots',
     'bharatheeyam_profiles_v1',
+    // Muhurta user rules (per event type)
+    'user_muhurta_rules_vivaha',
+    'user_muhurta_rules_upanayana',
+    'user_muhurta_rules_grihaPrevesha',
+    'user_muhurta_rules_devaPratishtha',
+    'user_muhurta_rules_aksharabhyasa',
+    'user_muhurta_rules_yatra',
+    'user_muhurta_rules_vyapara',
+    'user_muhurta_rules_annaprashana',
+    'user_muhurta_rules_namakarana',
+    'user_muhurta_rules_seemanta',
+    'user_muhurta_rules_chowla',
+    'user_muhurta_rules_vastuShilanyas',
+    'user_muhurta_rules_aushadha',
+    'user_muhurta_rules_krishi',
+    'user_muhurta_rules_vahanaKraya',
+    'user_muhurta_rules_aasthiKraya',
+    'user_muhurta_rules_swarnaKraya',
+    'user_muhurta_rules_udyoga',
+    'user_muhurta_rules_karnavedha',
   };
 
   /// Upload app data to Google Drive appDataFolder.
@@ -194,6 +215,7 @@ class DriveBackupService {
       // 7. Reload in-memory caches
       await ClientService.loadAll();
       await AppointmentService.loadAll();
+      await UserRulesManager.instance.loadAll();
 
       return null; // Success!
     } catch (e) {
