@@ -1373,9 +1373,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             final isUttarayana = (sunRashi >= 9 || sunRashi <= 2);
             if (!isUttarayana) continue;
           }
-          // Guru combustion
+          // Guru combustion — scored in evaluateMuhurta, not hard-blocked
           final guruCombustEarly = kr.planets['ಗುರು']?.isCombust ?? false;
-          if (guruCombustEarly) { countGuruCombust++; continue; }
+          if (guruCombustEarly) { countGuruCombust++; }
           // Tara Bala filter
           if (userRules.requireTaraBala) {
             final tb = calculateTaraBala(_mfNakIdx, pan.nakshatraIndex);

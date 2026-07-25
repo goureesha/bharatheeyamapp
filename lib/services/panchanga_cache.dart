@@ -303,9 +303,8 @@ class PanchangaCache {
       // 5. Karana check
       if (userRules.avoidVishti && (day.karanaName.contains('ವಿಷ್ಟಿ') || day.karanaName.contains('ಭದ್ರಾ'))) continue;
 
-      // 6. Dagdha Yoga check
-      final dagdhaList = dagdhaYogaTable[day.varaIndex];
-      if (dagdhaList != null && dagdhaList.contains(day.nakshatraIndex)) continue;
+      // 6. Dagdha Yoga — scored in evaluateMuhurta, NOT hard-blocked here
+      // (user can see dagdha dosha in results and decide)
 
       // 7. Shukla Paksha check
       if (userRules.requireShukla && day.tithiIndex >= 15) continue;
@@ -317,8 +316,8 @@ class PanchangaCache {
         if (!isUttarayana) continue;
       }
 
-      // 9. Guru combustion
-      if (day.guruCombust) continue;
+      // 9. Guru combustion — scored in evaluateMuhurta, NOT hard-blocked here
+      // (user can see guru asta dosha in results and decide)
 
       // 10. Tara Bala check (user-toggleable + user-selectable taras)
       if (userRules.requireTaraBala) {
