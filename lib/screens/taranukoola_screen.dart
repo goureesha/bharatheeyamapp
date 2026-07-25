@@ -1042,8 +1042,23 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   Future<void> _searchMuhurtasCached() async {
     final cache = PanchangaCache.instance;
     if (!cache.isLoaded) {
-      // Fall back to heavy search if cache not available
-      return _searchMuhurtas();
+      // Auto-generate cache for the search range so detailed rejection tracking works
+      setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; _mfDisplayCount = 20; _expandedResults.clear(); });
+      await Future.delayed(const Duration(milliseconds: 50));
+      try {
+        final startDate = DateTime(_mfMonth.year, _mfMonth.month);
+        final endDate = DateTime(_mfMonthEnd.year, _mfMonthEnd.month + 1, 0);
+        await cache.generate(
+          startDate: startDate,
+          endDate: endDate,
+          lat: LocationService.lat,
+          lon: LocationService.lon,
+          tzOffset: LocationService.tzOffset,
+        );
+      } catch (e) {
+        // If cache generation fails, fall back to non-cached
+        return _searchMuhurtas();
+      }
     }
 
     setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; _mfDisplayCount = 20; _expandedResults.clear(); });
