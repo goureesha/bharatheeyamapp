@@ -77,12 +77,6 @@ class DeviceBindingService {
           data['deviceName'] = ios.name;
           data['deviceModel'] = ios.model;
           data['iosVersion'] = ios.systemVersion;
-        } else if (defaultTargetPlatform == TargetPlatform.windows) {
-          final win = await deviceInfo.windowsInfo;
-          data['deviceName'] = win.computerName;
-          data['deviceModel'] = 'Windows PC';
-          data['windowsVersion'] = '${win.majorVersion}.${win.minorVersion}.${win.buildNumber}';
-          data['productName'] = win.productName;
         }
       }
     } catch (e) {

@@ -3,10 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'tester_service.dart';
 
-/// Whether we're running on Windows desktop (Google Sign-In not supported)
-bool get _isWindowsDesktop =>
-    !kIsWeb && defaultTargetPlatform == TargetPlatform.windows;
-
 /// Google Sign-In service — email-only (no sensitive scopes).
 /// Used for user identity (1-Gmail-1-device binding) + Firebase Auth for Firestore rules.
 class GoogleAuthService {
@@ -49,7 +45,6 @@ class GoogleAuthService {
   /// Request Drive scope if not already granted (for existing sessions).
   /// Returns true if scope is available, false if user denied.
   static Future<bool> ensureDriveScope() async {
-    if (_isWindowsDesktop) return false;
     if (_currentUser == null) return false;
     try {
       final granted = await _instance.requestScopes([
@@ -110,10 +105,6 @@ class GoogleAuthService {
   }
 
   static Future<bool> signIn() async {
-    if (_isWindowsDesktop) {
-      debugPrint('Google Sign-In: not supported on Windows desktop');
-      return false;
-    }
     try {
       _currentUser = await _instance.signIn();
       if (_currentUser != null) {
@@ -132,7 +123,6 @@ class GoogleAuthService {
   }
 
   static Future<void> signOut() async {
-    if (_isWindowsDesktop) return;
     try {
       await _instance.disconnect(); // Fully clear cached account so user can pick a different Gmail
     } catch (_) {
@@ -144,7 +134,6 @@ class GoogleAuthService {
   }
 
   static Future<bool> signInSilently() async {
-    if (_isWindowsDesktop) return false;
     try {
       _currentUser = await _instance.signInSilently();
       if (_currentUser != null) {
