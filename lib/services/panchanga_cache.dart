@@ -287,8 +287,8 @@ class PanchangaCache {
     final results = <CachedPanchangaDay>[];
 
     for (final day in daysInRange) {
-      // 1. Tithi check
-      if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(day.tithiIndex)) continue;
+      // 1. Tithi check (allowedTithis uses paksha-relative 0-14, day.tithiIndex is 0-29)
+      if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(day.tithiIndex % 15)) continue;
 
       // 2. Nakshatra check
       if (userRules.allowedNakshatras != null && !userRules.allowedNakshatras!.contains(day.nakshatraIndex)) continue;

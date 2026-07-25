@@ -1355,8 +1355,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             lagnaShuddhiShloka: defaultRulesNonCached.lagnaShuddhiShloka,
           );
 
-          // Tithi filter
-          if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(pan.tithiIndex)) continue;
+          // Tithi filter (paksha-relative: allowedTithis stores 0-14)
+          if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(pan.tithiIndex % 15)) continue;
           // Nakshatra filter
           if (userRules.allowedNakshatras != null && !userRules.allowedNakshatras!.contains(pan.nakshatraIndex)) continue;
           // Vara filter
