@@ -1163,9 +1163,10 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             final abhijitEnd = abhijitStart + muhDuration;
             // Compute lagna at Abhijit midpoint
             final abhijitMidJd = srJd + ((abhijitStart + muhDuration / 2 - srMins * 1.0) / (24.0 * 60.0));
-            final abhijitAscDeg = Ephemeris.ascendantDeg(abhijitMidJd);
-            final abhijitSidDeg = (abhijitAscDeg - ayn + 360) % 360;
-            final abhijitRashi = (abhijitSidDeg / 30).floor() % 12;
+            final abhijitHouses = Ephemeris.placidusHousesFull(abhijitMidJd, LocationService.lat, LocationService.lon);
+            if (abhijitHouses != null && abhijitHouses.ascmc.length >= 1) {
+              final abhijitSidDeg = ((abhijitHouses.ascmc[0] as double) - ayn) % 360.0;
+              final abhijitRashi = (abhijitSidDeg / 30).floor() % 12;
             final knRashiNames = ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ'];
             dayLagnaWindows.add(LagnaWindow(
               rashiIndex: abhijitRashi,
@@ -1179,6 +1180,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               guruAnukoola: true,
               guruFromLagna: 0,
             ));
+            } // end abhijitHouses check
           }
 
           rahuKala = _rahuKalaTime(day.date, kr.panchang.sunrise, kr.panchang.sunset);
