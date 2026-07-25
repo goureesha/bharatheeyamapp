@@ -1097,6 +1097,101 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
       final shukraCombust = (_mfEvent == MuhurtaEvent.vivaha) ? day.venusCombust : false;
 
+      // ── Compute lagna windows inline ──
+      List<LagnaWindow> dayLagnaWindows = [];
+      String rahuKala = '';
+      String vishaGhati = '';
+      try {
+        await Ephemeris.initSweph();
+        final srSs = Ephemeris.findSunriseSetForDate(
+          day.date.year, day.date.month, day.date.day,
+          LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
+        );
+        final srLocalFrac = ((srSs[0] + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
+        final hour24 = (srLocalFrac * 24.0) + (1.0 / 60.0);
+
+        final kr = await AstroCalculator.calculate(
+          year: day.date.year, month: day.date.month, day: day.date.day,
+          hourUtcOffset: LocationService.tzOffset,
+          hour24: hour24,
+          lat: LocationService.lat, lon: LocationService.lon,
+          ayanamsaMode: 'lahiri', trueNode: true,
+        );
+
+        if (kr != null) {
+          final Map<String, int> basePlanetRashis = {};
+          for (final entry in kr.planets.entries) {
+            if (entry.key == 'ಮಾಂದಿ') continue;
+            basePlanetRashis[entry.key] = entry.value.rashiIndex;
+          }
+          final guruRashiIdx2 = basePlanetRashis['ಗುರು'] ?? -1;
+
+          final double srJd = srSs[0];
+          final double ssJd = srSs[1];
+          Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+          final ayn = Sweph.swe_get_ayanamsa(srJd);
+
+          // Mandi
+          final mandiSrSs = Ephemeris.findSunriseSetForDate(
+            day.date.year, day.date.month, day.date.day,
+            LocationService.lat, LocationService.lon,
+          );
+          final dayDuration = mandiSrSs[1] - mandiSrSs[0];
+          final vedWday = ((day.date.weekday - 1) + 1) % 7;
+          const dayFactors = [26, 22, 18, 14, 10, 6, 2];
+          final dayMandiJd = mandiSrSs[0] + (dayDuration * dayFactors[vedWday] / 30.0);
+          final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
+          if (dayMandiRashi >= 0) basePlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
+
+          final rules = muhurtaRules[_mfEvent];
+          final allowedLagnas = rules?.allowedLagnas;
+
+          final scanEndJd = _mfEvent == MuhurtaEvent.grihaPrevesha
+              ? ssJd
+              : (srJd + 7.0 / 24.0).clamp(srJd, ssJd);
+
+          dayLagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
+
+          // If no good lagna but panchanga is good, check Abhijit muhurta lagna
+          final hasGoodLagna = dayLagnaWindows.any((w) => w.isPerfect || w.isShubha || w.isAllowed);
+          if (!hasGoodLagna && mResult.checks.every((c) => c.passed)) {
+            // Abhijit muhurta = 8th muhurta of 15 daytime muhurtas (midday)
+            final srMins = _parseTimeToMins(day.sunrise).toDouble();
+            final ssMins = _parseTimeToMins(day.sunset).toDouble();
+            final muhDuration = (ssMins - srMins) / 15.0;
+            final abhijitStart = srMins + 7 * muhDuration;
+            final abhijitEnd = abhijitStart + muhDuration;
+            // Compute lagna at Abhijit midpoint
+            final abhijitMidJd = srJd + ((abhijitStart + muhDuration / 2 - srMins * 1.0) / (24.0 * 60.0));
+            final abhijitAscDeg = Ephemeris.ascendantDeg(abhijitMidJd);
+            final abhijitSidDeg = (abhijitAscDeg - ayn + 360) % 360;
+            final abhijitRashi = (abhijitSidDeg / 30).floor() % 12;
+            final knRashiNames = ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ'];
+            dayLagnaWindows.add(LagnaWindow(
+              rashiIndex: abhijitRashi,
+              rashiName: '${knRashiNames[abhijitRashi]} (ಅಭಿಜಿತ್)',
+              startTime: _minsToTime(abhijitStart.round()),
+              endTime: _minsToTime(abhijitEnd.round()),
+              lagnaShuddhi: true,
+              saptamaShuddhi: true,
+              ashtamaShuddhi: true,
+              dashamaShuddhi: true,
+              guruAnukoola: true,
+              guruFromLagna: 0,
+            ));
+          }
+
+          rahuKala = _rahuKalaTime(day.date, kr.panchang.sunrise, kr.panchang.sunset);
+          vishaGhati = kr.panchang.vishaPraghati;
+        }
+      } catch (_) {}
+
+      // Yield to UI every 3 days
+      if (results.length % 3 == 0) {
+        await Future.delayed(Duration.zero);
+        if (mounted) setState(() {});
+      }
+
       results.add({
         'date': day.date,
         'vara': day.varaName,
@@ -1113,19 +1208,19 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         'guruBala': guruBala,
         'chandraBala': null,
         'jupRashi': day.jupiterRashiIndex,
-        'rahuKala': '',
-        'vishaGhati': '',
+        'rahuKala': rahuKala,
+        'vishaGhati': vishaGhati,
         'doshas': mResult.doshas,
         'doshaBhangas': mResult.doshaBhangas,
         'checks': mResult.checks,
         'shubhaMuhurtas': <Map<String, String>>[],
-        'lagnaWindows': <LagnaWindow>[], // computed on-demand
-        'isPerfect': true,
-        'isCandidate': false,
+        'lagnaWindows': dayLagnaWindows,
+        'isPerfect': dayLagnaWindows.any((w) => w.isPerfect),
+        'isCandidate': !dayLagnaWindows.any((w) => w.isPerfect) && dayLagnaWindows.isNotEmpty,
         'partialReasons': <String>[],
         'score': mResult.score,
         'verdict': mResult.verdict,
-        'needsLagna': true, // flag for on-demand lagna computation
+        'needsLagna': false,
       });
     }
 
@@ -1139,7 +1234,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       'countGuruCombust': 0,
       'countShukraCombust': 0,
       'countPanchangaFailed': 0,
-      'countNoLagnaShuddhi': 0,
+      'countNoLagnaShuddhi': results.where((r) => !(r['lagnaWindows'] as List).any((w) => w.isPerfect)).length,
     };
 
     if (mounted) setState(() { _mfResults = results; _mfStats = stats; _mfSearching = false; });
