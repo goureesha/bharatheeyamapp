@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import '../core/calculator.dart';
 import '../core/ephemeris.dart';
 import '../core/muhurta_rules.dart';
+import '../core/user_muhurta_rules.dart';
 import '../constants/strings.dart';
 
 /// ──────────────────────────────────────────────────────────────
@@ -266,6 +267,70 @@ class PanchangaCache {
       // 11. Guru Bala check
       final guruBala = calculateGuruBala(janmaRashiIdx, day.jupiterRashiIndex);
       if (guruBala.score == 0) continue;
+
+      results.add(day);
+    }
+    return results;
+  }
+
+  /// ────────────────────────────────────────────────────────────
+  /// INSTANT FILTER using user-editable rules
+  /// ────────────────────────────────────────────────────────────
+  List<CachedPanchangaDay> filterByUserRules({
+    required UserMuhurtaRules userRules,
+    required DateTime startDate,
+    required DateTime endDate,
+    required int janmaNakIdx,
+    required int janmaRashiIdx,
+  }) {
+    final daysInRange = getDaysInRange(startDate, endDate);
+    final results = <CachedPanchangaDay>[];
+
+    for (final day in daysInRange) {
+      // 1. Tithi check
+      if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(day.tithiIndex)) continue;
+
+      // 2. Nakshatra check
+      if (userRules.allowedNakshatras != null && !userRules.allowedNakshatras!.contains(day.nakshatraIndex)) continue;
+
+      // 3. Vara check
+      if (userRules.allowedVaras != null && !userRules.allowedVaras!.contains(day.varaIndex)) continue;
+
+      // 4. Yoga check (user-customizable blocked yogas)
+      final blocked = userRules.blockedYogas ?? blockedYogaIndices;
+      if (blocked.contains(day.yogaIndex)) continue;
+
+      // 5. Karana check
+      if (userRules.avoidVishti && (day.karanaName.contains('ವಿಷ್ಟಿ') || day.karanaName.contains('ಭದ್ರಾ'))) continue;
+
+      // 6. Dagdha Yoga check
+      final dagdhaList = dagdhaYogaTable[day.varaIndex];
+      if (dagdhaList != null && dagdhaList.contains(day.nakshatraIndex)) continue;
+
+      // 7. Shukla Paksha check
+      if (userRules.requireShukla && day.tithiIndex >= 15) continue;
+
+      // 8. Uttarayana check
+      if (userRules.requireUttarayana) {
+        final sunRashi = day.sunRashiIndex;
+        final isUttarayana = (sunRashi >= 9 || sunRashi <= 2);
+        if (!isUttarayana) continue;
+      }
+
+      // 9. Guru combustion
+      if (day.guruCombust) continue;
+
+      // 10. Tara Bala check (user-toggleable)
+      if (userRules.requireTaraBala) {
+        final taraBala = calculateTaraBala(janmaNakIdx, day.nakshatraIndex);
+        if (!taraBala.isGood) continue;
+      }
+
+      // 11. Guru Bala check (user-toggleable)
+      if (userRules.requireGuruBala) {
+        final guruBala = calculateGuruBala(janmaRashiIdx, day.jupiterRashiIndex);
+        if (guruBala.score == 0) continue;
+      }
 
       results.add(day);
     }

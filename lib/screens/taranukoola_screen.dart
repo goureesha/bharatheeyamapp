@@ -9,6 +9,8 @@ import '../core/ephemeris.dart';
 import '../services/location_service.dart';
 import '../core/muhurta_rules.dart';
 import '../services/panchanga_cache.dart';
+import '../core/user_muhurta_rules.dart';
+import '../widgets/muhurta_rules_editor.dart';
 
 class TaranukoolaScreen extends StatefulWidget {
   const TaranukoolaScreen({super.key});
@@ -79,6 +81,10 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     _calculatePanchangForSelectedDay();
     // Load pre-computed panchanga cache
     PanchangaCache.instance.loadFromStorage().then((_) {
+      if (mounted) setState(() {});
+    });
+    // Load user-customized rules
+    UserRulesManager.instance.loadAll().then((_) {
       if (mounted) setState(() {});
     });
   }
@@ -964,8 +970,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; });
     await Future.delayed(const Duration(milliseconds: 20));
 
-    final rules = muhurtaRules[_mfEvent];
-    if (rules == null) {
+    final userRules = UserRulesManager.instance.getRules(_mfEvent);
+    final defaultRules = muhurtaRules[_mfEvent];
+    if (defaultRules == null) {
       setState(() { _mfSearching = false; });
       return;
     }
@@ -975,8 +982,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     final startDate = DateTime(_mfMonth.year, _mfMonth.month, 1);
 
     // INSTANT filter — milliseconds!
-    final filteredDays = cache.filterByRules(
-      rules: rules,
+    final filteredDays = cache.filterByUserRules(
+      userRules: userRules,
       startDate: startDate,
       endDate: endDate,
       janmaNakIdx: _mfNakIdx,
@@ -1406,6 +1413,20 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                 )),
               ),
               const SizedBox(height: 10),
+            ],
+          )),
+
+          // ── Rules Editor (collapsible) ──
+          const SizedBox(height: 8),
+          MuhurtaRulesEditor(
+            event: _mfEvent,
+            onRulesChanged: () => setState(() {}),
+          ),
+          const SizedBox(height: 8),
+
+          AppCard(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
 
               // Month Range
               Text('${AppLocale.l('selectMonth')} (From - To)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
