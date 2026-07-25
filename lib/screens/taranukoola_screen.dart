@@ -1584,25 +1584,16 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'lagnaWindows': dayLagnaWindows,
           };
 
-          if (is100PercentPerfect) {
-            results.add({
-              ...dayData,
-              'isPerfect': true,
-              'isCandidate': false,
-              'partialReasons': <String>[],
-              'score': mResult.score,
-              'verdict': mResult.verdict,
-            });
-          } else if (hasShubhaLagna || (allChecksPassed && isAstaOk)) {
-            results.add({
-              ...dayData,
-              'isPerfect': false,
-              'isCandidate': true,
-              'partialReasons': partialReasons,
-              'score': (mResult.score * 0.75).round(),
-              'verdict': 'ಷರತ್ತುಬದ್ಧ',
-            });
-          }
+          // Add ALL days to results (matching cached path behavior)
+          results.add({
+            ...dayData,
+            'isPerfect': is100PercentPerfect,
+            'isCandidate': !is100PercentPerfect && (hasShubhaLagna || dayLagnaWindows.isNotEmpty),
+            'partialReasons': partialReasons,
+            'score': is100PercentPerfect ? mResult.score : (mResult.score * 0.75).round(),
+            'verdict': is100PercentPerfect ? mResult.verdict : 'ಷರತ್ತುಬದ್ಧ',
+            'needsLagna': false,
+          });
         } catch (_) {}
       }
       curMonth = DateTime(curMonth.year, curMonth.month + 1);
