@@ -1384,7 +1384,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           };
           final failures = <String>[];
 
-          if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(pan.tithiIndex % 15)) {
+          if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(pan.tithiIndex)) {
             rej['tithi']!.add(dayInfo); failures.add('tithi');
           }
           if (userRules.allowedNakshatras != null && !userRules.allowedNakshatras!.contains(pan.nakshatraIndex)) {

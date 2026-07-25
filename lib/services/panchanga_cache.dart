@@ -295,7 +295,7 @@ class PanchangaCache {
       bool rejected = false;
 
       // 1. Tithi check
-      if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(day.tithiIndex % 15)) {
+      if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(day.tithiIndex)) {
         rej['tithi']!.add(day); rejected = true;
       }
 
