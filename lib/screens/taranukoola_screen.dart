@@ -1120,6 +1120,41 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           final sunDeg = kr.planets['ರವಿ']?.longitude ?? 0;
           final sunRashi = (sunDeg / 30).floor() % 12;
 
+          // ── Apply user rules filtering ──
+          final userRules = UserRulesManager.instance.getRules(_mfEvent);
+
+          // Tithi filter
+          if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(pan.tithiIndex)) continue;
+          // Nakshatra filter
+          if (userRules.allowedNakshatras != null && !userRules.allowedNakshatras!.contains(pan.nakshatraIndex)) continue;
+          // Vara filter
+          if (userRules.allowedVaras != null && !userRules.allowedVaras!.contains(varaIdx)) continue;
+          // Yoga filter (blocked yogas)
+          final blocked = userRules.blockedYogas ?? blockedYogaIndices;
+          if (blocked.contains(yogaIdx)) continue;
+          // Karana (Vishti) filter
+          if (userRules.avoidVishti && (pan.karana.contains('ವಿಷ್ಟಿ') || pan.karana.contains('ಭದ್ರಾ'))) continue;
+          // Shukla Paksha filter
+          if (userRules.requireShukla && pan.tithiIndex >= 15) continue;
+          // Uttarayana filter
+          if (userRules.requireUttarayana) {
+            final isUttarayana = (sunRashi >= 9 || sunRashi <= 2);
+            if (!isUttarayana) continue;
+          }
+          // Guru combustion
+          final guruCombustEarly = kr.planets['ಗುರು']?.isCombust ?? false;
+          if (guruCombustEarly) { countGuruCombust++; continue; }
+          // Tara Bala filter
+          if (userRules.requireTaraBala) {
+            final tb = calculateTaraBala(_mfNakIdx, pan.nakshatraIndex);
+            if (!tb.isGood) { countTaraFailed++; continue; }
+          }
+          // Guru Bala filter
+          if (userRules.requireGuruBala) {
+            final gb = calculateGuruBala(_mfRashiIdx, jupRashi);
+            if (gb.score == 0) { countGuruFailed++; continue; }
+          }
+
           // Evaluate muhurta using existing engine
           final mResult = evaluateMuhurta(
             event: _mfEvent,
