@@ -292,57 +292,45 @@ class PanchangaCache {
     };
 
     for (final day in daysInRange) {
-      // 1. Tithi check (allowedTithis uses paksha-relative 0-14, day.tithiIndex is 0-29)
+      bool rejected = false;
+
+      // 1. Tithi check
       if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(day.tithiIndex % 15)) {
-        rej['tithi']!.add(day);
-        print('FILTER-DEBUG [${day.date}] BLOCKED by TITHI: idx=${day.tithiIndex}(mod15=${day.tithiIndex % 15}) name=${day.tithiName} allowed=${userRules.allowedTithis}');
-        continue;
+        rej['tithi']!.add(day); rejected = true;
       }
 
       // 2. Nakshatra check
       if (userRules.allowedNakshatras != null && !userRules.allowedNakshatras!.contains(day.nakshatraIndex)) {
-        rej['nakshatra']!.add(day);
-        print('FILTER-DEBUG [${day.date}] BLOCKED by NAKSHATRA: idx=${day.nakshatraIndex} name=${day.nakshatraName} allowed=${userRules.allowedNakshatras}');
-        continue;
+        rej['nakshatra']!.add(day); rejected = true;
       }
 
       // 3. Vara check
       if (userRules.allowedVaras != null && !userRules.allowedVaras!.contains(day.varaIndex)) {
-        rej['vara']!.add(day);
-        print('FILTER-DEBUG [${day.date}] BLOCKED by VARA: idx=${day.varaIndex} name=${day.varaName} allowed=${userRules.allowedVaras}');
-        continue;
+        rej['vara']!.add(day); rejected = true;
       }
 
-      // 4. Yoga check (user-customizable blocked yogas)
+      // 4. Yoga check
       final blocked = userRules.blockedYogas ?? blockedYogaIndices;
       if (blocked.contains(day.yogaIndex)) {
-        rej['yoga']!.add(day);
-        print('FILTER-DEBUG [${day.date}] BLOCKED by YOGA: idx=${day.yogaIndex} name=${day.yogaName} blocked=$blocked');
-        continue;
+        rej['yoga']!.add(day); rejected = true;
       }
 
       // 5. Karana check
       if (userRules.avoidVishti && (day.karanaName.contains('ವಿಷ್ಟಿ') || day.karanaName.contains('ಭದ್ರಾ'))) {
-        rej['karana']!.add(day);
-        print('FILTER-DEBUG [${day.date}] BLOCKED by KARANA: ${day.karanaName}');
-        continue;
+        rej['karana']!.add(day); rejected = true;
       }
 
-      // 6. Dagdha Yoga check (user-toggleable)
+      // 6. Dagdha Yoga check
       if (userRules.blockDagdhaYoga) {
         final dagdhaList = dagdhaYogaTable[day.varaIndex];
         if (dagdhaList != null && dagdhaList.contains(day.nakshatraIndex)) {
-          rej['dagdha']!.add(day);
-          print('FILTER-DEBUG [${day.date}] BLOCKED by DAGDHA_YOGA: vara=${day.varaIndex} nak=${day.nakshatraIndex}');
-          continue;
+          rej['dagdha']!.add(day); rejected = true;
         }
       }
 
       // 7. Shukla Paksha check
       if (userRules.requireShukla && day.tithiIndex >= 15) {
-        rej['shukla']!.add(day);
-        print('FILTER-DEBUG [${day.date}] BLOCKED by SHUKLA_PAKSHA: tithiIdx=${day.tithiIndex}');
-        continue;
+        rej['shukla']!.add(day); rejected = true;
       }
 
       // 8. Uttarayana check
@@ -350,33 +338,27 @@ class PanchangaCache {
         final sunRashi = day.sunRashiIndex;
         final isUttarayana = (sunRashi >= 9 || sunRashi <= 2);
         if (!isUttarayana) {
-          rej['uttarayana']!.add(day);
-          print('FILTER-DEBUG [${day.date}] BLOCKED by UTTARAYANA: sunRashi=$sunRashi');
-          continue;
+          rej['uttarayana']!.add(day); rejected = true;
         }
       }
 
-      // 9. Guru combustion — scored in evaluateMuhurta, NOT hard-blocked here
-
-      // 10. Tara Bala check (user-toggleable + user-selectable taras)
+      // 9. Tara Bala check
       if (userRules.requireTaraBala) {
         final taraBala = calculateTaraBala(janmaNakIdx, day.nakshatraIndex);
         if (!userRules.allowedTaras.contains(taraBala.taraIndex)) {
-          rej['tara']!.add(day);
-          print('FILTER-DEBUG [${day.date}] BLOCKED by TARA: taraIdx=${taraBala.taraIndex} name=${taraBala.taraName} allowed=${userRules.allowedTaras}');
-          continue;
+          rej['tara']!.add(day); rejected = true;
         }
       }
 
-      // 11. Guru Bala check (user-toggleable)
+      // 10. Guru Bala check
       if (userRules.requireGuruBala) {
         final guruBala = calculateGuruBala(janmaRashiIdx, day.jupiterRashiIndex);
         if (guruBala.score == 0) {
-          rej['guru']!.add(day);
-          print('FILTER-DEBUG [${day.date}] BLOCKED by GURU_BALA: score=${guruBala.score} label=${guruBala.label}');
-          continue;
+          rej['guru']!.add(day); rejected = true;
         }
       }
+
+      if (rejected) continue;
 
       print('FILTER-DEBUG [${day.date}] PASSED all filters');
       results.add(day);

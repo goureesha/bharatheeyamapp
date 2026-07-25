@@ -1305,14 +1305,15 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
     final results = <Map<String, dynamic>>[];
     int totalDays = 0;
-    int rejTithi = 0, rejNak = 0, rejVara = 0, rejYoga = 0, rejKarana = 0;
-    int rejShukla = 0, rejUttarayana = 0, rejDagdha = 0;
-    int countTaraFailed = 0;
-    int countGuruFailed = 0;
     int countGuruCombust = 0;
     int countShukraCombust = 0;
-    int countPanchangaFailed = 0;
     int countNoLagnaShuddhi = 0;
+    // Store rejected dates per rule (same format as cached path for clickable chips)
+    final rej = <String, List<Map<String, dynamic>>>{
+      'tithi': [], 'nakshatra': [], 'vara': [], 'yoga': [],
+      'karana': [], 'dagdha': [], 'shukla': [], 'uttarayana': [],
+      'tara': [], 'guru': [],
+    };
 
     await Ephemeris.initSweph();
     // Loop through each month in the range
@@ -1376,67 +1377,51 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             lagnaShuddhiShloka: defaultRulesNonCached.lagnaShuddhiShloka,
           );
 
-          // Tithi filter
+          // Check ALL rules — collect all failures (date can appear in multiple rejection lists)
+          final dayInfo = {
+            'date': date, 'vara': pan.vara, 'tithi': pan.tithi,
+            'nakshatra': pan.nakshatra, 'yoga': pan.yoga, 'karana': pan.karana,
+          };
+          final failures = <String>[];
+
           if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(pan.tithiIndex % 15)) {
-            rejTithi++;
-            print('FILTER [${date}] BLOCKED TITHI: ${pan.tithi} idx=${pan.tithiIndex} mod15=${pan.tithiIndex % 15}');
-            continue;
+            rej['tithi']!.add(dayInfo); failures.add('tithi');
           }
-          // Nakshatra filter
           if (userRules.allowedNakshatras != null && !userRules.allowedNakshatras!.contains(pan.nakshatraIndex)) {
-            rejNak++;
-            print('FILTER [${date}] BLOCKED NAKSHATRA: ${pan.nakshatra} idx=${pan.nakshatraIndex}');
-            continue;
+            rej['nakshatra']!.add(dayInfo); failures.add('nakshatra');
           }
-          // Vara filter
           if (userRules.allowedVaras != null && !userRules.allowedVaras!.contains(varaIdx)) {
-            rejVara++;
-            print('FILTER [${date}] BLOCKED VARA: ${pan.vara} idx=$varaIdx');
-            continue;
+            rej['vara']!.add(dayInfo); failures.add('vara');
           }
-          // Yoga filter
           final blocked = userRules.blockedYogas ?? blockedYogaIndices;
           if (blocked.contains(yogaIdx)) {
-            rejYoga++;
-            print('FILTER [${date}] BLOCKED YOGA: ${pan.yoga} idx=$yogaIdx');
-            continue;
+            rej['yoga']!.add(dayInfo); failures.add('yoga');
           }
-          // Karana filter
           if (userRules.avoidVishti && (pan.karana.contains('ವಿಷ್ಟಿ') || pan.karana.contains('ಭದ್ರಾ'))) {
-            rejKarana++;
-            print('FILTER [${date}] BLOCKED KARANA: ${pan.karana}');
-            continue;
+            rej['karana']!.add(dayInfo); failures.add('karana');
           }
-          // Shukla Paksha filter
           if (userRules.requireShukla && pan.tithiIndex >= 15) {
-            rejShukla++;
-            print('FILTER [${date}] BLOCKED SHUKLA');
-            continue;
+            rej['shukla']!.add(dayInfo); failures.add('shukla');
           }
-          // Uttarayana filter
           if (userRules.requireUttarayana) {
             final isUttarayana = (sunRashi >= 9 || sunRashi <= 2);
-            if (!isUttarayana) { rejUttarayana++; continue; }
+            if (!isUttarayana) { rej['uttarayana']!.add(dayInfo); failures.add('uttarayana'); }
           }
-          // Dagdha Yoga filter
           if (userRules.blockDagdhaYoga) {
             final dagdhaList = dagdhaYogaTable[varaIdx];
-            if (dagdhaList != null && dagdhaList.contains(pan.nakshatraIndex)) { rejDagdha++; continue; }
+            if (dagdhaList != null && dagdhaList.contains(pan.nakshatraIndex)) { rej['dagdha']!.add(dayInfo); failures.add('dagdha'); }
           }
-          // Guru combustion — scored, not blocked
           final guruCombustEarly = kr.planets['ಗುರು']?.isCombust ?? false;
           if (guruCombustEarly) { countGuruCombust++; }
-          // Tara Bala filter
           if (userRules.requireTaraBala) {
             final tb = calculateTaraBala(_mfNakIdx, pan.nakshatraIndex);
-            if (!userRules.allowedTaras.contains(tb.taraIndex)) { countTaraFailed++; continue; }
+            if (!userRules.allowedTaras.contains(tb.taraIndex)) { rej['tara']!.add(dayInfo); failures.add('tara'); }
           }
-          // Guru Bala filter
           if (userRules.requireGuruBala) {
             final gb = calculateGuruBala(_mfRashiIdx, jupRashi);
-            if (gb.score == 0) { countGuruFailed++; continue; }
+            if (gb.score == 0) { rej['guru']!.add(dayInfo); failures.add('guru'); }
           }
-          print('FILTER [${date}] PASSED all pre-filters ✓');
+          if (failures.isNotEmpty) continue; // Skip day only after checking ALL rules
 
           // Evaluate muhurta using existing engine
           final mResult = evaluateMuhurta(
@@ -1680,23 +1665,23 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       return (b['score'] as int).compareTo(a['score'] as int);
     });
 
-    print('=== FILTER SUMMARY: total=$totalDays tithi=$rejTithi nak=$rejNak vara=$rejVara yoga=$rejYoga karana=$rejKarana shukla=$rejShukla uttarayana=$rejUttarayana dagdha=$rejDagdha tara=$countTaraFailed guru=$countGuruFailed results=${results.length} ===');
     final stats = <String, dynamic>{
       'totalDays': totalDays,
-      'countTaraFailed': countTaraFailed,
-      'countGuruFailed': countGuruFailed,
+      'countTaraFailed': rej['tara']!.length,
+      'countGuruFailed': rej['guru']!.length,
       'countGuruCombust': countGuruCombust,
       'countShukraCombust': countShukraCombust,
-      'countPanchangaFailed': rejTithi + rejNak + rejVara + rejYoga + rejKarana,
+      'countPanchangaFailed': rej['tithi']!.length + rej['nakshatra']!.length + rej['vara']!.length + rej['yoga']!.length + rej['karana']!.length,
       'countNoLagnaShuddhi': countNoLagnaShuddhi,
-      'rejTithi': rejTithi,
-      'rejNak': rejNak,
-      'rejVara': rejVara,
-      'rejYoga': rejYoga,
-      'rejKarana': rejKarana,
-      'rejShukla': rejShukla,
-      'rejUttarayana': rejUttarayana,
-      'rejDagdha': rejDagdha,
+      'rejTithi': rej['tithi']!.length,
+      'rejNak': rej['nakshatra']!.length,
+      'rejVara': rej['vara']!.length,
+      'rejYoga': rej['yoga']!.length,
+      'rejKarana': rej['karana']!.length,
+      'rejShukla': rej['shukla']!.length,
+      'rejUttarayana': rej['uttarayana']!.length,
+      'rejDagdha': rej['dagdha']!.length,
+      'rejectedDays': rej,
     };
 
     if (mounted) setState(() { _mfResults = results; _mfStats = stats; _mfSearching = false; });
@@ -2193,9 +2178,24 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     separatorBuilder: (_, __) => const SizedBox(height: 6),
                     itemBuilder: (_, i) {
                       final day = rejectedDays[i];
-                      final d = day.date as DateTime;
+                      // Handle both CachedPanchangaDay (cached path) and Map (non-cached path)
+                      final DateTime d;
+                      final String vara, tithi, nakshatra, yoga;
+                      if (day is Map) {
+                        d = day['date'] as DateTime;
+                        vara = (day['vara'] as String?) ?? '';
+                        tithi = (day['tithi'] as String?) ?? '';
+                        nakshatra = (day['nakshatra'] as String?) ?? '';
+                        yoga = (day['yoga'] as String?) ?? '';
+                      } else {
+                        d = day.date as DateTime;
+                        final vi = day.varaIndex as int;
+                        vara = vi < varaNames.length ? varaNames[vi] : '';
+                        tithi = day.tithiName as String;
+                        nakshatra = day.nakshatraName as String;
+                        yoga = day.yogaName as String;
+                      }
                       final dateStr = '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
-                      final vara = day.varaIndex < varaNames.length ? varaNames[day.varaIndex] : '';
                       return Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -2213,7 +2213,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                             ]),
                             const SizedBox(height: 4),
                             Text(
-                              'ತಿಥಿ: ${day.tithiName}  |  ನಕ್ಷತ್ರ: ${day.nakshatraName}  |  ಯೋಗ: ${day.yogaName}',
+                              'ತಿಥಿ: $tithi  |  ನಕ್ಷತ್ರ: $nakshatra  |  ಯೋಗ: $yoga',
                               style: TextStyle(fontSize: 11, color: Colors.white70),
                             ),
                           ],
