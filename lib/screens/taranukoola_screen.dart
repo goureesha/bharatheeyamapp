@@ -1092,7 +1092,12 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
               if (dayMandiRashi >= 0) basePlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
 
-              dayLagnaWindows = _scanLagnaRange(srJd2, ssJd2, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
+              // For Griha Pravesha: full day scan. Others: sunrise to ~1 PM only.
+              final scanEndJd = _mfEvent == MuhurtaEvent.grihaPrevesha
+                  ? ssJd2
+                  : (srJd2 + 7.0 / 24.0).clamp(srJd2, ssJd2);
+
+              dayLagnaWindows = _scanLagnaRange(srJd2, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
             } catch (_) {}
 
             hasPerfectLagna = dayLagnaWindows.any((w) => w.isPerfect);
