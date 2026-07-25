@@ -1177,9 +1177,25 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           // Shuddhi pass/fail remains as informational markers on each window
           dayLagnaWindows = dayLagnaWindows.where((w) => w.isAllowed).toList();
 
-          // Always compute Abhijit muhurta as a fallback option
-          final hasGoodLagna = dayLagnaWindows.any((w) => w.isPerfect || w.isShubha);
-          if (!hasGoodLagna) {
+          // Check if any window passes ALL user-required shuddhi checks
+          final hasFullyShuddhLagna = dayLagnaWindows.any((w) {
+            for (final s in userRules.requiredShuddhis) {
+              switch (s) {
+                case ShuddhiType.lagna: if (!w.lagnaShuddhi) return false;
+                case ShuddhiType.saptama: if (!w.saptamaShuddhi) return false;
+                case ShuddhiType.ashtama: if (!w.ashtamaShuddhi) return false;
+                case ShuddhiType.dashama: if (!w.dashamaShuddhi) return false;
+                case ShuddhiType.chandraSaptama: if (!w.chandraSaptamaShuddhi) return false;
+              }
+            }
+            if (userRules.requireGuruAnukoolaForLagna && !w.guruAnukoola) return false;
+            return true;
+          });
+
+          // If panchanga shuddhi passes but no lagna satisfies all required checks,
+          // compute Abhijit muhurta as fallback
+          final panchangaPassed = mResult.checks.every((c) => c.passed);
+          if (!hasFullyShuddhLagna && panchangaPassed) {
             // Abhijit muhurta = 8th muhurta of 15 daytime muhurtas (midday)
             final srMins = _parseTimeToMins(day.sunrise).toDouble();
             final ssMins = _parseTimeToMins(day.sunset).toDouble();
