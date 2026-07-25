@@ -1172,9 +1172,23 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
           dayLagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules);
 
-          // Filter: only keep lagna windows in allowed rashi list
-          // Shuddhi pass/fail remains as informational markers on each window
-          dayLagnaWindows = dayLagnaWindows.where((w) => w.isAllowed).toList();
+
+          // Filter rashi lagnas: only show windows that pass ALL required shuddhi checks
+          // (Abhijit muhurta is added separately below — it doesn't need shuddhi)
+          dayLagnaWindows = dayLagnaWindows.where((w) {
+            if (!w.isAllowed) return false;
+            for (final s in userRules.requiredShuddhis) {
+              switch (s) {
+                case ShuddhiType.lagna: if (!w.lagnaShuddhi) return false;
+                case ShuddhiType.saptama: if (!w.saptamaShuddhi) return false;
+                case ShuddhiType.ashtama: if (!w.ashtamaShuddhi) return false;
+                case ShuddhiType.dashama: if (!w.dashamaShuddhi) return false;
+                case ShuddhiType.chandraSaptama: if (!w.chandraSaptamaShuddhi) return false;
+              }
+            }
+            if (userRules.requireGuruAnukoolaForLagna && !w.guruAnukoola) return false;
+            return true;
+          }).toList();
 
           // Abhijit muhurta is universally auspicious — no shuddhi checks needed
           // Compute when panchanga shuddhi passes
@@ -1499,8 +1513,21 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
               dayLagnaWindows = _scanLagnaRange(srJd2, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules2);
 
-              // Filter: only keep lagna windows in allowed rashi list
-              dayLagnaWindows = dayLagnaWindows.where((w) => w.isAllowed).toList();
+              // Filter rashi lagnas: only show windows that pass ALL required shuddhi checks
+              dayLagnaWindows = dayLagnaWindows.where((w) {
+                if (!w.isAllowed) return false;
+                for (final s in userRules.requiredShuddhis) {
+                  switch (s) {
+                    case ShuddhiType.lagna: if (!w.lagnaShuddhi) return false;
+                    case ShuddhiType.saptama: if (!w.saptamaShuddhi) return false;
+                    case ShuddhiType.ashtama: if (!w.ashtamaShuddhi) return false;
+                    case ShuddhiType.dashama: if (!w.dashamaShuddhi) return false;
+                    case ShuddhiType.chandraSaptama: if (!w.chandraSaptamaShuddhi) return false;
+                  }
+                }
+                if (userRules.requireGuruAnukoolaForLagna && !w.guruAnukoola) return false;
+                return true;
+              }).toList();
             } catch (_) {}
 
             hasPerfectLagna = dayLagnaWindows.any((w) => w.isPerfect);
