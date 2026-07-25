@@ -288,7 +288,7 @@ class PanchangaCache {
     final results = <CachedPanchangaDay>[];
     final rej = <String, List<CachedPanchangaDay>>{
       'tithi': [], 'nakshatra': [], 'vara': [], 'yoga': [],
-      'karana': [], 'shukla': [], 'uttarayana': [], 'tara': [], 'guru': [],
+      'karana': [], 'dagdha': [], 'shukla': [], 'uttarayana': [], 'tara': [], 'guru': [],
     };
 
     for (final day in daysInRange) {
@@ -328,7 +328,15 @@ class PanchangaCache {
         continue;
       }
 
-      // 6. Dagdha Yoga — scored in evaluateMuhurta, NOT hard-blocked here
+      // 6. Dagdha Yoga check (user-toggleable)
+      if (userRules.blockDagdhaYoga) {
+        final dagdhaList = dagdhaYogaTable[day.varaIndex];
+        if (dagdhaList != null && dagdhaList.contains(day.nakshatraIndex)) {
+          rej['dagdha']!.add(day);
+          print('FILTER-DEBUG [${day.date}] BLOCKED by DAGDHA_YOGA: vara=${day.varaIndex} nak=${day.nakshatraIndex}');
+          continue;
+        }
+      }
 
       // 7. Shukla Paksha check
       if (userRules.requireShukla && day.tithiIndex >= 15) {

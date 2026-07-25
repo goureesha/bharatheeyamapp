@@ -15,6 +15,8 @@ class UserMuhurtaRules {
   bool avoidVishti;
   bool requireShukla;
   bool requireUttarayana;
+  bool blockDagdhaYoga;            // true = block dagdha yoga days
+  bool considerAbhijit;            // true = always compute abhijit muhurta
 
   // Lagna filters
   List<int>? allowedLagnas;        // null = use default
@@ -37,6 +39,8 @@ class UserMuhurtaRules {
     this.avoidVishti = true,
     this.requireShukla = false,
     this.requireUttarayana = false,
+    this.blockDagdhaYoga = false,
+    this.considerAbhijit = true,
     this.allowedLagnas,
     this.requiredShuddhis = const {ShuddhiType.lagna},
     this.fullDayScan = false,
@@ -58,6 +62,8 @@ class UserMuhurtaRules {
       avoidVishti: defaults.avoidVishti,
       requireShukla: defaults.requireShukla,
       requireUttarayana: defaults.requireUttarayana,
+      blockDagdhaYoga: false,
+      considerAbhijit: true,
       allowedLagnas: defaults.allowedLagnas != null ? List<int>.from(defaults.allowedLagnas!) : null,
       requiredShuddhis: Set<ShuddhiType>.from(defaults.requiredShuddhis),
       fullDayScan: event == MuhurtaEvent.grihaPrevesha,
@@ -77,6 +83,8 @@ class UserMuhurtaRules {
     'avoidVishti': avoidVishti,
     'reqShukla': requireShukla,
     'reqUttarayana': requireUttarayana,
+    'blockDagdha': blockDagdhaYoga,
+    'abhijit': considerAbhijit,
     'lagnas': allowedLagnas,
     'shuddhis': requiredShuddhis.map((s) => s.index).toList(),
     'fullDay': fullDayScan,
@@ -96,6 +104,8 @@ class UserMuhurtaRules {
       avoidVishti: json['avoidVishti'] ?? true,
       requireShukla: json['reqShukla'] ?? false,
       requireUttarayana: json['reqUttarayana'] ?? false,
+      blockDagdhaYoga: json['blockDagdha'] ?? false,
+      considerAbhijit: json['abhijit'] ?? true,
       allowedLagnas: json['lagnas'] != null ? List<int>.from(json['lagnas']) : null,
       requiredShuddhis: json['shuddhis'] != null
           ? (json['shuddhis'] as List).map((i) => ShuddhiType.values[i as int]).toSet()

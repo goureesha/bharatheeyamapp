@@ -1377,6 +1377,11 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             final isUttarayana = (sunRashi >= 9 || sunRashi <= 2);
             if (!isUttarayana) continue;
           }
+          // Dagdha Yoga filter (user-toggleable)
+          if (userRules.blockDagdhaYoga) {
+            final dagdhaList = dagdhaYogaTable[varaIdx];
+            if (dagdhaList != null && dagdhaList.contains(pan.nakshatraIndex)) continue;
+          }
           // Guru combustion — scored in evaluateMuhurta, not hard-blocked
           final guruCombustEarly = kr.planets['ಗುರು']?.isCombust ?? false;
           if (guruCombustEarly) { countGuruCombust++; }
@@ -1467,16 +1472,13 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             }
           }
 
-          // Skip expensive lagna scan if basic checks clearly fail
-          final basicViable = (allChecksPassed || isTaraOk) && isAstaOk;
-
-          // Compute lagna windows only for viable days
+          // Always compute lagna windows for every day (no basicViable guard)
           final allowedLagnas = userRules.allowedLagnas ?? defaultRulesNonCached.allowedLagnas;
           List<LagnaWindow> dayLagnaWindows = [];
           bool hasPerfectLagna = false;
           bool hasShubhaLagna = false;
 
-          if (basicViable) {
+          {
             final Map<String, int> basePlanetRashis = {};
             for (final entry in kr.planets.entries) {
               if (entry.key == 'ಮಾಂದಿ') continue;
@@ -1532,6 +1534,37 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                 if (userRules.requireGuruAnukoolaForLagna && !w.guruAnukoola) return false;
                 return true;
               }).toList();
+
+              // Abhijit muhurta — universally auspicious (if user has it enabled)
+              if (userRules.considerAbhijit) {
+                final srMinsLagna = ((srSs2[0] + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 * 24.0 * 60.0);
+                final ssMinsLagna = ((srSs2[1] + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 * 24.0 * 60.0);
+                final muhDurLagna = (ssMinsLagna - srMinsLagna) / 15.0;
+                final abhijitStart = srMinsLagna + 7 * muhDurLagna;
+                final abhijitEnd = abhijitStart + muhDurLagna;
+                final abhijitMidJd = srJd2 + ((abhijitStart + muhDurLagna / 2 - srMinsLagna) / (24.0 * 60.0));
+                final abhijitHouses = Ephemeris.placidusHousesFull(abhijitMidJd, LocationService.lat, LocationService.lon);
+                if (abhijitHouses != null && abhijitHouses.ascmc.length >= 1) {
+                  final abhijitSidDeg = ((abhijitHouses.ascmc[0] as double) - ayn) % 360.0;
+                  final abhijitRashi = (abhijitSidDeg / 30).floor() % 12;
+                  final knRashiNames = ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ'];
+                  dayLagnaWindows.add(LagnaWindow(
+                    rashiIndex: abhijitRashi,
+                    rashiName: '${knRashiNames[abhijitRashi]} (ಅಭಿಜಿತ್)',
+                    startTime: _minsToTime(abhijitStart.round()),
+                    endTime: _minsToTime(abhijitEnd.round()),
+                    isAllowed: true,
+                    isPerfect: true,
+                    isShubha: true,
+                    lagnaShuddhi: true,
+                    saptamaShuddhi: true,
+                    ashtamaShuddhi: true,
+                    dashamaShuddhi: true,
+                    chandraSaptamaShuddhi: true,
+                    guruAnukoola: true,
+                  ));
+                }
+              }
             } catch (_) {}
 
             hasPerfectLagna = dayLagnaWindows.any((w) => w.isPerfect);
@@ -1986,6 +2019,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     'vara': ('ವಾರ', Colors.brown),
                     'yoga': ('ಯೋಗ', Colors.pink),
                     'karana': ('ಕರಣ', Colors.cyan.shade800),
+                    'dagdha': ('ದಗ್ಧ ಯೋಗ', Colors.red.shade800),
                     'shukla': ('ಶುಕ್ಲಪಕ್ಷ', Colors.grey),
                     'uttarayana': ('ಉತ್ತರಾಯಣ', Colors.blue),
                     'tara': ('ತಾರಾಬಲ', Colors.deepOrange),

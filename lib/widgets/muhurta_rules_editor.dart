@@ -186,6 +186,14 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
               setState(() => _rules.requireUttarayana = v);
               _onChanged();
             }),
+            _buildToggle('ದಗ್ಧ ಯೋಗ ತಪ್ಪಿಸಿ', _rules.blockDagdhaYoga, (v) {
+              setState(() => _rules.blockDagdhaYoga = v);
+              _onChanged();
+            }),
+            _buildToggle('ಅಭಿಜಿತ್ ಮುಹೂರ್ತ ಪರಿಗಣಿಸಿ', _rules.considerAbhijit, (v) {
+              setState(() => _rules.considerAbhijit = v);
+              _onChanged();
+            }),
             _buildToggle('ತಾರಾ ಬಲ ಅಗತ್ಯ', _rules.requireTaraBala, (v) {
               setState(() => _rules.requireTaraBala = v);
               _onChanged();
