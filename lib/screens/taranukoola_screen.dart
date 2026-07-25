@@ -47,7 +47,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   bool _mfSearching = false;
   List<Map<String, dynamic>> _mfResults = [];
   Map<String, int>? _mfStats;
-  int _mfDisplayCount = 20; // show 20 results at a time
+  int _mfDisplayCount = 20;
+  final Set<String> _expandedResults = {};
 
   // Cache state
   bool _cacheGenerating = false;
@@ -968,7 +969,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       return _searchMuhurtas();
     }
 
-    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; _mfDisplayCount = 20; });
+    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; _mfDisplayCount = 20; _expandedResults.clear(); });
     await Future.delayed(const Duration(milliseconds: 20));
 
     final userRules = UserRulesManager.instance.getRules(_mfEvent);
@@ -1723,12 +1724,14 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
     final date = r['date'] as DateTime;
     final score = r['score'] as int;
-    final verdict = isCandidate ? 'ಷರತ್ತುಬದ್ಧ' : (r['verdict'] as String);
     final Color scoreColor = isCandidate ? Colors.amber.shade800 : (score >= 80 ? Colors.green : score >= 60 ? Colors.orange : Colors.red);
     final dateStr = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
 
+    final dateKey = '${date.year}-${date.month}-${date.day}';
+    final isExpanded = _expandedResults.contains(dateKey);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: kCard, borderRadius: BorderRadius.circular(12),
         border: Border.all(color: scoreColor.withOpacity(0.4), width: 1.5),
@@ -1736,26 +1739,47 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── Header: Date + Score ──
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: scoreColor.withOpacity(0.08),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
-            ),
-            child: Row(children: [
-              Icon(isPerfect ? Icons.stars : (isCandidate ? Icons.warning_amber_rounded : Icons.calendar_today), size: 16, color: scoreColor),
-              const SizedBox(width: 8),
-              Expanded(child: Text('$dateStr  ${trAll(r['vara'])}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kText))),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: scoreColor.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-                child: Text('$score — $verdict', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: scoreColor)),
+          // ── ALWAYS VISIBLE: Tappable Header ──
+          GestureDetector(
+            onTap: () => setState(() {
+              if (isExpanded) { _expandedResults.remove(dateKey); }
+              else { _expandedResults.add(dateKey); }
+            }),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: scoreColor.withOpacity(0.08),
+                borderRadius: isExpanded
+                    ? const BorderRadius.vertical(top: Radius.circular(11))
+                    : BorderRadius.circular(11),
               ),
-            ]),
+              child: Row(children: [
+                Icon(isPerfect ? Icons.stars : (isCandidate ? Icons.warning_amber_rounded : Icons.calendar_today), size: 16, color: scoreColor),
+                const SizedBox(width: 8),
+                Expanded(child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('$dateStr  ${trAll(r['vara'])}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kText)),
+                    const SizedBox(height: 2),
+                    Text(
+                      isPerfect ? '✅ ಪರಿಪೂರ್ಣ ಮುಹೂರ್ತ' : (isCandidate ? '⚠ ಷರತ್ತುಬದ್ಧ' : '📅 ಮುಹೂರ್ತ'),
+                      style: TextStyle(fontSize: 11, color: scoreColor, fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                )),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(color: scoreColor.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                  child: Text('$score', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: scoreColor)),
+                ),
+                const SizedBox(width: 6),
+                Icon(isExpanded ? Icons.expand_less : Icons.expand_more, size: 20, color: kMuted),
+              ]),
+            ),
           ),
 
-          // Candidate Warning Banner
+          // ── EXPANDABLE: Full Details ──
+          if (isExpanded) ...[
           if (isCandidate)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -1957,6 +1981,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             ),
 
           const SizedBox(height: 12),
+          ], // end if(isExpanded)
         ],
       ),
     );
