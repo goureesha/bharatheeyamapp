@@ -1069,7 +1069,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       janmaRashiIdx: _mfRashiIdx,
     );
     final filteredDays = filterResult.days;
-    final rejections = filterResult.rejections;
+    final rejectedDays = filterResult.rejectedDays;
 
     // Build a MuhurtaEventRules from user's customized rules for evaluateMuhurta
     final userOverrideRules = MuhurtaEventRules(
@@ -1272,13 +1272,13 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
     final stats = {
       'totalDays': totalDays,
-      'countTaraFailed': rejections['tara'] ?? 0,
-      'countGuruFailed': rejections['guru'] ?? 0,
+      'countTaraFailed': rejectedDays['tara']?.length ?? 0,
+      'countGuruFailed': rejectedDays['guru']?.length ?? 0,
       'countGuruCombust': 0,
       'countShukraCombust': 0,
-      'countPanchangaFailed': (rejections['tithi'] ?? 0) + (rejections['nakshatra'] ?? 0) + (rejections['vara'] ?? 0) + (rejections['yoga'] ?? 0) + (rejections['karana'] ?? 0),
+      'countPanchangaFailed': (rejectedDays['tithi']?.length ?? 0) + (rejectedDays['nakshatra']?.length ?? 0) + (rejectedDays['vara']?.length ?? 0) + (rejectedDays['yoga']?.length ?? 0) + (rejectedDays['karana']?.length ?? 0),
       'countNoLagnaShuddhi': results.where((r) => !(r['lagnaWindows'] as List).any((w) => w.isPerfect)).length,
-      'rejections': rejections,
+      'rejectedDays': rejectedDays,
     };
 
     if (mounted) setState(() { _mfResults = results; _mfStats = stats; _mfSearching = false; });
@@ -1979,23 +1979,33 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               if (countLagna > 0) _diagChip('ಲಗ್ನ ಶುದ್ಧಿ ಕೊರತೆ', countLagna, Colors.blueGrey),
             ],
           ),
-          // Detailed per-rule rejection breakdown
-          if (stats['rejections'] != null) ...[
+          // Detailed per-rule rejection breakdown — clickable chips
+          if (stats['rejectedDays'] != null) ...[
             const SizedBox(height: 10),
-            Text('ನಿಯಮದ ಪ್ರಕಾರ ತಿರಸ್ಕೃತ ದಿನಗಳು:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
+            Text('ನಿಯಮದ ಪ್ರಕಾರ ತಿರಸ್ಕೃತ ದಿನಗಳು (ಒತ್ತಿ ನೋಡಿ):', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
             const SizedBox(height: 4),
             Wrap(
               spacing: 6, runSpacing: 4,
               children: [
-                if ((stats['rejections']['tithi'] ?? 0) > 0) _diagChip('ತಿಥಿ', stats['rejections']['tithi'], Colors.teal),
-                if ((stats['rejections']['nakshatra'] ?? 0) > 0) _diagChip('ನಕ್ಷತ್ರ', stats['rejections']['nakshatra'], Colors.indigo),
-                if ((stats['rejections']['vara'] ?? 0) > 0) _diagChip('ವಾರ', stats['rejections']['vara'], Colors.brown),
-                if ((stats['rejections']['yoga'] ?? 0) > 0) _diagChip('ಯೋಗ', stats['rejections']['yoga'], Colors.pink),
-                if ((stats['rejections']['karana'] ?? 0) > 0) _diagChip('ಕರಣ', stats['rejections']['karana'], Colors.cyan.shade800),
-                if ((stats['rejections']['shukla'] ?? 0) > 0) _diagChip('ಶುಕ್ಲಪಕ್ಷ', stats['rejections']['shukla'], Colors.grey),
-                if ((stats['rejections']['uttarayana'] ?? 0) > 0) _diagChip('ಉತ್ತರಾಯಣ', stats['rejections']['uttarayana'], Colors.blue),
-                if ((stats['rejections']['tara'] ?? 0) > 0) _diagChip('ತಾರಾಬಲ', stats['rejections']['tara'], Colors.deepOrange),
-                if ((stats['rejections']['guru'] ?? 0) > 0) _diagChip('ಗುರುಬಲ', stats['rejections']['guru'], Colors.amber.shade900),
+                for (final entry in {
+                  'tithi': ('ತಿಥಿ', Colors.teal),
+                  'nakshatra': ('ನಕ್ಷತ್ರ', Colors.indigo),
+                  'vara': ('ವಾರ', Colors.brown),
+                  'yoga': ('ಯೋಗ', Colors.pink),
+                  'karana': ('ಕರಣ', Colors.cyan.shade800),
+                  'shukla': ('ಶುಕ್ಲಪಕ್ಷ', Colors.grey),
+                  'uttarayana': ('ಉತ್ತರಾಯಣ', Colors.blue),
+                  'tara': ('ತಾರಾಬಲ', Colors.deepOrange),
+                  'guru': ('ಗುರುಬಲ', Colors.amber.shade900),
+                }.entries)
+                  if ((stats['rejectedDays'][entry.key] as List?)?.isNotEmpty ?? false)
+                    _clickableDiagChip(
+                      entry.value.$1,
+                      (stats['rejectedDays'][entry.key] as List).length,
+                      entry.value.$2,
+                      stats['rejectedDays'][entry.key] as List,
+                      entry.value.$1,
+                    ),
               ],
             ),
           ],
@@ -2030,6 +2040,108 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Text('$label: $count ದಿನ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+    );
+  }
+
+  Widget _clickableDiagChip(String label, int count, Color color, List rejectedDays, String ruleName) {
+    return GestureDetector(
+      onTap: () => _showRejectedDatesSheet(rejectedDays, ruleName, color),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('$label: $count ದಿನ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+            const SizedBox(width: 4),
+            Icon(Icons.open_in_new, size: 11, color: color),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRejectedDatesSheet(List rejectedDays, String ruleName, Color color) {
+    final varaNames = ['ರವಿ', 'ಸೋಮ', 'ಮಂಗಳ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ'];
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF1A1218),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.3,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (_, scrollCtrl) {
+            return Column(
+              children: [
+                Container(
+                  width: 40, height: 4,
+                  margin: const EdgeInsets.only(top: 10, bottom: 8),
+                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(children: [
+                    Icon(Icons.block, color: color, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '\"$ruleName\" ನಿಯಮದಿಂದ ತಿರಸ್ಕೃತ: ${rejectedDays.length} ದಿನಗಳು',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color),
+                      ),
+                    ),
+                  ]),
+                ),
+                const Divider(height: 1, color: Colors.white12),
+                Expanded(
+                  child: ListView.separated(
+                    controller: scrollCtrl,
+                    padding: const EdgeInsets.all(12),
+                    itemCount: rejectedDays.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 6),
+                    itemBuilder: (_, i) {
+                      final day = rejectedDays[i];
+                      final d = day.date as DateTime;
+                      final dateStr = '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+                      final vara = day.varaIndex < varaNames.length ? varaNames[day.varaIndex] : '';
+                      return Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.04),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: color.withOpacity(0.15)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              Text(dateStr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Colors.white)),
+                              const SizedBox(width: 8),
+                              Text(vara, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.amber)),
+                            ]),
+                            const SizedBox(height: 4),
+                            Text(
+                              'ತಿಥಿ: ${day.tithiName}  |  ನಕ್ಷತ್ರ: ${day.nakshatraName}  |  ಯೋಗ: ${day.yogaName}',
+                              style: TextStyle(fontSize: 11, color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
