@@ -25,6 +25,7 @@ class UserMuhurtaRules {
 
   // Bala filters
   bool requireTaraBala;
+  List<int> allowedTaras; // which of the 9 taras (0-8) are considered good
   bool requireGuruBala;
   bool requireGuruAnukoolaForLagna;
 
@@ -40,6 +41,7 @@ class UserMuhurtaRules {
     this.requiredShuddhis = const {ShuddhiType.lagna},
     this.fullDayScan = false,
     this.requireTaraBala = true,
+    this.allowedTaras = const [1, 3, 5, 7, 8],
     this.requireGuruBala = true,
     this.requireGuruAnukoolaForLagna = true,
   });
@@ -60,6 +62,7 @@ class UserMuhurtaRules {
       requiredShuddhis: Set<ShuddhiType>.from(defaults.requiredShuddhis),
       fullDayScan: event == MuhurtaEvent.grihaPrevesha,
       requireTaraBala: true,
+      allowedTaras: const [1, 3, 5, 7, 8],
       requireGuruBala: true,
       requireGuruAnukoolaForLagna: true,
     );
@@ -78,6 +81,7 @@ class UserMuhurtaRules {
     'shuddhis': requiredShuddhis.map((s) => s.index).toList(),
     'fullDay': fullDayScan,
     'reqTara': requireTaraBala,
+    'allowedTaras': allowedTaras,
     'reqGuru': requireGuruBala,
     'reqGuruLagna': requireGuruAnukoolaForLagna,
   };
@@ -98,6 +102,7 @@ class UserMuhurtaRules {
           : const {ShuddhiType.lagna},
       fullDayScan: json['fullDay'] ?? false,
       requireTaraBala: json['reqTara'] ?? true,
+      allowedTaras: json['allowedTaras'] != null ? List<int>.from(json['allowedTaras']) : const [1, 3, 5, 7, 8],
       requireGuruBala: json['reqGuru'] ?? true,
       requireGuruAnukoolaForLagna: json['reqGuruLagna'] ?? true,
     );

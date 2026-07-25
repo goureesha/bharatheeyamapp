@@ -1323,7 +1323,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           // Tara Bala filter
           if (userRules.requireTaraBala) {
             final tb = calculateTaraBala(_mfNakIdx, pan.nakshatraIndex);
-            if (!tb.isGood) { countTaraFailed++; continue; }
+            if (!userRules.allowedTaras.contains(tb.taraIndex)) { countTaraFailed++; continue; }
           }
           // Guru Bala filter
           if (userRules.requireGuruBala) {

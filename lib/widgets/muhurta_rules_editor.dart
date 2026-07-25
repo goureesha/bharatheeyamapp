@@ -190,6 +190,44 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
               setState(() => _rules.requireTaraBala = v);
               _onChanged();
             }),
+            if (_rules.requireTaraBala) ...[
+              const SizedBox(height: 6),
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Text('ಅನುಮತಿಸಿದ ತಾರೆಗಳು:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7))),
+              ),
+              const SizedBox(height: 4),
+              Wrap(
+                spacing: 6, runSpacing: 6,
+                children: List.generate(9, (i) {
+                  const taraLabels = [
+                    'ಜನ್ಮ', 'ಸಂಪತ್', 'ವಿಪತ್',
+                    'ಕ್ಷೇಮ', 'ಪ್ರತ್ಯಕ್', 'ಸಾಧಕ',
+                    'ವಧ', 'ಮಿತ್ರ', 'ಪ.ಮಿತ್ರ',
+                  ];
+                  const defaultGood = [1, 3, 5, 7, 8];
+                  final selected = _rules.allowedTaras.contains(i);
+                  final isDefault = defaultGood.contains(i);
+                  return FilterChip(
+                    label: Text(taraLabels[i], style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                    selected: selected,
+                    selectedColor: isDefault ? Colors.green.withOpacity(0.2) : Colors.orange.withOpacity(0.2),
+                    checkmarkColor: isDefault ? Colors.green.shade700 : Colors.orange.shade700,
+                    backgroundColor: Colors.grey.withOpacity(0.1),
+                    side: BorderSide(color: selected ? (isDefault ? Colors.green : Colors.orange) : Colors.grey.shade400, width: 0.5),
+                    onSelected: (sel) {
+                      setState(() {
+                        final mutable = List<int>.from(_rules.allowedTaras);
+                        if (sel) { mutable.add(i); } else { mutable.remove(i); }
+                        _rules.allowedTaras = mutable;
+                      });
+                      _onChanged();
+                    },
+                  );
+                }),
+              ),
+              const SizedBox(height: 4),
+            ],
             _buildToggle('ಗುರು ಬಲ ಅಗತ್ಯ', _rules.requireGuruBala, (v) {
               setState(() => _rules.requireGuruBala = v);
               _onChanged();

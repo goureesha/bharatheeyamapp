@@ -320,10 +320,10 @@ class PanchangaCache {
       // 9. Guru combustion
       if (day.guruCombust) continue;
 
-      // 10. Tara Bala check (user-toggleable)
+      // 10. Tara Bala check (user-toggleable + user-selectable taras)
       if (userRules.requireTaraBala) {
         final taraBala = calculateTaraBala(janmaNakIdx, day.nakshatraIndex);
-        if (!taraBala.isGood) continue;
+        if (!userRules.allowedTaras.contains(taraBala.taraIndex)) continue;
       }
 
       // 11. Guru Bala check (user-toggleable)
