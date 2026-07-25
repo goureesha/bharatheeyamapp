@@ -1907,46 +1907,119 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                         ]),
                       );
                     } else {
-                      return Column(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Row(
+                      // Build individual and comparison sections separately for landscape
+                      Widget? groomSummary;
+                      Widget? brideSummary;
+                      Widget? comparisonSection;
+
+                      if (_brideResult != null && _groomResult != null && _fullResult != null) {
+                        final br = _brideResult!;
+                        final gr = _groomResult!;
+                        final fr = _fullResult!;
+                        final bName = _bNameCtrl.text.isNotEmpty ? _bNameCtrl.text : AppLocale.l('brideDetails');
+                        final gName = _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : AppLocale.l('groomDetails');
+
+                        groomSummary = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          _sectionHeader('$gName — ${AppLocale.l('chart')}', Icons.male, kTeal),
+                          _buildPersonSummary(gr, gName, _gDob, _gHour, _gMinute, _gAmpm, _gPlaceCtrl.text),
+                        ]);
+
+                        brideSummary = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          _sectionHeader('$bName — ${AppLocale.l('chart')}', Icons.female, kOrange),
+                          _buildPersonSummary(br, bName, _bDob, _bHour, _bMinute, _bAmpm, _bPlaceCtrl.text),
+                        ]);
+
+                        comparisonSection = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          _sectionHeader(AppLocale.l('kujaDosha'), Icons.brightness_7, Colors.red.shade700),
+                          _buildKujaDoshaSection(fr),
+                          _sectionHeader(AppLocale.l('papaDosha'), Icons.shield, Colors.deepOrange),
+                          _buildPapaDoshaSection(fr),
+                          _sectionHeader(AppLocale.l('grahaMaitriAmsha'), Icons.handshake, kPurple2),
+                          _buildGrahaMaitriSection(fr),
+                          _sectionHeader('${AppLocale.l('shathaAshtaka')} & ${AppLocale.l('dvirdvadasha')}', Icons.compare_arrows, Colors.indigo),
+                          _buildShathaAshtakaDvirdvadashaSection(fr),
+                          _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                            child: Row(children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => _kootaMode = 0),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: _kootaMode == 0 ? kPurple1 : kCard,
+                                      borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
+                                      border: Border.all(color: kPurple1),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(AppLocale.l('ashtaKootaLabel'), style: TextStyle(
+                                      fontWeight: FontWeight.w800, fontSize: 13,
+                                      color: _kootaMode == 0 ? Colors.white : kPurple1,
+                                    )),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => _kootaMode = 1),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: _kootaMode == 1 ? kPurple1 : kCard,
+                                      borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
+                                      border: Border.all(color: kPurple1),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(AppLocale.l('dvadashaKootaLabel'), style: TextStyle(
+                                      fontWeight: FontWeight.w800, fontSize: 13,
+                                      color: _kootaMode == 1 ? Colors.white : kPurple1,
+                                    )),
+                                  ),
+                                ),
+                              ),
+                            ]),
+                          ),
+                          _kootaMode == 0
+                            ? _buildAshtaKootaTable(fr['ashtaKoota'])
+                            : _buildDvadashaKootaTable(fr['dvadashaKoota']),
+                          _sectionHeader(AppLocale.l('dashaSandhi'), Icons.swap_horiz, Colors.deepPurple),
+                          _buildDashaSandhiSection(br, gr),
+                          const SizedBox(height: 32),
+                        ]);
+                      }
+
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          children: [
+                            // Inputs side by side
+                            Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: SingleChildScrollView(
-                                    padding: const EdgeInsets.all(16),
-                                    child: groomInput,
-                                  ),
-                                ),
-                                VerticalDivider(width: 12, thickness: 1, color: kBorder),
-                                Expanded(
-                                  flex: 1,
-                                  child: SingleChildScrollView(
-                                    padding: const EdgeInsets.all(16),
-                                    child: brideInput,
-                                  ),
-                                ),
+                                Expanded(child: groomInput),
+                                const SizedBox(width: 12),
+                                Expanded(child: brideInput),
                               ],
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: calcButton,
-                          ),
-                          if (_fullResult != null)
-                            Expanded(
-                              flex: 1,
-                              child: SingleChildScrollView(
-                                padding: const EdgeInsets.all(16),
-                                child: _buildResults(),
+                            const SizedBox(height: 12),
+                            calcButton,
+                            const SizedBox(height: 12),
+                            // Person summaries side by side
+                            if (groomSummary != null && brideSummary != null)
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(child: groomSummary),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: brideSummary),
+                                ],
                               ),
-                            )
-                          else
-                            const SizedBox(height: 16),
-                        ],
+                            // Comparison sections full width
+                            if (comparisonSection != null)
+                              comparisonSection,
+                          ],
+                        ),
                       );
                     }
                   },
