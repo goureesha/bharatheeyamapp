@@ -25,6 +25,8 @@ class DriveBackupService {
     'cached_appointments',
     'cached_slots',
     'bharatheeyam_profiles_v1',
+    // Pooja lists
+    'bharatheeyam_pooja_lists_v1',
     // Muhurta user rules (per event type)
     'user_muhurta_rules_vivaha',
     'user_muhurta_rules_upanayana',
