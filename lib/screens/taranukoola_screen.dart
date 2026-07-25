@@ -1290,6 +1290,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
     final results = <Map<String, dynamic>>[];
     int totalDays = 0;
+    int rejTithi = 0, rejNak = 0, rejVara = 0, rejYoga = 0, rejKarana = 0;
+    int rejShukla = 0, rejUttarayana = 0, rejDagdha = 0;
     int countTaraFailed = 0;
     int countGuruFailed = 0;
     int countGuruCombust = 0;
@@ -1359,30 +1361,54 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             lagnaShuddhiShloka: defaultRulesNonCached.lagnaShuddhiShloka,
           );
 
-          // Tithi filter (paksha-relative: allowedTithis stores 0-14)
-          if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(pan.tithiIndex % 15)) continue;
+          // Tithi filter
+          if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(pan.tithiIndex % 15)) {
+            rejTithi++;
+            print('FILTER [${date}] BLOCKED TITHI: ${pan.tithi} idx=${pan.tithiIndex} mod15=${pan.tithiIndex % 15}');
+            continue;
+          }
           // Nakshatra filter
-          if (userRules.allowedNakshatras != null && !userRules.allowedNakshatras!.contains(pan.nakshatraIndex)) continue;
+          if (userRules.allowedNakshatras != null && !userRules.allowedNakshatras!.contains(pan.nakshatraIndex)) {
+            rejNak++;
+            print('FILTER [${date}] BLOCKED NAKSHATRA: ${pan.nakshatra} idx=${pan.nakshatraIndex}');
+            continue;
+          }
           // Vara filter
-          if (userRules.allowedVaras != null && !userRules.allowedVaras!.contains(varaIdx)) continue;
-          // Yoga filter (blocked yogas)
+          if (userRules.allowedVaras != null && !userRules.allowedVaras!.contains(varaIdx)) {
+            rejVara++;
+            print('FILTER [${date}] BLOCKED VARA: ${pan.vara} idx=$varaIdx');
+            continue;
+          }
+          // Yoga filter
           final blocked = userRules.blockedYogas ?? blockedYogaIndices;
-          if (blocked.contains(yogaIdx)) continue;
-          // Karana (Vishti) filter
-          if (userRules.avoidVishti && (pan.karana.contains('ವಿಷ್ಟಿ') || pan.karana.contains('ಭದ್ರಾ'))) continue;
+          if (blocked.contains(yogaIdx)) {
+            rejYoga++;
+            print('FILTER [${date}] BLOCKED YOGA: ${pan.yoga} idx=$yogaIdx');
+            continue;
+          }
+          // Karana filter
+          if (userRules.avoidVishti && (pan.karana.contains('ವಿಷ್ಟಿ') || pan.karana.contains('ಭದ್ರಾ'))) {
+            rejKarana++;
+            print('FILTER [${date}] BLOCKED KARANA: ${pan.karana}');
+            continue;
+          }
           // Shukla Paksha filter
-          if (userRules.requireShukla && pan.tithiIndex >= 15) continue;
+          if (userRules.requireShukla && pan.tithiIndex >= 15) {
+            rejShukla++;
+            print('FILTER [${date}] BLOCKED SHUKLA');
+            continue;
+          }
           // Uttarayana filter
           if (userRules.requireUttarayana) {
             final isUttarayana = (sunRashi >= 9 || sunRashi <= 2);
-            if (!isUttarayana) continue;
+            if (!isUttarayana) { rejUttarayana++; continue; }
           }
-          // Dagdha Yoga filter (user-toggleable)
+          // Dagdha Yoga filter
           if (userRules.blockDagdhaYoga) {
             final dagdhaList = dagdhaYogaTable[varaIdx];
-            if (dagdhaList != null && dagdhaList.contains(pan.nakshatraIndex)) continue;
+            if (dagdhaList != null && dagdhaList.contains(pan.nakshatraIndex)) { rejDagdha++; continue; }
           }
-          // Guru combustion — scored in evaluateMuhurta, not hard-blocked
+          // Guru combustion — scored, not blocked
           final guruCombustEarly = kr.planets['ಗುರು']?.isCombust ?? false;
           if (guruCombustEarly) { countGuruCombust++; }
           // Tara Bala filter
@@ -1395,6 +1421,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             final gb = calculateGuruBala(_mfRashiIdx, jupRashi);
             if (gb.score == 0) { countGuruFailed++; continue; }
           }
+          print('FILTER [${date}] PASSED all pre-filters ✓');
 
           // Evaluate muhurta using existing engine
           final mResult = evaluateMuhurta(
@@ -1638,14 +1665,23 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       return (b['score'] as int).compareTo(a['score'] as int);
     });
 
-    final stats = {
+    print('=== FILTER SUMMARY: total=$totalDays tithi=$rejTithi nak=$rejNak vara=$rejVara yoga=$rejYoga karana=$rejKarana shukla=$rejShukla uttarayana=$rejUttarayana dagdha=$rejDagdha tara=$countTaraFailed guru=$countGuruFailed results=${results.length} ===');
+    final stats = <String, dynamic>{
       'totalDays': totalDays,
       'countTaraFailed': countTaraFailed,
       'countGuruFailed': countGuruFailed,
       'countGuruCombust': countGuruCombust,
       'countShukraCombust': countShukraCombust,
-      'countPanchangaFailed': countPanchangaFailed,
+      'countPanchangaFailed': rejTithi + rejNak + rejVara + rejYoga + rejKarana,
       'countNoLagnaShuddhi': countNoLagnaShuddhi,
+      'rejTithi': rejTithi,
+      'rejNak': rejNak,
+      'rejVara': rejVara,
+      'rejYoga': rejYoga,
+      'rejKarana': rejKarana,
+      'rejShukla': rejShukla,
+      'rejUttarayana': rejUttarayana,
+      'rejDagdha': rejDagdha,
     };
 
     if (mounted) setState(() { _mfResults = results; _mfStats = stats; _mfSearching = false; });
@@ -1994,7 +2030,15 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           Wrap(
             spacing: 8, runSpacing: 6,
             children: [
-              if (countPanchanga > 0) _diagChip('ಪಂಚಾಂಗ ದೋಷ', countPanchanga, Colors.red),
+              if (((stats['rejTithi'] as int?) ?? 0) > 0) _diagChip('ತಿಥಿ ಕೊರತೆ', (stats['rejTithi'] as int?) ?? 0, Colors.teal),
+              if (((stats['rejNak'] as int?) ?? 0) > 0) _diagChip('ನಕ್ಷತ್ರ ಕೊರತೆ', (stats['rejNak'] as int?) ?? 0, Colors.indigo),
+              if (((stats['rejVara'] as int?) ?? 0) > 0) _diagChip('ವಾರ ಕೊರತೆ', (stats['rejVara'] as int?) ?? 0, Colors.brown),
+              if (((stats['rejYoga'] as int?) ?? 0) > 0) _diagChip('ಯೋಗ ಕೊರತೆ', (stats['rejYoga'] as int?) ?? 0, Colors.pink),
+              if (((stats['rejKarana'] as int?) ?? 0) > 0) _diagChip('ಕರಣ ಕೊರತೆ', (stats['rejKarana'] as int?) ?? 0, Colors.cyan.shade800),
+              if (((stats['rejShukla'] as int?) ?? 0) > 0) _diagChip('ಶುಕ್ಲಪಕ್ಷ', (stats['rejShukla'] as int?) ?? 0, Colors.grey),
+              if (((stats['rejUttarayana'] as int?) ?? 0) > 0) _diagChip('ಉತ್ತರಾಯಣ', (stats['rejUttarayana'] as int?) ?? 0, Colors.blue),
+              if (((stats['rejDagdha'] as int?) ?? 0) > 0) _diagChip('ದಗ್ಧ ಯೋಗ', (stats['rejDagdha'] as int?) ?? 0, Colors.red.shade800),
+              if (countPanchanga > 0 && stats['rejTithi'] == null) _diagChip('ಪಂಚಾಂಗ ದೋಷ', countPanchanga, Colors.red),
               if (countTara > 0) _diagChip('ತಾರಾನುಕೂಲ ಕೊರತೆ', countTara, Colors.deepOrange),
               if (countGuru > 0) _diagChip('ಗುರು ಬಲ ಕೊರತೆ', countGuru, Colors.amber.shade900),
               if (countCombust > 0) _diagChip('ಗುರು/ಶುಕ್ರ ಅಸ್ತ ದೋಷ', countCombust, Colors.purple),
