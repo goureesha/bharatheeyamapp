@@ -1455,11 +1455,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           final shukraCombust = (_mfEvent == MuhurtaEvent.vivaha) ? (kr.planets['ಶುಕ್ರ']?.isCombust ?? false) : false;
           final isAstaOk = !guruCombust && !shukraCombust;
 
-          if (!isTaraOk) countTaraFailed++;
-          if (!isGuruOk) countGuruFailed++;
           if (guruCombust) countGuruCombust++;
           if (shukraCombust) countShukraCombust++;
-          if (!allChecksPassed) countPanchangaFailed++;
 
           // Compute avoidance times
           final rahuKala = _rahuKalaTime(date, pan.sunrise, pan.sunset);
