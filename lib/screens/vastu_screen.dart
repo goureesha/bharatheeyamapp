@@ -562,11 +562,12 @@ class _VastuScreenState extends State<VastuScreen> {
         iconTheme: IconThemeData(color: kText),
         elevation: 0,
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ── Input mode toggle: Paridhi vs SqFt ──
-            Container(
+      body: OrientationBuilder(
+        builder: (context, orientation) {
+          final isLandscape = orientation == Orientation.landscape;
+
+          // ── Shared widgets ──
+          final modeToggle = Container(
               margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
               child: Row(
                 children: [
@@ -606,9 +607,9 @@ class _VastuScreenState extends State<VastuScreen> {
                   ),
                 ],
               ),
-            ),
-            // ── Shared: Nakshatra dropdown ──
-            Container(
+            );
+
+          final nakDropdown = Container(
               margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
@@ -619,256 +620,219 @@ class _VastuScreenState extends State<VastuScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_v('ownerNak'),
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
+                  Text(_v('nakLabel'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
                   const SizedBox(height: 6),
                   DropdownButtonFormField<int>(
                     value: _ownerNakIndex,
                     isExpanded: true,
                     decoration: InputDecoration(
-                      hintText: _v('selectNak'),
-                      hintStyle: TextStyle(color: kMuted, fontSize: 13),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      filled: true,
+                      fillColor: kBg,
                     ),
                     items: List.generate(27, (i) => DropdownMenuItem(
                       value: i,
-                      child: Text('${i + 1}. ${naks[i]}', style: TextStyle(fontSize: 14, color: kText)),
+                      child: Text(trAll(naks[i]), style: TextStyle(fontSize: 14, color: kText)),
                     )),
-                    onChanged: (v) => setState(() => _ownerNakIndex = v),
+                    onChanged: (v) => setState(() { _ownerNakIndex = v!; _searched = false; _results = []; }),
                   ),
-                  const SizedBox(height: 12),
-                  Text(_v('koluType'),
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
-                  const SizedBox(height: 6),
-                  DropdownButtonFormField<int>(
-                    value: _koluIndex,
-                    isExpanded: true,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                    items: [
-                      ...List.generate(_koluTypes.length, (i) {
+                  if (_inputMode == 0) ...[
+                    const SizedBox(height: 10),
+                    Text(_v('koluLabel'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<int>(
+                      value: _koluIndex,
+                      isExpanded: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        filled: true,
+                        fillColor: kBg,
+                      ),
+                      items: List.generate(_koluTypes.length, (i) {
                         final k = _koluTypes[i];
                         return DropdownMenuItem(
                           value: i,
                           child: Text(
-                            '${_v(k.id)}  (${k.angula} ${_v('angula')} = ${k.cm.toInt()} cm)',
+                            '${_v('kolu_${k.id}')} (${k.angula} ಅಂಗುಲ = ${k.cm.toStringAsFixed(0)} cm)',
                             style: TextStyle(fontSize: 13, color: kText),
                           ),
                         );
                       }),
-                      DropdownMenuItem(
-                        value: -1,
-                        child: Text('✏️ ${_v('custom')}', style: TextStyle(fontSize: 13, color: kOrange, fontWeight: FontWeight.w700)),
-                      ),
-                    ],
-                    onChanged: (v) => setState(() { _koluIndex = v!; _searched = false; _results = []; }),
-                  ),
-                  if (_koluIndex == -1) ...[
-                    const SizedBox(height: 8),
-                    Row(children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _customKoluNameCtrl,
-                          decoration: InputDecoration(
-                            labelText: _v('koluName'),
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          style: TextStyle(fontSize: 13, color: kText),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        width: 100,
-                        child: TextField(
-                          controller: _customKoluCmCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'cm',
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          style: TextStyle(fontSize: 13, color: kText),
-                        ),
-                      ),
-                    ]),
+                      onChanged: (v) => setState(() { _koluIndex = v!; _searched = false; _results = []; }),
+                    ),
                   ],
                 ],
               ),
+            );
+
+          final searchBtn = Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _inputMode == 0 ? _searchParidhi : _searchSqft,
+                icon: const Icon(Icons.search, size: 20),
+                label: Text(_v('search'), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPurple2,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
             ),
+          );
 
-            // ── Tab content ──
-            Expanded(
-              child: CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: _inputMode == 0 ? _buildParInput() : _buildSqftInputs(),
-                  ),
-
-                  // Formula info
-                  SliverToBoxAdapter(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 12),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: kPurple2.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: kPurple2.withOpacity(0.15)),
+          final resultsWidget = Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (_searched) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: Row(
+                    children: [
+                      Icon(_showOnlyGood ? Icons.filter_alt : Icons.filter_alt_off,
+                          size: 16, color: _showOnlyGood ? kGreen : kMuted),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          _showOnlyGood ? _v('goodOnly') : _v('allResults'),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted),
+                        ),
                       ),
+                      Text('${_filteredResults.length}/${_results.length}',
+                        style: TextStyle(fontSize: 12, color: kPurple2, fontWeight: FontWeight.w800)),
+                      Switch(
+                        value: _showOnlyGood,
+                        activeColor: kGreen,
+                        onChanged: (v) => setState(() => _showOnlyGood = v),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: List.generate(8, (i) {
+                        final sel = _selectedYoniFilter == i;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: FilterChip(
+                            label: Text(trAll(appYoni[i]), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                            selected: sel,
+                            selectedColor: kPurple2.withOpacity(0.15),
+                            checkmarkColor: kPurple2,
+                            backgroundColor: kCard,
+                            side: BorderSide(color: sel ? kPurple2 : kBorder),
+                            onSelected: (v) => setState(() => _selectedYoniFilter = v ? i : -1),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+              if (!_searched)
+                Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: Column(
+                    children: [
+                      Icon(Icons.home_work_rounded, size: 64, color: kPurple2.withOpacity(0.3)),
+                      const SizedBox(height: 12),
+                      Text(_v('hint'), style: TextStyle(color: kMuted, fontSize: 14)),
+                      Text(_v('hintEn'), style: TextStyle(color: kMuted, fontSize: 12)),
+                    ],
+                  ),
+                )
+              else if (_filteredResults.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: Column(
+                    children: [
+                      Icon(Icons.search_off, size: 48, color: Colors.red.withOpacity(0.4)),
+                      const SizedBox(height: 8),
+                      Text(_v('noResults'), style: TextStyle(color: kMuted, fontSize: 14)),
+                    ],
+                  ),
+                )
+              else
+                ..._filteredResults.map((r) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: _buildResultCard(r),
+                )),
+              const SizedBox(height: 24),
+            ],
+          );
+
+          if (!isLandscape) {
+            // ── PORTRAIT: existing layout ──
+            return SafeArea(
+              child: Column(
+                children: [
+                  modeToggle,
+                  nakDropdown,
+                  Expanded(
+                    child: CustomScrollView(
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: _inputMode == 0 ? _buildParInput() : _buildSqftInputs(),
+                        ),
+
+                        const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                        SliverToBoxAdapter(child: searchBtn),
+                        const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                        SliverToBoxAdapter(child: resultsWidget),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            // ── LANDSCAPE: inputs left, results right ──
+            return SafeArea(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 24),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(_v('formula'), style: TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.w800, color: kPurple2)),
-                          const SizedBox(height: 4),
-                          Text('• ${_v('peridhi')} (cm) = 2 × (${_v('length').split(' /')[0].split(' (')[0]} + ${_v('breadth').split(' /')[0].split(' (')[0]}) × 30.48',
-                            style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${_v('hasta')} = ${_v('peridhi')} (cm) ÷ ${_effectiveKoluCm.toInt()}  (whole number only)',
-                            style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• 1 foot = 30.48 cm  |  1 $_effectiveKoluName = ${_effectiveKoluCm.toInt()} cm',
-                            style: TextStyle(fontSize: 10, color: kOrange, fontWeight: FontWeight.w700)),
-                          Text('• ${_v('yoni')} = (${_v('hasta')} × 3) % 8',
-                            style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${_v('aaya')} = (${_v('hasta')} × 8) % 12  |  ${_v('vyaya')} = (${_v('hasta')} × 3) % 14',
-                            style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${AppLocale.l('nakshatra')} = (${_v('hasta')} × 8) % 27  |  ${_v('tithi')} = (${_v('hasta')} × 8) % 30',
-                            style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${_v('vaara')} = (${_v('hasta')} × 8) % 7',
-                            style: TextStyle(fontSize: 10, color: kMuted)),
-                          Text('• ${_v('vayassu')} = ((${_v('hasta')} × 8) ÷ 27) % 5',
-                            style: TextStyle(fontSize: 10, color: kMuted)),
+                          modeToggle,
+                          nakDropdown,
+                          _inputMode == 0 ? _buildParInput() : _buildSqftInputs(),
+
+                          const SizedBox(height: 8),
+                          searchBtn,
                         ],
                       ),
                     ),
                   ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
-
-                  // Search button
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: _inputMode == 0 ? _searchParidhi : _searchSqft,
-                          icon: const Icon(Icons.search, size: 20),
-                          label: Text(_v('search'), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kPurple2,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
-                      ),
+                  const VerticalDivider(width: 1),
+                  Expanded(
+                    flex: 3,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(8),
+                      child: resultsWidget,
                     ),
                   ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
-
-                  // ── Filter toggle ──
-                  if (_searched)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        child: Row(
-                          children: [
-                            Icon(_showOnlyGood ? Icons.filter_alt : Icons.filter_alt_off,
-                                size: 16, color: _showOnlyGood ? kGreen : kMuted),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                _showOnlyGood ? _v('goodOnly') : _v('allResults'),
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted),
-                              ),
-                            ),
-                            Text('${_filteredResults.length}/${_results.length}',
-                              style: TextStyle(fontSize: 12, color: kPurple2, fontWeight: FontWeight.w800)),
-                            Switch(
-                              value: _showOnlyGood,
-                              activeColor: kGreen,
-                              onChanged: (v) => setState(() => _showOnlyGood = v),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  // ── Yoni filter chips ──
-                  if (_searched)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              _yoniChip(null, _v('all')),
-                              const SizedBox(width: 6),
-                              ...List.generate(8, (i) => Padding(
-                                padding: const EdgeInsets.only(right: 6),
-                                child: _yoniChip(i, _yoniNames[i]),
-                              )),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                  // ── Results ──
-                  if (!_searched)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 40),
-                        child: Column(
-                          children: [
-                            Icon(Icons.home_work_rounded, size: 64, color: kPurple2.withOpacity(0.3)),
-                            const SizedBox(height: 12),
-                            Text(_v('hint'), style: TextStyle(color: kMuted, fontSize: 14)),
-                            Text(_v('hintEn'), style: TextStyle(color: kMuted, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                    )
-                  else if (_filteredResults.isEmpty)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 40),
-                        child: Column(
-                          children: [
-                            Icon(Icons.search_off, size: 48, color: Colors.red.withOpacity(0.4)),
-                            const SizedBox(height: 8),
-                            Text(_v('noResults'), style: TextStyle(color: kMuted, fontSize: 14)),
-                          ],
-                        ),
-                      ),
-                    )
-                  else
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) => Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: _buildResultCard(_filteredResults[index]),
-                        ),
-                        childCount: _filteredResults.length,
-                      ),
-                    ),
-
-                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
                 ],
               ),
-            ),
-          ],
-        ),
+            );
+          }
+        },
       ),
     );
   }
+
 
   // ─── Paridhi (Perimeter) input ───
   Widget _buildParInput() {

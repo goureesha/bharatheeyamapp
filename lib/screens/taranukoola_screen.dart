@@ -1559,250 +1559,290 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       return m;
     });
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: ResponsiveCenter(child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // ── Inputs ──
-          AppCard(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(AppLocale.l('muhurtaShodhane'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kPurple1)),
-              const SizedBox(height: 12),
+    final searchForm = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // ── Inputs ──
+        AppCard(child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(AppLocale.l('muhurtaShodhane'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kPurple1)),
+            const SizedBox(height: 12),
 
-              // Rashi
-              Text(AppLocale.l('selectRashi'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
-              const SizedBox(height: 4),
-              Container(
+            // Rashi
+            Text(AppLocale.l('selectRashi'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
+              child: DropdownButtonHideUnderline(child: DropdownButton<int>(
+                isExpanded: true, value: _mfRashiIdx, dropdownColor: kCard,
+                style: TextStyle(color: kText, fontSize: 14),
+                items: List.generate(12, (i) => DropdownMenuItem(value: i, child: Text(rashiNames[i]))),
+                onChanged: (v) {
+                  final naks = _naksForRashi(v!);
+                  setState(() {
+                    _mfRashiIdx = v;
+                    if (!naks.contains(_mfNakIdx)) _mfNakIdx = naks.first;
+                  });
+                },
+              )),
+            ),
+            const SizedBox(height: 10),
+
+            // Nakshatra
+            Text(AppLocale.l('nakshatra'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
+              child: DropdownButtonHideUnderline(child: DropdownButton<int>(
+                isExpanded: true, value: _mfNakIdx, dropdownColor: kCard,
+                style: TextStyle(color: kText, fontSize: 14),
+                items: _naksForRashi(_mfRashiIdx).map((i) => DropdownMenuItem(value: i, child: Text(nakNames[i]))).toList(),
+                onChanged: (v) => setState(() => _mfNakIdx = v!),
+              )),
+            ),
+            const SizedBox(height: 10),
+
+            // Event
+            Text(AppLocale.l('selectEvent'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
+              child: DropdownButtonHideUnderline(child: DropdownButton<MuhurtaEvent>(
+                isExpanded: true, value: _mfEvent, dropdownColor: kCard,
+                style: TextStyle(color: kText, fontSize: 14),
+                items: MuhurtaEvent.values.map((e) {
+                  final info = muhurtaEventNames[e]!;
+                  return DropdownMenuItem(value: e, child: Text('${AppLocale.l(info.localeKey)} (${info.englishName})'));
+                }).toList(),
+                onChanged: (v) => setState(() => _mfEvent = v!),
+              )),
+            ),
+            const SizedBox(height: 10),
+          ],
+        )),
+
+        // ── Rules Editor (collapsible) ──
+        const SizedBox(height: 8),
+        MuhurtaRulesEditor(
+          event: _mfEvent,
+          onRulesChanged: () {
+            setState(() {});
+            // Auto re-search with new rules if user already searched
+            if (_mfResults.isNotEmpty || _mfStats != null) {
+              _searchMuhurtasCached();
+            }
+          },
+        ),
+        const SizedBox(height: 8),
+
+        AppCard(child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+
+            // Month Range
+            Text('${AppLocale.l('selectMonth')} (From - To)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+            const SizedBox(height: 4),
+            Row(children: [
+              Expanded(child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
-                child: DropdownButtonHideUnderline(child: DropdownButton<int>(
-                  isExpanded: true, value: _mfRashiIdx, dropdownColor: kCard,
-                  style: TextStyle(color: kText, fontSize: 14),
-                  items: List.generate(12, (i) => DropdownMenuItem(value: i, child: Text(rashiNames[i]))),
+                child: DropdownButtonHideUnderline(child: DropdownButton<DateTime>(
+                  isExpanded: true, value: _mfMonth, dropdownColor: kCard,
+                  style: TextStyle(color: kText, fontSize: 13),
+                  items: months.map((m) {
+                    final mNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    return DropdownMenuItem(value: m, child: Text('${mNames[m.month]} ${m.year}'));
+                  }).toList(),
                   onChanged: (v) {
-                    final naks = _naksForRashi(v!);
-                    setState(() {
-                      _mfRashiIdx = v;
-                      if (!naks.contains(_mfNakIdx)) _mfNakIdx = naks.first;
+                    if (v != null) setState(() {
+                      _mfMonth = v;
+                      if (_mfMonthEnd.isBefore(v)) _mfMonthEnd = v;
                     });
                   },
                 )),
-              ),
-              const SizedBox(height: 10),
-
-              // Nakshatra
-              Text(AppLocale.l('nakshatra'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
-              const SizedBox(height: 4),
-              Container(
+              )),
+              Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text('→', style: TextStyle(fontSize: 18, color: kMuted))),
+              Expanded(child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
-                child: DropdownButtonHideUnderline(child: DropdownButton<int>(
-                  isExpanded: true, value: _mfNakIdx, dropdownColor: kCard,
-                  style: TextStyle(color: kText, fontSize: 14),
-                  items: _naksForRashi(_mfRashiIdx).map((i) => DropdownMenuItem(value: i, child: Text(nakNames[i]))).toList(),
-                  onChanged: (v) => setState(() => _mfNakIdx = v!),
-                )),
-              ),
-              const SizedBox(height: 10),
-
-              // Event
-              Text(AppLocale.l('selectEvent'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
-                child: DropdownButtonHideUnderline(child: DropdownButton<MuhurtaEvent>(
-                  isExpanded: true, value: _mfEvent, dropdownColor: kCard,
-                  style: TextStyle(color: kText, fontSize: 14),
-                  items: MuhurtaEvent.values.map((e) {
-                    final info = muhurtaEventNames[e]!;
-                    return DropdownMenuItem(value: e, child: Text('${AppLocale.l(info.localeKey)} (${info.englishName})'));
+                child: DropdownButtonHideUnderline(child: DropdownButton<DateTime>(
+                  isExpanded: true, value: _mfMonthEnd, dropdownColor: kCard,
+                  style: TextStyle(color: kText, fontSize: 13),
+                  items: months.where((m) => !m.isBefore(_mfMonth)).map((m) {
+                    final mNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    return DropdownMenuItem(value: m, child: Text('${mNames[m.month]} ${m.year}'));
                   }).toList(),
-                  onChanged: (v) => setState(() => _mfEvent = v!),
+                  onChanged: (v) => setState(() => _mfMonthEnd = v!),
                 )),
-              ),
-              const SizedBox(height: 10),
-            ],
-          )),
+              )),
+            ]),
+            const SizedBox(height: 14),
 
-          // ── Rules Editor (collapsible) ──
-          const SizedBox(height: 8),
-          MuhurtaRulesEditor(
-            event: _mfEvent,
-            onRulesChanged: () {
-              setState(() {});
-              // Auto re-search with new rules if user already searched
-              if (_mfResults.isNotEmpty || _mfStats != null) {
-                _searchMuhurtasCached();
-              }
-            },
-          ),
-          const SizedBox(height: 8),
-
-          AppCard(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-
-              // Month Range
-              Text('${AppLocale.l('selectMonth')} (From - To)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
-              const SizedBox(height: 4),
-              Row(children: [
-                Expanded(child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
-                  child: DropdownButtonHideUnderline(child: DropdownButton<DateTime>(
-                    isExpanded: true, value: _mfMonth, dropdownColor: kCard,
-                    style: TextStyle(color: kText, fontSize: 13),
-                    items: months.map((m) {
-                      final mNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                      return DropdownMenuItem(value: m, child: Text('${mNames[m.month]} ${m.year}'));
-                    }).toList(),
-                    onChanged: (v) {
-                      if (v != null) setState(() {
-                        _mfMonth = v;
-                        if (_mfMonthEnd.isBefore(v)) _mfMonthEnd = v;
-                      });
-                    },
-                  )),
-                )),
-                Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text('→', style: TextStyle(fontSize: 18, color: kMuted))),
-                Expanded(child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
-                  child: DropdownButtonHideUnderline(child: DropdownButton<DateTime>(
-                    isExpanded: true, value: _mfMonthEnd, dropdownColor: kCard,
-                    style: TextStyle(color: kText, fontSize: 13),
-                    items: months.where((m) => !m.isBefore(_mfMonth)).map((m) {
-                      final mNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                      return DropdownMenuItem(value: m, child: Text('${mNames[m.month]} ${m.year}'));
-                    }).toList(),
-                    onChanged: (v) => setState(() => _mfMonthEnd = v!),
-                  )),
-                )),
-              ]),
-              const SizedBox(height: 14),
-
-              // ── Cache Status & Generate ──
-              Builder(builder: (_) {
-                final cache = PanchangaCache.instance;
-                if (_cacheGenerating) {
-                  return Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0x15FF9800),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0x40FF9800)),
-                    ),
-                    child: Column(children: [
-                      Row(children: [
-                        SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: kPurple1)),
-                        const SizedBox(width: 8),
-                        Text('ಪಂಚಾಂಗ ದತ್ತಾಂಶ ತಯಾರಿಸಲಾಗುತ್ತಿದೆ... ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
-                      ]),
-                      const SizedBox(height: 8),
-                      LinearProgressIndicator(
-                        value: _cacheTotal > 0 ? _cacheProgress / _cacheTotal : null,
-                        backgroundColor: kBorder,
-                        valueColor: AlwaysStoppedAnimation(kPurple1),
-                      ),
-                      const SizedBox(height: 4),
-                      Text('$_cacheProgress / $_cacheTotal ದಿನಗಳು', style: TextStyle(fontSize: 11, color: kMuted)),
-                    ]),
-                  );
-                }
-                if (cache.isLoaded) {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: const Color(0x104CAF50),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0x404CAF50)),
-                    ),
-                    child: Row(children: [
-                      Icon(Icons.check_circle, color: kTeal, size: 16),
-                      const SizedBox(width: 6),
-                      Expanded(child: Text(
-                        '${cache.dayCount} ದಿನಗಳ ದತ್ತಾಂಶ ಸಿದ್ಧ (${cache.startDate?.year}–${cache.endDate?.year})',
-                        style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w600),
-                      )),
-                      TextButton(
-                        onPressed: _generateCache,
-                        child: Text('ಮರು ತಯಾರಿ', style: TextStyle(fontSize: 10)),
-                      ),
-                    ]),
-                  );
-                }
-                return ElevatedButton.icon(
-                  onPressed: _generateCache,
-                  icon: Icon(Icons.build_circle_outlined, size: 18),
-                  label: Text('2 ವರ್ಷ ಪಂಚಾಂಗ ತಯಾರಿಸಿ (ಒಮ್ಮೆ ಮಾತ್ರ)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF9800), foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            // ── Cache Status & Generate ──
+            Builder(builder: (_) {
+              final cache = PanchangaCache.instance;
+              if (_cacheGenerating) {
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0x15FF9800),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0x40FF9800)),
                   ),
+                  child: Column(children: [
+                    Row(children: [
+                      SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: kPurple1)),
+                      const SizedBox(width: 8),
+                      Text('ಪಂಚಾಂಗ ದತ್ತಾಂಶ ತಯಾರಿಸಲಾಗುತ್ತಿದೆ... ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                    ]),
+                    const SizedBox(height: 8),
+                    LinearProgressIndicator(
+                      value: _cacheTotal > 0 ? _cacheProgress / _cacheTotal : null,
+                      backgroundColor: kBorder,
+                      valueColor: AlwaysStoppedAnimation(kPurple1),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('$_cacheProgress / $_cacheTotal ದಿನಗಳು', style: TextStyle(fontSize: 11, color: kMuted)),
+                  ]),
                 );
-              }),
-              const SizedBox(height: 10),
-
-              // Search button
-              ElevatedButton.icon(
-                onPressed: _mfSearching ? null : _searchMuhurtasCached,
-                icon: _mfSearching ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Icon(Icons.search),
-                label: Text(
-                  _mfSearching ? '...' : (PanchangaCache.instance.isLoaded ? '⚡ ${AppLocale.l('searchMuhurta')}' : AppLocale.l('searchMuhurta')),
-                  style: TextStyle(fontWeight: FontWeight.w800),
-                ),
+              }
+              if (cache.isLoaded) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0x104CAF50),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0x404CAF50)),
+                  ),
+                  child: Row(children: [
+                    Icon(Icons.check_circle, color: kTeal, size: 16),
+                    const SizedBox(width: 6),
+                    Expanded(child: Text(
+                      '${cache.dayCount} ದಿನಗಳ ದತ್ತಾಂಶ ಸಿದ್ಧ (${cache.startDate?.year}–${cache.endDate?.year})',
+                      style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w600),
+                    )),
+                    TextButton(
+                      onPressed: _generateCache,
+                      child: Text('ಮರು ತಯಾರಿ', style: TextStyle(fontSize: 10)),
+                    ),
+                  ]),
+                );
+              }
+              return ElevatedButton.icon(
+                onPressed: _generateCache,
+                icon: Icon(Icons.build_circle_outlined, size: 18),
+                label: Text('2 ವರ್ಷ ಪಂಚಾಂಗ ತಯಾರಿಸಿ (ಒಮ್ಮೆ ಮಾತ್ರ)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPurple1, foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: const Color(0xFFFF9800), foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
+              );
+            }),
+            const SizedBox(height: 10),
+
+            // Search button
+            ElevatedButton.icon(
+              onPressed: _mfSearching ? null : _searchMuhurtasCached,
+              icon: _mfSearching ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Icon(Icons.search),
+              label: Text(
+                _mfSearching ? '...' : (PanchangaCache.instance.isLoaded ? '⚡ ${AppLocale.l('searchMuhurta')}' : AppLocale.l('searchMuhurta')),
+                style: TextStyle(fontWeight: FontWeight.w800),
               ),
-            ],
-          )),
-
-          const SizedBox(height: 12),
-
-          // ── Results ──
-          if (_mfSearching)
-            Padding(
-              padding: const EdgeInsets.all(32),
-              child: Center(child: CircularProgressIndicator(color: kPurple1)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPurple1, foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
             ),
-          if (!_mfSearching && _mfStats != null) ...[
-            _buildSearchDiagnosticsCard(),
-            if (_mfResults.isNotEmpty) ...[
-              Row(
-                children: [
-                  Text('${_mfResults.length} ದಿನಗಳು ಸಿಕ್ಕಿವೆ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
-                  const SizedBox(width: 8),
-                  Text('(${_mfResults.where((r) => r['isPerfect'] == true).length} ಪರಿಪೂರ್ಣ, ${_mfResults.where((r) => r['isCandidate'] == true).length} ಷರತ್ತುಬದ್ಧ)',
-                    style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
-                ],
-              ),
-              const SizedBox(height: 8),
-              // Lazy-load results: show only _mfDisplayCount at a time
-              ...List.generate(
-                _mfResults.length < _mfDisplayCount ? _mfResults.length : _mfDisplayCount,
-                (i) => _buildMuhurtaResultCard(_mfResults[i]),
-              ),
-              if (_mfDisplayCount < _mfResults.length)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: TextButton.icon(
-                    onPressed: () => setState(() { _mfDisplayCount += 20; }),
-                    icon: Icon(Icons.expand_more, color: kPurple2),
-                    label: Text('ಇನ್ನಷ್ಟು ತೋರಿಸಿ (${_mfResults.length - _mfDisplayCount} ಉಳಿದಿವೆ)',
-                      style: TextStyle(color: kPurple2, fontWeight: FontWeight.w700)),
-                  ),
+          ],
+        )),
+      ],
+    );
+
+    final searchResults = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (_mfSearching)
+          Padding(
+            padding: const EdgeInsets.all(32),
+            child: Center(child: CircularProgressIndicator(color: kPurple1)),
+          ),
+        if (!_mfSearching && _mfStats != null) ...[
+          _buildSearchDiagnosticsCard(),
+          if (_mfResults.isNotEmpty) ...[
+            Row(
+              children: [
+                Text('${_mfResults.length} ದಿನಗಳು ಸಿಕ್ಕಿವೆ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
+                const SizedBox(width: 8),
+                Text('(${_mfResults.where((r) => r['isPerfect'] == true).length} ಪರಿಪೂರ್ಣ, ${_mfResults.where((r) => r['isCandidate'] == true).length} ಷರತ್ತುಬದ್ಧ)',
+                  style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Lazy-load results: show only _mfDisplayCount at a time
+            ...List.generate(
+              _mfResults.length < _mfDisplayCount ? _mfResults.length : _mfDisplayCount,
+              (i) => _buildMuhurtaResultCard(_mfResults[i]),
+            ),
+            if (_mfDisplayCount < _mfResults.length)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: TextButton.icon(
+                  onPressed: () => setState(() { _mfDisplayCount += 20; }),
+                  icon: Icon(Icons.expand_more, color: kPurple2),
+                  label: Text('ಇನ್ನಷ್ಟು ತೋರಿಸಿ (${_mfResults.length - _mfDisplayCount} ಉಳಿದಿವೆ)',
+                    style: TextStyle(color: kPurple2, fontWeight: FontWeight.w700)),
                 ),
-            ],
+              ),
           ],
         ],
-      )),
+      ],
+    );
+
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (orientation == Orientation.portrait) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: ResponsiveCenter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  searchForm,
+                  const SizedBox(height: 12),
+                  searchResults,
+                ],
+              ),
+            ),
+          );
+        } else {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 2,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: searchForm,
+                ),
+              ),
+              const VerticalDivider(width: 1),
+              Expanded(
+                flex: 3,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: searchResults,
+                ),
+              ),
+            ],
+          );
+        }
+      },
     );
   }
 

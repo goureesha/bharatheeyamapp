@@ -1830,75 +1830,126 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
           Expanded(
             child: TabBarView(
               children: [
-                SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(children: [
-                    // Groom input
-                    _buildPersonInput(
-          title: AppLocale.l('groomDetails'), color: kTeal,
-          nameCtrl: _gNameCtrl, placeCtrl: _gPlaceCtrl, latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
-          dob: _gDob, hour: _gHour, minute: _gMinute, ampm: _gAmpm,
-          geoLoading: _gGeoLoading, geoStatus: _gGeoStatus,
-          onDobChanged: (d) => setState(() => _gDob = d),
-          onTimeChanged: (h, m, a) => setState(() { _gHour = h; _gMinute = m; _gAmpm = a; }),
-          onGeoLoadingChanged: (v) => _gGeoLoading = v,
-          onGeoStatusChanged: (v) => _gGeoStatus = v,
-          onLoadSaved: () => _showProfilePicker(
-            nameCtrl: _gNameCtrl, placeCtrl: _gPlaceCtrl,
-            latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
-            onDobChanged: (d) => setState(() => _gDob = d),
-            onTimeChanged: (h, m, a) => setState(() { _gHour = h; _gMinute = m; _gAmpm = a; }),
-            onGeoStatusChanged: (v) => setState(() => _gGeoStatus = v),
-          ),
-          onSave: () => _savePersonProfile(
-            nameCtrl: _gNameCtrl, placeCtrl: _gPlaceCtrl,
-            latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
-            dob: _gDob, hour: _gHour, minute: _gMinute, ampm: _gAmpm,
-          ),
-        ),
-        const SizedBox(height: 12),
-        // Bride input
-        _buildPersonInput(
-          title: AppLocale.l('brideDetails'), color: kOrange,
-          nameCtrl: _bNameCtrl, placeCtrl: _bPlaceCtrl, latCtrl: _bLatCtrl, lonCtrl: _bLonCtrl, tzCtrl: _bTzCtrl,
-          dob: _bDob, hour: _bHour, minute: _bMinute, ampm: _bAmpm,
-          geoLoading: _bGeoLoading, geoStatus: _bGeoStatus,
-          onDobChanged: (d) => setState(() => _bDob = d),
-          onTimeChanged: (h, m, a) => setState(() { _bHour = h; _bMinute = m; _bAmpm = a; }),
-          onGeoLoadingChanged: (v) => _bGeoLoading = v,
-          onGeoStatusChanged: (v) => _bGeoStatus = v,
-          onLoadSaved: () => _showProfilePicker(
-            nameCtrl: _bNameCtrl, placeCtrl: _bPlaceCtrl,
-            latCtrl: _bLatCtrl, lonCtrl: _bLonCtrl, tzCtrl: _bTzCtrl,
-            onDobChanged: (d) => setState(() => _bDob = d),
-            onTimeChanged: (h, m, a) => setState(() { _bHour = h; _bMinute = m; _bAmpm = a; }),
-            onGeoStatusChanged: (v) => setState(() => _bGeoStatus = v),
-          ),
-          onSave: () => _savePersonProfile(
-            nameCtrl: _bNameCtrl, placeCtrl: _bPlaceCtrl,
-            latCtrl: _bLatCtrl, lonCtrl: _bLonCtrl, tzCtrl: _bTzCtrl,
-            dob: _bDob, hour: _bHour, minute: _bMinute, ampm: _bAmpm,
-          ),
-        ),
-        const SizedBox(height: 16),
-        // Calculate button
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: _loading ? null : _calculate,
-            icon: _loading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.calculate),
-            label: Text(_loading ? '${AppLocale.l('calcInProgress')}' : AppLocale.l('checkMatch'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kPurple1, foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 0,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        _buildResults(),
-                  ]),
+                OrientationBuilder(
+                  builder: (context, orientation) {
+                    final groomInput = _buildPersonInput(
+                      title: AppLocale.l('groomDetails'), color: kTeal,
+                      nameCtrl: _gNameCtrl, placeCtrl: _gPlaceCtrl, latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
+                      dob: _gDob, hour: _gHour, minute: _gMinute, ampm: _gAmpm,
+                      geoLoading: _gGeoLoading, geoStatus: _gGeoStatus,
+                      onDobChanged: (d) => setState(() => _gDob = d),
+                      onTimeChanged: (h, m, a) => setState(() { _gHour = h; _gMinute = m; _gAmpm = a; }),
+                      onGeoLoadingChanged: (v) => _gGeoLoading = v,
+                      onGeoStatusChanged: (v) => _gGeoStatus = v,
+                      onLoadSaved: () => _showProfilePicker(
+                        nameCtrl: _gNameCtrl, placeCtrl: _gPlaceCtrl,
+                        latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
+                        onDobChanged: (d) => setState(() => _gDob = d),
+                        onTimeChanged: (h, m, a) => setState(() { _gHour = h; _gMinute = m; _gAmpm = a; }),
+                        onGeoStatusChanged: (v) => setState(() => _gGeoStatus = v),
+                      ),
+                      onSave: () => _savePersonProfile(
+                        nameCtrl: _gNameCtrl, placeCtrl: _gPlaceCtrl,
+                        latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
+                        dob: _gDob, hour: _gHour, minute: _gMinute, ampm: _gAmpm,
+                      ),
+                    );
+
+                    final brideInput = _buildPersonInput(
+                      title: AppLocale.l('brideDetails'), color: kOrange,
+                      nameCtrl: _bNameCtrl, placeCtrl: _bPlaceCtrl, latCtrl: _bLatCtrl, lonCtrl: _bLonCtrl, tzCtrl: _bTzCtrl,
+                      dob: _bDob, hour: _bHour, minute: _bMinute, ampm: _bAmpm,
+                      geoLoading: _bGeoLoading, geoStatus: _bGeoStatus,
+                      onDobChanged: (d) => setState(() => _bDob = d),
+                      onTimeChanged: (h, m, a) => setState(() { _bHour = h; _bMinute = m; _bAmpm = a; }),
+                      onGeoLoadingChanged: (v) => _bGeoLoading = v,
+                      onGeoStatusChanged: (v) => _bGeoStatus = v,
+                      onLoadSaved: () => _showProfilePicker(
+                        nameCtrl: _bNameCtrl, placeCtrl: _bPlaceCtrl,
+                        latCtrl: _bLatCtrl, lonCtrl: _bLonCtrl, tzCtrl: _bTzCtrl,
+                        onDobChanged: (d) => setState(() => _bDob = d),
+                        onTimeChanged: (h, m, a) => setState(() { _bHour = h; _bMinute = m; _bAmpm = a; }),
+                        onGeoStatusChanged: (v) => setState(() => _bGeoStatus = v),
+                      ),
+                      onSave: () => _savePersonProfile(
+                        nameCtrl: _bNameCtrl, placeCtrl: _bPlaceCtrl,
+                        latCtrl: _bLatCtrl, lonCtrl: _bLonCtrl, tzCtrl: _bTzCtrl,
+                        dob: _bDob, hour: _bHour, minute: _bMinute, ampm: _bAmpm,
+                      ),
+                    );
+
+                    final calcButton = SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _loading ? null : _calculate,
+                        icon: _loading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.calculate),
+                        label: Text(_loading ? '${AppLocale.l('calcInProgress')}' : AppLocale.l('checkMatch'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kPurple1, foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 0,
+                        ),
+                      ),
+                    );
+
+                    if (orientation == Orientation.portrait) {
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(children: [
+                          groomInput,
+                          const SizedBox(height: 12),
+                          brideInput,
+                          const SizedBox(height: 16),
+                          calcButton,
+                          const SizedBox(height: 8),
+                          _buildResults(),
+                        ]),
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: SingleChildScrollView(
+                                    padding: const EdgeInsets.all(16),
+                                    child: groomInput,
+                                  ),
+                                ),
+                                VerticalDivider(width: 12, thickness: 1, color: kBorder),
+                                Expanded(
+                                  flex: 1,
+                                  child: SingleChildScrollView(
+                                    padding: const EdgeInsets.all(16),
+                                    child: brideInput,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: calcButton,
+                          ),
+                          if (_fullResult != null)
+                            Expanded(
+                              flex: 1,
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.all(16),
+                                child: _buildResults(),
+                              ),
+                            )
+                          else
+                            const SizedBox(height: 16),
+                        ],
+                      );
+                    }
+                  },
                 ),
                 _buildQuickKootaTab(),
                 _buildNamaaksharaTab(),
