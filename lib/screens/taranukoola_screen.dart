@@ -1554,8 +1554,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     startTime: _minsToTime(abhijitStart.round()),
                     endTime: _minsToTime(abhijitEnd.round()),
                     isAllowed: true,
-                    isPerfect: true,
-                    isShubha: true,
                     lagnaShuddhi: true,
                     saptamaShuddhi: true,
                     ashtamaShuddhi: true,
