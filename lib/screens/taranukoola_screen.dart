@@ -47,6 +47,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   bool _mfSearching = false;
   List<Map<String, dynamic>> _mfResults = [];
   Map<String, int>? _mfStats;
+  int _mfDisplayCount = 20; // show 20 results at a time
 
   // Cache state
   bool _cacheGenerating = false;
@@ -967,7 +968,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       return _searchMuhurtas();
     }
 
-    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; });
+    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; _mfDisplayCount = 20; });
     await Future.delayed(const Duration(milliseconds: 20));
 
     final userRules = UserRulesManager.instance.getRules(_mfEvent);
@@ -1067,7 +1068,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   }
 
   Future<void> _searchMuhurtas() async {
-    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; });
+    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; _mfDisplayCount = 20; });
     await Future.delayed(const Duration(milliseconds: 50));
 
     final results = <Map<String, dynamic>>[];
@@ -1604,7 +1605,21 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                 ],
               ),
               const SizedBox(height: 8),
-              ..._mfResults.map((r) => _buildMuhurtaResultCard(r)),
+              // Lazy-load results: show only _mfDisplayCount at a time
+              ...List.generate(
+                _mfResults.length < _mfDisplayCount ? _mfResults.length : _mfDisplayCount,
+                (i) => _buildMuhurtaResultCard(_mfResults[i]),
+              ),
+              if (_mfDisplayCount < _mfResults.length)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: TextButton.icon(
+                    onPressed: () => setState(() { _mfDisplayCount += 20; }),
+                    icon: Icon(Icons.expand_more, color: kPurple2),
+                    label: Text('ಇನ್ನಷ್ಟು ತೋರಿಸಿ (${_mfResults.length - _mfDisplayCount} ಉಳಿದಿವೆ)',
+                      style: TextStyle(color: kPurple2, fontWeight: FontWeight.w700)),
+                  ),
+                ),
             ],
           ],
         ],
