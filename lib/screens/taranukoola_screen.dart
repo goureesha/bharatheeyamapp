@@ -1182,6 +1182,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                 case ShuddhiType.saptama: if (!w.saptamaShuddhi) return false; break;
                 case ShuddhiType.ashtama: if (!w.ashtamaShuddhi) return false; break;
                 case ShuddhiType.dashama: if (!w.dashamaShuddhi) return false; break;
+                case ShuddhiType.chandraSaptama: if (!w.chandraSaptamaShuddhi) return false; break;
               }
             }
             if (userRules.requireGuruAnukoolaForLagna && !w.guruAnukoola) return false;
@@ -1520,6 +1521,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     case ShuddhiType.saptama: if (!w.saptamaShuddhi) return false; break;
                     case ShuddhiType.ashtama: if (!w.ashtamaShuddhi) return false; break;
                     case ShuddhiType.dashama: if (!w.dashamaShuddhi) return false; break;
+                    case ShuddhiType.chandraSaptama: if (!w.chandraSaptamaShuddhi) return false; break;
                   }
                 }
                 if (userRules.requireGuruAnukoolaForLagna && !w.guruAnukoola) return false;
