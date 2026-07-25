@@ -941,6 +941,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     while (!curMonth.isAfter(endMonth)) {
       final daysInMonth = DateTime(curMonth.year, curMonth.month + 1, 0).day;
       for (int d = 1; d <= daysInMonth; d++) {
+        // Yield to UI thread every 3 days to prevent freeze
+        if (totalDays % 3 == 0) await Future.delayed(Duration.zero);
         try {
           totalDays++;
           final date = DateTime(curMonth.year, curMonth.month, d);
@@ -1048,46 +1050,54 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             }
           }
 
-          // Compute lagna windows for this day
+          // Skip expensive lagna scan if basic checks clearly fail
+          final basicViable = (allChecksPassed || isTaraOk) && isAstaOk;
+
+          // Compute lagna windows only for viable days
           final rules = muhurtaRules[_mfEvent];
           final allowedLagnas = rules?.allowedLagnas;
-          final Map<String, int> basePlanetRashis = {};
-          for (final entry in kr.planets.entries) {
-            if (entry.key == 'ಮಾಂದಿ') continue;
-            basePlanetRashis[entry.key] = entry.value.rashiIndex;
-          }
-          final guruRashiIdx2 = basePlanetRashis['ಗುರು'] ?? -1;
-
           List<LagnaWindow> dayLagnaWindows = [];
-          try {
-            final srSs2 = Ephemeris.findSunriseSetForDate(
-              date.year, date.month, date.day,
-              LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
-            );
-            final double srJd2 = srSs2[0];
-            final double ssJd2 = srSs2[1];
-            Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
-            final ayn = Sweph.swe_get_ayanamsa(srJd2);
+          bool hasPerfectLagna = false;
+          bool hasShubhaLagna = false;
 
-            final mandiSrSs = Ephemeris.findSunriseSetForDate(
-              date.year, date.month, date.day,
-              LocationService.lat, LocationService.lon,
-            );
-            final double mandiSr = mandiSrSs[0];
-            final double mandiSs = mandiSrSs[1];
+          if (basicViable) {
+            final Map<String, int> basePlanetRashis = {};
+            for (final entry in kr.planets.entries) {
+              if (entry.key == 'ಮಾಂದಿ') continue;
+              basePlanetRashis[entry.key] = entry.value.rashiIndex;
+            }
+            final guruRashiIdx2 = basePlanetRashis['ಗುರು'] ?? -1;
 
-            final vedWday = ((date.weekday - 1) + 1) % 7;
-            final dayDuration = mandiSs - mandiSr;
-            const dayFactors = [26, 22, 18, 14, 10, 6, 2];
-            final dayMandiJd = mandiSr + (dayDuration * dayFactors[vedWday] / 30.0);
-            final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
-            if (dayMandiRashi >= 0) basePlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
+            try {
+              final srSs2 = Ephemeris.findSunriseSetForDate(
+                date.year, date.month, date.day,
+                LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
+              );
+              final double srJd2 = srSs2[0];
+              final double ssJd2 = srSs2[1];
+              Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+              final ayn = Sweph.swe_get_ayanamsa(srJd2);
 
-            dayLagnaWindows = _scanLagnaRange(srJd2, ssJd2, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
-          } catch (_) {}
+              final mandiSrSs = Ephemeris.findSunriseSetForDate(
+                date.year, date.month, date.day,
+                LocationService.lat, LocationService.lon,
+              );
+              final double mandiSr = mandiSrSs[0];
+              final double mandiSs = mandiSrSs[1];
 
-          final hasPerfectLagna = dayLagnaWindows.any((w) => w.isPerfect);
-          final hasShubhaLagna = dayLagnaWindows.any((w) => w.isShubha || w.isAllowed);
+              final vedWday = ((date.weekday - 1) + 1) % 7;
+              final dayDuration = mandiSs - mandiSr;
+              const dayFactors = [26, 22, 18, 14, 10, 6, 2];
+              final dayMandiJd = mandiSr + (dayDuration * dayFactors[vedWday] / 30.0);
+              final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
+              if (dayMandiRashi >= 0) basePlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
+
+              dayLagnaWindows = _scanLagnaRange(srJd2, ssJd2, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
+            } catch (_) {}
+
+            hasPerfectLagna = dayLagnaWindows.any((w) => w.isPerfect);
+            hasShubhaLagna = dayLagnaWindows.any((w) => w.isShubha || w.isAllowed);
+          }
 
           if (!hasPerfectLagna) countNoLagnaShuddhi++;
 
