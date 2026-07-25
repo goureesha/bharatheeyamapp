@@ -1109,7 +1109,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         sunRashiIndex: day.sunRashiIndex,
         janmaNakIdx1: _mfNakIdx,
         janmaRashiIdx1: _mfRashiIdx,
-        overrideRules: userOverrideRules,
       );
 
       final guruBala = mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null;
@@ -1407,7 +1406,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             sunRashiIndex: sunRashi,
             janmaNakIdx1: _mfNakIdx,
             janmaRashiIdx1: _mfRashiIdx,
-            overrideRules: userOverrideRules2,
           );
 
           // Evaluate individual checks
