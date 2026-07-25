@@ -718,17 +718,17 @@ class _VastuScreenState extends State<VastuScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: List.generate(8, (i) {
-                        final sel = _selectedYoniFilter == i;
+                        final sel = _selectedYoni == i;
                         return Padding(
                           padding: const EdgeInsets.only(right: 6),
                           child: FilterChip(
-                            label: Text(trAll(appYoni[i]), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                            label: Text(_yoniEnglish[i], style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
                             selected: sel,
                             selectedColor: kPurple2.withOpacity(0.15),
                             checkmarkColor: kPurple2,
                             backgroundColor: kCard,
                             side: BorderSide(color: sel ? kPurple2 : kBorder),
-                            onSelected: (v) => setState(() => _selectedYoniFilter = v ? i : -1),
+                            onSelected: (v) => setState(() => _selectedYoni = v ? i : null),
                           ),
                         );
                       }),
