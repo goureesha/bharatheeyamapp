@@ -1069,6 +1069,25 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       janmaRashiIdx: _mfRashiIdx,
     );
 
+    // Build a MuhurtaEventRules from user's customized rules for evaluateMuhurta
+    final userOverrideRules = MuhurtaEventRules(
+      allowedTithis: userRules.allowedTithis ?? defaultRules.allowedTithis,
+      allowedNakshatras: userRules.allowedNakshatras ?? defaultRules.allowedNakshatras,
+      allowedVaras: userRules.allowedVaras ?? defaultRules.allowedVaras,
+      avoidVishti: userRules.avoidVishti,
+      requireShukla: userRules.requireShukla,
+      requireUttarayana: userRules.requireUttarayana,
+      allowedLagnas: userRules.allowedLagnas ?? defaultRules.allowedLagnas,
+      requiredShuddhis: userRules.requiredShuddhis,
+      shloka: defaultRules.shloka,
+      shastraRef: defaultRules.shastraRef,
+      tithiShloka: defaultRules.tithiShloka,
+      varaShloka: defaultRules.varaShloka,
+      nakshatraShloka: defaultRules.nakshatraShloka,
+      lagnaShloka: defaultRules.lagnaShloka,
+      lagnaShuddhiShloka: defaultRules.lagnaShuddhiShloka,
+    );
+
     // Build results from cached data
     final results = <Map<String, dynamic>>[];
     int totalDays = cache.getDaysInRange(startDate, endDate).length;
@@ -1090,6 +1109,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         sunRashiIndex: day.sunRashiIndex,
         janmaNakIdx1: _mfNakIdx,
         janmaRashiIdx1: _mfRashiIdx,
+        overrideRules: userOverrideRules,
       );
 
       final guruBala = mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null;
@@ -1143,14 +1163,30 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
           if (dayMandiRashi >= 0) basePlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
 
-          final rules = muhurtaRules[_mfEvent];
-          final allowedLagnas = rules?.allowedLagnas;
+          final allowedLagnas = userRules.allowedLagnas ?? defaultRules.allowedLagnas;
 
-          final scanEndJd = _mfEvent == MuhurtaEvent.grihaPrevesha
+          final scanEndJd = userRules.fullDayScan
               ? ssJd
-              : (srJd + 7.0 / 24.0).clamp(srJd, ssJd);
+              : (_mfEvent == MuhurtaEvent.grihaPrevesha
+                  ? ssJd
+                  : (srJd + 7.0 / 24.0).clamp(srJd, ssJd));
 
-          dayLagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
+          dayLagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules);
+
+          // Filter: only keep lagna windows that pass required shuddhi checks
+          dayLagnaWindows = dayLagnaWindows.where((w) {
+            if (!w.isAllowed) return false;
+            for (final s in userRules.requiredShuddhis) {
+              switch (s) {
+                case ShuddhiType.lagna: if (!w.lagnaShuddhi) return false; break;
+                case ShuddhiType.saptama: if (!w.saptamaShuddhi) return false; break;
+                case ShuddhiType.ashtama: if (!w.ashtamaShuddhi) return false; break;
+                case ShuddhiType.dashama: if (!w.dashamaShuddhi) return false; break;
+              }
+            }
+            if (userRules.requireGuruAnukoolaForLagna && !w.guruAnukoola) return false;
+            return true;
+          }).toList();
 
           // If no good lagna but panchanga is good, check Abhijit muhurta lagna
           final hasGoodLagna = dayLagnaWindows.any((w) => w.isPerfect || w.isShubha || w.isAllowed);
@@ -1298,6 +1334,24 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
           // ── Apply user rules filtering ──
           final userRules = UserRulesManager.instance.getRules(_mfEvent);
+          final defaultRulesNonCached = muhurtaRules[_mfEvent]!;
+          final userOverrideRules2 = MuhurtaEventRules(
+            allowedTithis: userRules.allowedTithis ?? defaultRulesNonCached.allowedTithis,
+            allowedNakshatras: userRules.allowedNakshatras ?? defaultRulesNonCached.allowedNakshatras,
+            allowedVaras: userRules.allowedVaras ?? defaultRulesNonCached.allowedVaras,
+            avoidVishti: userRules.avoidVishti,
+            requireShukla: userRules.requireShukla,
+            requireUttarayana: userRules.requireUttarayana,
+            allowedLagnas: userRules.allowedLagnas ?? defaultRulesNonCached.allowedLagnas,
+            requiredShuddhis: userRules.requiredShuddhis,
+            shloka: defaultRulesNonCached.shloka,
+            shastraRef: defaultRulesNonCached.shastraRef,
+            tithiShloka: defaultRulesNonCached.tithiShloka,
+            varaShloka: defaultRulesNonCached.varaShloka,
+            nakshatraShloka: defaultRulesNonCached.nakshatraShloka,
+            lagnaShloka: defaultRulesNonCached.lagnaShloka,
+            lagnaShuddhiShloka: defaultRulesNonCached.lagnaShuddhiShloka,
+          );
 
           // Tithi filter
           if (userRules.allowedTithis != null && !userRules.allowedTithis!.contains(pan.tithiIndex)) continue;
@@ -1348,6 +1402,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             sunRashiIndex: sunRashi,
             janmaNakIdx1: _mfNakIdx,
             janmaRashiIdx1: _mfRashiIdx,
+            overrideRules: userOverrideRules2,
           );
 
           // Evaluate individual checks
@@ -1410,8 +1465,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           final basicViable = (allChecksPassed || isTaraOk) && isAstaOk;
 
           // Compute lagna windows only for viable days
-          final rules = muhurtaRules[_mfEvent];
-          final allowedLagnas = rules?.allowedLagnas;
+          final allowedLagnas = userRules.allowedLagnas ?? defaultRulesNonCached.allowedLagnas;
           List<LagnaWindow> dayLagnaWindows = [];
           bool hasPerfectLagna = false;
           bool hasShubhaLagna = false;
@@ -1448,12 +1502,29 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
               if (dayMandiRashi >= 0) basePlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
 
-              // For Griha Pravesha: full day scan. Others: sunrise to ~1 PM only.
-              final scanEndJd = _mfEvent == MuhurtaEvent.grihaPrevesha
+              // Use user's fullDayScan setting
+              final scanEndJd = userRules.fullDayScan
                   ? ssJd2
-                  : (srJd2 + 7.0 / 24.0).clamp(srJd2, ssJd2);
+                  : (_mfEvent == MuhurtaEvent.grihaPrevesha
+                      ? ssJd2
+                      : (srJd2 + 7.0 / 24.0).clamp(srJd2, ssJd2));
 
-              dayLagnaWindows = _scanLagnaRange(srJd2, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, rules);
+              dayLagnaWindows = _scanLagnaRange(srJd2, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules2);
+
+              // Filter: only keep lagna windows that pass required shuddhi checks
+              dayLagnaWindows = dayLagnaWindows.where((w) {
+                if (!w.isAllowed) return false;
+                for (final s in userRules.requiredShuddhis) {
+                  switch (s) {
+                    case ShuddhiType.lagna: if (!w.lagnaShuddhi) return false; break;
+                    case ShuddhiType.saptama: if (!w.saptamaShuddhi) return false; break;
+                    case ShuddhiType.ashtama: if (!w.ashtamaShuddhi) return false; break;
+                    case ShuddhiType.dashama: if (!w.dashamaShuddhi) return false; break;
+                  }
+                }
+                if (userRules.requireGuruAnukoolaForLagna && !w.guruAnukoola) return false;
+                return true;
+              }).toList();
             } catch (_) {}
 
             hasPerfectLagna = dayLagnaWindows.any((w) => w.isPerfect);

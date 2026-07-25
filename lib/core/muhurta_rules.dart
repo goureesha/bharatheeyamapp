@@ -927,8 +927,10 @@ MuhurtaDayResult evaluateMuhurta({
   // Phase 3: Abhijit & Godhuli overrides
   String? abhijitTimeWindow,  // e.g. "11:48 AM - 12:20 PM"
   String? godhuliTimeWindow,  // e.g. "05:55 PM - 06:43 PM"
+  // User-customized rules override
+  MuhurtaEventRules? overrideRules,
 }) {
-  final rules = muhurtaRules[event]!;
+  final rules = overrideRules ?? muhurtaRules[event]!;
   final List<MuhurtaCheckItem> checks = [];
   final List<String> doshas = [];
   final List<String> doshaBhangas = [];
