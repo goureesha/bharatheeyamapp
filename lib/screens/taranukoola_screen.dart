@@ -965,6 +965,79 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     }
   }
 
+  /// Compute lagna windows on-demand for a single cached result
+  Future<void> _computeLagnaForResult(Map<String, dynamic> r) async {
+    if (r['needsLagna'] != true) return;
+    final date = r['date'] as DateTime;
+    try {
+      await Ephemeris.initSweph();
+      final srSs = Ephemeris.findSunriseSetForDate(
+        date.year, date.month, date.day,
+        LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
+      );
+      final srLocalFrac = ((srSs[0] + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
+      final hour24 = (srLocalFrac * 24.0) + (1.0 / 60.0);
+
+      final kr = await AstroCalculator.calculate(
+        year: date.year, month: date.month, day: date.day,
+        hourUtcOffset: LocationService.tzOffset,
+        hour24: hour24,
+        lat: LocationService.lat, lon: LocationService.lon,
+        ayanamsaMode: 'lahiri', trueNode: true,
+      );
+      if (kr == null) return;
+
+      final Map<String, int> basePlanetRashis = {};
+      for (final entry in kr.planets.entries) {
+        if (entry.key == 'ಮಾಂದಿ') continue;
+        basePlanetRashis[entry.key] = entry.value.rashiIndex;
+      }
+      final guruRashiIdx = basePlanetRashis['ಗುರು'] ?? -1;
+
+      final double srJd = srSs[0];
+      final double ssJd = srSs[1];
+      Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+      final ayn = Sweph.swe_get_ayanamsa(srJd);
+
+      // Mandi
+      final mandiSrSs = Ephemeris.findSunriseSetForDate(
+        date.year, date.month, date.day,
+        LocationService.lat, LocationService.lon,
+      );
+      final dayDuration = mandiSrSs[1] - mandiSrSs[0];
+      final vedWday = ((date.weekday - 1) + 1) % 7;
+      const dayFactors = [26, 22, 18, 14, 10, 6, 2];
+      final dayMandiJd = mandiSrSs[0] + (dayDuration * dayFactors[vedWday] / 30.0);
+      final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
+      if (dayMandiRashi >= 0) basePlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
+
+      final rules = muhurtaRules[_mfEvent];
+      final allowedLagnas = rules?.allowedLagnas;
+
+      final scanEndJd = _mfEvent == MuhurtaEvent.grihaPrevesha
+          ? ssJd
+          : (srJd + 7.0 / 24.0).clamp(srJd, ssJd);
+
+      final lagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx, allowedLagnas, rules);
+
+      // Compute rahu kala and visha ghati
+      final rahuKala = _rahuKalaTime(date, kr.panchang.sunrise, kr.panchang.sunset);
+      final vishaGhati = kr.panchang.vishaPraghati;
+
+      if (mounted) {
+        setState(() {
+          r['lagnaWindows'] = lagnaWindows;
+          r['rahuKala'] = rahuKala;
+          r['vishaGhati'] = vishaGhati;
+          r['needsLagna'] = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Lagna compute error for $date: $e');
+      if (mounted) setState(() { r['needsLagna'] = false; });
+    }
+  }
+
   /// INSTANT search using pre-computed cache
   Future<void> _searchMuhurtasCached() async {
     final cache = PanchangaCache.instance;
@@ -1749,10 +1822,15 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         children: [
           // ── ALWAYS VISIBLE: Tappable Header ──
           GestureDetector(
-            onTap: () => setState(() {
-              if (isExpanded) { _expandedResults.remove(dateKey); }
-              else { _expandedResults.add(dateKey); }
-            }),
+            onTap: () {
+              setState(() {
+                if (isExpanded) { _expandedResults.remove(dateKey); }
+                else { _expandedResults.add(dateKey); }
+              });
+              if (!isExpanded && r['needsLagna'] == true) {
+                _computeLagnaForResult(r);
+              }
+            },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
@@ -1892,6 +1970,17 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     Text('${AppLocale.l('vishaGhati')}: ${r['vishaGhati']}', style: TextStyle(fontSize: 12, color: kText)),
                 ]),
               ),
+            ),
+
+          // ── Lagna loading indicator ──
+          if (r['needsLagna'] == true)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: Row(children: [
+                SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: kPurple1)),
+                const SizedBox(width: 8),
+                Text('ಲಗ್ನ ಲೆಕ್ಕಾಚಾರ ಮಾಡಲಾಗುತ್ತಿದೆ...', style: TextStyle(fontSize: 12, color: kMuted, fontWeight: FontWeight.w600)),
+              ]),
             ),
 
           // ── Lagna Windows (shows perfect, shubha & allowed windows) ──
