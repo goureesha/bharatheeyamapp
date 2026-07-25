@@ -936,14 +936,14 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     return '${h12.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $ampm';
   }
 
-  /// Generate 20-year panchanga cache
+  /// Generate 2-year panchanga cache
   Future<void> _generateCache() async {
     if (_cacheGenerating) return;
     setState(() { _cacheGenerating = true; _cacheProgress = 0; _cacheTotal = 0; });
 
     final now = DateTime.now();
     final startDate = DateTime(now.year, 1, 1);
-    final endDate = DateTime(now.year + 19, 12, 31);
+    final endDate = DateTime(now.year + 1, 12, 31);
 
     await PanchangaCache.instance.generate(
       startDate: startDate,
@@ -1557,7 +1557,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                 return ElevatedButton.icon(
                   onPressed: _generateCache,
                   icon: Icon(Icons.build_circle_outlined, size: 18),
-                  label: Text('20 ವರ್ಷ ಪಂಚಾಂಗ ತಯಾರಿಸಿ (ಒಮ್ಮೆ ಮಾತ್ರ)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                  label: Text('2 ವರ್ಷ ಪಂಚಾಂಗ ತಯಾರಿಸಿ (ಒಮ್ಮೆ ಮಾತ್ರ)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF9800), foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
