@@ -55,15 +55,20 @@ class AppThemes {
       'muted': Color(0xFF166534),
     },
     { // Tanjore Gold (Royal Dark)
-      'purple1': Color(0xFFC9A84C), // Antique gold
-      'purple2': Color(0xFFA8882F), // Dark gold
-      'bg': Color(0xFF1A0A0E),      // Deep maroon
-      'card': Color(0xFF2A1118),     // Dark burgundy
-      'text': Color(0xFFF5E6C8),     // Ivory cream
-      'border': Color(0xFF5C3D2E),   // Warm brown border
-      'muted': Color(0xFF9B8E6E),    // Faded gold
+      'purple1': Color(0xFFD4AF37), // Rich antique gold
+      'purple2': Color(0xFFB8941F), // Deep temple gold
+      'bg': Color(0xFF120008),      // Deep maroon-black
+      'card': Color(0xFF1E0C12),    // Dark wine burgundy
+      'text': Color(0xFFF5E6C8),    // Ivory cream
+      'border': Color(0xFF6B4226),  // Warm copper border
+      'muted': Color(0xFFAA9B6F),   // Muted gold
     }
   ];
+
+  /// Whether the current theme is a dark theme
+  static bool get isDark => themeNotifier.value == 1 || themeNotifier.value == 5;
+  /// Whether the current theme is Tanjore Gold
+  static bool get isTanjore => themeNotifier.value == 5;
 
   static void setTheme(int i) {
     if (i < 0 || i >= palettes.length) return;
@@ -75,6 +80,16 @@ class AppThemes {
     kText = p['text']!;
     kBorder = p['border']!;
     kMuted = p['muted']!;
+    // Adapt accent colors for dark themes
+    if (i == 5) { // Tanjore Gold
+      kOrange = const Color(0xFFD4AF37); // Gold
+      kTeal = const Color(0xFFCDA434);   // Warm gold
+      kGreen = const Color(0xFFB8941F);  // Deep gold
+    } else {
+      kOrange = const Color(0xFFDD6B20);
+      kTeal = const Color(0xFF319795);
+      kGreen = const Color(0xFF047857);
+    }
     themeNotifier.value = i;
     // Persist theme choice
     SharedPreferences.getInstance().then((prefs) => prefs.setInt('app_theme', i));
@@ -2886,42 +2901,66 @@ class ResponsiveCenter extends StatelessWidget {
 
 
 // ─────────────────────────────────────────────
-// Header widget (purple gradient banner)
+// Header widget (gradient banner — gold for Tanjore)
 // ─────────────────────────────────────────────
 class AppHeader extends StatelessWidget {
   const AppHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isTanjore = AppThemes.isTanjore;
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [kPurple1, kPurple2],
+          colors: isTanjore
+              ? [const Color(0xFF2A1118), const Color(0xFF1E0C12)]
+              : [kPurple1, kPurple2],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: kPurple2.withOpacity(0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 4),
-          )
+          if (isTanjore)
+            BoxShadow(
+              color: const Color(0xFFD4AF37).withOpacity(0.25),
+              blurRadius: 20,
+              spreadRadius: 1,
+              offset: const Offset(0, 2),
+            )
+          else
+            BoxShadow(
+              color: kPurple2.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 4),
+            ),
         ],
-        border: const Border(bottom: BorderSide(color: Color(0xFFF6D365), width: 4)),
-      ),
-      child: Center(
-        child: Text(
-          'ಭಾರತೀಯಮ್',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.2,
-          ),
+        border: Border.all(
+          color: isTanjore ? const Color(0xFFD4AF37) : const Color(0xFFF6D365),
+          width: isTanjore ? 1.5 : 0,
         ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (isTanjore) ...[
+            Text('ॐ', style: TextStyle(fontSize: 28, color: const Color(0xFFD4AF37), fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+          ],
+          Text(
+            isTanjore ? "'ಭಾರತೀಯಮ್'" : 'ಭಾರತೀಯಮ್',
+            style: TextStyle(
+              color: isTanjore ? const Color(0xFFD4AF37) : Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
+              shadows: isTanjore ? [
+                Shadow(color: const Color(0xFFD4AF37).withOpacity(0.5), blurRadius: 12),
+              ] : null,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -2937,19 +2976,29 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isTanjore = AppThemes.isTanjore;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: padding ?? const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: kCard,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: kBorder),
+        border: isTanjore
+            ? Border.all(color: const Color(0xFFD4AF37).withOpacity(0.4), width: 1.2)
+            : Border.all(color: kBorder),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          )
+          if (isTanjore)
+            BoxShadow(
+              color: const Color(0xFFD4AF37).withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 2),
+            )
+          else
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
         ],
       ),
       child: child,

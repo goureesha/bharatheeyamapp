@@ -3533,12 +3533,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF4A148C),
+                      color: kPurple2,
                     ),
                   ),
                 ),
                 const SizedBox(height: 8),
-                Divider(color: Color(0xFF6A1B9A), thickness: 2),
+                Divider(color: kPurple2, thickness: 2),
                 const SizedBox(height: 16),
                 // Notes content
                 Expanded(

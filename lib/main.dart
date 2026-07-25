@@ -364,7 +364,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                 dialogBackgroundColor: kCard,
                 colorScheme: ColorScheme.fromSeed(
                   seedColor: kPurple2,
-                  brightness: themeIndex == 1 ? Brightness.dark : Brightness.light,
+                  brightness: (themeIndex == 1 || themeIndex == 5) ? Brightness.dark : Brightness.light,
                   primary: kPurple2,
                   secondary: kOrange,
                   surface: kCard,
