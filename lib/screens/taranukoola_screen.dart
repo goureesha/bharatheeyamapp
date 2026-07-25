@@ -8,6 +8,7 @@ import '../core/calculator.dart';
 import '../core/ephemeris.dart';
 import '../services/location_service.dart';
 import '../core/muhurta_rules.dart';
+import '../services/panchanga_cache.dart';
 
 class TaranukoolaScreen extends StatefulWidget {
   const TaranukoolaScreen({super.key});
@@ -45,6 +46,11 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   List<Map<String, dynamic>> _mfResults = [];
   Map<String, int>? _mfStats;
 
+  // Cache state
+  bool _cacheGenerating = false;
+  int _cacheProgress = 0;
+  int _cacheTotal = 0;
+
   // ── Ready Muhurta state (Tab 3) ──
 
 
@@ -71,7 +77,10 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     _selectedDay = _focusedDay;
     _loadNakshatra();
     _calculatePanchangForSelectedDay();
-
+    // Load pre-computed panchanga cache
+    PanchangaCache.instance.loadFromStorage().then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
 
@@ -921,6 +930,135 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     return '${h12.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $ampm';
   }
 
+  /// Generate 20-year panchanga cache
+  Future<void> _generateCache() async {
+    if (_cacheGenerating) return;
+    setState(() { _cacheGenerating = true; _cacheProgress = 0; _cacheTotal = 0; });
+
+    final now = DateTime.now();
+    final startDate = DateTime(now.year, 1, 1);
+    final endDate = DateTime(now.year + 19, 12, 31);
+
+    await PanchangaCache.instance.generate(
+      startDate: startDate,
+      endDate: endDate,
+      lat: LocationService.lat,
+      lon: LocationService.lon,
+      tzOffset: LocationService.tzOffset,
+      onProgress: (cur, total) {
+        if (mounted) setState(() { _cacheProgress = cur; _cacheTotal = total; });
+      },
+    );
+
+    if (mounted) setState(() { _cacheGenerating = false; });
+  }
+
+  /// INSTANT search using pre-computed cache
+  Future<void> _searchMuhurtasCached() async {
+    final cache = PanchangaCache.instance;
+    if (!cache.isLoaded) {
+      // Fall back to heavy search if cache not available
+      return _searchMuhurtas();
+    }
+
+    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; });
+    await Future.delayed(const Duration(milliseconds: 20));
+
+    final rules = muhurtaRules[_mfEvent];
+    if (rules == null) {
+      setState(() { _mfSearching = false; });
+      return;
+    }
+
+    // End of month range
+    final endDate = DateTime(_mfMonthEnd.year, _mfMonthEnd.month + 1, 0);
+    final startDate = DateTime(_mfMonth.year, _mfMonth.month, 1);
+
+    // INSTANT filter — milliseconds!
+    final filteredDays = cache.filterByRules(
+      rules: rules,
+      startDate: startDate,
+      endDate: endDate,
+      janmaNakIdx: _mfNakIdx,
+      janmaRashiIdx: _mfRashiIdx,
+    );
+
+    // Build results from cached data
+    final results = <Map<String, dynamic>>[];
+    int totalDays = cache.getDaysInRange(startDate, endDate).length;
+
+    for (final day in filteredDays) {
+      final mResult = evaluateMuhurta(
+        event: _mfEvent,
+        tithiIndex: day.tithiIndex,
+        tithiName: day.tithiName,
+        nakshatraIndex: day.nakshatraIndex,
+        nakshatraName: day.nakshatraName,
+        varaIndex: day.varaIndex,
+        varaName: day.varaName,
+        yogaIndex: day.yogaIndex,
+        yogaName: day.yogaName,
+        karanaName: day.karanaName,
+        moonRashiIndex: day.moonRashiIndex,
+        jupiterRashiIndex: day.jupiterRashiIndex,
+        sunRashiIndex: day.sunRashiIndex,
+        janmaNakIdx1: _mfNakIdx,
+        janmaRashiIdx1: _mfRashiIdx,
+      );
+
+      final guruBala = mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null;
+      final taraBala = mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null;
+
+      final shukraCombust = (_mfEvent == MuhurtaEvent.vivaha) ? day.venusCombust : false;
+
+      results.add({
+        'date': day.date,
+        'vara': day.varaName,
+        'tithi': day.tithiName,
+        'tithiEnd': day.tithiEndTime,
+        'nakshatra': day.nakshatraName,
+        'nakEnd': day.nakEndTime,
+        'pada': day.pada,
+        'yoga': day.yogaName,
+        'karana': day.karanaName,
+        'sunrise': day.sunrise,
+        'sunset': day.sunset,
+        'taraBala': taraBala,
+        'guruBala': guruBala,
+        'chandraBala': null,
+        'jupRashi': day.jupiterRashiIndex,
+        'rahuKala': '',
+        'vishaGhati': '',
+        'doshas': mResult.doshas,
+        'doshaBhangas': mResult.doshaBhangas,
+        'checks': mResult.checks,
+        'shubhaMuhurtas': <Map<String, String>>[],
+        'lagnaWindows': <LagnaWindow>[], // computed on-demand
+        'isPerfect': true,
+        'isCandidate': false,
+        'partialReasons': <String>[],
+        'score': mResult.score,
+        'verdict': mResult.verdict,
+        'needsLagna': true, // flag for on-demand lagna computation
+      });
+    }
+
+    // Sort by score
+    results.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+
+    final stats = {
+      'totalDays': totalDays,
+      'countTaraFailed': totalDays - filteredDays.length,
+      'countGuruFailed': 0,
+      'countGuruCombust': 0,
+      'countShukraCombust': 0,
+      'countPanchangaFailed': 0,
+      'countNoLagnaShuddhi': 0,
+    };
+
+    if (mounted) setState(() { _mfResults = results; _mfStats = stats; _mfSearching = false; });
+  }
+
   Future<void> _searchMuhurtas() async {
     setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; });
     await Future.delayed(const Duration(milliseconds: 50));
@@ -1308,11 +1446,73 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               ]),
               const SizedBox(height: 14),
 
+              // ── Cache Status & Generate ──
+              Builder(builder: (_) {
+                final cache = PanchangaCache.instance;
+                if (_cacheGenerating) {
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0x15FF9800),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0x40FF9800)),
+                    ),
+                    child: Column(children: [
+                      Text('ಪಂಚಾಂಗ ದತ್ತಾಂಶ ತಯಾರಿಸಲಾಗುತ್ತಿದೆ...', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                      const SizedBox(height: 8),
+                      LinearProgressIndicator(
+                        value: _cacheTotal > 0 ? _cacheProgress / _cacheTotal : null,
+                        backgroundColor: kBorder,
+                        valueColor: AlwaysStoppedAnimation(kPurple1),
+                      ),
+                      const SizedBox(height: 4),
+                      Text('$_cacheProgress / $_cacheTotal ದಿನಗಳು', style: TextStyle(fontSize: 11, color: kMuted)),
+                    ]),
+                  );
+                }
+                if (cache.isLoaded) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0x104CAF50),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0x404CAF50)),
+                    ),
+                    child: Row(children: [
+                      Icon(Icons.check_circle, color: kTeal, size: 16),
+                      const SizedBox(width: 6),
+                      Expanded(child: Text(
+                        '${cache.dayCount} ದಿನಗಳ ದತ್ತಾಂಶ ಸಿದ್ಧ (${cache.startDate?.year}–${cache.endDate?.year})',
+                        style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w600),
+                      )),
+                      TextButton(
+                        onPressed: _generateCache,
+                        child: Text('ಮರು ತಯಾರಿ', style: TextStyle(fontSize: 10)),
+                      ),
+                    ]),
+                  );
+                }
+                return ElevatedButton.icon(
+                  onPressed: _generateCache,
+                  icon: Icon(Icons.build_circle_outlined, size: 18),
+                  label: Text('20 ವರ್ಷ ಪಂಚಾಂಗ ತಯಾರಿಸಿ (ಒಮ್ಮೆ ಮಾತ್ರ)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF9800), foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                );
+              }),
+              const SizedBox(height: 10),
+
               // Search button
               ElevatedButton.icon(
-                onPressed: _mfSearching ? null : _searchMuhurtas,
+                onPressed: _mfSearching ? null : _searchMuhurtasCached,
                 icon: _mfSearching ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Icon(Icons.search),
-                label: Text(_mfSearching ? '...' : AppLocale.l('searchMuhurta'), style: TextStyle(fontWeight: FontWeight.w800)),
+                label: Text(
+                  _mfSearching ? '...' : (PanchangaCache.instance.isLoaded ? '⚡ ${AppLocale.l('searchMuhurta')}' : AppLocale.l('searchMuhurta')),
+                  style: TextStyle(fontWeight: FontWeight.w800),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: kPurple1, foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),

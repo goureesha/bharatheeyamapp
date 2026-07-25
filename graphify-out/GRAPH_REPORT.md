@@ -1,16 +1,16 @@
-# Graph Report - bharatheeyamapp sample  (2026-06-06)
+# Graph Report - bharatheeyamapp sample  (2026-07-24)
 
 ## Corpus Check
-- 182 files · ~22,268,596 words
+- 119 files · ~479,395 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2432 nodes · 2840 edges · 180 communities (157 shown, 23 thin omitted)
+- 2277 nodes · 2693 edges · 130 communities (112 shown, 18 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `55635837`
+- Built from commit: `93b72a5d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -82,14 +82,11 @@
 - [[_COMMUNITY_Community 64|Community 64]]
 - [[_COMMUNITY_Community 65|Community 65]]
 - [[_COMMUNITY_Community 66|Community 66]]
-- [[_COMMUNITY_Community 67|Community 67]]
 - [[_COMMUNITY_Community 68|Community 68]]
 - [[_COMMUNITY_Community 69|Community 69]]
 - [[_COMMUNITY_Community 70|Community 70]]
 - [[_COMMUNITY_Community 71|Community 71]]
-- [[_COMMUNITY_Community 72|Community 72]]
 - [[_COMMUNITY_Community 73|Community 73]]
-- [[_COMMUNITY_Community 74|Community 74]]
 - [[_COMMUNITY_Community 75|Community 75]]
 - [[_COMMUNITY_Community 76|Community 76]]
 - [[_COMMUNITY_Community 77|Community 77]]
@@ -97,13 +94,10 @@
 - [[_COMMUNITY_Community 79|Community 79]]
 - [[_COMMUNITY_Community 80|Community 80]]
 - [[_COMMUNITY_Community 81|Community 81]]
-- [[_COMMUNITY_Community 82|Community 82]]
-- [[_COMMUNITY_Community 83|Community 83]]
 - [[_COMMUNITY_Community 84|Community 84]]
 - [[_COMMUNITY_Community 85|Community 85]]
 - [[_COMMUNITY_Community 86|Community 86]]
 - [[_COMMUNITY_Community 87|Community 87]]
-- [[_COMMUNITY_Community 88|Community 88]]
 - [[_COMMUNITY_Community 89|Community 89]]
 - [[_COMMUNITY_Community 90|Community 90]]
 - [[_COMMUNITY_Community 91|Community 91]]
@@ -118,7 +112,6 @@
 - [[_COMMUNITY_Community 100|Community 100]]
 - [[_COMMUNITY_Community 101|Community 101]]
 - [[_COMMUNITY_Community 102|Community 102]]
-- [[_COMMUNITY_Community 103|Community 103]]
 - [[_COMMUNITY_Community 104|Community 104]]
 - [[_COMMUNITY_Community 105|Community 105]]
 - [[_COMMUNITY_Community 106|Community 106]]
@@ -131,55 +124,49 @@
 - [[_COMMUNITY_Community 113|Community 113]]
 - [[_COMMUNITY_Community 114|Community 114]]
 - [[_COMMUNITY_Community 115|Community 115]]
-- [[_COMMUNITY_Community 116|Community 116]]
 - [[_COMMUNITY_Community 117|Community 117]]
-- [[_COMMUNITY_Community 118|Community 118]]
 - [[_COMMUNITY_Community 119|Community 119]]
 - [[_COMMUNITY_Community 120|Community 120]]
-- [[_COMMUNITY_Community 121|Community 121]]
-- [[_COMMUNITY_Community 122|Community 122]]
 - [[_COMMUNITY_Community 123|Community 123]]
 - [[_COMMUNITY_Community 124|Community 124]]
 - [[_COMMUNITY_Community 125|Community 125]]
 - [[_COMMUNITY_Community 127|Community 127]]
-- [[_COMMUNITY_Community 128|Community 128]]
 - [[_COMMUNITY_Community 129|Community 129]]
 - [[_COMMUNITY_Community 130|Community 130]]
 - [[_COMMUNITY_Community 131|Community 131]]
 - [[_COMMUNITY_Community 132|Community 132]]
 - [[_COMMUNITY_Community 140|Community 140]]
-- [[_COMMUNITY_Community 177|Community 177]]
 - [[_COMMUNITY_Community 178|Community 178]]
 - [[_COMMUNITY_Community 179|Community 179]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `list` - 16 edges
 2. `🚗 Travel Buddy App — Complete Plan` - 14 edges
-3. `JanmaPatrikePDF` - 12 edges
-4. `loadClients()` - 11 edges
-5. `Firebase Backend + Admin Panel for Bharatiyam Gratha Sudha` - 10 edges
-6. `build_page1()` - 9 edges
-7. `ಭಾರತೀಯಮ್ (Bharatheeyam) V2 — App Overview` - 9 edges
-8. `Files to Create/Modify` - 9 edges
-9. `Flutter App Changes (Phase 1)` - 9 edges
-10. `Detailed Rule Analysis for All Muhurta Events` - 9 edges
+3. `loadClients()` - 11 edges
+4. `Firebase Backend + Admin Panel for Bharatiyam Gratha Sudha` - 10 edges
+5. `ಭಾರತೀಯಮ್ (Bharatheeyam) V2 — App Overview` - 9 edges
+6. `Files to Create/Modify` - 9 edges
+7. `Flutter App Changes (Phase 1)` - 9 edges
+8. `updateWidget()` - 8 edges
+9. `drawClock()` - 8 edges
+10. `drawText()` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `BharatheeyamApp` --inherits--> `StatefulWidget`  [EXTRACTED]
   lib/main.dart → None  _Bridges community 68 → community 48_
-- `_DeviceMismatchScreen` --inherits--> `StatefulWidget`  [EXTRACTED]
-  lib/main.dart → None  _Bridges community 48 → community 103_
-- `_FirstTimeSignInScreen` --inherits--> `StatefulWidget`  [EXTRACTED]
-  lib/main.dart → None  _Bridges community 48 → community 118_
-- `_InternetRequiredScreen` --inherits--> `StatefulWidget`  [EXTRACTED]
-  lib/main.dart → None  _Bridges community 48 → community 177_
+- `_BlockedScreen` --inherits--> `StatefulWidget`  [EXTRACTED]
+  lib/main.dart → None  _Bridges community 48 → community 61_
 - `AppointmentScreen` --inherits--> `StatefulWidget`  [EXTRACTED]
   lib/screens/appointment_screen.dart → None  _Bridges community 48 → community 33_
+- `ClientDetailScreen` --inherits--> `StatefulWidget`  [EXTRACTED]
+  lib/screens/client_detail_screen.dart → None  _Bridges community 48 → community 21_
+- `InputScreen` --inherits--> `StatefulWidget`  [EXTRACTED]
+  lib/screens/input_screen.dart → None  _Bridges community 48 → community 12_
 
 ## Import Cycles
 - None detected.
 
-## Communities (180 total, 23 thin omitted)
+## Communities (130 total, 18 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.02
@@ -231,7 +218,7 @@ Nodes (43): _addDefaultItems, _addItemFromDropdown, build, _createDefaultItems, 
 
 ### Community 12 - "Community 12"
 Cohesion: 0.05
-Nodes (40): _ampm, _ayanamsa, build, _buildHistorySheet, _buildInputCard, _buildProfileListSheet, createState, dispose (+32 more)
+Nodes (42): _ampm, _ayanamsa, build, _buildHistorySheet, _buildInputCard, _buildProfileListSheet, createState, dispose (+34 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.05
@@ -270,8 +257,8 @@ Cohesion: 0.07
 Nodes (30): Client, dashboard_screen.dart, build, _buildClientHeader, _buildHistorySection, _buildMembersList, _buildModeToggle, client (+22 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.08
-Nodes (23): package:device_info_plus/device_info_plus.dart, package:uuid/uuid.dart, _cacheLocalBinding, checkBinding, checkDeviceBlock, _clearLocalBinding, DeviceBindingService, deviceBlockedReason (+15 more)
+Cohesion: 0.06
+Nodes (32): package:device_info_plus/device_info_plus.dart, package:package_info_plus/package_info_plus.dart, package:uuid/uuid.dart, _cacheLocalBinding, checkBinding, checkDeviceBlock, _clearLocalBinding, DeviceBindingService (+24 more)
 
 ### Community 23 - "Community 23"
 Cohesion: 0.07
@@ -282,16 +269,16 @@ Cohesion: 0.07
 Nodes (27): ../core/ephemeris.dart, location_service.dart, allEvents, _cache, _cachePrefix, _cacheVersion, _cacheVersionKey, clear (+19 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.04
-Nodes (45): AshtakaVarga, computeAll, computeBAV, _jupiterBav, _marsBav, _mercuryBav, _moonBav, planets (+37 more)
+Cohesion: 0.07
+Nodes (27): calculateCompatibility, calculateFullCompatibility, calculateGrahaMaitriComparison, calculateKujaDosha, calculatePapaDosha, checkDvirdvadasha, _checkHouseRelation, checkPapaSamya (+19 more)
 
 ### Community 26 - "Community 26"
 Cohesion: 0.07
 Nodes (26): _amshaDegree, _aroodhaChip, aroodhas, bhavaFromPlanet, build, _buildHouseWidgets, centerLabel, houseRashi (+18 more)
 
 ### Community 27 - "Community 27"
-Cohesion: 0.16
-Nodes (12): appointment_service.dart, backup_service_stub.dart, client_service.dart, package:shared_preferences/shared_preferences.dart, BackupService, exportData, importData, validKeys (+4 more)
+Cohesion: 0.09
+Nodes (23): appointment_service.dart, backup_service_stub.dart, client_service.dart, package:shared_preferences/shared_preferences.dart, BackupService, exportData, importData, validKeys (+15 more)
 
 ### Community 28 - "Community 28"
 Cohesion: 0.08
@@ -311,7 +298,7 @@ Nodes (24): add, ampm, clearAll, date, _entries, fromJson, HistoryEntry, History
 
 ### Community 32 - "Community 32"
 Cohesion: 0.08
-Nodes (24): claimDurationHours, claimOfflineDay, _claimStartKey, clearActiveClaim, clearExpiredClaim, _currentClaimStart, daysRemaining, daysUsed (+16 more)
+Nodes (23): claimDurationHours, claimOfflineDay, _claimStartKey, clearActiveClaim, clearExpiredClaim, _currentClaimStart, daysRemaining, daysUsed (+15 more)
 
 ### Community 33 - "Community 33"
 Cohesion: 0.29
@@ -322,16 +309,16 @@ Cohesion: 0.08
 Nodes (23): offline_access_service.dart, _blockedKey, blockedReason, _blockedReasonKey, checkManualPremium, dispose, hasAdFree, hasSubscription (+15 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.05
-Nodes (40): ayanamsaKP, ayanamsaLahiri, ayanamsaRaman, calcAll, _deg, _epheFiles, Ephemeris, findMoonriseSetForDate (+32 more)
+Cohesion: 0.04
+Nodes (44): AstaPeriod, astaPeriods, calculateAnnualEvents, date, description, endDate, _findExactTransitJd, fromRashi (+36 more)
 
 ### Community 36 - "Community 36"
-Cohesion: 0.04
-Nodes (45): ../core/events.dart, package:firebase_auth/firebase_auth.dart, package:google_sign_in/google_sign_in.dart, package:url_launcher/url_launcher.dart, AboutScreen, _bodyCard, build, _buildEventReference (+37 more)
+Cohesion: 0.09
+Nodes (22): package:firebase_auth/firebase_auth.dart, package:google_sign_in/google_sign_in.dart, _currentUser, ensureDriveScope, ensureFirebaseAuth, firebaseAuthEmail, getAuthHeaders, GoogleAuthService (+14 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.09
-Nodes (22): ampm, aroodhas, clientId, date, delete, fromJson, groupMembers, hour (+14 more)
+Cohesion: 0.05
+Nodes (39): getTimezoneForPlace, karnatakaPlaces, _knownTimezones, lowerName, offlinePlaces, otherPlaces, dart:convert, dart:html (+31 more)
 
 ### Community 38 - "Community 38"
 Cohesion: 0.09
@@ -350,20 +337,20 @@ Cohesion: 0.09
 Nodes (21): Adhika/Nija Masa Calculation, 🏗️ Architecture, Bharatheeyam App — Project Context & Setup Guide, Build & Run, CI/CD, 🗂️ Conversation IDs (for reference), Core Engine (`lib/core/`), Device Binding (Security) (+13 more)
 
 ### Community 42 - "Community 42"
-Cohesion: 0.09
-Nodes (21): int get, addList, checked, checkedCount, createdAt, deleteList, fromJson, id (+13 more)
+Cohesion: 0.11
+Nodes (17): ayanamsaKP, ayanamsaLahiri, ayanamsaRaman, calcAll, _deg, _epheFiles, Ephemeris, findMoonriseSetForDate (+9 more)
 
 ### Community 43 - "Community 43"
 Cohesion: 0.11
 Nodes (18): AmaraKoshaEntry, author, Book, category, Chapter, chapters, fromJson, id (+10 more)
 
 ### Community 44 - "Community 44"
-Cohesion: 0.11
-Nodes (18): ../core/ashtakavarga.dart, KundaliResult, _avData, _barColor, _binduColor, build, _buildAVKundaliChart, _buildBarChart (+10 more)
+Cohesion: 0.10
+Nodes (20): ../core/ashtakavarga.dart, KundaliResult, AshtakaVargaWidget, _AshtakaVargaWidgetState, _avData, _barColor, _binduColor, build (+12 more)
 
 ### Community 45 - "Community 45"
-Cohesion: 0.11
-Nodes (17): ANNAPRASHANA LAGNA, CHOWLA/CHUDAKARANA LAGNA, Detailed Rule Analysis for All Muhurta Events, GENERAL LAGNA SHUDDHI, GRIHA PRAVESHA LAGNA, Key Source Text Snippets:, Key Source Text Snippets:, Key Source Text Snippets: (+9 more)
+Cohesion: 0.14
+Nodes (13): AshtakaVarga, computeAll, computeBAV, _jupiterBav, _marsBav, _mercuryBav, _moonBav, planets (+5 more)
 
 ### Community 46 - "Community 46"
 Cohesion: 0.11
@@ -375,15 +362,11 @@ Nodes (17): Automated Tests, Category 1: Astrological Terms (Transliteration), C
 
 ### Community 48 - "Community 48"
 Cohesion: 0.17
-Nodes (16): _BlockedScreen, _BlockedScreenState, _GmailRequiredScreen, _GmailRequiredScreenState, _OfflineVerifyScreen, _OfflineVerifyScreenState, InputScreen, _InputScreenState (+8 more)
+Nodes (16): _DeviceMismatchScreen, _DeviceMismatchScreenState, _FirstTimeSignInScreen, _FirstTimeSignInScreenState, _GmailRequiredScreen, _GmailRequiredScreenState, _InternetRequiredScreen, _InternetRequiredScreenState (+8 more)
 
 ### Community 49 - "Community 49"
 Cohesion: 0.12
 Nodes (16): dart:async, hasTrustedTime, init, isClockTampered, _lastSyncKey, _lastSyncTime, now, _offsetKey (+8 more)
-
-### Community 50 - "Community 50"
-Cohesion: 0.30
-Nodes (6): FPDF, build_page1(), build_page2(), JanmaPatrikePDF, main(), Generate a sample Janma Patrike PDF using fpdf2 + uharfbuzz. Proper Kannada text
 
 ### Community 51 - "Community 51"
 Cohesion: 0.12
@@ -406,32 +389,28 @@ Cohesion: 0.14
 Nodes (13): Manual Verification, [MODIFY] [planets_screen.dart](file:///d:/bharatheeyamapp%20sample/lib/screens/planets_screen.dart), [MODIFY] [transit_calculator.dart](file:///d:/bharatheeyamapp%20sample/lib/core/transit_calculator.dart), [NEW] [transit_cache.dart](file:///d:/bharatheeyamapp%20sample/lib/core/transit_cache.dart), Open Questions, Pre-calculate Planets Data for 200 Years, Problem, Proposed Approach: In-Memory Cache + Background Pre-computation (+5 more)
 
 ### Community 56 - "Community 56"
-Cohesion: 0.17
-Nodes (11): google_auth_service.dart, downloadAndRestore, _driveApi, DriveBackupService, _fileName, _findBackupFileId, getBackupInfo, _mimeType (+3 more)
+Cohesion: 0.14
+Nodes (13): ../core/events.dart, AboutScreen, _bodyCard, build, _buildEventReference, _calcCard, _getEventsForMasaTithi, _githubUrl (+5 more)
 
 ### Community 57 - "Community 57"
-Cohesion: 0.29
-Nodes (6): package:cloud_firestore/cloud_firestore.dart, package:firebase_core/firebase_core.dart, FirebaseService, init, _initialized, static bool
+Cohesion: 0.33
+Nodes (5): package:firebase_core/firebase_core.dart, package:flutter/material.dart, FirebaseService, init, _initialized
 
 ### Community 58 - "Community 58"
 Cohesion: 0.18
 Nodes (11): dart:io, package:file_picker/file_picker.dart, package:path_provider/path_provider.dart, package:share_plus/share_plus.dart, exportJsonFile, pickJsonFile, ExportService, shareCSV (+3 more)
 
 ### Community 59 - "Community 59"
-Cohesion: 0.17
-Nodes (11): dart:convert, dart:html, exportJsonFile, pickJsonFile, blob, bytes, _downloadFile, exportJsonFile (+3 more)
+Cohesion: 0.18
+Nodes (10): package:url_launcher/url_launcher.dart, _body, build, _bullet, _header, _meta, PrivacyPolicyScreen, _privacyUrl (+2 more)
 
 ### Community 60 - "Community 60"
-Cohesion: 0.15
-Nodes (12): icon, min_sdk_version, name, package_name, permissions, split_apks, split_configs, target_sdk_version (+4 more)
-
-### Community 61 - "Community 61"
-Cohesion: 0.29
-Nodes (11): calculate_ashtakavarga(), calculate_mandi(), find_nak_limit(), find_sunrise_set_for_date(), fmt_deg(), fmt_ghati(), get_altitude_manual(), get_full_calculations() (+3 more)
+Cohesion: 0.33
+Nodes (5): calculateShadbala, planets, ShadbalaLogic, dart:math, static const List
 
 ### Community 62 - "Community 62"
-Cohesion: 0.17
-Nodes (11): checkTesterStatus, _clearStatus, init, isTester, isTesterNotifier, onSignOut, statusMessage, _testerCacheKey (+3 more)
+Cohesion: 0.15
+Nodes (12): google_auth_service.dart, package:cloud_firestore/cloud_firestore.dart, checkTesterStatus, _clearStatus, init, isTester, isTesterNotifier, onSignOut (+4 more)
 
 ### Community 63 - "Community 63"
 Cohesion: 0.17
@@ -446,20 +425,16 @@ Cohesion: 0.18
 Nodes (10): Admin Features (all built into app.js), Admin Panel Files, Firebase Backend + Admin Panel — Task Tracker, Firebase Infrastructure, Flutter Firebase Integration, GitHub Actions, Phase 1: Firebase Setup + Firestore, Phase 2: Web Admin Panel (+2 more)
 
 ### Community 66 - "Community 66"
-Cohesion: 0.15
-Nodes (12): common.dart, ../constants/strings.dart, DashaEntry, package:flutter/material.dart, list, ad, build, dashas (+4 more)
-
-### Community 67 - "Community 67"
-Cohesion: 0.18
-Nodes (10): buildPlugin, buildPluginVersion, buildSystem, buildSystemVersion, projectSettings, isCompatibilityMetadataVariantEnabled, isHmppEnabled, isKPMEnabled (+2 more)
+Cohesion: 0.17
+Nodes (11): ../constants/strings.dart, DashaEntry, list, ad, _AntarBlock, build, dashas, DashaWidget (+3 more)
 
 ### Community 68 - "Community 68"
 Cohesion: 0.40
 Nodes (5): BharatheeyamApp, _BharatheeyamAppState, DashboardScreen, _DashboardScreenState, WidgetsBindingObserver
 
 ### Community 69 - "Community 69"
-Cohesion: 0.14
-Nodes (14): HomeScreen, MatchMakingScreen, _PlainListViewPage, StatelessWidget, AppCard, AppHeader, ResponsiveCenter, SectionTitle (+6 more)
+Cohesion: 0.20
+Nodes (10): HomeScreen, MatchMakingScreen, _PlainListViewPage, StatelessWidget, AppCard, AppHeader, ResponsiveCenter, SectionTitle (+2 more)
 
 ### Community 70 - "Community 70"
 Cohesion: 0.20
@@ -469,17 +444,9 @@ Nodes (9): Admin Panel, Architecture, Files Created, Firebase Backend + Admin Pa
 Cohesion: 0.20
 Nodes (9): AstroEvent, description, EventCalculator, getEventsForPanchang, meaning, name, shloka, source (+1 more)
 
-### Community 72 - "Community 72"
-Cohesion: 0.20
-Nodes (9): assets/images/logo.png, packages/sweph/assets/ephe/seas_18.se1, packages/sweph/assets/ephe/seasnam.txt, packages/sweph/assets/ephe/sefstars.txt, packages/sweph/assets/ephe/seleapsec.txt, packages/sweph/assets/ephe/semo_18.se1, packages/sweph/assets/ephe/seorbel.txt, packages/sweph/assets/ephe/sepl_18.se1 (+1 more)
-
 ### Community 73 - "Community 73"
 Cohesion: 0.20
 Nodes (10): build, MaterialPageRoute, _buildAppointmentCard, _buildClientCard, _generateKundaliForMember, build, _calculate, _openList (+2 more)
-
-### Community 74 - "Community 74"
-Cohesion: 0.20
-Nodes (9): file, fontBytes, fontFile, main, pdf, ttf, writeAsBytes, package:pdf/pdf.dart (+1 more)
 
 ### Community 75 - "Community 75"
 Cohesion: 0.22
@@ -490,8 +457,8 @@ Cohesion: 0.22
 Nodes (8): Appointment Service Integration, Auth Service, Calendar Service (Full Rewrite), Google Calendar 2-Way Sync — Tasks, Model Changes, Package Setup, UI Updates (appointment_screen.dart), Verification
 
 ### Community 77 - "Community 77"
-Cohesion: 0.22
-Nodes (8): ../core/calculator.dart, dart:typed_data, package:printing/printing.dart, generateAndPrint, _pageFooter, _pageHeader, PdfService, _sectionTitle
+Cohesion: 0.18
+Nodes (10): ../core/calculator.dart, dart:typed_data, package:pdf/pdf.dart, package:pdf/widgets.dart, package:printing/printing.dart, generateAndPrint, _pageFooter, _pageHeader (+2 more)
 
 ### Community 78 - "Community 78"
 Cohesion: 0.22
@@ -506,16 +473,8 @@ Cohesion: 0.43
 Nodes (6): Context, Intent, cancelUpdates(), GhatiWidgetUpdateService, scheduleNextUpdate(), BroadcastReceiver
 
 ### Community 81 - "Community 81"
-Cohesion: 0.25
-Nodes (7): getTimezoneForPlace, karnatakaPlaces, _knownTimezones, lowerName, offlinePlaces, otherPlaces, Map
-
-### Community 82 - "Community 82"
-Cohesion: 0.32
-Nodes (5): DateTime, calculate_mandi(), find_sunrise_set_for_date(), get_altitude_manual(), Manual Premium & Block/Unblock Script for Bharatheeyam App Usage:   python unloc
-
-### Community 83 - "Community 83"
-Cohesion: 0.25
-Nodes (7): package:package_info_plus/package_info_plus.dart, check, _checked, InstallChecker, isFromPlayStore, _isFromStore, static bool get
+Cohesion: 0.33
+Nodes (5): common.dart, Map, build, shadbala, ShadbalaWidget
 
 ### Community 84 - "Community 84"
 Cohesion: 0.29
@@ -532,10 +491,6 @@ Nodes (6): 1. Description of Service, 2. Google Calendar Integration, 3. Disclai
 ### Community 87 - "Community 87"
 Cohesion: 0.29
 Nodes (6): firestore, rules, hosting, ignore, public, rewrites
-
-### Community 88 - "Community 88"
-Cohesion: 0.29
-Nodes (6): main, srHour, srMin, srMinBug, srParts, sunriseStr
 
 ### Community 89 - "Community 89"
 Cohesion: 0.29
@@ -634,21 +589,21 @@ Cohesion: 0.50
 Nodes (3): exportJsonFile, exportMultipleFiles, pickJsonFile
 
 ## Knowledge Gaps
-- **1837 isolated node(s):** `artifactType`, `summary`, `updatedAt`, `version`, `requestFeedback` (+1832 more)
+- **1780 isolated node(s):** `artifactType`, `summary`, `updatedAt`, `version`, `requestFeedback` (+1775 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `list` connect `Community 66` to `Community 0`, `Community 1`, `Community 2`, `Community 35`, `Community 4`, `Community 5`, `Community 3`, `Community 37`, `Community 8`, `Community 42`, `Community 43`, `Community 12`, `Community 11`, `Community 14`, `Community 21`?**
-  _High betweenness centrality (0.062) - this node is a cross-community bridge._
+- **Why does `list` connect `Community 66` to `Community 0`, `Community 1`, `Community 2`, `Community 35`, `Community 4`, `Community 5`, `Community 3`, `Community 37`, `Community 8`, `Community 43`, `Community 12`, `Community 11`, `Community 14`, `Community 21`?**
+  _High betweenness centrality (0.073) - this node is a cross-community bridge._
 - **Why does `KundaliResult` connect `Community 44` to `Community 1`, `Community 2`, `Community 4`, `Community 7`, `Community 26`, `Community 30`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **Why does `MuhurtaEvent` connect `Community 4` to `Community 0`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
 - **What connects `artifactType`, `summary`, `updatedAt` to the rest of the system?**
-  _1840 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1780 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.017857142857142856 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
