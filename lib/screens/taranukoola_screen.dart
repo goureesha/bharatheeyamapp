@@ -1061,13 +1061,15 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     final startDate = DateTime(_mfMonth.year, _mfMonth.month, 1);
 
     // INSTANT filter — milliseconds!
-    final filteredDays = cache.filterByUserRules(
+    final filterResult = cache.filterByUserRules(
       userRules: userRules,
       startDate: startDate,
       endDate: endDate,
       janmaNakIdx: _mfNakIdx,
       janmaRashiIdx: _mfRashiIdx,
     );
+    final filteredDays = filterResult.days;
+    final rejections = filterResult.rejections;
 
     // Build a MuhurtaEventRules from user's customized rules for evaluateMuhurta
     final userOverrideRules = MuhurtaEventRules(
@@ -1269,12 +1271,13 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
     final stats = {
       'totalDays': totalDays,
-      'countTaraFailed': totalDays - filteredDays.length,
-      'countGuruFailed': 0,
+      'countTaraFailed': rejections['tara'] ?? 0,
+      'countGuruFailed': rejections['guru'] ?? 0,
       'countGuruCombust': 0,
       'countShukraCombust': 0,
-      'countPanchangaFailed': 0,
+      'countPanchangaFailed': (rejections['tithi'] ?? 0) + (rejections['nakshatra'] ?? 0) + (rejections['vara'] ?? 0) + (rejections['yoga'] ?? 0) + (rejections['karana'] ?? 0),
       'countNoLagnaShuddhi': results.where((r) => !(r['lagnaWindows'] as List).any((w) => w.isPerfect)).length,
+      'rejections': rejections,
     };
 
     if (mounted) setState(() { _mfResults = results; _mfStats = stats; _mfSearching = false; });
@@ -1967,13 +1970,33 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           Wrap(
             spacing: 8, runSpacing: 6,
             children: [
+              if (countPanchanga > 0) _diagChip('ಪಂಚಾಂಗ ದೋಷ', countPanchanga, Colors.red),
               if (countTara > 0) _diagChip('ತಾರಾನುಕೂಲ ಕೊರತೆ', countTara, Colors.deepOrange),
               if (countGuru > 0) _diagChip('ಗುರು ಬಲ ಕೊರತೆ', countGuru, Colors.amber.shade900),
               if (countCombust > 0) _diagChip('ಗುರು/ಶುಕ್ರ ಅಸ್ತ ದೋಷ', countCombust, Colors.purple),
-              if (countPanchanga > 0) _diagChip('ಪಂಚಾಂಗ ದೋಷ', countPanchanga, Colors.red),
               if (countLagna > 0) _diagChip('ಲಗ್ನ ಶುದ್ಧಿ ಕೊರತೆ', countLagna, Colors.blueGrey),
             ],
           ),
+          // Detailed per-rule rejection breakdown
+          if (stats['rejections'] != null) ...[
+            const SizedBox(height: 10),
+            Text('ನಿಯಮದ ಪ್ರಕಾರ ತಿರಸ್ಕೃತ ದಿನಗಳು:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 6, runSpacing: 4,
+              children: [
+                if ((stats['rejections']['tithi'] ?? 0) > 0) _diagChip('ತಿಥಿ', stats['rejections']['tithi'], Colors.teal),
+                if ((stats['rejections']['nakshatra'] ?? 0) > 0) _diagChip('ನಕ್ಷತ್ರ', stats['rejections']['nakshatra'], Colors.indigo),
+                if ((stats['rejections']['vara'] ?? 0) > 0) _diagChip('ವಾರ', stats['rejections']['vara'], Colors.brown),
+                if ((stats['rejections']['yoga'] ?? 0) > 0) _diagChip('ಯೋಗ', stats['rejections']['yoga'], Colors.pink),
+                if ((stats['rejections']['karana'] ?? 0) > 0) _diagChip('ಕರಣ', stats['rejections']['karana'], Colors.cyan.shade800),
+                if ((stats['rejections']['shukla'] ?? 0) > 0) _diagChip('ಶುಕ್ಲಪಕ್ಷ', stats['rejections']['shukla'], Colors.grey),
+                if ((stats['rejections']['uttarayana'] ?? 0) > 0) _diagChip('ಉತ್ತರಾಯಣ', stats['rejections']['uttarayana'], Colors.blue),
+                if ((stats['rejections']['tara'] ?? 0) > 0) _diagChip('ತಾರಾಬಲ', stats['rejections']['tara'], Colors.deepOrange),
+                if ((stats['rejections']['guru'] ?? 0) > 0) _diagChip('ಗುರುಬಲ', stats['rejections']['guru'], Colors.amber.shade900),
+              ],
+            ),
+          ],
           if (isNoPerfect && candidateCount > 0) ...[
             const SizedBox(height: 10),
             Container(
