@@ -46,7 +46,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   DateTime _mfMonthEnd = DateTime(DateTime.now().year, DateTime.now().month + 2);
   bool _mfSearching = false;
   List<Map<String, dynamic>> _mfResults = [];
-  Map<String, int>? _mfStats;
+  Map<String, dynamic>? _mfStats;
   int _mfDisplayCount = 20;
   final Set<String> _expandedResults = {};
 
@@ -1927,15 +1927,15 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   Widget _buildSearchDiagnosticsCard() {
     if (_mfStats == null) return const SizedBox();
     final stats = _mfStats!;
-    final totalDays = stats['totalDays'] ?? 0;
+    final totalDays = (stats['totalDays'] as int?) ?? 0;
     final perfectCount = _mfResults.where((r) => r['isPerfect'] == true).length;
     final candidateCount = _mfResults.where((r) => r['isCandidate'] == true).length;
 
-    final countTara = stats['countTaraFailed'] ?? 0;
-    final countGuru = stats['countGuruFailed'] ?? 0;
-    final countCombust = (stats['countGuruCombust'] ?? 0) + (stats['countShukraCombust'] ?? 0);
-    final countPanchanga = stats['countPanchangaFailed'] ?? 0;
-    final countLagna = stats['countNoLagnaShuddhi'] ?? 0;
+    final countTara = (stats['countTaraFailed'] as int?) ?? 0;
+    final countGuru = (stats['countGuruFailed'] as int?) ?? 0;
+    final countCombust = ((stats['countGuruCombust'] as int?) ?? 0) + ((stats['countShukraCombust'] as int?) ?? 0);
+    final countPanchanga = (stats['countPanchangaFailed'] as int?) ?? 0;
+    final countLagna = (stats['countNoLagnaShuddhi'] as int?) ?? 0;
 
     final isNoPerfect = perfectCount == 0;
 
@@ -1984,30 +1984,33 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             const SizedBox(height: 10),
             Text('ನಿಯಮದ ಪ್ರಕಾರ ತಿರಸ್ಕೃತ ದಿನಗಳು (ಒತ್ತಿ ನೋಡಿ):', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
             const SizedBox(height: 4),
-            Wrap(
-              spacing: 6, runSpacing: 4,
-              children: [
-                for (final entry in {
-                  'tithi': ('ತಿಥಿ', Colors.teal),
-                  'nakshatra': ('ನಕ್ಷತ್ರ', Colors.indigo),
-                  'vara': ('ವಾರ', Colors.brown),
-                  'yoga': ('ಯೋಗ', Colors.pink),
-                  'karana': ('ಕರಣ', Colors.cyan.shade800),
-                  'shukla': ('ಶುಕ್ಲಪಕ್ಷ', Colors.grey),
-                  'uttarayana': ('ಉತ್ತರಾಯಣ', Colors.blue),
-                  'tara': ('ತಾರಾಬಲ', Colors.deepOrange),
-                  'guru': ('ಗುರುಬಲ', Colors.amber.shade900),
-                }.entries)
-                  if ((stats['rejectedDays'][entry.key] as List?)?.isNotEmpty ?? false)
-                    _clickableDiagChip(
-                      entry.value.$1,
-                      (stats['rejectedDays'][entry.key] as List).length,
-                      entry.value.$2,
-                      stats['rejectedDays'][entry.key] as List,
-                      entry.value.$1,
-                    ),
-              ],
-            ),
+            Builder(builder: (_) {
+              final rejDays = stats['rejectedDays'] as Map<String, List>;
+              return Wrap(
+                spacing: 6, runSpacing: 4,
+                children: [
+                  for (final entry in {
+                    'tithi': ('ತಿಥಿ', Colors.teal),
+                    'nakshatra': ('ನಕ್ಷತ್ರ', Colors.indigo),
+                    'vara': ('ವಾರ', Colors.brown),
+                    'yoga': ('ಯೋಗ', Colors.pink),
+                    'karana': ('ಕರಣ', Colors.cyan.shade800),
+                    'shukla': ('ಶುಕ್ಲಪಕ್ಷ', Colors.grey),
+                    'uttarayana': ('ಉತ್ತರಾಯಣ', Colors.blue),
+                    'tara': ('ತಾರಾಬಲ', Colors.deepOrange),
+                    'guru': ('ಗುರುಬಲ', Colors.amber.shade900),
+                  }.entries)
+                    if ((rejDays[entry.key]?.isNotEmpty ?? false))
+                      _clickableDiagChip(
+                        entry.value.$1,
+                        rejDays[entry.key]!.length,
+                        entry.value.$2,
+                        rejDays[entry.key]!,
+                        entry.value.$1,
+                      ),
+                ],
+              );
+            }),
           ],
           if (isNoPerfect && candidateCount > 0) ...[
             const SizedBox(height: 10),
