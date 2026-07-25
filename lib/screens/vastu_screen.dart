@@ -620,7 +620,7 @@ class _VastuScreenState extends State<VastuScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_v('nakLabel'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                  Text(_v('ownerNak'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
                   const SizedBox(height: 6),
                   DropdownButtonFormField<int>(
                     value: _ownerNakIndex,
@@ -639,7 +639,7 @@ class _VastuScreenState extends State<VastuScreen> {
                   ),
                   if (_inputMode == 0) ...[
                     const SizedBox(height: 10),
-                    Text(_v('koluLabel'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                    Text(_v('koluType'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<int>(
                       value: _koluIndex,
@@ -650,18 +650,50 @@ class _VastuScreenState extends State<VastuScreen> {
                         filled: true,
                         fillColor: kBg,
                       ),
-                      items: List.generate(_koluTypes.length, (i) {
-                        final k = _koluTypes[i];
-                        return DropdownMenuItem(
-                          value: i,
-                          child: Text(
-                            '${_v('kolu_${k.id}')} (${k.angula} ಅಂಗುಲ = ${k.cm.toStringAsFixed(0)} cm)',
-                            style: TextStyle(fontSize: 13, color: kText),
-                          ),
-                        );
-                      }),
+                      items: [
+                        ...List.generate(_koluTypes.length, (i) {
+                          final k = _koluTypes[i];
+                          return DropdownMenuItem(
+                            value: i,
+                            child: Text(
+                              '${_v(k.id)} (${k.angula} ${_v('angula')} = ${k.cm.toStringAsFixed(0)} cm)',
+                              style: TextStyle(fontSize: 13, color: kText),
+                            ),
+                          );
+                        }),
+                        DropdownMenuItem(
+                          value: -1,
+                          child: Text('${_v('custom')}', style: TextStyle(fontSize: 13, color: kPurple2, fontWeight: FontWeight.w700)),
+                        ),
+                      ],
                       onChanged: (v) => setState(() { _koluIndex = v!; _searched = false; _results = []; }),
                     ),
+                    if (_koluIndex == -1) ...[
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _customKoluNameCtrl,
+                        decoration: InputDecoration(
+                          labelText: _v('koluName'),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          filled: true, fillColor: kBg,
+                        ),
+                        style: TextStyle(fontSize: 13, color: kText),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _customKoluCmCtrl,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: '${_v('koluType')} (cm)',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          filled: true, fillColor: kBg,
+                        ),
+                        style: TextStyle(fontSize: 13, color: kText),
+                        onChanged: (_) => setState(() { _searched = false; _results = []; }),
+                      ),
+                    ],
                   ],
                 ],
               ),
@@ -722,7 +754,7 @@ class _VastuScreenState extends State<VastuScreen> {
                         return Padding(
                           padding: const EdgeInsets.only(right: 6),
                           child: FilterChip(
-                            label: Text(_yoniEnglish[i], style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                            label: Text(_v('a${i+1}'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
                             selected: sel,
                             selectedColor: kPurple2.withOpacity(0.15),
                             checkmarkColor: kPurple2,
