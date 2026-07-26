@@ -15,6 +15,7 @@ class AppAccessService {
   static const String _blockedKey = 'user_blocked';
   static const String _blockedReasonKey = 'user_blocked_reason';
   static const String _muhurtaUnlockedKey = 'muhurta_unlocked';
+  static const String _isStudentKey = 'is_student';
 
   // ── Constants ──
   static const int _trialMinutes = 30;
@@ -30,6 +31,7 @@ class AppAccessService {
   static bool isBlocked = false;
   static String blockedReason = '';
   static bool muhurtaUnlocked = false;
+  static bool isStudent = false;
 
   // ════════════════════════════════════════════════
   // COMPUTED PROPERTIES FOR UI
@@ -172,6 +174,7 @@ class AppAccessService {
                     prefs.getBool('has_active_subscription') ?? false;
       adminAccess = isActivated;
       muhurtaUnlocked = prefs.getBool(_muhurtaUnlockedKey) ?? false;
+      isStudent = prefs.getBool(_isStudentKey) ?? false;
       debugPrint('⚠️ Firestore unreachable — using cached access: $isActivated');
       debugPrint('⚠️ Last online check: $lastOnlineCheck');
       if (lastOnlineCheck != null) {
@@ -287,6 +290,12 @@ class AppAccessService {
       final prefs3 = await SharedPreferences.getInstance();
       await prefs3.setBool(_muhurtaUnlockedKey, muhurtaFlag);
       debugPrint('🔮 Muhurta access: ${muhurtaFlag ? 'UNLOCKED' : 'LOCKED'}');
+
+      // ── Student mode (locks taranukoola + vastu) ──
+      final studentFlag = data['isStudent'] == true;
+      isStudent = studentFlag;
+      await prefs3.setBool(_isStudentKey, studentFlag);
+      debugPrint('🎓 Student mode: ${studentFlag ? 'ON' : 'OFF'}');
 
       if (hasAdminGrant) {
         // Expiry is REQUIRED — no lifetime access

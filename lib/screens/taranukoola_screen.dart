@@ -369,8 +369,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    // Gate: if muhurta not unlocked, show support screen
-    if (!AppAccessService.muhurtaUnlocked) {
+    // Gate: if muhurta not unlocked OR student mode, show support screen
+    if (!AppAccessService.muhurtaUnlocked || AppAccessService.isStudent) {
       return const SupportScreen();
     }
 

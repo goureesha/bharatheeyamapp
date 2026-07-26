@@ -2,6 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../widgets/common.dart';
 import '../constants/strings.dart';
+import '../services/app_access_service.dart';
+import 'support_screen.dart';
 
 // ─── English names (constant, language-independent) ───
 const List<String> _yoniEnglish = [
@@ -546,6 +548,11 @@ class _VastuScreenState extends State<VastuScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Gate: if student mode, show support screen
+    if (AppAccessService.isStudent) {
+      return const SupportScreen();
+    }
+
     final naks = appNak;
 
     return Scaffold(
