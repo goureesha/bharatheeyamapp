@@ -1182,8 +1182,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
           final allowedLagnas = userRules.allowedLagnas ?? defaultRules.allowedLagnas;
 
+          // fullDayScan: scan sunrise to 11 PM (srJd + 17h covers ~6AM to 11PM)
           final scanEndJd = userRules.fullDayScan
-              ? ssJd
+              ? (srJd + 17.0 / 24.0)
               : (_mfEvent == MuhurtaEvent.grihaPrevesha
                   ? ssJd
                   : (srJd + 7.0 / 24.0).clamp(srJd, ssJd));
@@ -1534,9 +1535,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               final dayMandiRashi = _mandiRashiFromJd(dayMandiJd);
               if (dayMandiRashi >= 0) basePlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
 
-              // Use user's fullDayScan setting
+              // fullDayScan: scan sunrise to 11 PM
               final scanEndJd = userRules.fullDayScan
-                  ? ssJd2
+                  ? (srJd2 + 17.0 / 24.0)
                   : (_mfEvent == MuhurtaEvent.grihaPrevesha
                       ? ssJd2
                       : (srJd2 + 7.0 / 24.0).clamp(srJd2, ssJd2));
