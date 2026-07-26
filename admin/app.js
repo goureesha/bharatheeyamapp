@@ -73,6 +73,8 @@ async function loadClients() {
         _offlineDays: data.offlineDaysUsed || 0,
         _isBlocked: data.blocked === true,
         _blockedReason: data.blockedReason || '',
+        _isMuhurta: data.muhurtaUnlocked === true,
+        _isStudent: data.isStudent === true,
       });
     });
 
@@ -311,6 +313,18 @@ function renderTable(clients) {
     } else {
       actions = `<button class="btn-unlock" onclick="openUnlockModal('${c.email}')" style="font-size:10px; padding:4px 8px;">Unlock</button>`;
       actions += ` <button class="btn-revoke-small" onclick="openBlockModal('${c.email}')" style="font-size:10px; padding:4px 8px; background:#dc2626;">Block</button>`;
+    }
+    // Muhurta toggle
+    if (c._isMuhurta) {
+      actions += ` <button onclick="toggleMuhurta('${c.email}', false)" style="font-size:10px; padding:4px 8px; background:rgba(139,92,246,0.15); color:#8b5cf6; border:1px solid #8b5cf6; border-radius:6px; cursor:pointer; font-weight:700;">🔮 Muhurta ✓</button>`;
+    } else {
+      actions += ` <button onclick="toggleMuhurta('${c.email}', true)" style="font-size:10px; padding:4px 8px; background:var(--card); color:var(--muted); border:1px solid var(--border); border-radius:6px; cursor:pointer;">🔮 Muhurta</button>`;
+    }
+    // Student toggle
+    if (c._isStudent) {
+      actions += ` <button onclick="toggleStudent('${c.email}', false)" style="font-size:10px; padding:4px 8px; background:rgba(245,158,11,0.15); color:#f59e0b; border:1px solid #f59e0b; border-radius:6px; cursor:pointer; font-weight:700;">🎓 Student ✓</button>`;
+    } else {
+      actions += ` <button onclick="toggleStudent('${c.email}', true)" style="font-size:10px; padding:4px 8px; background:var(--card); color:var(--muted); border:1px solid var(--border); border-radius:6px; cursor:pointer;">🎓 Student</button>`;
     }
 
     const device = c.deviceName || c.deviceModel || '—';
@@ -623,6 +637,30 @@ async function unblockInstall(deviceId) {
       blockedReason: firebase.firestore.FieldValue.delete(),
     });
     loadInstalls();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+// ─── Muhurta & Student Toggles ───
+
+async function toggleMuhurta(email, enable) {
+  try {
+    await db.collection('device_bindings').doc(email).update({
+      muhurtaUnlocked: enable,
+    });
+    loadClients();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+async function toggleStudent(email, enable) {
+  try {
+    await db.collection('device_bindings').doc(email).update({
+      isStudent: enable,
+    });
+    loadClients();
   } catch (err) {
     alert('Error: ' + err.message);
   }
