@@ -1764,10 +1764,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           event: _mfEvent,
           onRulesChanged: () {
             setState(() {});
-            // Auto re-search with new rules if user already searched
-            if (_mfResults.isNotEmpty || _mfStats != null) {
-              _searchMuhurtasCached();
-            }
           },
         ),
         const SizedBox(height: 8),

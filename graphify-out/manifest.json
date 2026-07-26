@@ -90,8 +90,8 @@
     "semantic_hash": ""
   },
   "lib/core/muhurta_rules.dart": {
-    "mtime": 1784814216.0857913,
-    "ast_hash": "4c1c8839266ae76bd6491f32c01f29c2",
+    "mtime": 1784980579.7915776,
+    "ast_hash": "a5d072d7af409f8484cf0280de4ebbad",
     "semantic_hash": ""
   },
   "lib/core/shadbala.dart": {
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "lib/main.dart": {
-    "mtime": 1784720064.802163,
-    "ast_hash": "5f373e418fbf9317f52b7b9cb958a072",
+    "mtime": 1784956805.3447585,
+    "ast_hash": "90af08b0aaf4bd32adbe0399e88d0852",
     "semantic_hash": ""
   },
   "lib/models/library_models.dart": {
@@ -135,13 +135,13 @@
     "semantic_hash": ""
   },
   "lib/screens/dashboard_screen.dart": {
-    "mtime": 1784869868.1640651,
-    "ast_hash": "9decc86f841a23ce8c8afd287f0e96db",
+    "mtime": 1784977152.4403932,
+    "ast_hash": "8934363c5ca1c1d9158612461c4584f0",
     "semantic_hash": ""
   },
   "lib/screens/home_screen.dart": {
-    "mtime": 1780663875.5684397,
-    "ast_hash": "608f78dae9a0daf5199ec4bf51d40e44",
+    "mtime": 1784956942.3378024,
+    "ast_hash": "86c94f93a852a15fb20b61c2dc13cb61",
     "semantic_hash": ""
   },
   "lib/screens/input_screen.dart": {
@@ -150,8 +150,8 @@
     "semantic_hash": ""
   },
   "lib/screens/match_making_tab.dart": {
-    "mtime": 1784866682.551268,
-    "ast_hash": "89935d70abea760505576f0549e5280a",
+    "mtime": 1784978913.8548431,
+    "ast_hash": "fdce8bc7e8c3a7f358e6dc1b7892c392",
     "semantic_hash": ""
   },
   "lib/screens/panchanga_screen.dart": {
@@ -180,8 +180,8 @@
     "semantic_hash": ""
   },
   "lib/screens/settings_screen.dart": {
-    "mtime": 1784696920.064885,
-    "ast_hash": "02174032fa6d3769036377bd4197c06c",
+    "mtime": 1784872392.1447518,
+    "ast_hash": "10ec607cf86cc9ee9eb74e87d6ff946e",
     "semantic_hash": ""
   },
   "lib/screens/support_screen.dart": {
@@ -190,13 +190,13 @@
     "semantic_hash": ""
   },
   "lib/screens/taranukoola_screen.dart": {
-    "mtime": 1784868975.9750388,
-    "ast_hash": "bf940133374a53b429c89d99aea888c6",
+    "mtime": 1784994267.0977995,
+    "ast_hash": "1dc21b88096642b24e156787d25a8e72",
     "semantic_hash": ""
   },
   "lib/screens/vastu_screen.dart": {
-    "mtime": 1784721300.603557,
-    "ast_hash": "03b58e52117dce9b1767747e94b084dc",
+    "mtime": 1784978461.2530384,
+    "ast_hash": "4334c7b8dddb4a0698f6c29b6e669f9d",
     "semantic_hash": ""
   },
   "lib/screens/vedic_clock_screen.dart": {
@@ -210,8 +210,8 @@
     "semantic_hash": ""
   },
   "lib/services/backup_service.dart": {
-    "mtime": 1775700496.2716637,
-    "ast_hash": "ec30c2669f989f2e7b95c5e784fc5f87",
+    "mtime": 1784955054.4781008,
+    "ast_hash": "f9d475aac1cbbb58a97fdb296d5710af",
     "semantic_hash": ""
   },
   "lib/services/backup_service_mobile.dart": {
@@ -240,7 +240,7 @@
     "semantic_hash": ""
   },
   "lib/services/device_binding_service.dart": {
-    "mtime": 1784696902.7724388,
+    "mtime": 1784955614.3765125,
     "ast_hash": "17c41deb031dd380006757ab0a45b815",
     "semantic_hash": ""
   },
@@ -250,8 +250,8 @@
     "semantic_hash": ""
   },
   "lib/services/drive_backup_service.dart": {
-    "mtime": 1775803226.0359414,
-    "ast_hash": "c5328567fbd7a0c80bd22d986bf2e228",
+    "mtime": 1784955061.526346,
+    "ast_hash": "003d94af2d1a0284c59ccf6bfa84e1c8",
     "semantic_hash": ""
   },
   "lib/services/export_service.dart": {
@@ -280,8 +280,8 @@
     "semantic_hash": ""
   },
   "lib/services/google_auth_service.dart": {
-    "mtime": 1778065631.56475,
-    "ast_hash": "9c5b7a75f589e6aa79ad2bac116c36f7",
+    "mtime": 1784955614.3765125,
+    "ast_hash": "576b9191c3cd075be15e480b4c1e0132",
     "semantic_hash": ""
   },
   "lib/services/history_service.dart": {
@@ -370,8 +370,8 @@
     "semantic_hash": ""
   },
   "lib/widgets/common.dart": {
-    "mtime": 1784787677.7611573,
-    "ast_hash": "60d348751c1c69e3977447ca3189eec4",
+    "mtime": 1784956776.899965,
+    "ast_hash": "8f98364b699222e13ed1407950eaf483",
     "semantic_hash": ""
   },
   "lib/widgets/dasha_widget.dart": {
@@ -782,6 +782,21 @@
   ".gemini-backup/conversations/fcebfe0c-6765-4c98-b670-f333b885c095/media__1784529671846.png": {
     "mtime": 1784529701.6089623,
     "ast_hash": "c4a5a98a146b0b30f0b47788909f91a4",
+    "semantic_hash": ""
+  },
+  "lib/core/user_muhurta_rules.dart": {
+    "mtime": 1784990685.4139278,
+    "ast_hash": "8f0a03eced8f4ea1b89f93ec64de1dd2",
+    "semantic_hash": ""
+  },
+  "lib/services/panchanga_cache.dart": {
+    "mtime": 1784994140.931612,
+    "ast_hash": "74ee434c07fed9be483eaf4ad2b541a4",
+    "semantic_hash": ""
+  },
+  "lib/widgets/muhurta_rules_editor.dart": {
+    "mtime": 1784990734.18384,
+    "ast_hash": "f93ec32a8144adfe3b1f281063cbd3a9",
     "semantic_hash": ""
   }
 }
