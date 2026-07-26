@@ -1325,7 +1325,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     final rej = <String, List<Map<String, dynamic>>>{
       'tithi': [], 'nakshatra': [], 'vara': [], 'yoga': [],
       'karana': [], 'dagdha': [], 'shukla': [], 'uttarayana': [],
-      'tara': [], 'guru': [],
+      'tara': [], 'guru': [], 'guruAsta': [], 'shukraAsta': [],
     };
 
     await Ephemeris.initSweph();
@@ -1433,6 +1433,16 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           if (userRules.requireGuruBala) {
             final gb = calculateGuruBala(_mfRashiIdx, jupRashi);
             if (gb.score == 0) { rej['guru']!.add(dayInfo); failures.add('guru'); }
+          }
+          // Guru Asta (Jupiter combust) check
+          if (userRules.blockGuruAsta) {
+            final guruCombust = kr.planets['ಗುರು']?.isCombust ?? false;
+            if (guruCombust) { rej['guruAsta']!.add(dayInfo); failures.add('guruAsta'); }
+          }
+          // Shukra Asta (Venus combust) check
+          if (userRules.blockShukraAsta) {
+            final shukraCombust = kr.planets['ಶುಕ್ರ']?.isCombust ?? false;
+            if (shukraCombust) { rej['shukraAsta']!.add(dayInfo); failures.add('shukraAsta'); }
           }
           if (failures.isNotEmpty) continue; // Skip day only after checking ALL rules
 
@@ -1692,6 +1702,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       'rejUttarayana': rej['uttarayana']!.length,
       'rejDagdha': rej['dagdha']!.length,
       'rejectedDays': rej,
+      'rejGuruAsta': rej['guruAsta']!.length,
+      'rejShukraAsta': rej['shukraAsta']!.length,
     };
 
     WakelockPlus.disable();
@@ -2050,6 +2062,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               if (((stats['rejShukla'] as int?) ?? 0) > 0) _diagChip('ಶುಕ್ಲಪಕ್ಷ', (stats['rejShukla'] as int?) ?? 0, Colors.grey),
               if (((stats['rejUttarayana'] as int?) ?? 0) > 0) _diagChip('ಉತ್ತರಾಯಣ', (stats['rejUttarayana'] as int?) ?? 0, Colors.blue),
               if (((stats['rejDagdha'] as int?) ?? 0) > 0) _diagChip('ದಗ್ಧ ಯೋಗ', (stats['rejDagdha'] as int?) ?? 0, Colors.red.shade800),
+              if (((stats['rejGuruAsta'] as int?) ?? 0) > 0) _diagChip('ಗುರು ಅಸ್ತ', (stats['rejGuruAsta'] as int?) ?? 0, Colors.deepPurple),
+              if (((stats['rejShukraAsta'] as int?) ?? 0) > 0) _diagChip('ಶುಕ್ರ ಅಸ್ತ', (stats['rejShukraAsta'] as int?) ?? 0, Colors.purple),
               if (countPanchanga > 0 && stats['rejTithi'] == null) _diagChip('ಪಂಚಾಂಗ ದೋಷ', countPanchanga, Colors.red),
               if (countTara > 0) _diagChip('ತಾರಾನುಕೂಲ ಕೊರತೆ', countTara, Colors.deepOrange),
               if (countGuru > 0) _diagChip('ಗುರು ಬಲ ಕೊರತೆ', countGuru, Colors.amber.shade900),
@@ -2078,6 +2092,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     'uttarayana': ('ಉತ್ತರಾಯಣ', Colors.blue),
                     'tara': ('ತಾರಾಬಲ', Colors.deepOrange),
                     'guru': ('ಗುರುಬಲ', Colors.amber.shade900),
+                    'guruAsta': ('ಗುರು ಅಸ್ತ', Colors.deepPurple),
+                    'shukraAsta': ('ಶುಕ್ರ ಅಸ್ತ', Colors.purple),
                   }.entries)
                     if ((rejDays[entry.key]?.isNotEmpty ?? false))
                       _clickableDiagChip(

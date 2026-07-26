@@ -190,6 +190,14 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
               setState(() => _rules.blockDagdhaYoga = v);
               _onChanged();
             }),
+            _buildToggle('ಗುರು ಅಸ್ತ ತಪ್ಪಿಸಿ', _rules.blockGuruAsta, (v) {
+              setState(() => _rules.blockGuruAsta = v);
+              _onChanged();
+            }),
+            _buildToggle('ಶುಕ್ರ ಅಸ್ತ ತಪ್ಪಿಸಿ', _rules.blockShukraAsta, (v) {
+              setState(() => _rules.blockShukraAsta = v);
+              _onChanged();
+            }),
             _buildToggle('ಅಭಿಜಿತ್ ಮುಹೂರ್ತ ಪರಿಗಣಿಸಿ', _rules.considerAbhijit, (v) {
               setState(() => _rules.considerAbhijit = v);
               _onChanged();

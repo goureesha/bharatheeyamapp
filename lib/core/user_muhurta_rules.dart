@@ -30,6 +30,8 @@ class UserMuhurtaRules {
   List<int> allowedTaras; // which of the 9 taras (0-8) are considered good
   bool requireGuruBala;
   bool requireGuruAnukoolaForLagna;
+  bool blockGuruAsta;               // true = block days when Jupiter is combust
+  bool blockShukraAsta;             // true = block days when Venus is combust
 
   UserMuhurtaRules({
     this.allowedTithis,
@@ -48,6 +50,8 @@ class UserMuhurtaRules {
     this.allowedTaras = const [1, 3, 5, 7, 8],
     this.requireGuruBala = true,
     this.requireGuruAnukoolaForLagna = true,
+    this.blockGuruAsta = false,
+    this.blockShukraAsta = false,
   });
 
   /// Create from default MuhurtaEventRules for a given event
@@ -71,6 +75,8 @@ class UserMuhurtaRules {
       allowedTaras: const [1, 3, 5, 7, 8],
       requireGuruBala: true,
       requireGuruAnukoolaForLagna: true,
+      blockGuruAsta: false,
+      blockShukraAsta: false,
     );
   }
 
@@ -92,6 +98,8 @@ class UserMuhurtaRules {
     'allowedTaras': allowedTaras,
     'reqGuru': requireGuruBala,
     'reqGuruLagna': requireGuruAnukoolaForLagna,
+    'blockGuruAsta': blockGuruAsta,
+    'blockShukraAsta': blockShukraAsta,
   };
 
   /// Deserialize from JSON map
@@ -115,6 +123,8 @@ class UserMuhurtaRules {
       allowedTaras: json['allowedTaras'] != null ? List<int>.from(json['allowedTaras']) : const [1, 3, 5, 7, 8],
       requireGuruBala: json['reqGuru'] ?? true,
       requireGuruAnukoolaForLagna: json['reqGuruLagna'] ?? true,
+      blockGuruAsta: json['blockGuruAsta'] ?? false,
+      blockShukraAsta: json['blockShukraAsta'] ?? false,
     );
   }
 
