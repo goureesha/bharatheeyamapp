@@ -16,13 +16,19 @@ service cloud.firestore {
                     && request.auth.token.email == email
                     && !('manualPremium' in request.resource.data);
       
-      // Users can update their doc, but cannot change manualPremium/Expiry
+      // Users can update their doc, but cannot change protected admin fields
       allow update: if request.auth != null 
                     && request.auth.token.email == email
                     && (!('manualPremium' in request.resource.data) 
                         || request.resource.data.manualPremium == resource.data.manualPremium)
                     && (!('manualPremiumExpiry' in request.resource.data) 
-                        || request.resource.data.manualPremiumExpiry == resource.data.manualPremiumExpiry);
+                        || request.resource.data.manualPremiumExpiry == resource.data.manualPremiumExpiry)
+                    && (!('muhurtaUnlocked' in request.resource.data) 
+                        || request.resource.data.muhurtaUnlocked == resource.data.muhurtaUnlocked)
+                    && (!('isStudent' in request.resource.data) 
+                        || request.resource.data.isStudent == resource.data.isStudent)
+                    && (!('blocked' in request.resource.data) 
+                        || request.resource.data.blocked == resource.data.blocked);
     }
 
     match /installs/{deviceId} {
