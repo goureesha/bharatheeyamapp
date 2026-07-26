@@ -371,7 +371,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   Widget build(BuildContext context) {
     // Student mode: block entire taranukoola section
     if (AppAccessService.isStudent) {
-      return const SupportScreen();
+      return const SupportScreen(lockType: SupportLockType.student);
     }
 
     return Scaffold(
@@ -1699,9 +1699,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   }
 
   Widget _buildMuhurtaFinderTab() {
-    // Gate: if muhurta not unlocked OR student mode, show support screen
-    if (!AppAccessService.muhurtaUnlocked || AppAccessService.isStudent) {
-      return const SupportScreen();
+    // Gate: if muhurta not unlocked, show support screen
+    if (!AppAccessService.muhurtaUnlocked) {
+      return const SupportScreen(lockType: SupportLockType.muhurta);
     }
 
     final rashiNames = List.generate(12, (i) => trAll(knRashi[i]));

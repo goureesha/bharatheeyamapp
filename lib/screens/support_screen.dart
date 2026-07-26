@@ -7,8 +7,11 @@ import '../services/device_binding_service.dart';
 import '../services/app_access_service.dart';
 import '../main.dart';
 
+enum SupportLockType { general, muhurta, student }
+
 class SupportScreen extends StatefulWidget {
-  const SupportScreen({super.key});
+  final SupportLockType lockType;
+  const SupportScreen({super.key, this.lockType = SupportLockType.general});
 
   @override
   State<SupportScreen> createState() => _SupportScreenState();
@@ -84,29 +87,7 @@ class _SupportScreenState extends State<SupportScreen> {
                 const SizedBox(height: 32),
 
                 // Access info
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: kBorder.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: kBorder.withOpacity(0.3)),
-                  ),
-                  child: Column(children: [
-                    Icon(Icons.info_outline, color: kMuted, size: 40),
-                    const SizedBox(height: 12),
-                    Text(AppLocale.l('trialExpired'),
-                      style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w800,
-                        color: kText,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(AppLocale.l('trialExpiredSub'),
-                      style: TextStyle(fontSize: 13, color: kMuted),
-                    ),
-                  ]),
-                ),
+                _buildLockInfo(widget.lockType),
                 const SizedBox(height: 24),
 
                 // ── Gmail Sign-In (if not signed in) ──
@@ -288,6 +269,59 @@ class _SupportScreenState extends State<SupportScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLockInfo(SupportLockType lockType) {
+    IconData icon;
+    Color iconColor;
+    String title;
+    String subtitle;
+
+    switch (lockType) {
+      case SupportLockType.muhurta:
+        icon = Icons.auto_awesome;
+        iconColor = Colors.purple;
+        title = 'ಮುಹೂರ್ತ ವೈಶಿಷ್ಟ್ಯ ಲಾಕ್ ಆಗಿದೆ';
+        subtitle = 'ಈ ವೈಶಿಷ್ಟ್ಯವನ್ನು ಪ್ರವೇಶಿಸಲು ದಯವಿಟ್ಟು ಬೆಂಬಲವನ್ನು ಸಂಪರ್ಕಿಸಿ';
+        break;
+      case SupportLockType.student:
+        icon = Icons.school;
+        iconColor = Colors.orange;
+        title = 'ವಿದ್ಯಾರ್ಥಿ ಮೋಡ್';
+        subtitle = 'ಈ ವಿಭಾಗವು ವಿದ್ಯಾರ್ಥಿ ಖಾತೆಗೆ ಲಭ್ಯವಿಲ್ಲ. ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಲು ಬೆಂಬಲವನ್ನು ಸಂಪರ್ಕಿಸಿ';
+        break;
+      case SupportLockType.general:
+        icon = Icons.info_outline;
+        iconColor = kMuted;
+        title = AppLocale.l('trialExpired');
+        subtitle = AppLocale.l('trialExpiredSub');
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: kBorder.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: kBorder.withOpacity(0.3)),
+      ),
+      child: Column(children: [
+        Icon(icon, color: iconColor, size: 40),
+        const SizedBox(height: 12),
+        Text(title,
+          style: TextStyle(
+            fontSize: 18, fontWeight: FontWeight.w800,
+            color: kText,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(subtitle,
+          style: TextStyle(fontSize: 13, color: kMuted),
+          textAlign: TextAlign.center,
+        ),
+      ]),
     );
   }
 

@@ -550,7 +550,7 @@ class _VastuScreenState extends State<VastuScreen> {
   Widget build(BuildContext context) {
     // Gate: if student mode, show support screen
     if (AppAccessService.isStudent) {
-      return const SupportScreen();
+      return const SupportScreen(lockType: SupportLockType.student);
     }
 
     final naks = appNak;
