@@ -4310,11 +4310,9 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
         ),
       );
     } else {
-      // ── LANDSCAPE: 2 charts per page, swipe in pairs ──
-      final pairCount = (widget.charts.length / 2).ceil();
+      // ── LANDSCAPE: single chart per page swipe (same as portrait) ──
       final screenHeight = MediaQuery.of(context).size.height;
-      final chartSize = (screenHeight * 0.6).clamp(200.0, 400.0);
-
+      final chartSize = screenHeight - 100;
       return SizedBox(
         height: chartSize + 40,
         child: Column(
@@ -4322,30 +4320,17 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
             Expanded(
               child: PageView.builder(
                 onPageChanged: (i) => setState(() => _page = i),
-                itemCount: pairCount,
-                itemBuilder: (context, pairIdx) {
-                  final leftIdx = pairIdx * 2;
-                  final rightIdx = leftIdx + 1;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      children: [
-                        Expanded(child: _buildChart(leftIdx)),
-                        const SizedBox(width: 8),
-                        if (rightIdx < widget.charts.length)
-                          Expanded(child: _buildChart(rightIdx))
-                        else
-                          const Expanded(child: SizedBox()),
-                      ],
-                    ),
-                  );
-                },
+                itemCount: widget.charts.length,
+                itemBuilder: (context, i) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _buildChart(i),
+                ),
               ),
             ),
             const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(pairCount, (i) => Container(
+              children: List.generate(widget.charts.length, (i) => Container(
                 margin: const EdgeInsets.symmetric(horizontal: 3),
                 width: _page == i ? 18 : 8, height: 8,
                 decoration: BoxDecoration(
