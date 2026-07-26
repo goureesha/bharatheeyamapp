@@ -189,10 +189,8 @@ class OfflineAccessService {
     debugPrint('OfflineAccess: Active claim force-cleared (server revocation)');
   }
 
-  // ── Server sync (incremental, no overwrites) ──
-
-  /// Sync offline usage to Firestore using FieldValue.increment.
-  /// Only syncs the DELTA (new days used since last sync) to avoid overwrites.
+  /// Sync offline usage to Firestore.
+  /// Writes the absolute local count to ensure server always matches.
   /// Call this when the user comes back online.
   static Future<void> syncToServer() async {
     final email = GoogleAuthService.userEmail;
@@ -201,9 +199,8 @@ class OfflineAccessService {
     // Also fetch latest max days while we're online
     await fetchMaxDaysFromServer();
 
-    final delta = _totalDaysUsed - _syncedToServer;
-    if (delta <= 0) {
-      debugPrint('OfflineAccess: Nothing to sync (synced=$_syncedToServer, used=$_totalDaysUsed)');
+    if (_totalDaysUsed <= 0) {
+      debugPrint('OfflineAccess: Nothing to sync (used=$_totalDaysUsed)');
       return;
     }
 
@@ -212,9 +209,9 @@ class OfflineAccessService {
           .collection('device_bindings')
           .doc(email.toLowerCase());
 
-      // Use FieldValue.increment to avoid overwriting other devices/sessions
+      // Write absolute count — ensures server always matches app
       await docRef.set({
-        'offlineDaysUsed': FieldValue.increment(delta),
+        'offlineDaysUsed': _totalDaysUsed,
         'lastOfflineSync': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
@@ -223,7 +220,7 @@ class OfflineAccessService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_syncedToServerKey, _syncedToServer);
 
-      debugPrint('OfflineAccess: Synced $delta days to server (total: $_totalDaysUsed)');
+      debugPrint('OfflineAccess: Synced absolute count to server: $_totalDaysUsed days');
     } catch (e) {
       debugPrint('OfflineAccess: Server sync failed: $e');
     }
