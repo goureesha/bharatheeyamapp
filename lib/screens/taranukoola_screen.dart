@@ -369,6 +369,11 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
+    // Student mode: block entire taranukoola section
+    if (AppAccessService.isStudent) {
+      return const SupportScreen();
+    }
+
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
