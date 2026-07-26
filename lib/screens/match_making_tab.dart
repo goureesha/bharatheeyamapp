@@ -21,6 +21,23 @@ class MatchMakingTab extends StatefulWidget {
   State<MatchMakingTab> createState() => _MatchMakingTabState();
 }
 
+class _MatchPerson {
+  final String name;
+  final DateTime dob;
+  final int hour, minute;
+  final String ampm;
+  final String place;
+  final double lat, lon, tz;
+  final KundaliResult result;
+
+  _MatchPerson({
+    required this.name, required this.dob,
+    required this.hour, required this.minute, required this.ampm,
+    required this.place, required this.lat, required this.lon, required this.tz,
+    required this.result,
+  });
+}
+
 class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStateMixin {
   // Bride input
   final _bNameCtrl = TextEditingController();
@@ -51,6 +68,12 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   KundaliResult? _groomResult;
   Map<String, dynamic>? _fullResult;
   int _kootaMode = 0; // 0 = Ashta Koota, 1 = Dvadasha Koota
+
+  // Multi-person lists
+  final List<_MatchPerson> _varaList = [];
+  final List<_MatchPerson> _vadhuList = [];
+  int _activeVaraIdx = 0;
+  int _activeVadhuIdx = 0;
 
   // Quick Koota tab state
   int _qBrideRashi = 0;
@@ -254,6 +277,185 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       }
     }
     setState(() => _loading = false);
+  }
+
+  Future<void> _addPerson({required bool isVara}) async {
+    final nameCtrl = isVara ? _gNameCtrl : _bNameCtrl;
+    final placeCtrl = isVara ? _gPlaceCtrl : _bPlaceCtrl;
+    final latCtrl = isVara ? _gLatCtrl : _bLatCtrl;
+    final lonCtrl = isVara ? _gLonCtrl : _bLonCtrl;
+    final tzCtrl = isVara ? _gTzCtrl : _bTzCtrl;
+    final dob = isVara ? _gDob : _bDob;
+    final hour = isVara ? _gHour : _bHour;
+    final minute = isVara ? _gMinute : _bMinute;
+    final ampm = isVara ? _gAmpm : _bAmpm;
+
+    final name = nameCtrl.text.trim();
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocale.l('enterName')), backgroundColor: Colors.orange),
+      );
+      return;
+    }
+
+    setState(() => _loading = true);
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    try {
+      final lat = double.tryParse(latCtrl.text) ?? 14.98;
+      final lon = double.tryParse(lonCtrl.text) ?? 74.73;
+      final tz = double.tryParse(tzCtrl.text) ?? 5.5;
+      int h24 = hour + (ampm == 'PM' && hour != 12 ? 12 : 0);
+      if (ampm == 'AM' && hour == 12) h24 = 0;
+
+      final result = await AstroCalculator.calculate(
+        year: dob.year, month: dob.month, day: dob.day,
+        hourUtcOffset: tz, hour24: h24 + minute / 60.0,
+        lat: lat, lon: lon, ayanamsaMode: 'lahiri', trueNode: true,
+      );
+
+      if (result == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocale.l('calcFailed')), backgroundColor: Colors.red),
+          );
+        }
+        setState(() => _loading = false);
+        return;
+      }
+
+      final entry = _MatchPerson(
+        name: name, dob: dob, hour: hour, minute: minute, ampm: ampm,
+        place: placeCtrl.text, lat: lat, lon: lon, tz: tz, result: result,
+      );
+
+      setState(() {
+        if (isVara) {
+          _varaList.add(entry);
+          _activeVaraIdx = _varaList.length - 1;
+        } else {
+          _vadhuList.add(entry);
+          _activeVadhuIdx = _vadhuList.length - 1;
+        }
+        // Clear input fields for next entry
+        nameCtrl.clear();
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+    setState(() => _loading = false);
+  }
+
+  void _recalculateMatch() {
+    if (_varaList.isEmpty || _vadhuList.isEmpty) return;
+    if (_activeVaraIdx >= _varaList.length) _activeVaraIdx = 0;
+    if (_activeVadhuIdx >= _vadhuList.length) _activeVadhuIdx = 0;
+
+    final groomR = _varaList[_activeVaraIdx].result;
+    final brideR = _vadhuList[_activeVadhuIdx].result;
+
+    Map<String, int> extractRashis(KundaliResult r) {
+      final m = <String, int>{};
+      for (final e in r.planets.entries) m[e.key] = e.value.rashiIndex;
+      return m;
+    }
+
+    Map<String, int> extractBhavaHouses(KundaliResult r) {
+      final m = <String, int>{};
+      final cusps = r.bhavas;
+      for (final e in r.planets.entries) {
+        if (e.key == 'ಲಗ್ನ') continue;
+        final pLon = e.value.longitude;
+        int house = 1;
+        for (int i = 0; i < 12; i++) {
+          final start = cusps[i];
+          final end = cusps[(i + 1) % 12];
+          if (end > start) {
+            if (pLon >= start && pLon < end) { house = i + 1; break; }
+          } else {
+            if (pLon >= start || pLon < end) { house = i + 1; break; }
+          }
+        }
+        m[e.key] = house;
+      }
+      return m;
+    }
+
+    final bRashis = extractRashis(brideR);
+    final gRashis = extractRashis(groomR);
+    final bBhavaHouses = extractBhavaHouses(brideR);
+    final gBhavaHouses = extractBhavaHouses(groomR);
+    final bLagnaRashi = brideR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
+    final gLagnaRashi = groomR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
+    final bMoonRashi = brideR.planets['ಚಂದ್ರ']?.rashiIndex ?? 0;
+    final gMoonRashi = groomR.planets['ಚಂದ್ರ']?.rashiIndex ?? 0;
+    final bNakIdx = brideR.panchang.nakshatraIndex;
+    final gNakIdx = groomR.panchang.nakshatraIndex;
+
+    final bNavLagna = MatchMakingLogic.navamshaRashi(brideR.planets['ಲಗ್ನ']?.longitude ?? 0);
+    final bNavMoon = MatchMakingLogic.navamshaRashi(brideR.planets['ಚಂದ್ರ']?.longitude ?? 0);
+    final gNavLagna = MatchMakingLogic.navamshaRashi(groomR.planets['ಲಗ್ನ']?.longitude ?? 0);
+    final gNavMoon = MatchMakingLogic.navamshaRashi(groomR.planets['ಚಂದ್ರ']?.longitude ?? 0);
+
+    final fullResult = MatchMakingLogic.calculateFullCompatibility(
+      brideNakIdx: bNakIdx, brideMoonRashi: bMoonRashi, brideLagnaRashi: bLagnaRashi, bridePlanetRashis: bRashis,
+      brideNavLagnaRashi: bNavLagna, brideNavMoonRashi: bNavMoon,
+      groomNakIdx: gNakIdx, groomMoonRashi: gMoonRashi, groomLagnaRashi: gLagnaRashi, groomPlanetRashis: gRashis,
+      groomNavLagnaRashi: gNavLagna, groomNavMoonRashi: gNavMoon,
+      brideBhavaHouses: bBhavaHouses, groomBhavaHouses: gBhavaHouses,
+    );
+
+    setState(() {
+      _groomResult = groomR;
+      _brideResult = brideR;
+      _fullResult = fullResult;
+    });
+  }
+
+  Widget _buildPersonChips({required bool isVara, required Color color}) {
+    final list = isVara ? _varaList : _vadhuList;
+    final activeIdx = isVara ? _activeVaraIdx : _activeVadhuIdx;
+    if (list.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 4,
+        children: List.generate(list.length, (i) {
+          final isActive = i == activeIdx;
+          return InputChip(
+            label: Text(list[i].name, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: isActive ? Colors.white : kText)),
+            selected: isActive,
+            selectedColor: color,
+            backgroundColor: kCard,
+            side: BorderSide(color: isActive ? color : kBorder),
+            onSelected: (_) => setState(() {
+              if (isVara) _activeVaraIdx = i; else _activeVadhuIdx = i;
+              _recalculateMatch();
+            }),
+            onDeleted: () => setState(() {
+              if (isVara) {
+                _varaList.removeAt(i);
+                if (_activeVaraIdx >= _varaList.length) _activeVaraIdx = _varaList.isEmpty ? 0 : _varaList.length - 1;
+              } else {
+                _vadhuList.removeAt(i);
+                if (_activeVadhuIdx >= _vadhuList.length) _activeVadhuIdx = _vadhuList.isEmpty ? 0 : _vadhuList.length - 1;
+              }
+              if (_varaList.isNotEmpty && _vadhuList.isNotEmpty) _recalculateMatch();
+              else setState(() { _fullResult = null; _brideResult = null; _groomResult = null; });
+            }),
+            deleteIconColor: isActive ? Colors.white70 : kMuted,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+          );
+        }),
+      ),
+    );
   }
 
   void _calculateQuickKoota() {
@@ -606,8 +808,11 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     required void Function(String) onGeoStatusChanged,
     required VoidCallback onLoadSaved,
     required VoidCallback onSave,
+    Widget? savedChips,
+    VoidCallback? onAdd,
   }) {
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      if (savedChips != null) savedChips,
       Row(children: [
         Expanded(child: SectionTitle(title, color: color)),
         TextButton.icon(
@@ -733,6 +938,23 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         const SizedBox(width: 6),
         Expanded(flex: 3, child: TextField(controller: tzCtrl, style: TextStyle(color: kText, fontSize: 12), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true), decoration: InputDecoration(labelText: AppLocale.l('tzOffset'), isDense: true))),
       ]),
+      if (onAdd != null) ...[
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: _loading ? null : onAdd,
+            icon: const Icon(Icons.person_add, size: 16),
+            label: Text(AppLocale.l('addLabel'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: color,
+              side: BorderSide(color: color),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+        ),
+      ],
     ]));
   }
 
@@ -787,6 +1009,28 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     final gName = _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : AppLocale.l('groomDetails');
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // Person pair switcher
+      if (_varaList.length > 1 || _vadhuList.length > 1)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Row(children: [
+            if (_varaList.length > 1)
+              Expanded(child: DropdownButtonFormField<int>(
+                value: _activeVaraIdx < _varaList.length ? _activeVaraIdx : 0,
+                decoration: InputDecoration(labelText: AppLocale.l('groomDetails'), isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
+                items: List.generate(_varaList.length, (i) => DropdownMenuItem(value: i, child: Text(_varaList[i].name, style: TextStyle(fontSize: 12)))),
+                onChanged: (v) { if (v != null) { setState(() => _activeVaraIdx = v); _recalculateMatch(); } },
+              )),
+            if (_varaList.length > 1 && _vadhuList.length > 1) const SizedBox(width: 8),
+            if (_vadhuList.length > 1)
+              Expanded(child: DropdownButtonFormField<int>(
+                value: _activeVadhuIdx < _vadhuList.length ? _activeVadhuIdx : 0,
+                decoration: InputDecoration(labelText: AppLocale.l('brideDetails'), isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
+                items: List.generate(_vadhuList.length, (i) => DropdownMenuItem(value: i, child: Text(_vadhuList[i].name, style: TextStyle(fontSize: 12)))),
+                onChanged: (v) { if (v != null) { setState(() => _activeVadhuIdx = v); _recalculateMatch(); } },
+              )),
+          ]),
+        ),
       // ── INDIVIDUAL DETAILS ──
       _sectionHeader('$gName — ${AppLocale.l('chart')}', Icons.male, kTeal),
       _buildPersonSummary(gr, gName, _gDob, _gHour, _gMinute, _gAmpm, _gPlaceCtrl.text),
@@ -1853,6 +2097,8 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                         latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
                         dob: _gDob, hour: _gHour, minute: _gMinute, ampm: _gAmpm,
                       ),
+                      savedChips: _buildPersonChips(isVara: true, color: kTeal),
+                      onAdd: () => _addPerson(isVara: true),
                     );
 
                     final brideInput = _buildPersonInput(
@@ -1876,6 +2122,8 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                         latCtrl: _bLatCtrl, lonCtrl: _bLonCtrl, tzCtrl: _bTzCtrl,
                         dob: _bDob, hour: _bHour, minute: _bMinute, ampm: _bAmpm,
                       ),
+                      savedChips: _buildPersonChips(isVara: false, color: kOrange),
+                      onAdd: () => _addPerson(isVara: false),
                     );
 
                     final calcButton = SizedBox(
