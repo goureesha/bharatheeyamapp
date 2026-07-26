@@ -133,7 +133,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   // Multi-person support
   final List<_PersonEntry> _extraPersons = [];
-  int _selectedPersonIdx = -1; // -1 = show all, 0+ = show specific person
+  Set<int> _selectedPersonIndices = {}; // empty = show all, otherwise show selected indices
   int _selectedChartIdx = 0;  // which chart type is selected (0 = Rashi, 1 = Navamsha, ...)
 
   // Mutable primary person (editable)
@@ -1445,13 +1445,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                       // "All" chip
                       Padding(
                         padding: const EdgeInsets.only(right: 6),
-                        child: ChoiceChip(
-                          label: Text('ಎಲ್ಲ / All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIdx == -1 ? Colors.white : kText)),
-                          selected: _selectedPersonIdx == -1,
+                        child: FilterChip(
+                          label: Text('ಎಲ್ಲ / All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIndices.isEmpty ? Colors.white : kText)),
+                          selected: _selectedPersonIndices.isEmpty,
                           selectedColor: kPurple2,
                           backgroundColor: kCard,
-                          side: BorderSide(color: _selectedPersonIdx == -1 ? kPurple2 : kBorder),
-                          onSelected: (_) => setState(() => _selectedPersonIdx = -1),
+                          side: BorderSide(color: _selectedPersonIndices.isEmpty ? kPurple2 : kBorder),
+                          onSelected: (_) => setState(() => _selectedPersonIndices = {}),
                           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           visualDensity: VisualDensity.compact,
                         ),
@@ -1459,13 +1459,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                       // Primary person chip
                       Padding(
                         padding: const EdgeInsets.only(right: 6),
-                        child: ChoiceChip(
-                          label: Text(_primaryName, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIdx == 0 ? Colors.white : kText)),
-                          selected: _selectedPersonIdx == 0,
+                        child: FilterChip(
+                          label: Text(_primaryName, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIndices.contains(0) ? Colors.white : kText)),
+                          selected: _selectedPersonIndices.contains(0),
                           selectedColor: kPurple2,
                           backgroundColor: kCard,
-                          side: BorderSide(color: _selectedPersonIdx == 0 ? kPurple2 : kBorder),
-                          onSelected: (_) => setState(() => _selectedPersonIdx = 0),
+                          side: BorderSide(color: _selectedPersonIndices.contains(0) ? kPurple2 : kBorder),
+                          onSelected: (selected) => setState(() {
+                            final s = Set<int>.from(_selectedPersonIndices);
+                            if (selected) { s.add(0); } else { s.remove(0); }
+                            _selectedPersonIndices = s;
+                          }),
                           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           visualDensity: VisualDensity.compact,
                         ),
@@ -1475,13 +1479,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                         final idx = i + 1;
                         return Padding(
                           padding: const EdgeInsets.only(right: 6),
-                          child: ChoiceChip(
-                            label: Text(_extraPersons[i].name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIdx == idx ? Colors.white : kText)),
-                            selected: _selectedPersonIdx == idx,
+                          child: FilterChip(
+                            label: Text(_extraPersons[i].name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIndices.contains(idx) ? Colors.white : kText)),
+                            selected: _selectedPersonIndices.contains(idx),
                             selectedColor: kTeal,
                             backgroundColor: kCard,
-                            side: BorderSide(color: _selectedPersonIdx == idx ? kTeal : kBorder),
-                            onSelected: (_) => setState(() => _selectedPersonIdx = idx),
+                            side: BorderSide(color: _selectedPersonIndices.contains(idx) ? kTeal : kBorder),
+                            onSelected: (selected) => setState(() {
+                              final s = Set<int>.from(_selectedPersonIndices);
+                              if (selected) { s.add(idx); } else { s.remove(idx); }
+                              _selectedPersonIndices = s;
+                            }),
                             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             visualDensity: VisualDensity.compact,
                           ),
@@ -1582,8 +1590,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   // Filter allPersons by selected person index
   // ─────────────────────────────────────────────
   List<Map<String, dynamic>> _filterPersons(List<Map<String, dynamic>> allPersons) {
-    if (_selectedPersonIdx < 0 || _selectedPersonIdx >= allPersons.length) return allPersons;
-    return [allPersons[_selectedPersonIdx]];
+    if (_selectedPersonIndices.isEmpty) return allPersons;
+    return allPersons.asMap().entries
+        .where((e) => _selectedPersonIndices.contains(e.key))
+        .map((e) => e.value)
+        .toList();
   }
 
   // ─────────────────────────────────────────────
