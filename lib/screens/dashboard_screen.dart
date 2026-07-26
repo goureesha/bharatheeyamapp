@@ -1688,6 +1688,25 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  /// Get current Mahadasha + Bhukti lord names (Kannada) for chart highlighting
+  Set<String> _currentDashaLords(KundaliResult r) {
+    final now = DateTime.now();
+    final lords = <String>{};
+    for (final md in r.dashas) {
+      if (now.isAfter(md.start) && now.isBefore(md.end)) {
+        lords.add(md.lord);
+        for (final ad in md.antardashas) {
+          if (now.isAfter(ad.start) && now.isBefore(ad.end)) {
+            lords.add(ad.lord);
+            break;
+          }
+        }
+        break;
+      }
+    }
+    return lords;
+  }
+
   // ─────────────────────────────────────────────
   // TAB 2: UPAGRAHA SPHUTA (multi-person)
   // ─────────────────────────────────────────────
@@ -2054,6 +2073,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 aroodhas: _aroodhas,
                                 centerLabel: _prastutaResult != null ? '${AppLocale.l('prastuta')}\n$label' : label,
                                 onPlanetTap: _showPlanetDetail,
+                                highlightPlanets: ((chart['varga'] as int) == 1 || (chart['varga'] as int) == 9 || isBhavaChart)
+                                    ? _currentDashaLords(activeResult)
+                                    : null,
                               ),
                             ),
                           ],
@@ -4208,9 +4230,12 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
     final chart = widget.charts[chartIdx];
     final isBhava = chart['isBhava'] as bool;
     final label = chart['label'] as String;
+    // Only highlight in Rashi (D1), Navamsha (D9), and Bhava charts
+    final varga = chart['varga'] as int;
+    final shouldHighlight = (varga == 1 || varga == 9) || isBhava;
     return KundaliChart(
       result: widget.personResult,
-      varga: chart['varga'] as int,
+      varga: varga,
       isBhava: isBhava,
       showSphutas: false,
       centerLabel: label,
@@ -4218,7 +4243,27 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
       selectedPlanet: isBhava ? widget.bhavaPlanet : null,
       onPlanetLongPress: isBhava ? widget.onBhavaPlanetToggle : null,
       bhavaFromPlanet: isBhava ? widget.bhavaPlanet : null,
+      highlightPlanets: shouldHighlight ? _dashaLords : null,
     );
+  }
+
+  /// Current Mahadasha + Bhukti lord names (Kannada) for highlighting
+  Set<String> get _dashaLords {
+    final now = DateTime.now();
+    final lords = <String>{};
+    for (final md in widget.personResult.dashas) {
+      if (now.isAfter(md.start) && now.isBefore(md.end)) {
+        lords.add(md.lord);
+        for (final ad in md.antardashas) {
+          if (now.isAfter(ad.start) && now.isBefore(ad.end)) {
+            lords.add(ad.lord);
+            break;
+          }
+        }
+        break;
+      }
+    }
+    return lords;
   }
 
   @override

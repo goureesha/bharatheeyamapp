@@ -21,6 +21,7 @@ class NorthIndianChart extends StatelessWidget {
   final String? selectedPlanet;
   final String? bhavaFromPlanet;
   final double textScale;
+  final Set<String>? highlightPlanets;
 
   const NorthIndianChart({
     super.key,
@@ -35,6 +36,7 @@ class NorthIndianChart extends StatelessWidget {
     this.selectedPlanet,
     this.bhavaFromPlanet,
     this.textScale = 1.0,
+    this.highlightPlanets,
   });
 
   /// Compute which rashi index a planet falls in for the chosen varga
@@ -434,13 +436,22 @@ class NorthIndianChart extends StatelessWidget {
       onTap: () { if (onPlanetTap != null) onPlanetTap!(name); },
       onLongPress: () { if (onPlanetLongPress != null) onPlanetLongPress!(name); },
       behavior: HitTestBehavior.opaque,
-      child: Text(
-        displayText,
-        style: TextStyle(
-          fontSize: (isSelected ? 12 : 9) * textScale,
-          fontWeight: FontWeight.w900,
-          color: color.withValues(alpha: opacity),
-          decoration: isSelected ? TextDecoration.underline : null,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 1),
+        decoration: (highlightPlanets != null && highlightPlanets!.contains(name))
+            ? BoxDecoration(
+                color: const Color(0xFFFFD700).withOpacity(0.30),
+                borderRadius: BorderRadius.circular(3),
+              )
+            : null,
+        child: Text(
+          displayText,
+          style: TextStyle(
+            fontSize: (isSelected ? 12 : 9) * textScale,
+            fontWeight: FontWeight.w900,
+            color: color.withValues(alpha: opacity),
+            decoration: isSelected ? TextDecoration.underline : null,
+          ),
         ),
       ),
     );
