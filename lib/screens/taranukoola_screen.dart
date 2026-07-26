@@ -12,6 +12,8 @@ import '../services/panchanga_cache.dart';
 import '../core/user_muhurta_rules.dart';
 import '../widgets/muhurta_rules_editor.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import '../services/app_access_service.dart';
+import 'support_screen.dart';
 
 class TaranukoolaScreen extends StatefulWidget {
   const TaranukoolaScreen({super.key});
@@ -367,6 +369,11 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
+    // Gate: if muhurta not unlocked, show support screen
+    if (!AppAccessService.muhurtaUnlocked) {
+      return const SupportScreen();
+    }
+
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(

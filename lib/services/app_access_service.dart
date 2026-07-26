@@ -14,6 +14,7 @@ class AppAccessService {
   static const String _lastOnlineCheckKey = 'last_online_check_timestamp';
   static const String _blockedKey = 'user_blocked';
   static const String _blockedReasonKey = 'user_blocked_reason';
+  static const String _muhurtaUnlockedKey = 'muhurta_unlocked';
 
   // ── Constants ──
   static const int _trialMinutes = 30;
@@ -28,6 +29,7 @@ class AppAccessService {
   static DateTime? lastOnlineCheck;
   static bool isBlocked = false;
   static String blockedReason = '';
+  static bool muhurtaUnlocked = false;
 
   // ════════════════════════════════════════════════
   // COMPUTED PROPERTIES FOR UI
@@ -169,6 +171,7 @@ class AppAccessService {
       isActivated = prefs.getBool(_accessStatusKey) ??
                     prefs.getBool('has_active_subscription') ?? false;
       adminAccess = isActivated;
+      muhurtaUnlocked = prefs.getBool(_muhurtaUnlockedKey) ?? false;
       debugPrint('⚠️ Firestore unreachable — using cached access: $isActivated');
       debugPrint('⚠️ Last online check: $lastOnlineCheck');
       if (lastOnlineCheck != null) {
@@ -277,6 +280,13 @@ class AppAccessService {
 
       // Firestore field names kept as-is for data compatibility
       final hasAdminGrant = data['manualPremium'] == true;
+
+      // ── Muhurta unlock (separate premium feature) ──
+      final muhurtaFlag = data['muhurtaUnlocked'] == true;
+      muhurtaUnlocked = muhurtaFlag;
+      final prefs3 = await SharedPreferences.getInstance();
+      await prefs3.setBool(_muhurtaUnlockedKey, muhurtaFlag);
+      debugPrint('🔮 Muhurta access: ${muhurtaFlag ? 'UNLOCKED' : 'LOCKED'}');
 
       if (hasAdminGrant) {
         // Expiry is REQUIRED — no lifetime access
