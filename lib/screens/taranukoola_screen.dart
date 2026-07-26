@@ -369,11 +369,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    // Gate: if muhurta not unlocked OR student mode, show support screen
-    if (!AppAccessService.muhurtaUnlocked || AppAccessService.isStudent) {
-      return const SupportScreen();
-    }
-
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
@@ -1699,6 +1694,11 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   }
 
   Widget _buildMuhurtaFinderTab() {
+    // Gate: if muhurta not unlocked OR student mode, show support screen
+    if (!AppAccessService.muhurtaUnlocked || AppAccessService.isStudent) {
+      return const SupportScreen();
+    }
+
     final rashiNames = List.generate(12, (i) => trAll(knRashi[i]));
     final nakNames = List.generate(27, (i) => trAll(knNak[i]));
     final months = List.generate(12, (i) {
