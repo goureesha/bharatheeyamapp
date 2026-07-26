@@ -1533,59 +1533,34 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ],
                     );
                   } else {
-                    // ── LANDSCAPE: Panchanga left, tabs right ──
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    // ── LANDSCAPE: Full width tabs (no panchanga side panel) ──
+                    return Column(
                       children: [
-                        // Left panel: Panchanga details (fixed)
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.32,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                color: kCard,
-                                width: double.infinity,
-                                child: Text(_tabs[0], style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kPurple1)),
-                              ),
-                              Expanded(child: _buildPanchangTab()),
-                            ],
+                        Container(
+                          color: kCard,
+                          child: TabBar(
+                            controller: _tabCtrl,
+                            isScrollable: true,
+                            tabs: _tabs.map((t) => Tab(text: t)).toList(),
                           ),
                         ),
-                        const VerticalDivider(width: 1),
-                        // Right panel: All tabs
                         Expanded(
-                          child: Column(
+                          child: TabBarView(
+                            controller: _tabCtrl,
                             children: [
-                              Container(
-                                color: kCard,
-                                child: TabBar(
-                                  controller: _tabCtrl,
-                                  isScrollable: true,
-                                  tabs: _tabs.map((t) => Tab(text: t)).toList(),
-                                ),
-                              ),
-                              Expanded(
-                                child: TabBarView(
-                                  controller: _tabCtrl,
-                                  children: [
-                                    _buildPanchangTab(),
-                                    _buildKundaliTab(),
-                                    _buildSphutas(),
-                                    _buildAroodhaTab(),
-                                    _buildDashaTab(),
-                                    _buildBhavaTab(),
-                                    _buildGrahaShadvargaTab(),
-                                    _buildShadbalaTab(),
-                                    _buildAshtakaTab(),
-                                    _buildYogaTab(),
-                                    _buildGocharTab(),
-                                    _buildNotesTab(),
-                                    _buildJanmaPatrikeTab(),
-                                  ],
-                                ),
-                              ),
+                              _buildPanchangTab(),
+                              _buildKundaliTab(),
+                              _buildSphutas(),
+                              _buildAroodhaTab(),
+                              _buildDashaTab(),
+                              _buildBhavaTab(),
+                              _buildGrahaShadvargaTab(),
+                              _buildShadbalaTab(),
+                              _buildAshtakaTab(),
+                              _buildYogaTab(),
+                              _buildGocharTab(),
+                              _buildNotesTab(),
+                              _buildJanmaPatrikeTab(),
                             ],
                           ),
                         ),
