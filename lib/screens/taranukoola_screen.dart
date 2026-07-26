@@ -1245,11 +1245,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         }
       } catch (_) {}
 
-      // Yield to UI every 3 days
-      if (results.length % 3 == 0) {
-        await Future.delayed(Duration.zero);
-        if (mounted) setState(() {});
-      }
+      // Yield to UI EVERY day to prevent ANR on long searches
+      await Future.delayed(Duration.zero);
+      if (mounted) setState(() {});
 
       results.add({
         'date': day.date,
@@ -1323,8 +1321,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     while (!curMonth.isAfter(endMonth)) {
       final daysInMonth = DateTime(curMonth.year, curMonth.month + 1, 0).day;
       for (int d = 1; d <= daysInMonth; d++) {
-        // Yield to UI thread every 3 days to prevent freeze
-        if (totalDays % 3 == 0) await Future.delayed(Duration.zero);
+        // Yield to UI EVERY day to prevent ANR on long searches
+        await Future.delayed(Duration.zero);
         try {
           totalDays++;
           final date = DateTime(curMonth.year, curMonth.month, d);
