@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════
 // BHARATHEEYAM ADMIN DASHBOARD - APP LOGIC
+// v2.1 — Muhurta + Student toggles
 // ═══════════════════════════════════════════
 
 // Firebase config (same as your app)
