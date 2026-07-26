@@ -310,7 +310,7 @@ class PanchangaCache {
       }
 
       // 4. Yoga check
-      final blocked = userRules.blockedYogas ?? blockedYogaIndices;
+      final blocked = userRules.blockedYogas ?? <int>[];
       if (blocked.contains(day.yogaIndex)) {
         rej['yoga']!.add(day); rejected = true;
       }

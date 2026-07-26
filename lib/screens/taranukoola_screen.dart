@@ -1406,7 +1406,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           if (userRules.allowedVaras != null && !userRules.allowedVaras!.contains(varaIdx)) {
             rej['vara']!.add(dayInfo); failures.add('vara');
           }
-          final blocked = userRules.blockedYogas ?? blockedYogaIndices;
+          final blocked = userRules.blockedYogas ?? <int>[];
           if (blocked.contains(yogaIdx)) {
             rej['yoga']!.add(dayInfo); failures.add('yoga');
           }
