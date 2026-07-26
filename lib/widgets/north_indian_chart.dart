@@ -21,7 +21,7 @@ class NorthIndianChart extends StatelessWidget {
   final String? selectedPlanet;
   final String? bhavaFromPlanet;
   final double textScale;
-  final Set<String>? highlightPlanets;
+  final Map<String, Color>? highlightPlanets;
 
   const NorthIndianChart({
     super.key,
@@ -438,9 +438,9 @@ class NorthIndianChart extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 1),
-        decoration: (highlightPlanets != null && highlightPlanets!.contains(name))
+        decoration: (highlightPlanets != null && highlightPlanets!.containsKey(name))
             ? BoxDecoration(
-                color: const Color(0xFFFFD700).withOpacity(0.30),
+                color: highlightPlanets![name]!.withOpacity(0.28),
                 borderRadius: BorderRadius.circular(3),
               )
             : null,

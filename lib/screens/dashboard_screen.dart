@@ -1688,16 +1688,19 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  /// Get current Mahadasha + Bhukti lord names (Kannada) for chart highlighting
-  Set<String> _currentDashaLords(KundaliResult r) {
+  /// Get current Mahadasha + Bhukti lord names with distinct colors
+  Map<String, Color> _currentDashaLords(KundaliResult r) {
     final now = DateTime.now();
-    final lords = <String>{};
+    final lords = <String, Color>{};
     for (final md in r.dashas) {
       if (now.isAfter(md.start) && now.isBefore(md.end)) {
-        lords.add(md.lord);
+        lords[md.lord] = const Color(0xFFFF8C00); // Orange for Dasha
         for (final ad in md.antardashas) {
           if (now.isAfter(ad.start) && now.isBefore(ad.end)) {
-            lords.add(ad.lord);
+            // If same planet is both dasha & bhukti, keep dasha color
+            if (!lords.containsKey(ad.lord)) {
+              lords[ad.lord] = const Color(0xFF00C853); // Green for Bhukti
+            }
             break;
           }
         }
@@ -4247,16 +4250,18 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
     );
   }
 
-  /// Current Mahadasha + Bhukti lord names (Kannada) for highlighting
-  Set<String> get _dashaLords {
+  /// Current Mahadasha + Bhukti lord names with distinct colors
+  Map<String, Color> get _dashaLords {
     final now = DateTime.now();
-    final lords = <String>{};
+    final lords = <String, Color>{};
     for (final md in widget.personResult.dashas) {
       if (now.isAfter(md.start) && now.isBefore(md.end)) {
-        lords.add(md.lord);
+        lords[md.lord] = const Color(0xFFFF8C00); // Orange for Dasha
         for (final ad in md.antardashas) {
           if (now.isAfter(ad.start) && now.isBefore(ad.end)) {
-            lords.add(ad.lord);
+            if (!lords.containsKey(ad.lord)) {
+              lords[ad.lord] = const Color(0xFF00C853); // Green for Bhukti
+            }
             break;
           }
         }

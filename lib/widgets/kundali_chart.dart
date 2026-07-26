@@ -21,7 +21,7 @@ class KundaliChart extends StatelessWidget {
   final String? selectedPlanet; // for bhava highlight
   final String? bhavaFromPlanet; // planet to calculate bhava from (null = lagna)
   final double textScale; // scale text on larger screens
-  final Set<String>? highlightPlanets; // Kannada planet names to highlight (e.g. dasha/bhukti lords)
+  final Map<String, Color>? highlightPlanets; // planet name → highlight color (e.g. dasha=orange, bhukti=green)
 
   const KundaliChart({
     super.key,
@@ -606,9 +606,9 @@ class KundaliChart extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 2),
-        decoration: (highlightPlanets != null && highlightPlanets!.contains(name))
+        decoration: (highlightPlanets != null && highlightPlanets!.containsKey(name))
             ? BoxDecoration(
-                color: const Color(0xFFFFD700).withOpacity(0.30),
+                color: highlightPlanets![name]!.withOpacity(0.28),
                 borderRadius: BorderRadius.circular(3),
               )
             : null,
