@@ -33,6 +33,7 @@ dependencies:
   cloud_firestore: ^6.2.0
   screenshot: ^3.0.0
   device_info_plus: any
+  wakelock_plus: ^4.0.0
 
 dev_dependencies:
   flutter_test:

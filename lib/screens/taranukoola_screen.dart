@@ -11,6 +11,7 @@ import '../core/muhurta_rules.dart';
 import '../services/panchanga_cache.dart';
 import '../core/user_muhurta_rules.dart';
 import '../widgets/muhurta_rules_editor.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class TaranukoolaScreen extends StatefulWidget {
   const TaranukoolaScreen({super.key});
@@ -1040,6 +1041,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
   /// INSTANT search using pre-computed cache
   Future<void> _searchMuhurtasCached() async {
+    // Keep screen on during long calculation
+    WakelockPlus.enable();
     final cache = PanchangaCache.instance;
     if (!cache.isLoaded) {
       // Auto-generate cache for the search range so detailed rejection tracking works
@@ -1067,6 +1070,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     final userRules = UserRulesManager.instance.getRules(_mfEvent);
     final defaultRules = muhurtaRules[_mfEvent];
     if (defaultRules == null) {
+      WakelockPlus.disable();
       setState(() { _mfSearching = false; });
       return;
     }
@@ -1295,10 +1299,13 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       'rejectedDays': rejectedDays,
     };
 
+    WakelockPlus.disable();
     if (mounted) setState(() { _mfResults = results; _mfStats = stats; _mfSearching = false; });
   }
 
   Future<void> _searchMuhurtas() async {
+    // Keep screen on during long calculation
+    WakelockPlus.enable();
     setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; _mfDisplayCount = 20; });
     await Future.delayed(const Duration(milliseconds: 50));
 
@@ -1680,6 +1687,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       'rejectedDays': rej,
     };
 
+    WakelockPlus.disable();
     if (mounted) setState(() { _mfResults = results; _mfStats = stats; _mfSearching = false; });
   }
 
