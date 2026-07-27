@@ -30,6 +30,7 @@ import '../services/docs_service.dart';
 import '../services/calendar_service.dart';
 import '../services/location_service.dart';
 import '../services/janma_patrike_service.dart'; // NEW
+import '../services/tippani_pdf_service.dart';
 import '../services/pdf_theme.dart';
 import '../constants/places.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -130,6 +131,10 @@ class _DashboardScreenState extends State<DashboardScreen>
   String _selectedThemeId = 'traditional';
   List<bool> _pdfPageSelection = [true, true, true, true, true, true]; // 6 pages
 
+  // Tippani PDF fields
+  final _tippaniInvocationCtrl = TextEditingController(text: 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ');
+  final _tippaniAddressCtrl = TextEditingController();
+
 
   // Multi-person support
   final List<_PersonEntry> _extraPersons = [];
@@ -229,6 +234,8 @@ class _DashboardScreenState extends State<DashboardScreen>
     _gotraCtrl.dispose();
     _jyotishiNameCtrl.dispose();
     _jyotishiPhoneCtrl.dispose();
+    _tippaniInvocationCtrl.dispose();
+    _tippaniAddressCtrl.dispose();
     SingleLetterMode.notifier.removeListener(_onChartModeChanged);
     SamshakaMode.notifier.removeListener(_onChartModeChanged);
     super.dispose();
@@ -253,6 +260,8 @@ class _DashboardScreenState extends State<DashboardScreen>
       setState(() {
         _jyotishiNameCtrl.text = prefs.getString('jyotishi_name') ?? '';
         _jyotishiPhoneCtrl.text = prefs.getString('jyotishi_phone') ?? '';
+        _tippaniInvocationCtrl.text = prefs.getString('tippani_invocation') ?? 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ';
+        _tippaniAddressCtrl.text = prefs.getString('tippani_address') ?? '';
       });
     }
   }
@@ -261,6 +270,8 @@ class _DashboardScreenState extends State<DashboardScreen>
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('jyotishi_name', _jyotishiNameCtrl.text.trim());
     await prefs.setString('jyotishi_phone', _jyotishiPhoneCtrl.text.trim());
+    await prefs.setString('tippani_invocation', _tippaniInvocationCtrl.text.trim());
+    await prefs.setString('tippani_address', _tippaniAddressCtrl.text.trim());
   }
 
   /// Show simple 2-option dialog to add a person
@@ -3092,6 +3103,148 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
+  /// Show dialog to configure and generate Tippani PDF
+  void _showTippaniPdfDialog(String name, bool isPrimary, _PersonEntry? entry, List<Map<String, String>> noteEntries) {
+    final dobDate = isPrimary ? widget.dob : entry!.dob;
+    final dobStr = '${dobDate.day.toString().padLeft(2, '0')}-${dobDate.month.toString().padLeft(2, '0')}-${dobDate.year}';
+    final birthHour = isPrimary ? widget.hour : entry!.hour;
+    final birthMin = isPrimary ? widget.minute : entry!.minute;
+    final birthAmpm = isPrimary ? widget.ampm : entry!.ampm;
+    final birthPlace = isPrimary ? widget.place : entry!.place;
+    final timeStr = '${birthHour.toString().padLeft(2, '0')}:${birthMin.toString().padLeft(2, '0')} $birthAmpm';
+    final clientId = widget.extraInfo['clientId'] ?? '';
+    final activeResult = isPrimary ? _primaryResult : entry!.result;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: kCard,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(Icons.picture_as_pdf, color: Colors.deepOrange, size: 24),
+              const SizedBox(width: 8),
+              Expanded(child: Text('ಟಿಪ್ಪಣಿ PDF', style: TextStyle(fontWeight: FontWeight.w900, color: kText, fontSize: 18))),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('ಮಂಗಳ ಶ್ಲೋಕ / ಆಹ್ವಾನ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                const SizedBox(height: 4),
+                TextField(
+                  controller: _tippaniInvocationCtrl,
+                  decoration: InputDecoration(
+                    hintText: 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ',
+                    prefixIcon: Icon(Icons.auto_awesome, size: 18),
+                    isDense: true,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onChanged: (_) => _saveJyotishiDetails(),
+                ),
+                const SizedBox(height: 14),
+                Text('ಜ್ಯೋತಿಷಿ ವಿವರ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                const SizedBox(height: 4),
+                TextField(
+                  controller: _jyotishiNameCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'ಹೆಸರು',
+                    prefixIcon: Icon(Icons.storefront, size: 18),
+                    isDense: true,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onChanged: (_) => _saveJyotishiDetails(),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _tippaniAddressCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'ವಿಳಾಸ',
+                    prefixIcon: Icon(Icons.location_on_outlined, size: 18),
+                    isDense: true,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  maxLines: 2,
+                  onChanged: (_) => _saveJyotishiDetails(),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _jyotishiPhoneCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'ದೂರವಾಣಿ',
+                    prefixIcon: Icon(Icons.phone, size: 18),
+                    isDense: true,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  keyboardType: TextInputType.phone,
+                  onChanged: (_) => _saveJyotishiDetails(),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: kBg,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: kBorder),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('ಜನನ ವಿವರ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
+                      const SizedBox(height: 4),
+                      Text('👤 $name', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+                      Text('📅 $dobStr  🕰️ $timeStr', style: TextStyle(fontSize: 12, color: kText)),
+                      Text('📍 $birthPlace', style: TextStyle(fontSize: 12, color: kText)),
+                      if (clientId.isNotEmpty) Text('🪪 $clientId', style: TextStyle(fontSize: 12, color: kMuted)),
+                      Text('📝 ${noteEntries.length} ಟಿಪ್ಪಣಿಗಳು', style: TextStyle(fontSize: 12, color: kTeal, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('ರದ್ದು', style: TextStyle(color: kMuted)),
+            ),
+            ElevatedButton.icon(
+              onPressed: () async {
+                Navigator.pop(ctx);
+                final rashi = activeResult.panchang.chandraRashi;
+                final nakshatra = activeResult.panchang.nakshatra;
+                final data = TippaniData(
+                  name: name,
+                  dateStr: dobStr,
+                  timeStr: timeStr,
+                  place: birthPlace,
+                  clientId: clientId is String ? clientId : '',
+                  rashi: rashi,
+                  nakshatra: nakshatra,
+                  invocationText: _tippaniInvocationCtrl.text.trim(),
+                  astrologerName: _jyotishiNameCtrl.text.trim(),
+                  astrologerAddress: _tippaniAddressCtrl.text.trim(),
+                  astrologerPhone: _jyotishiPhoneCtrl.text.trim(),
+                  notes: noteEntries,
+                );
+                final selectedTheme = PdfThemes.all.firstWhere((t) => t.id == _selectedThemeId, orElse: () => PdfThemes.traditional);
+                await TippaniPdfService.generateAndPrint(data, theme: selectedTheme);
+              },
+              icon: const Icon(Icons.picture_as_pdf, size: 18),
+              label: const Text('PDF ರಚಿಸಿ'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepOrange, foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildIndividualNoteSection({required String name, required bool isPrimary, required _PersonEntry? entry}) {
     final currentNotes = isPrimary ? _notes : (entry?.notes ?? '');
     final entries = _parseNoteEntries(currentNotes);
@@ -3201,6 +3354,19 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+          // ── Tippani PDF Export Button ──
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => _showTippaniPdfDialog(name, isPrimary, entry, entries),
+              icon: const Icon(Icons.picture_as_pdf, size: 18),
+              label: Text('ಟಿಪ್ಪಣಿ PDF', style: TextStyle(fontSize: 13)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepOrange, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 8),
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           Row(
