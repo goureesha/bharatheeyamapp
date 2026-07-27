@@ -360,7 +360,7 @@ class KundaliChart extends StatelessWidget {
   }
 
   Widget _rashiBox(int rashiIdx, List<Widget> planets) {
-    final bool singleLetter = (SingleLetterMode.isActive || forceShortNames) && ((varga == 1) || isBhava);
+    final bool singleLetter = forceShortNames || (SingleLetterMode.isActive && ((varga == 1) || isBhava));
     return Container(
       margin: const EdgeInsets.all(1.0),
       decoration: BoxDecoration(
@@ -563,6 +563,9 @@ class KundaliChart extends StatelessWidget {
         displayText = '$fullName $navNum';
       } else if (showDeg && (SingleLetterMode.isActive || forceShortNames)) {
         // Single letter mode: abbreviation only, no degrees
+        displayText = shortName;
+      } else if (forceShortNames) {
+        // Force short names in amsha charts too
         displayText = shortName;
       } else if (showDeg) {
         // Degree within D1 rashi

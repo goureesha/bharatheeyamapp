@@ -307,7 +307,7 @@ class NorthIndianChart extends StatelessWidget {
       final w = isCorner ? boxW * 0.85 : boxW;
       final ht = isCorner ? boxH * 0.85 : boxH;
 
-      final bool singleLetter = (SingleLetterMode.isActive || forceShortNames) && ((varga == 1) || isBhava);
+      final bool singleLetter = forceShortNames || (SingleLetterMode.isActive && ((varga == 1) || isBhava));
 
       widgets.add(Positioned(
         left: center.dx * s - w / 2,
@@ -400,6 +400,9 @@ class NorthIndianChart extends StatelessWidget {
         displayText = '$fullName $navNum';
       } else if (showRashiDeg && (SingleLetterMode.isActive || forceShortNames)) {
         // Single letter mode: abbreviation only, no degrees
+        displayText = shortName;
+      } else if (forceShortNames) {
+        // Force short names in amsha charts too
         displayText = shortName;
       } else {
         final double degToShow = showRashiDeg ? (info.longitude % 30) : (displayDeg ?? info.longitude % 30);
