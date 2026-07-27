@@ -3115,131 +3115,199 @@ class _DashboardScreenState extends State<DashboardScreen>
     final clientId = widget.extraInfo['clientId'] ?? '';
     final activeResult = isPrimary ? _primaryResult : entry!.result;
 
+    // All notes selected by default
+    final selectedNotes = List<bool>.filled(noteEntries.length, true);
+
     showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
-          backgroundColor: kCard,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Row(
-            children: [
-              Icon(Icons.picture_as_pdf, color: Colors.deepOrange, size: 24),
-              const SizedBox(width: 8),
-              Expanded(child: Text('ಟಿಪ್ಪಣಿ PDF', style: TextStyle(fontWeight: FontWeight.w900, color: kText, fontSize: 18))),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('ಮಂಗಳ ಶ್ಲೋಕ / ಆಹ್ವಾನ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
-                const SizedBox(height: 4),
-                TextField(
-                  controller: _tippaniInvocationCtrl,
-                  decoration: InputDecoration(
-                    hintText: 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ',
-                    prefixIcon: Icon(Icons.auto_awesome, size: 18),
-                    isDense: true,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onChanged: (_) => _saveJyotishiDetails(),
-                ),
-                const SizedBox(height: 14),
-                Text('ಜ್ಯೋತಿಷಿ ವಿವರ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
-                const SizedBox(height: 4),
-                TextField(
-                  controller: _jyotishiNameCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'ಹೆಸರು',
-                    prefixIcon: Icon(Icons.storefront, size: 18),
-                    isDense: true,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onChanged: (_) => _saveJyotishiDetails(),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _tippaniAddressCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'ವಿಳಾಸ',
-                    prefixIcon: Icon(Icons.location_on_outlined, size: 18),
-                    isDense: true,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  maxLines: 2,
-                  onChanged: (_) => _saveJyotishiDetails(),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _jyotishiPhoneCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'ದೂರವಾಣಿ',
-                    prefixIcon: Icon(Icons.phone, size: 18),
-                    isDense: true,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  keyboardType: TextInputType.phone,
-                  onChanged: (_) => _saveJyotishiDetails(),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: kBg,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: kBorder),
-                  ),
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            final selectedCount = selectedNotes.where((s) => s).length;
+            return AlertDialog(
+              backgroundColor: kCard,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                children: [
+                  Icon(Icons.picture_as_pdf, color: Colors.deepOrange, size: 24),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text('ಟಿಪ್ಪಣಿ PDF', style: TextStyle(fontWeight: FontWeight.w900, color: kText, fontSize: 18))),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: SingleChildScrollView(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text('ಜನನ ವಿವರ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
+                      Text('ಮಂಗಳ ಶ್ಲೋಕ / ಆಹ್ವಾನ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
                       const SizedBox(height: 4),
-                      Text('👤 $name', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
-                      Text('📅 $dobStr  🕰️ $timeStr', style: TextStyle(fontSize: 12, color: kText)),
-                      Text('📍 $birthPlace', style: TextStyle(fontSize: 12, color: kText)),
-                      if (clientId.isNotEmpty) Text('🪪 $clientId', style: TextStyle(fontSize: 12, color: kMuted)),
-                      Text('📝 ${noteEntries.length} ಟಿಪ್ಪಣಿಗಳು', style: TextStyle(fontSize: 12, color: kTeal, fontWeight: FontWeight.w600)),
+                      TextField(
+                        controller: _tippaniInvocationCtrl,
+                        decoration: InputDecoration(
+                          hintText: 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ',
+                          prefixIcon: Icon(Icons.auto_awesome, size: 18),
+                          isDense: true,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onChanged: (_) => _saveJyotishiDetails(),
+                      ),
+                      const SizedBox(height: 14),
+                      Text('ಜ್ಯೋತಿಷಿ ವಿವರ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                      const SizedBox(height: 4),
+                      TextField(
+                        controller: _jyotishiNameCtrl,
+                        decoration: InputDecoration(
+                          labelText: 'ಹೆಸರು',
+                          prefixIcon: Icon(Icons.storefront, size: 18),
+                          isDense: true,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onChanged: (_) => _saveJyotishiDetails(),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _tippaniAddressCtrl,
+                        decoration: InputDecoration(
+                          labelText: 'ವಿಳಾಸ',
+                          prefixIcon: Icon(Icons.location_on_outlined, size: 18),
+                          isDense: true,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        maxLines: 2,
+                        onChanged: (_) => _saveJyotishiDetails(),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _jyotishiPhoneCtrl,
+                        decoration: InputDecoration(
+                          labelText: 'ದೂರವಾಣಿ',
+                          prefixIcon: Icon(Icons.phone, size: 18),
+                          isDense: true,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        keyboardType: TextInputType.phone,
+                        onChanged: (_) => _saveJyotishiDetails(),
+                      ),
+                      const SizedBox(height: 14),
+
+                      // ── Note Selection ──
+                      if (noteEntries.isNotEmpty) ...[
+                        Row(
+                          children: [
+                            Text('📝 ಟಿಪ್ಪಣಿ ಆಯ್ಕೆ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                            const Spacer(),
+                            Text('$selectedCount/${noteEntries.length}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () {
+                                final allSelected = selectedNotes.every((s) => s);
+                                setDialogState(() {
+                                  for (int i = 0; i < selectedNotes.length; i++) {
+                                    selectedNotes[i] = !allSelected;
+                                  }
+                                });
+                              },
+                              child: Text(
+                                selectedNotes.every((s) => s) ? 'ಎಲ್ಲಾ ತೆಗೆ' : 'ಎಲ್ಲಾ ಆಯ್ಕೆ',
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.deepOrange),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          constraints: const BoxConstraints(maxHeight: 200),
+                          decoration: BoxDecoration(
+                            color: kBg,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: kBorder),
+                          ),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            padding: EdgeInsets.zero,
+                            itemCount: noteEntries.length,
+                            itemBuilder: (_, i) {
+                              final note = noteEntries[i];
+                              return CheckboxListTile(
+                                dense: true,
+                                visualDensity: VisualDensity.compact,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                controlAffinity: ListTileControlAffinity.leading,
+                                value: selectedNotes[i],
+                                onChanged: (v) => setDialogState(() => selectedNotes[i] = v ?? false),
+                                activeColor: Colors.deepOrange,
+                                title: Text(
+                                  note['text'] ?? '',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontSize: 12, color: kText),
+                                ),
+                                subtitle: Text(
+                                  note['date'] ?? '',
+                                  style: TextStyle(fontSize: 10, color: kMuted),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ] else ...[
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: kBg,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: kBorder),
+                          ),
+                          child: Text('ಟಿಪ್ಪಣಿಗಳಿಲ್ಲ', style: TextStyle(fontSize: 12, color: kMuted, fontStyle: FontStyle.italic), textAlign: TextAlign.center),
+                        ),
+                      ],
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text('ರದ್ದು', style: TextStyle(color: kMuted)),
-            ),
-            ElevatedButton.icon(
-              onPressed: () async {
-                Navigator.pop(ctx);
-                final rashi = activeResult.panchang.chandraRashi;
-                final nakshatra = activeResult.panchang.nakshatra;
-                final data = TippaniData(
-                  name: name,
-                  dateStr: dobStr,
-                  timeStr: timeStr,
-                  place: birthPlace,
-                  clientId: clientId is String ? clientId : '',
-                  rashi: rashi,
-                  nakshatra: nakshatra,
-                  invocationText: _tippaniInvocationCtrl.text.trim(),
-                  astrologerName: _jyotishiNameCtrl.text.trim(),
-                  astrologerAddress: _tippaniAddressCtrl.text.trim(),
-                  astrologerPhone: _jyotishiPhoneCtrl.text.trim(),
-                  notes: noteEntries,
-                );
-                final selectedTheme = PdfThemes.all.firstWhere((t) => t.id == _selectedThemeId, orElse: () => PdfThemes.traditional);
-                await TippaniPdfService.generateAndPrint(data, theme: selectedTheme);
-              },
-              icon: const Icon(Icons.picture_as_pdf, size: 18),
-              label: const Text('PDF ರಚಿಸಿ'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepOrange, foregroundColor: Colors.white,
               ),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text('ರದ್ದು', style: TextStyle(color: kMuted)),
+                ),
+                ElevatedButton.icon(
+                  onPressed: selectedCount == 0 && noteEntries.isNotEmpty ? null : () async {
+                    Navigator.pop(ctx);
+                    final rashi = activeResult.panchang.chandraRashi;
+                    final nakshatra = activeResult.panchang.nakshatra;
+                    // Filter only selected notes
+                    final filteredNotes = <Map<String, String>>[];
+                    for (int i = 0; i < noteEntries.length; i++) {
+                      if (selectedNotes[i]) filteredNotes.add(noteEntries[i]);
+                    }
+                    final data = TippaniData(
+                      name: name,
+                      dateStr: dobStr,
+                      timeStr: timeStr,
+                      place: birthPlace,
+                      clientId: clientId is String ? clientId : '',
+                      rashi: rashi,
+                      nakshatra: nakshatra,
+                      invocationText: _tippaniInvocationCtrl.text.trim(),
+                      astrologerName: _jyotishiNameCtrl.text.trim(),
+                      astrologerAddress: _tippaniAddressCtrl.text.trim(),
+                      astrologerPhone: _jyotishiPhoneCtrl.text.trim(),
+                      notes: filteredNotes,
+                    );
+                    final selectedTheme = PdfThemes.all.firstWhere((t) => t.id == _selectedThemeId, orElse: () => PdfThemes.traditional);
+                    await TippaniPdfService.generateAndPrint(data, theme: selectedTheme);
+                  },
+                  icon: const Icon(Icons.picture_as_pdf, size: 18),
+                  label: Text('PDF ರಚಿಸಿ ($selectedCount)'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrange, foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
