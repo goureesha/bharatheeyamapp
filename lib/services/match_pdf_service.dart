@@ -318,7 +318,7 @@ class MatchPdfService {
     return Column(children: [
       SizedBox(
         width: 220, height: 220,
-        child: KundaliChart(result: r, varga: varga, isBhava: isBhava, showSphutas: false),
+        child: KundaliChart(result: r, varga: varga, isBhava: isBhava, showSphutas: false, forceShortNames: true),
       ),
       const SizedBox(height: 2),
       Text(label, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: t.primaryDark)),

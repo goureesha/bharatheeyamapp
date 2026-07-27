@@ -22,6 +22,7 @@ class NorthIndianChart extends StatelessWidget {
   final String? bhavaFromPlanet;
   final double textScale;
   final Map<String, Color>? highlightPlanets;
+  final bool forceShortNames;
 
   const NorthIndianChart({
     super.key,
@@ -37,6 +38,7 @@ class NorthIndianChart extends StatelessWidget {
     this.bhavaFromPlanet,
     this.textScale = 1.0,
     this.highlightPlanets,
+    this.forceShortNames = false,
   });
 
   /// Compute which rashi index a planet falls in for the chosen varga
@@ -305,7 +307,7 @@ class NorthIndianChart extends StatelessWidget {
       final w = isCorner ? boxW * 0.85 : boxW;
       final ht = isCorner ? boxH * 0.85 : boxH;
 
-      final bool singleLetter = SingleLetterMode.isActive && ((varga == 1) || isBhava);
+      final bool singleLetter = (SingleLetterMode.isActive || forceShortNames) && ((varga == 1) || isBhava);
 
       widgets.add(Positioned(
         left: center.dx * s - w / 2,
@@ -396,7 +398,7 @@ class NorthIndianChart extends StatelessWidget {
         final navNum = SamshakaMode.navamshaSign(info.longitude);
         final fullName = translateKn(name);
         displayText = '$fullName $navNum';
-      } else if (showRashiDeg && SingleLetterMode.isActive) {
+      } else if (showRashiDeg && (SingleLetterMode.isActive || forceShortNames)) {
         // Single letter mode: abbreviation only, no degrees
         displayText = shortName;
       } else {

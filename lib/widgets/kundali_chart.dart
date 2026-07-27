@@ -22,6 +22,7 @@ class KundaliChart extends StatelessWidget {
   final String? bhavaFromPlanet; // planet to calculate bhava from (null = lagna)
   final double textScale; // scale text on larger screens
   final Map<String, Color>? highlightPlanets; // planet name → highlight color (e.g. dasha=orange, bhukti=green)
+  final bool forceShortNames; // force single-letter mode (for PDF)
 
   const KundaliChart({
     super.key,
@@ -37,6 +38,7 @@ class KundaliChart extends StatelessWidget {
     this.bhavaFromPlanet,
     this.textScale = 1.0,
     this.highlightPlanets,
+    this.forceShortNames = false,
   });
 
   // Grid layout: indices into rashi boxes, null = center
@@ -141,6 +143,7 @@ class KundaliChart extends StatelessWidget {
         bhavaFromPlanet: bhavaFromPlanet,
         textScale: textScale,
         highlightPlanets: highlightPlanets,
+        forceShortNames: forceShortNames,
       );
     }
 
@@ -357,7 +360,7 @@ class KundaliChart extends StatelessWidget {
   }
 
   Widget _rashiBox(int rashiIdx, List<Widget> planets) {
-    final bool singleLetter = SingleLetterMode.isActive && ((varga == 1) || isBhava);
+    final bool singleLetter = (SingleLetterMode.isActive || forceShortNames) && ((varga == 1) || isBhava);
     return Container(
       margin: const EdgeInsets.all(1.0),
       decoration: BoxDecoration(
@@ -558,7 +561,7 @@ class KundaliChart extends StatelessWidget {
         final navNum = SamshakaMode.navamshaSign(info.longitude);
         final fullName = translateKn(name);
         displayText = '$fullName $navNum';
-      } else if (showDeg && SingleLetterMode.isActive) {
+      } else if (showDeg && (SingleLetterMode.isActive || forceShortNames)) {
         // Single letter mode: abbreviation only, no degrees
         displayText = shortName;
       } else if (showDeg) {
