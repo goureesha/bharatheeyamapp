@@ -3489,18 +3489,23 @@ class _DashboardScreenState extends State<DashboardScreen>
             ...entries.asMap().entries.map((en) {
               final i = en.key;
               final e = en.value;
+              final noteText = e['text'] ?? '';
+              final isLong = noteText.length > 120;
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: kBorder)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                clipBehavior: Clip.antiAlias,
+                child: Theme(
+                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                    childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                    initiallyExpanded: !isLong,
+                    dense: true,
+                    leading: Icon(Icons.access_time, size: 14, color: kTeal),
+                    title: Row(
                       children: [
-                        Icon(Icons.access_time, size: 14, color: kTeal), const SizedBox(width: 6),
-                        Text(e['date'] ?? '', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kTeal)),
-                        const Spacer(),
+                        Expanded(child: Text(e['date'] ?? '', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kTeal))),
                         GestureDetector(
                           onTap: () {
                             ctrl.text = e['text'] ?? '';
@@ -3530,9 +3535,16 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
-                    Text(e['text'] ?? '', style: TextStyle(fontSize: 14, height: 1.4, color: kText)),
-                  ],
+                    subtitle: isLong
+                        ? Text(noteText.substring(0, 100) + '...', style: TextStyle(fontSize: 12, color: kMuted), maxLines: 1, overflow: TextOverflow.ellipsis)
+                        : null,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(noteText, style: TextStyle(fontSize: 14, height: 1.4, color: kText)),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }),
