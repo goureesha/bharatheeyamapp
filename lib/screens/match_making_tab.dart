@@ -11,8 +11,11 @@ import '../core/calculator.dart';
 import '../services/location_service.dart';
 import '../services/storage_service.dart';
 import '../services/client_service.dart';
+import '../services/match_pdf_service.dart';
+import '../services/pdf_theme.dart';
 import '../core/ephemeris.dart';
 import 'package:sweph/sweph.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MatchMakingTab extends StatefulWidget {
   const MatchMakingTab({super.key});
@@ -92,6 +95,13 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   int? _nGroomPada;
   Map<String, dynamic>? _nResult;
   List<Map<String, dynamic>> _nGuruTransits = [];
+
+  // ── PDF Jyotishi details (persisted) ──
+  final _mJyotishiNameCtrl = TextEditingController();
+  final _mJyotishiAddressCtrl = TextEditingController();
+  final _mJyotishiPhoneCtrl = TextEditingController();
+  final _mInvocationCtrl = TextEditingController(text: 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ');
+  String _mSelectedThemeId = 'traditional';
 
   // Nakshatra pada syllables (27 nakshatras × 4 padas each)
   static const List<List<String>> _nakSyllables = [
@@ -1104,8 +1114,141 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       _sectionHeader(AppLocale.l('dashaSandhi'), Icons.swap_horiz, Colors.deepPurple),
       _buildDashaSandhiSection(br, gr),
 
+      // ── PDF EXPORT BUTTON ──
+      const SizedBox(height: 16),
+      Center(
+        child: ElevatedButton.icon(
+          onPressed: _showMatchPdfDialog,
+          icon: const Icon(Icons.picture_as_pdf, size: 20),
+          label: Text('PDF ${AppLocale.l('save')}', style: const TextStyle(fontWeight: FontWeight.w800)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red.shade600, foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+      ),
+
       const SizedBox(height: 32),
     ]);
+  }
+
+  void _loadMatchJyotishiDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    _mJyotishiNameCtrl.text = prefs.getString('match_jyotishi_name') ?? '';
+    _mJyotishiAddressCtrl.text = prefs.getString('match_jyotishi_address') ?? '';
+    _mJyotishiPhoneCtrl.text = prefs.getString('match_jyotishi_phone') ?? '';
+    final inv = prefs.getString('match_invocation');
+    if (inv != null && inv.isNotEmpty) _mInvocationCtrl.text = inv;
+    _mSelectedThemeId = prefs.getString('match_pdf_theme') ?? 'traditional';
+  }
+
+  void _saveMatchJyotishiDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('match_jyotishi_name', _mJyotishiNameCtrl.text.trim());
+    prefs.setString('match_jyotishi_address', _mJyotishiAddressCtrl.text.trim());
+    prefs.setString('match_jyotishi_phone', _mJyotishiPhoneCtrl.text.trim());
+    prefs.setString('match_invocation', _mInvocationCtrl.text.trim());
+    prefs.setString('match_pdf_theme', _mSelectedThemeId);
+  }
+
+  void _showMatchPdfDialog() {
+    if (_brideResult == null || _groomResult == null || _fullResult == null) return;
+    _loadMatchJyotishiDetails();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: kCard,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(children: [
+          Icon(Icons.picture_as_pdf, color: Colors.red, size: 24),
+          const SizedBox(width: 8),
+          Expanded(child: Text('ವಿವಾಹ ಹೊಂದಾಣಿಕೆ PDF', style: TextStyle(fontWeight: FontWeight.w900, color: kText, fontSize: 18))),
+        ]),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('ಮಂಗಳ ಶ್ಲೋಕ / ಆಹ್ವಾನ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+              const SizedBox(height: 4),
+              TextField(
+                controller: _mInvocationCtrl,
+                decoration: InputDecoration(hintText: 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ', prefixIcon: Icon(Icons.auto_awesome, size: 18), isDense: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+                onChanged: (_) => _saveMatchJyotishiDetails(),
+              ),
+              const SizedBox(height: 14),
+              Text('ಜ್ಯೋತಿಷಿ ವಿವರ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+              const SizedBox(height: 4),
+              TextField(
+                controller: _mJyotishiNameCtrl,
+                decoration: InputDecoration(labelText: 'ಹೆಸರು', prefixIcon: Icon(Icons.storefront, size: 18), isDense: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+                onChanged: (_) => _saveMatchJyotishiDetails(),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _mJyotishiAddressCtrl,
+                maxLines: 2,
+                decoration: InputDecoration(labelText: 'ವಿಳಾಸ', prefixIcon: Icon(Icons.location_on_outlined, size: 18), isDense: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+                onChanged: (_) => _saveMatchJyotishiDetails(),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _mJyotishiPhoneCtrl,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(labelText: 'ದೂರವಾಣಿ', prefixIcon: Icon(Icons.phone, size: 18), isDense: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+                onChanged: (_) => _saveMatchJyotishiDetails(),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('ವರ: ${_gNameCtrl.text}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.blue.shade700)),
+                  Text('ವಧು: ${_bNameCtrl.text}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.pink.shade700)),
+                  Text('ಕೂಟ: ${_kootaMode == 0 ? "ಅಷ್ಟಕೂಟ" : "ದ್ವಾದಶಕೂಟ"}', style: TextStyle(fontSize: 11, color: kMuted)),
+                ]),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('ರದ್ದು', style: TextStyle(color: kMuted))),
+          ElevatedButton.icon(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              _saveMatchJyotishiDetails();
+              final bDobStr = '${_bDob.day.toString().padLeft(2, '0')}-${_bDob.month.toString().padLeft(2, '0')}-${_bDob.year}';
+              final gDobStr = '${_gDob.day.toString().padLeft(2, '0')}-${_gDob.month.toString().padLeft(2, '0')}-${_gDob.year}';
+              final data = MatchPdfData(
+                groomName: _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : 'ವರ',
+                groomDob: gDobStr,
+                groomTime: '${_gHour.toString().padLeft(2, '0')}:${_gMinute.toString().padLeft(2, '0')} $_gAmpm',
+                groomPlace: _gPlaceCtrl.text,
+                brideName: _bNameCtrl.text.isNotEmpty ? _bNameCtrl.text : 'ವಧು',
+                brideDob: bDobStr,
+                brideTime: '${_bHour.toString().padLeft(2, '0')}:${_bMinute.toString().padLeft(2, '0')} $_bAmpm',
+                bridePlace: _bPlaceCtrl.text,
+                groomResult: _groomResult!,
+                brideResult: _brideResult!,
+                fullResult: _fullResult!,
+                kootaMode: _kootaMode,
+                invocationText: _mInvocationCtrl.text.trim(),
+                astrologerName: _mJyotishiNameCtrl.text.trim(),
+                astrologerAddress: _mJyotishiAddressCtrl.text.trim(),
+                astrologerPhone: _mJyotishiPhoneCtrl.text.trim(),
+              );
+              final selectedTheme = PdfThemes.all.firstWhere((t) => t.id == _mSelectedThemeId, orElse: () => PdfThemes.traditional);
+              await MatchPdfService.generateAndPrint(data, theme: selectedTheme);
+            },
+            icon: const Icon(Icons.picture_as_pdf, size: 18),
+            label: const Text('PDF ರಚಿಸಿ'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+          ),
+        ],
+      ),
+    );
   }
 
   /// Check if any mahadasha of bride and groom end within 6 months of each other
