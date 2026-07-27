@@ -43,42 +43,46 @@ class TippaniData {
 class TippaniPdfService {
   static String _fontForLocale() => 'NotoSansKannada';
 
-  /// Generate and print Tippani PDF
+  static const double _pw = 793.0;
+  static const double _ph = 1122.0;
+  // How many notes fit per page (approx)
+  static const int _notesPerPage1 = 12;  // Page 1 has header+birth details
+  static const int _notesPerPage = 18;   // Continuation pages
+
+  /// Generate and print Tippani PDF (multi-page)
   static Future<void> generateAndPrint(TippaniData data, {PdfThemeConfig? theme}) async {
     theme ??= PdfThemes.traditional;
     final controller = ScreenshotController();
-
-    const double pageWidth = 793.0;
-    const double pageHeight = 1122.0;
-    final targetSize = const Size(pageWidth, pageHeight);
-
-    final pageWidget = _buildPageWrapper(
-      width: pageWidth,
-      height: pageHeight,
-      theme: theme,
-      child: _buildTippaniContent(data, theme),
-    );
-
-    final pageBytes = await controller.captureFromWidget(
-      pageWidget,
-      targetSize: targetSize,
-      pixelRatio: 3.0,
-      delay: const Duration(milliseconds: 200),
-    );
-
+    final targetSize = const Size(_pw, _ph);
     final doc = pw.Document();
-    doc.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: pw.EdgeInsets.zero,
-        build: (pw.Context context) {
-          return pw.FullPage(
-            ignoreMargins: true,
-            child: pw.Image(pw.MemoryImage(pageBytes), fit: pw.BoxFit.contain),
-          );
-        },
-      ),
-    );
+
+    // Split notes into pages
+    final allNotes = data.notes;
+    if (allNotes.isEmpty) {
+      // Single page with no notes
+      final widget = _wrap(theme, _buildPage1(data, theme, allNotes));
+      final bytes = await controller.captureFromWidget(widget, targetSize: targetSize, pixelRatio: 3.0, delay: const Duration(milliseconds: 200));
+      _addPage(doc, bytes);
+    } else {
+      // Page 1: header + first batch of notes
+      final page1Notes = allNotes.length <= _notesPerPage1 ? allNotes : allNotes.sublist(0, _notesPerPage1);
+      final widget1 = _wrap(theme, _buildPage1(data, theme, page1Notes));
+      final bytes1 = await controller.captureFromWidget(widget1, targetSize: targetSize, pixelRatio: 3.0, delay: const Duration(milliseconds: 200));
+      _addPage(doc, bytes1);
+
+      // Continuation pages
+      int offset = _notesPerPage1;
+      int pageNum = 2;
+      while (offset < allNotes.length) {
+        final end = (offset + _notesPerPage) > allNotes.length ? allNotes.length : offset + _notesPerPage;
+        final pageNotes = allNotes.sublist(offset, end);
+        final widget = _wrap(theme, _buildContinuationPage(data, theme, pageNotes, pageNum));
+        final bytes = await controller.captureFromWidget(widget, targetSize: targetSize, pixelRatio: 3.0, delay: const Duration(milliseconds: 200));
+        _addPage(doc, bytes);
+        offset = end;
+        pageNum++;
+      }
+    }
 
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => doc.save(),
@@ -86,312 +90,266 @@ class TippaniPdfService {
     );
   }
 
-  /// Page wrapper with theme border
-  static Widget _buildPageWrapper({
-    required double width,
-    required double height,
-    required PdfThemeConfig theme,
-    required Widget child,
-  }) {
+  static void _addPage(pw.Document doc, Uint8List bytes) {
+    doc.addPage(pw.Page(
+      pageFormat: PdfPageFormat.a4,
+      margin: pw.EdgeInsets.zero,
+      build: (pw.Context c) => pw.FullPage(ignoreMargins: true, child: pw.Image(pw.MemoryImage(bytes), fit: pw.BoxFit.contain)),
+    ));
+  }
+
+  static Widget _wrap(PdfThemeConfig theme, Widget child) {
     return Directionality(
       textDirection: TextDirection.ltr,
-      child: MediaQuery(
-        data: const MediaQueryData(),
-        child: Theme(
-          data: ThemeData(fontFamily: _fontForLocale()),
-          child: DefaultTextStyle(
-            style: TextStyle(color: Colors.black, fontSize: 13, fontFamily: _fontForLocale()),
-            child: Material(
-              color: Colors.white,
-              child: theme.buildPageBorder(
-                width: width,
-                height: height,
-                child: child,
-              ),
-            ),
-          ),
+      child: MediaQuery(data: const MediaQueryData(), child: Theme(
+        data: ThemeData(fontFamily: _fontForLocale()),
+        child: DefaultTextStyle(
+          style: TextStyle(color: Colors.black, fontSize: 13, fontFamily: _fontForLocale()),
+          child: Material(color: Colors.white, child: theme.buildPageBorder(width: _pw, height: _ph, child: child)),
         ),
-      ),
+      )),
     );
   }
 
-  /// Main content layout
-  static Widget _buildTippaniContent(TippaniData data, PdfThemeConfig theme) {
+  // ═══════════════ PAGE 1: Header + Birth + Notes ═══════════════
+  static Widget _buildPage1(TippaniData data, PdfThemeConfig theme, List<Map<String, String>> notes) {
     final now = DateTime.now();
     final todayStr = '${now.day.toString().padLeft(2, '0')}-${now.month.toString().padLeft(2, '0')}-${now.year}';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── Logo + Invocation ──
-          Center(
-            child: Column(
-              children: [
-                Image.asset('assets/images/logo.png', width: 56, height: 56),
-                const SizedBox(height: 6),
-                Text(
-                  data.invocationText,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: theme.shlokaText,
-                    letterSpacing: 1.2,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  trAll(AppLocale.l('appName')),
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: theme.primaryDark,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // ── Astrologer Info Section ──
-          if (data.astrologerName.isNotEmpty || data.astrologerAddress.isNotEmpty) ...[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: theme.headerBg.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: theme.primaryDark.withOpacity(0.2)),
-              ),
-              child: Column(
+          // ── TOP ROW: Jyotishi (left) | Logo+Title (center) | Date (right) ──
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left: Jyotishi details
+              Expanded(flex: 3, child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (data.astrologerName.isNotEmpty)
-                    Text(
-                      data.astrologerName,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: theme.primaryDark,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  if (data.astrologerAddress.isNotEmpty) ...[
-                    const SizedBox(height: 3),
-                    Text(
-                      data.astrologerAddress,
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                  if (data.astrologerPhone.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      '📞 ${data.astrologerPhone}',
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
-                    ),
-                  ],
+                    Text(data.astrologerName, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: theme.primaryDark)),
+                  if (data.astrologerAddress.isNotEmpty)
+                    Text(data.astrologerAddress, style: TextStyle(fontSize: 10, color: Colors.grey.shade700, height: 1.3)),
+                  if (data.astrologerPhone.isNotEmpty)
+                    Text('📞 ${data.astrologerPhone}', style: TextStyle(fontSize: 10, color: Colors.grey.shade700)),
                 ],
-              ),
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          // ── Divider ──
-          _sectionDivider(theme),
+              )),
+              // Center: Logo + Invocation + App name
+              Expanded(flex: 4, child: Column(
+                children: [
+                  Image.asset('assets/images/logo.png', width: 44, height: 44),
+                  const SizedBox(height: 3),
+                  Text(data.invocationText, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: theme.shlokaText, letterSpacing: 0.8)),
+                  Text(trAll(AppLocale.l('appName')), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: theme.primaryDark)),
+                ],
+              )),
+              // Right: Date
+              Expanded(flex: 3, child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('ದಿನಾಂಕ', style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+                  Text(todayStr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: theme.primaryDark)),
+                ],
+              )),
+            ],
+          ),
           const SizedBox(height: 8),
+          _divider(theme),
+          const SizedBox(height: 6),
 
-          // ── Birth Details Section ──
-          _buildSectionTitle('ಜನನ ವಿವರ', theme),
-          const SizedBox(height: 8),
+          // ── COMPACT BIRTH DETAILS: single row ──
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: theme.detailBoxBg,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: theme.detailBorder.withOpacity(0.3)),
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Left: Birth details
-                Expanded(
-                  flex: 3,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _detailRow('👤 ಹೆಸರು', data.name, theme),
-                      _detailRow('📅 ಜನ್ಮ ದಿನಾಂಕ', data.dateStr, theme),
-                      _detailRow('🕰️ ಜನ್ಮ ಸಮಯ', data.timeStr, theme),
-                      _detailRow('📍 ಜನ್ಮ ಸ್ಥಳ', data.place, theme),
-                      if (data.rashi.isNotEmpty)
-                        _detailRow('🌙 ರಾಶಿ', trAll(data.rashi), theme),
-                      if (data.nakshatra.isNotEmpty)
-                        _detailRow('⭐ ನಕ್ಷತ್ರ', trAll(data.nakshatra), theme),
-                    ],
-                  ),
-                ),
-                // Right: Client ID + Date
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      if (data.clientId.isNotEmpty)
-                        _detailRow('🪪 ID', data.clientId, theme, align: CrossAxisAlignment.end),
-                      _detailRow('📋 ದಿನಾಂಕ', todayStr, theme, align: CrossAxisAlignment.end),
-                    ],
-                  ),
-                ),
+                // Name
+                Expanded(flex: 3, child: Row(children: [
+                  Text('👤 ', style: TextStyle(fontSize: 11)),
+                  Expanded(child: Text(data.name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: theme.primaryDark), overflow: TextOverflow.ellipsis)),
+                ])),
+                // DOB + Time
+                Expanded(flex: 3, child: Text(
+                  '📅 ${data.dateStr}  🕰️ ${data.timeStr}',
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: theme.primaryDark),
+                  textAlign: TextAlign.center,
+                )),
+                // Place
+                Expanded(flex: 2, child: Text(
+                  '📍 ${data.place}',
+                  style: TextStyle(fontSize: 10, color: Colors.grey.shade700),
+                  textAlign: TextAlign.right,
+                  overflow: TextOverflow.ellipsis,
+                )),
               ],
             ),
           ),
-          const SizedBox(height: 14),
+          // Rashi / Nakshatra compact row
+          if (data.rashi.isNotEmpty || data.nakshatra.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (data.rashi.isNotEmpty)
+                    Text('🌙 ರಾಶಿ: ${trAll(data.rashi)}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: theme.primaryDark)),
+                  if (data.rashi.isNotEmpty && data.nakshatra.isNotEmpty)
+                    Text('  |  ', style: TextStyle(fontSize: 10, color: Colors.grey.shade400)),
+                  if (data.nakshatra.isNotEmpty)
+                    Text('⭐ ನಕ್ಷತ್ರ: ${trAll(data.nakshatra)}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: theme.primaryDark)),
+                  if (data.clientId.isNotEmpty) ...[
+                    Text('  |  ', style: TextStyle(fontSize: 10, color: Colors.grey.shade400)),
+                    Text('🪪 ${data.clientId}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey.shade600)),
+                  ],
+                ],
+              ),
+            ),
+          const SizedBox(height: 10),
 
-          // ── Notes Section ──
-          _sectionDivider(theme),
-          const SizedBox(height: 8),
-          _buildSectionTitle('📝 ಟಿಪ್ಪಣಿ', theme),
-          const SizedBox(height: 8),
+          // ── NOTES SECTION ──
+          _divider(theme),
+          const SizedBox(height: 6),
+          _sectionTitle('📝 ಟಿಪ್ಪಣಿ', theme),
+          const SizedBox(height: 6),
 
-          // Notes content
           Expanded(
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: theme.detailBorder.withOpacity(0.2)),
               ),
-              child: data.notes.isEmpty
-                  ? Center(
-                      child: Text(
-                        'ಟಿಪ್ಪಣಿಗಳಿಲ್ಲ',
-                        style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontStyle: FontStyle.italic),
-                      ),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (int i = 0; i < data.notes.length; i++) ...[
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 6,
-                                height: 6,
-                                margin: const EdgeInsets.only(top: 6, right: 8),
-                                decoration: BoxDecoration(
-                                  color: theme.primaryDark,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      data.notes[i]['date'] ?? '',
-                                      style: TextStyle(
-                                        fontSize: 9,
-                                        color: Colors.grey.shade500,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      data.notes[i]['text'] ?? '',
-                                      style: const TextStyle(fontSize: 12, height: 1.4),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (i < data.notes.length - 1)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 6),
-                              child: Divider(height: 1, color: theme.detailBorder.withOpacity(0.15)),
-                            ),
-                        ],
-                      ],
-                    ),
+              child: notes.isEmpty
+                  ? Center(child: Text('ಟಿಪ್ಪಣಿಗಳಿಲ್ಲ', style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontStyle: FontStyle.italic)))
+                  : _buildNotesList(notes, theme),
             ),
           ),
-          const SizedBox(height: 10),
-
-          // ── Footer ──
+          const SizedBox(height: 8),
           _buildFooter(data, theme),
         ],
       ),
     );
   }
 
-  // ── Helper Widgets ──
+  // ═══════════════ CONTINUATION PAGES: Mini header + Notes ═══════════════
+  static Widget _buildContinuationPage(TippaniData data, PdfThemeConfig theme, List<Map<String, String>> notes, int pageNum) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Mini header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/images/logo.png', width: 28, height: 28),
+              const SizedBox(width: 8),
+              Text('📝 ಟಿಪ್ಪಣಿ — ${data.name}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: theme.primaryDark)),
+              const SizedBox(width: 12),
+              Text('ಪುಟ $pageNum', style: TextStyle(fontSize: 10, color: Colors.grey.shade500)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _divider(theme),
+          const SizedBox(height: 8),
 
-  static Widget _buildSectionTitle(String title, PdfThemeConfig theme) {
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: theme.detailBorder.withOpacity(0.2)),
+              ),
+              child: _buildNotesList(notes, theme),
+            ),
+          ),
+          const SizedBox(height: 8),
+          _buildFooter(data, theme),
+        ],
+      ),
+    );
+  }
+
+  // ═══════════════ NOTES LIST WIDGET ═══════════════
+  static Widget _buildNotesList(List<Map<String, String>> notes, PdfThemeConfig theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (int i = 0; i < notes.length; i++) ...[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 6, height: 6,
+                margin: const EdgeInsets.only(top: 6, right: 8),
+                decoration: BoxDecoration(color: theme.primaryDark, shape: BoxShape.circle),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(notes[i]['date'] ?? '', style: TextStyle(fontSize: 9, color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 2),
+                    Text(notes[i]['text'] ?? '', style: const TextStyle(fontSize: 12, height: 1.4)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (i < notes.length - 1)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Divider(height: 1, color: theme.detailBorder.withOpacity(0.15)),
+            ),
+        ],
+      ],
+    );
+  }
+
+  // ═══════════════ COMMON HELPERS ═══════════════
+
+  static Widget _sectionTitle(String title, PdfThemeConfig theme) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
         color: theme.sectionTitleBg.withOpacity(0.12),
         borderRadius: BorderRadius.circular(6),
         border: Border(left: BorderSide(color: theme.primaryDark, width: 3)),
       ),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w800,
-          color: theme.sectionTitleText,
-          letterSpacing: 0.5,
-        ),
-      ),
+      child: Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: theme.sectionTitleText, letterSpacing: 0.5)),
     );
   }
 
-  static Widget _detailRow(String label, String value, PdfThemeConfig theme, {CrossAxisAlignment align = CrossAxisAlignment.start}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Column(
-        crossAxisAlignment: align,
-        children: [
-          Text(label, style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
-          Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: theme.primaryDark)),
-        ],
-      ),
-    );
-  }
-
-  static Widget _sectionDivider(PdfThemeConfig theme) {
-    return Row(
-      children: [
-        Expanded(child: Divider(color: theme.primaryDark.withOpacity(0.15), thickness: 1)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Icon(Icons.auto_awesome, size: 12, color: theme.primaryDark.withOpacity(0.3)),
-        ),
-        Expanded(child: Divider(color: theme.primaryDark.withOpacity(0.15), thickness: 1)),
-      ],
-    );
+  static Widget _divider(PdfThemeConfig theme) {
+    return Row(children: [
+      Expanded(child: Divider(color: theme.primaryDark.withOpacity(0.15), thickness: 1)),
+      Padding(padding: const EdgeInsets.symmetric(horizontal: 6), child: Icon(Icons.auto_awesome, size: 10, color: theme.primaryDark.withOpacity(0.3))),
+      Expanded(child: Divider(color: theme.primaryDark.withOpacity(0.15), thickness: 1)),
+    ]);
   }
 
   static Widget _buildFooter(TippaniData data, PdfThemeConfig theme) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: theme.primaryDark.withOpacity(0.2))),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          if (data.astrologerName.isNotEmpty)
-            Text(data.astrologerName, style: TextStyle(fontSize: 10, color: theme.footerText, fontWeight: FontWeight.w600)),
-          Text(trAll(AppLocale.l('appName')), style: TextStyle(fontSize: 10, color: theme.footerText)),
-          if (data.astrologerPhone.isNotEmpty)
-            Text('📞 ${data.astrologerPhone}', style: TextStyle(fontSize: 10, color: theme.footerText)),
-        ],
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: theme.primaryDark.withOpacity(0.2)))),
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        if (data.astrologerName.isNotEmpty)
+          Text(data.astrologerName, style: TextStyle(fontSize: 9, color: theme.footerText, fontWeight: FontWeight.w600)),
+        Text(trAll(AppLocale.l('appName')), style: TextStyle(fontSize: 9, color: theme.footerText)),
+        if (data.astrologerPhone.isNotEmpty)
+          Text('📞 ${data.astrologerPhone}', style: TextStyle(fontSize: 9, color: theme.footerText)),
+      ]),
     );
   }
 }
