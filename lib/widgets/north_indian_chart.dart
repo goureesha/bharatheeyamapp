@@ -393,16 +393,16 @@ class NorthIndianChart extends StatelessWidget {
       // D1 (Rashi) and Bhava: show rashi degree; Amshas: show amsha degree
       final bool showRashiDeg = (varga == 1) || isBhava;
 
-      if (showRashiDeg && SamshakaMode.isActive) {
+      if (forceShortNames) {
+        // PDF mode: always use short names, skip all other modes
+        displayText = shortName;
+      } else if (showRashiDeg && SamshakaMode.isActive) {
         // Samshaka mode: show navamsha rashi number with full planet name
         final navNum = SamshakaMode.navamshaSign(info.longitude);
         final fullName = translateKn(name);
         displayText = '$fullName $navNum';
-      } else if (showRashiDeg && (SingleLetterMode.isActive || forceShortNames)) {
+      } else if (showRashiDeg && SingleLetterMode.isActive) {
         // Single letter mode: abbreviation only, no degrees
-        displayText = shortName;
-      } else if (forceShortNames) {
-        // Force short names in amsha charts too
         displayText = shortName;
       } else {
         final double degToShow = showRashiDeg ? (info.longitude % 30) : (displayDeg ?? info.longitude % 30);

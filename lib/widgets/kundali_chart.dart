@@ -556,16 +556,16 @@ class KundaliChart extends StatelessWidget {
       final bool showDeg = (varga == 1) || isBhava;
       final bool showAmshaDeg = (varga != 1) && !isBhava;
 
-      if (showDeg && SamshakaMode.isActive) {
+      if (forceShortNames) {
+        // PDF mode: always use short names, skip all other modes
+        displayText = shortName;
+      } else if (showDeg && SamshakaMode.isActive) {
         // Samshaka mode: show navamsha rashi number with full planet name
         final navNum = SamshakaMode.navamshaSign(info.longitude);
         final fullName = translateKn(name);
         displayText = '$fullName $navNum';
-      } else if (showDeg && (SingleLetterMode.isActive || forceShortNames)) {
+      } else if (showDeg && SingleLetterMode.isActive) {
         // Single letter mode: abbreviation only, no degrees
-        displayText = shortName;
-      } else if (forceShortNames) {
-        // Force short names in amsha charts too
         displayText = shortName;
       } else if (showDeg) {
         // Degree within D1 rashi
