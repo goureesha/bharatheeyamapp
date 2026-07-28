@@ -45,9 +45,52 @@ class TippaniPdfService {
 
   static const double _pw = 793.0;
   static const double _ph = 1122.0;
-  // How many notes fit per page (approx)
-  static const int _notesPerPage1 = 12;  // Page 1 has header+birth details
-  static const int _notesPerPage = 18;   // Continuation pages
+
+  /// Estimate "weight" of a note (how many lines it takes)
+  static int _noteWeight(Map<String, String> note) {
+    final len = (note['text'] ?? '').length;
+    if (len <= 80) return 1;
+    if (len <= 200) return 2;
+    if (len <= 400) return 3;
+    return 4;
+  }
+
+  /// Split notes into pages using weight estimation
+  static List<List<Map<String, String>>> _splitNotesIntoPages(List<Map<String, String>> allNotes) {
+    if (allNotes.isEmpty) return [[]];
+    const int page1Capacity = 18;  // Page 1 has header+birth details
+    const int contCapacity = 28;   // Continuation pages have more space
+    final pages = <List<Map<String, String>>>[];
+    int i = 0;
+
+    // Page 1
+    int weight = 0;
+    final page1 = <Map<String, String>>[];
+    while (i < allNotes.length && weight + _noteWeight(allNotes[i]) <= page1Capacity) {
+      weight += _noteWeight(allNotes[i]);
+      page1.add(allNotes[i]);
+      i++;
+    }
+    pages.add(page1);
+
+    // Continuation pages
+    while (i < allNotes.length) {
+      weight = 0;
+      final page = <Map<String, String>>[];
+      while (i < allNotes.length && weight + _noteWeight(allNotes[i]) <= contCapacity) {
+        weight += _noteWeight(allNotes[i]);
+        page.add(allNotes[i]);
+        i++;
+      }
+      // If a single note exceeds capacity, add it alone to avoid infinite loop
+      if (page.isEmpty && i < allNotes.length) {
+        page.add(allNotes[i]);
+        i++;
+      }
+      pages.add(page);
+    }
+    return pages;
+  }
 
   /// Generate and print Tippani PDF (multi-page)
   static Future<void> generateAndPrint(TippaniData data, {PdfThemeConfig? theme}) async {
@@ -56,32 +99,19 @@ class TippaniPdfService {
     final targetSize = const Size(_pw, _ph);
     final doc = pw.Document();
 
-    // Split notes into pages
-    final allNotes = data.notes;
-    if (allNotes.isEmpty) {
-      // Single page with no notes
-      final widget = _wrap(theme, _buildPage1(data, theme, allNotes));
+    // Split notes into pages based on content weight
+    final notePages = _splitNotesIntoPages(data.notes);
+
+    // Page 1: header + birth details + first batch of notes
+    final widget1 = _wrap(theme, _buildPage1(data, theme, notePages[0]));
+    final bytes1 = await controller.captureFromWidget(widget1, targetSize: targetSize, pixelRatio: 3.0, delay: const Duration(milliseconds: 200));
+    _addPage(doc, bytes1);
+
+    // Continuation pages (if any)
+    for (int p = 1; p < notePages.length; p++) {
+      final widget = _wrap(theme, _buildContinuationPage(data, theme, notePages[p], p + 1));
       final bytes = await controller.captureFromWidget(widget, targetSize: targetSize, pixelRatio: 3.0, delay: const Duration(milliseconds: 200));
       _addPage(doc, bytes);
-    } else {
-      // Page 1: header + first batch of notes
-      final page1Notes = allNotes.length <= _notesPerPage1 ? allNotes : allNotes.sublist(0, _notesPerPage1);
-      final widget1 = _wrap(theme, _buildPage1(data, theme, page1Notes));
-      final bytes1 = await controller.captureFromWidget(widget1, targetSize: targetSize, pixelRatio: 3.0, delay: const Duration(milliseconds: 200));
-      _addPage(doc, bytes1);
-
-      // Continuation pages
-      int offset = _notesPerPage1;
-      int pageNum = 2;
-      while (offset < allNotes.length) {
-        final end = (offset + _notesPerPage) > allNotes.length ? allNotes.length : offset + _notesPerPage;
-        final pageNotes = allNotes.sublist(offset, end);
-        final widget = _wrap(theme, _buildContinuationPage(data, theme, pageNotes, pageNum));
-        final bytes = await controller.captureFromWidget(widget, targetSize: targetSize, pixelRatio: 3.0, delay: const Duration(milliseconds: 200));
-        _addPage(doc, bytes);
-        offset = end;
-        pageNum++;
-      }
     }
 
     await Printing.layoutPdf(
