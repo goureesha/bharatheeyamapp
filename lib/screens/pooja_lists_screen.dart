@@ -950,9 +950,9 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       final altRow = const Color(0xFFFAFAFA);
 
       // Calculate items per page: page 1 has header (~280px), subsequent pages have small header (~100px)
-      // Each item row ~32px, available height page1 ~700px, page2+ ~950px
-      const int itemsPerPage1 = 22;
-      const int itemsPerPageN = 30;
+      // Each item row ~35px, available height page1 ~680px, page2+ ~920px
+      const int itemsPerPage1 = 18;
+      const int itemsPerPageN = 26;
 
       final totalItems = _list.items.length;
       final List<List<PoojaItem>> pages = [];
