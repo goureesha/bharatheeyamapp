@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../widgets/common.dart';
 
 import '../services/app_access_service.dart';
+import '../services/offline_access_service.dart';
 import '../services/trusted_time_service.dart';
 import '../services/backup_service.dart';
 import '../services/google_auth_service.dart';
@@ -910,6 +911,106 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     const SizedBox(height: 24),
                     Divider(color: kBorder),
+                    const SizedBox(height: 24),
+
+                    // Offline Days Remaining
+                    if (AppAccessService.isActivated || AppAccessService.adminAccess) ...[
+                      SectionTitle('Offline Days'),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: OfflineAccessService.daysRemaining > 3
+                              ? Colors.blue.withOpacity(0.06)
+                              : Colors.orange.withOpacity(0.06),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: OfflineAccessService.daysRemaining > 3
+                                ? Colors.blue.withOpacity(0.25)
+                                : Colors.orange.withOpacity(0.25),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              Icon(Icons.wifi_off_rounded, size: 22,
+                                color: OfflineAccessService.daysRemaining > 3 ? Colors.blue : Colors.orange),
+                              const SizedBox(width: 10),
+                              Expanded(child: Text(
+                                'Offline Access',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kText),
+                              )),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: OfflineAccessService.daysRemaining > 3
+                                      ? Colors.blue.withOpacity(0.12)
+                                      : Colors.orange.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '${OfflineAccessService.daysRemaining} / ${OfflineAccessService.maxOfflineDays}',
+                                  style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w900,
+                                    color: OfflineAccessService.daysRemaining > 3 ? Colors.blue : Colors.orange,
+                                  ),
+                                ),
+                              ),
+                            ]),
+                            const SizedBox(height: 12),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: OfflineAccessService.maxOfflineDays > 0
+                                    ? OfflineAccessService.daysRemaining / OfflineAccessService.maxOfflineDays
+                                    : 0,
+                                backgroundColor: kBorder.withOpacity(0.3),
+                                color: OfflineAccessService.daysRemaining > 3 ? Colors.blue : Colors.orange,
+                                minHeight: 6,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${OfflineAccessService.daysUsed} days used',
+                                  style: TextStyle(fontSize: 12, color: kMuted),
+                                ),
+                                Text(
+                                  '${OfflineAccessService.daysRemaining} days remaining',
+                                  style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w700,
+                                    color: OfflineAccessService.daysRemaining > 3 ? Colors.blue : Colors.orange,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (OfflineAccessService.hasActiveClaim) ...[
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                  Icon(Icons.timer, size: 14, color: Colors.green.shade700),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Active: ${OfflineAccessService.claimHoursRemaining}h remaining',
+                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.green.shade700),
+                                  ),
+                                ]),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Divider(color: kBorder),
+                    ],
 
                     // About Us
                     ListTile(
