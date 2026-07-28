@@ -283,7 +283,7 @@ class TippaniPdfService {
             children: [
               Image.asset('assets/images/logo.png', width: 28, height: 28),
               const SizedBox(width: 8),
-              Text('📝 ಟಿಪ್ಪಣಿ — ${data.name}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: theme.primaryDark)),
+              Text('📝 ಟಿಪ್ಪಣಿ', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: theme.primaryDark)),
               const SizedBox(width: 12),
               Text('ಪುಟ $pageNum', style: TextStyle(fontSize: 10, color: Colors.grey.shade500)),
             ],
