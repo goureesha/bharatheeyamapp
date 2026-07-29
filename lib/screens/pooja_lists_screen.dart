@@ -433,14 +433,19 @@ class _PoojaListsScreenState extends State<PoojaListsScreen> {
             child: Text(_p('cancel'), style: TextStyle(color: kMuted)),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               final name = ctrl.text.trim();
               if (name.isEmpty) return;
               Navigator.pop(ctx);
+              // Pre-fill purohit from Settings defaults
+              final prefs = await SharedPreferences.getInstance();
               final newList = PoojaList(
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
                 name: name,
                 items: [],
+                purohitName: prefs.getString('default_jyotishi_name') ?? '',
+                purohitPhone: prefs.getString('default_jyotishi_phone') ?? '',
+                purohitAddress: prefs.getString('default_jyotishi_address') ?? '',
               );
               setState(() => _lists.insert(0, newList));
               _save();
@@ -866,10 +871,12 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
     else { await Share.share(text, subject: _list.name); }
   }
 
-  void _exportPdf() {
-    final nameCtrl = TextEditingController(text: _list.purohitName);
-    final phoneCtrl = TextEditingController(text: _list.purohitPhone);
-    final addressCtrl = TextEditingController(text: _list.purohitAddress);
+  void _exportPdf() async {
+    // Fall back to Settings defaults if per-list purohit fields are empty
+    final prefs = await SharedPreferences.getInstance();
+    final nameCtrl = TextEditingController(text: _list.purohitName.isNotEmpty ? _list.purohitName : (prefs.getString('default_jyotishi_name') ?? ''));
+    final phoneCtrl = TextEditingController(text: _list.purohitPhone.isNotEmpty ? _list.purohitPhone : (prefs.getString('default_jyotishi_phone') ?? ''));
+    final addressCtrl = TextEditingController(text: _list.purohitAddress.isNotEmpty ? _list.purohitAddress : (prefs.getString('default_jyotishi_address') ?? ''));
     final now = DateTime.now();
     final dateCtrl = TextEditingController(text: '${now.day.toString().padLeft(2, '0')}-${now.month.toString().padLeft(2, '0')}-${now.year}');
 
