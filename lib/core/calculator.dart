@@ -184,7 +184,8 @@ class KundaliResult {
 String formatGhati(double decVal) {
   final g = decVal.floor();
   final rem = decVal - g;
-  final v = (rem * 60).floor();
+  final v = (rem * 60).round();
+  if (v >= 60) return '${g + 1}.00';
   return '$g.${v.toString().padLeft(2, '0')}';
 }
 
