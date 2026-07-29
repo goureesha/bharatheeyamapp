@@ -46,12 +46,19 @@ class TippaniPdfService {
   static const double _pw = 793.0;
   static const double _ph = 1122.0;
 
-  /// Estimate "weight" of a note (how many lines it takes)
+  /// Estimate "weight" of a note (how many visual lines it takes)
+  static const int _maxCharsPerLine = 70; // approx chars that fit in one PDF line
+
   static int _noteWeight(Map<String, String> note) {
     final text = note['text'] ?? '';
-    // Count actual lines (newlines + 1 for the text itself)
-    final lineCount = '\n'.allMatches(text).length + 1;
-    return lineCount;
+    if (text.isEmpty) return 1;
+    final lines = text.split('\n');
+    int visualLines = 0;
+    for (final line in lines) {
+      // Each line takes at least 1 visual line, plus wraps for long lines
+      visualLines += (line.length / _maxCharsPerLine).ceil().clamp(1, 100);
+    }
+    return visualLines;
   }
 
   /// Split notes into pages using weight estimation
