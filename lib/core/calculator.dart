@@ -1024,8 +1024,8 @@ class AstroCalculator {
         dashaLord: dashaLord,
         nakshatraIndex: nIdx,
         nakPercent: perc,
-        sunrise: formatTimeFromJd(srCivil, tzOffset: hourUtcOffset),
-        sunset: formatTimeFromJd(ssCivil, tzOffset: hourUtcOffset),
+        sunrise: formatTimeFromJd(panchSunrise, tzOffset: hourUtcOffset),
+        sunset: formatTimeFromJd(panchSrSs[1], tzOffset: hourUtcOffset),
         tithiIndex: tIdx,
         chandraMasaRaw: chandraMasaRaw, // raw name assigned above
         suryaNakshatra: knNak[sunNakIdx],
@@ -1084,7 +1084,7 @@ class AstroCalculator {
           'Saturn': speeds['ಶನಿ'] ?? 0.0,
         },
         ascendant: positions['ಲಗ್ನ'] ?? 0.0,
-        sunRiseJd: srCivil,
+        sunRiseJd: panchSunrise,
         birthJd: jdBirth,
       );
 
