@@ -48,11 +48,10 @@ class TippaniPdfService {
 
   /// Estimate "weight" of a note (how many lines it takes)
   static int _noteWeight(Map<String, String> note) {
-    final len = (note['text'] ?? '').length;
-    if (len <= 80) return 1;
-    if (len <= 200) return 2;
-    if (len <= 400) return 3;
-    return 4;
+    final text = note['text'] ?? '';
+    // Count actual lines (newlines + 1 for the text itself)
+    final lineCount = '\n'.allMatches(text).length + 1;
+    return lineCount;
   }
 
   /// Split notes into pages using weight estimation
