@@ -64,16 +64,21 @@ class TippaniPdfService {
   /// Split notes into pages using weight estimation
   static List<List<Map<String, String>>> _splitNotesIntoPages(List<Map<String, String>> allNotes) {
     if (allNotes.isEmpty) return [[]];
-    const int page1Capacity = 18;  // Page 1 has header+birth details
-    const int contCapacity = 28;   // Continuation pages have more space
+    const int page1Capacity = 22;  // Page 1 has header+birth details
+    const int contCapacity = 32;   // Continuation pages have more space
     final pages = <List<Map<String, String>>>[];
     int i = 0;
 
-    // Page 1
+    // Page 1 — always include at least 1 note
     int weight = 0;
     final page1 = <Map<String, String>>[];
     while (i < allNotes.length && weight + _noteWeight(allNotes[i]) <= page1Capacity) {
       weight += _noteWeight(allNotes[i]);
+      page1.add(allNotes[i]);
+      i++;
+    }
+    // Safety: if no notes fit, add the first one anyway
+    if (page1.isEmpty && i < allNotes.length) {
       page1.add(allNotes[i]);
       i++;
     }
