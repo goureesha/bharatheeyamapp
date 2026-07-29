@@ -46,39 +46,51 @@ class TippaniPdfService {
   static const double _pw = 793.0;
   static const double _ph = 1122.0;
 
-  /// Estimate "weight" of a note (how many visual lines it takes)
-  static const int _maxCharsPerLine = 70; // approx chars that fit in one PDF line
-
-  static int _noteWeight(Map<String, String> note) {
+  /// Measure actual rendered height of a note (date + text + divider padding)
+  static double _measureNoteHeight(Map<String, String> note) {
     final text = note['text'] ?? '';
-    if (text.isEmpty) return 1;
-    final lines = text.split('\n');
-    int visualLines = 0;
-    for (final line in lines) {
-      // Each line takes at least 1 visual line, plus wraps for long lines
-      visualLines += (line.length / _maxCharsPerLine).ceil().clamp(1, 100);
+    final dateText = note['date'] ?? '';
+    // Available width for note text: page width - padding(24*2) - container padding(12*2) - bullet(6+8)
+    const double availableWidth = _pw - 48 - 24 - 14;
+
+    // Measure date line height
+    double dateH = 0;
+    if (dateText.isNotEmpty) {
+      final datePainter = TextPainter(
+        text: TextSpan(text: dateText, style: const TextStyle(fontSize: 9)),
+        textDirection: TextDirection.ltr,
+        maxLines: 1,
+      )..layout(maxWidth: availableWidth);
+      dateH = datePainter.height + 2; // +2 for SizedBox spacing
     }
-    return visualLines;
+
+    // Measure main text height
+    final textPainter = TextPainter(
+      text: TextSpan(text: text, style: const TextStyle(fontSize: 12, height: 1.4)),
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: availableWidth);
+
+    // Total: date + text + divider padding(~11px per note)
+    return dateH + textPainter.height + 16;
   }
 
-  /// Split notes into pages using weight estimation
+  // Available height for notes on each page type (in pixels)
+  static const double _page1NotesHeight = 740.0;  // after header + birth details + section title
+  static const double _contNotesHeight = 960.0;   // after mini header
+
+  /// Split notes into pages based on measured pixel heights
   static List<List<Map<String, String>>> _splitNotesIntoPages(List<Map<String, String>> allNotes) {
     if (allNotes.isEmpty) return [[]];
-    const int page1Capacity = 22;  // Page 1 has header+birth details
-    const int contCapacity = 32;   // Continuation pages have more space
     final pages = <List<Map<String, String>>>[];
     int i = 0;
 
-    // Page 1 — always include at least 1 note
-    int weight = 0;
+    // Page 1
+    double usedHeight = 0;
     final page1 = <Map<String, String>>[];
-    while (i < allNotes.length && weight + _noteWeight(allNotes[i]) <= page1Capacity) {
-      weight += _noteWeight(allNotes[i]);
-      page1.add(allNotes[i]);
-      i++;
-    }
-    // Safety: if no notes fit, add the first one anyway
-    if (page1.isEmpty && i < allNotes.length) {
+    while (i < allNotes.length) {
+      final h = _measureNoteHeight(allNotes[i]);
+      if (page1.isNotEmpty && usedHeight + h > _page1NotesHeight) break;
+      usedHeight += h;
       page1.add(allNotes[i]);
       i++;
     }
@@ -86,15 +98,12 @@ class TippaniPdfService {
 
     // Continuation pages
     while (i < allNotes.length) {
-      weight = 0;
+      usedHeight = 0;
       final page = <Map<String, String>>[];
-      while (i < allNotes.length && weight + _noteWeight(allNotes[i]) <= contCapacity) {
-        weight += _noteWeight(allNotes[i]);
-        page.add(allNotes[i]);
-        i++;
-      }
-      // If a single note exceeds capacity, add it alone to avoid infinite loop
-      if (page.isEmpty && i < allNotes.length) {
+      while (i < allNotes.length) {
+        final h = _measureNoteHeight(allNotes[i]);
+        if (page.isNotEmpty && usedHeight + h > _contNotesHeight) break;
+        usedHeight += h;
         page.add(allNotes[i]);
         i++;
       }
