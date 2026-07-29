@@ -1150,9 +1150,9 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
 
   void _loadMatchJyotishiDetails() async {
     final prefs = await SharedPreferences.getInstance();
-    _mJyotishiNameCtrl.text = prefs.getString('match_jyotishi_name') ?? '';
-    _mJyotishiAddressCtrl.text = prefs.getString('match_jyotishi_address') ?? '';
-    _mJyotishiPhoneCtrl.text = prefs.getString('match_jyotishi_phone') ?? '';
+    _mJyotishiNameCtrl.text = prefs.getString('match_jyotishi_name') ?? prefs.getString('default_jyotishi_name') ?? '';
+    _mJyotishiAddressCtrl.text = prefs.getString('match_jyotishi_address') ?? prefs.getString('default_jyotishi_address') ?? '';
+    _mJyotishiPhoneCtrl.text = prefs.getString('match_jyotishi_phone') ?? prefs.getString('default_jyotishi_phone') ?? '';
     final inv = prefs.getString('match_invocation');
     if (inv != null && inv.isNotEmpty) _mInvocationCtrl.text = inv;
     _mSelectedThemeId = prefs.getString('match_pdf_theme') ?? 'traditional';

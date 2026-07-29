@@ -29,13 +29,36 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final _tzCtrl = TextEditingController();
+  final _jyotishiNameCtrl = TextEditingController();
+  final _jyotishiAddressCtrl = TextEditingController();
+  final _jyotishiPhoneCtrl = TextEditingController();
   bool _geoLoading = false;
   String _geoStatus = '';
+
+  // SharedPreferences keys for default jyotishi details
+  static const String _kJyotishiName = 'default_jyotishi_name';
+  static const String _kJyotishiAddress = 'default_jyotishi_address';
+  static const String _kJyotishiPhone = 'default_jyotishi_phone';
 
   @override
   void initState() {
     super.initState();
     _tzCtrl.text = '${LocationService.tzOffset >= 0 ? '+' : ''}${LocationService.tzOffset}';
+    _loadJyotishiDefaults();
+  }
+
+  Future<void> _loadJyotishiDefaults() async {
+    final prefs = await SharedPreferences.getInstance();
+    _jyotishiNameCtrl.text = prefs.getString(_kJyotishiName) ?? '';
+    _jyotishiAddressCtrl.text = prefs.getString(_kJyotishiAddress) ?? '';
+    _jyotishiPhoneCtrl.text = prefs.getString(_kJyotishiPhone) ?? '';
+  }
+
+  Future<void> _saveJyotishiDefaults() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kJyotishiName, _jyotishiNameCtrl.text.trim());
+    await prefs.setString(_kJyotishiAddress, _jyotishiAddressCtrl.text.trim());
+    await prefs.setString(_kJyotishiPhone, _jyotishiPhoneCtrl.text.trim());
   }
 
   Future<void> _performGeocode(String placeName) async {
@@ -421,6 +444,75 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ));
                         }
                       },
+                    ),
+
+                    const SizedBox(height: 24),
+                    Divider(color: kBorder),
+                    const SizedBox(height: 24),
+
+                    // Default Jyotishi Details
+                    SectionTitle('${AppLocale.l('jyotishiSection')} / Astrologer Details'),
+                    const SizedBox(height: 8),
+                    Text('All PDFs will use these details by default',
+                      style: TextStyle(fontSize: 12, color: kMuted)),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: kBorder.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: kBorder.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: _jyotishiNameCtrl,
+                            onChanged: (_) => _saveJyotishiDefaults(),
+                            style: TextStyle(color: kText, fontSize: 14),
+                            decoration: InputDecoration(
+                              labelText: '${AppLocale.l('jyotishiName')} / Name',
+                              labelStyle: TextStyle(color: kMuted, fontSize: 13),
+                              prefixIcon: Icon(Icons.person, color: kPurple2, size: 20),
+                              filled: true, fillColor: kCard,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: kBorder)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: kBorder)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: _jyotishiAddressCtrl,
+                            onChanged: (_) => _saveJyotishiDefaults(),
+                            style: TextStyle(color: kText, fontSize: 14),
+                            maxLines: 2,
+                            decoration: InputDecoration(
+                              labelText: 'Address / ವಿಳಾಸ',
+                              labelStyle: TextStyle(color: kMuted, fontSize: 13),
+                              prefixIcon: Icon(Icons.location_on, color: kPurple2, size: 20),
+                              filled: true, fillColor: kCard,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: kBorder)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: kBorder)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: _jyotishiPhoneCtrl,
+                            onChanged: (_) => _saveJyotishiDefaults(),
+                            style: TextStyle(color: kText, fontSize: 14),
+                            keyboardType: TextInputType.phone,
+                            decoration: InputDecoration(
+                              labelText: '${AppLocale.l('jyotishiPhone')} / Phone',
+                              labelStyle: TextStyle(color: kMuted, fontSize: 13),
+                              prefixIcon: Icon(Icons.phone, color: kPurple2, size: 20),
+                              filled: true, fillColor: kCard,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: kBorder)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: kBorder)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
                     const SizedBox(height: 24),

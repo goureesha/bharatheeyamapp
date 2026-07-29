@@ -258,10 +258,10 @@ class _DashboardScreenState extends State<DashboardScreen>
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
       setState(() {
-        _jyotishiNameCtrl.text = prefs.getString('jyotishi_name') ?? '';
-        _jyotishiPhoneCtrl.text = prefs.getString('jyotishi_phone') ?? '';
+        _jyotishiNameCtrl.text = prefs.getString('jyotishi_name') ?? prefs.getString('default_jyotishi_name') ?? '';
+        _jyotishiPhoneCtrl.text = prefs.getString('jyotishi_phone') ?? prefs.getString('default_jyotishi_phone') ?? '';
         _tippaniInvocationCtrl.text = prefs.getString('tippani_invocation') ?? 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ';
-        _tippaniAddressCtrl.text = prefs.getString('tippani_address') ?? '';
+        _tippaniAddressCtrl.text = prefs.getString('tippani_address') ?? prefs.getString('default_jyotishi_address') ?? '';
       });
     }
   }

@@ -22,6 +22,10 @@ class BackupService {
     'bharatheeyam_profiles_v1',
     // Pooja lists
     'bharatheeyam_pooja_lists_v1',
+    // Default Jyotishi (astrologer) details
+    'default_jyotishi_name',
+    'default_jyotishi_address',
+    'default_jyotishi_phone',
     // Muhurta user rules (per event type)
     'user_muhurta_rules_vivaha',
     'user_muhurta_rules_upanayana',
