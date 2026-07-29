@@ -184,10 +184,8 @@ class KundaliResult {
 String formatGhati(double decVal) {
   final g = decVal.floor();
   final rem = decVal - g;
-  final v = (rem * 60).round();
-  final vActual = v == 60 ? 0 : v;
-  final gActual = v == 60 ? g + 1 : g;
-  return '$gActual.${vActual.toString().padLeft(2, '0')}';
+  final v = (rem * 60).floor();
+  return '$g.${v.toString().padLeft(2, '0')}';
 }
 
 String formatDeg(double deg) {
