@@ -46,69 +46,80 @@ class TippaniPdfService {
   static const double _pw = 793.0;
   static const double _ph = 1122.0;
 
-  /// Measure actual rendered height of a note (date + text + divider padding)
-  static double _measureNoteHeight(Map<String, String> note) {
-    final text = note['text'] ?? '';
-    final dateText = note['date'] ?? '';
-    // Available width for note text: page width - padding(24*2) - container padding(12*2) - bullet(6+8)
-    const double availableWidth = _pw - 48 - 24 - 14;
-
-    // Measure date line height
-    double dateH = 0;
-    if (dateText.isNotEmpty) {
-      final datePainter = TextPainter(
-        text: TextSpan(text: dateText, style: const TextStyle(fontSize: 9)),
-        textDirection: TextDirection.ltr,
-        maxLines: 1,
-      )..layout(maxWidth: availableWidth);
-      dateH = datePainter.height + 2; // +2 for SizedBox spacing
-    }
-
-    // Measure main text height
-    final textPainter = TextPainter(
-      text: TextSpan(text: text, style: const TextStyle(fontSize: 12, height: 1.4)),
-      textDirection: TextDirection.ltr,
-    )..layout(maxWidth: availableWidth);
-
-    // Total: date + text + divider padding(~11px per note)
-    return dateH + textPainter.height + 16;
-  }
-
+  // Available width for note text: page width - padding(24*2) - container padding(12*2) - bullet(6+8)
+  static const double _noteWidth = _pw - 48 - 24 - 14;
   // Available height for notes on each page type (in pixels)
-  static const double _page1NotesHeight = 740.0;  // after header + birth details + section title
+  static const double _page1NotesHeight = 740.0;  // after header + birth details
   static const double _contNotesHeight = 960.0;   // after mini header
 
-  /// Split notes into pages based on measured pixel heights
+  /// Measure height of a single line of text at font 12, lineHeight 1.4
+  static double _measureLineHeight(String line) {
+    final tp = TextPainter(
+      text: TextSpan(text: line, style: const TextStyle(fontSize: 12, height: 1.4)),
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: _noteWidth);
+    return tp.height;
+  }
+
+  /// Per-note overhead: date line (~14px) + bullet padding + divider (~16px)
+  static const double _noteOverhead = 30.0;
+
+  /// Split notes into pages, breaking long notes across pages by line.
+  /// Each page entry is a map with 'date' and 'text' keys.
   static List<List<Map<String, String>>> _splitNotesIntoPages(List<Map<String, String>> allNotes) {
     if (allNotes.isEmpty) return [[]];
+
     final pages = <List<Map<String, String>>>[];
-    int i = 0;
+    var currentPage = <Map<String, String>>[];
+    double remaining = _page1NotesHeight;
+    bool isFirstPage = true;
 
-    // Page 1
-    double usedHeight = 0;
-    final page1 = <Map<String, String>>[];
-    while (i < allNotes.length) {
-      final h = _measureNoteHeight(allNotes[i]);
-      if (page1.isNotEmpty && usedHeight + h > _page1NotesHeight) break;
-      usedHeight += h;
-      page1.add(allNotes[i]);
-      i++;
-    }
-    pages.add(page1);
+    for (final note in allNotes) {
+      final date = note['date'] ?? '';
+      final text = note['text'] ?? '';
+      final lines = text.split('\n');
 
-    // Continuation pages
-    while (i < allNotes.length) {
-      usedHeight = 0;
-      final page = <Map<String, String>>[];
-      while (i < allNotes.length) {
-        final h = _measureNoteHeight(allNotes[i]);
-        if (page.isNotEmpty && usedHeight + h > _contNotesHeight) break;
-        usedHeight += h;
-        page.add(allNotes[i]);
-        i++;
+      // Try to fit this note (or start of it) on the current page
+      double noteHeaderCost = _noteOverhead;
+      var linesForThisChunk = <String>[];
+      double chunkHeight = noteHeaderCost;
+
+      for (int li = 0; li < lines.length; li++) {
+        final lineH = _measureLineHeight(lines[li]);
+
+        if (chunkHeight + lineH <= remaining || linesForThisChunk.isEmpty) {
+          // Line fits on current page (or it's the first line — always add at least one)
+          linesForThisChunk.add(lines[li]);
+          chunkHeight += lineH;
+        } else {
+          // This line doesn't fit — flush current chunk to current page
+          currentPage.add({'date': linesForThisChunk == lines.take(linesForThisChunk.length).toList() ? date : '', 'text': linesForThisChunk.join('\n')});
+          pages.add(currentPage);
+
+          // Start new page
+          currentPage = <Map<String, String>>[];
+          remaining = isFirstPage ? _contNotesHeight : _contNotesHeight;
+          isFirstPage = false;
+
+          // Start new chunk with this line
+          linesForThisChunk = [lines[li]];
+          chunkHeight = _noteOverhead + lineH;
+        }
       }
-      pages.add(page);
+
+      // Add remaining lines of this note to current page
+      if (linesForThisChunk.isNotEmpty) {
+        final isStart = (linesForThisChunk.length == lines.length);
+        currentPage.add({'date': isStart ? date : '(ಮುಂದುವರಿಕೆ)', 'text': linesForThisChunk.join('\n')});
+        remaining -= chunkHeight;
+      }
     }
+
+    // Add last page if it has content
+    if (currentPage.isNotEmpty) {
+      pages.add(currentPage);
+    }
+
     return pages;
   }
 
