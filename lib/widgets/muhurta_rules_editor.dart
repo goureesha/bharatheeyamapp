@@ -72,7 +72,7 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
     widget.onRulesChanged?.call();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ಡೀಫಾಲ್ಟ್ ನಿಯಮಗಳಿಗೆ ಮರಳಿದೆ'), backgroundColor: kTeal, duration: Duration(seconds: 2)),
+        SnackBar(content: Text(AppLocale.l('mRulesReset')), backgroundColor: kTeal, duration: Duration(seconds: 2)),
       );
     }
   }
@@ -91,13 +91,13 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
                 Icon(_isExpanded ? Icons.tune : Icons.tune, color: kPurple1, size: 20),
                 const SizedBox(width: 8),
                 Expanded(child: Text(
-                  'ನಿಯಮಗಳನ್ನು ಸಂಪಾದಿಸಿ',
+                  AppLocale.l('mEditRules'),
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kPurple1),
                 )),
                 if (_isExpanded)
                   TextButton(
                     onPressed: _resetToDefaults,
-                    child: Text('ಡೀಫಾಲ್ಟ್', style: TextStyle(fontSize: 11, color: Colors.orange)),
+                    child: Text(AppLocale.l('mDefault'), style: TextStyle(fontSize: 11, color: Colors.orange)),
                   ),
                 Icon(_isExpanded ? Icons.expand_less : Icons.expand_more, color: kMuted),
               ],
@@ -110,12 +110,12 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
             const SizedBox(height: 12),
 
             // ── 1. Tithi ──
-            _buildSectionTitle('ತಿಥಿ', Icons.calendar_today),
+            _buildSectionTitle(AppLocale.l('mTithi'), Icons.calendar_today),
             const SizedBox(height: 6),
             _buildChipGroup(
               itemCount: 30,
-              labelBuilder: (i) => '${knTithi[i]}${i < 15 ? " ಶು" : " ಕೃ"}',
-              shortLabelBuilder: (i) => '${(i % 15) + 1}${i < 15 ? "ಶು" : "ಕೃ"}',
+              labelBuilder: (i) => '${knTithi[i]}${i < 15 ? " ${AppLocale.l('mShukla')}" : " ${AppLocale.l('mKrishna')}"}',
+              shortLabelBuilder: (i) => '${(i % 15) + 1}${i < 15 ? AppLocale.l('mShukla') : AppLocale.l('mKrishna')}',
               selectedIndices: _rules.allowedTithis,
               onChanged: (selected) {
                 setState(() => _rules.allowedTithis = selected.isEmpty ? null : selected);
@@ -125,7 +125,7 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
             const SizedBox(height: 14),
 
             // ── 2. Nakshatra ──
-            _buildSectionTitle('ನಕ್ಷತ್ರ', Icons.star),
+            _buildSectionTitle(AppLocale.l('mNakshatra'), Icons.star),
             const SizedBox(height: 6),
             _buildChipGroup(
               itemCount: 27,
@@ -140,7 +140,7 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
             const SizedBox(height: 14),
 
             // ── 3. Vara ──
-            _buildSectionTitle('ವಾರ', Icons.today),
+            _buildSectionTitle(AppLocale.l('mVara'), Icons.today),
             const SizedBox(height: 6),
             _buildChipGroup(
               itemCount: 7,
@@ -155,7 +155,7 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
             const SizedBox(height: 14),
 
             // ── 4. Yoga (blocked) ──
-            _buildSectionTitle('ಯೋಗ (ನಿಷೇಧಿತ)', Icons.block),
+            _buildSectionTitle(AppLocale.l('mBlockedYogas'), Icons.block),
             const SizedBox(height: 6),
             _buildChipGroup(
               itemCount: 27,
@@ -171,38 +171,38 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
             const SizedBox(height: 14),
 
             // ── 5. Toggle switches ──
-            _buildSectionTitle('ಇತರ ನಿಯಮಗಳು', Icons.settings),
+            _buildSectionTitle(AppLocale.l('mOtherRules'), Icons.settings),
             const SizedBox(height: 6),
 
-            _buildToggle('ವಿಷ್ಟಿ/ಭದ್ರಾ ಕರಣ ತಪ್ಪಿಸಿ', _rules.avoidVishti, (v) {
+            _buildToggle(AppLocale.l('mAvoidVishti'), _rules.avoidVishti, (v) {
               setState(() => _rules.avoidVishti = v);
               _onChanged();
             }),
-            _buildToggle('ಶುಕ್ಲ ಪಕ್ಷ ಮಾತ್ರ', _rules.requireShukla, (v) {
+            _buildToggle(AppLocale.l('mShuklaOnly'), _rules.requireShukla, (v) {
               setState(() => _rules.requireShukla = v);
               _onChanged();
             }),
-            _buildToggle('ಉತ್ತರಾಯಣ ಅಗತ್ಯ', _rules.requireUttarayana, (v) {
+            _buildToggle(AppLocale.l('mNeedUttarayana'), _rules.requireUttarayana, (v) {
               setState(() => _rules.requireUttarayana = v);
               _onChanged();
             }),
-            _buildToggle('ದಗ್ಧ ಯೋಗ ತಪ್ಪಿಸಿ', _rules.blockDagdhaYoga, (v) {
+            _buildToggle(AppLocale.l('mAvoidDagdha'), _rules.blockDagdhaYoga, (v) {
               setState(() => _rules.blockDagdhaYoga = v);
               _onChanged();
             }),
-            _buildToggle('ಗುರು ಅಸ್ತ ತಪ್ಪಿಸಿ', _rules.blockGuruAsta, (v) {
+            _buildToggle(AppLocale.l('mAvoidGuruAsta'), _rules.blockGuruAsta, (v) {
               setState(() => _rules.blockGuruAsta = v);
               _onChanged();
             }),
-            _buildToggle('ಶುಕ್ರ ಅಸ್ತ ತಪ್ಪಿಸಿ', _rules.blockShukraAsta, (v) {
+            _buildToggle(AppLocale.l('mAvoidShukraAsta'), _rules.blockShukraAsta, (v) {
               setState(() => _rules.blockShukraAsta = v);
               _onChanged();
             }),
-            _buildToggle('ಅಭಿಜಿತ್ ಮುಹೂರ್ತ ಪರಿಗಣಿಸಿ', _rules.considerAbhijit, (v) {
+            _buildToggle(AppLocale.l('mConsiderAbhijit'), _rules.considerAbhijit, (v) {
               setState(() => _rules.considerAbhijit = v);
               _onChanged();
             }),
-            _buildToggle('ತಾರಾ ಬಲ ಅಗತ್ಯ', _rules.requireTaraBala, (v) {
+            _buildToggle(AppLocale.l('mNeedTaraBala'), _rules.requireTaraBala, (v) {
               setState(() => _rules.requireTaraBala = v);
               _onChanged();
             }),
@@ -210,16 +210,16 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
               const SizedBox(height: 6),
               Padding(
                 padding: const EdgeInsets.only(left: 8),
-                child: Text('ಅನುಮತಿಸಿದ ತಾರೆಗಳು:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7))),
+                child: Text(AppLocale.l('mAllowedTaras'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7))),
               ),
               const SizedBox(height: 4),
               Wrap(
                 spacing: 6, runSpacing: 6,
                 children: List.generate(9, (i) {
-                  const taraLabels = [
-                    'ಜನ್ಮ', 'ಸಂಪತ್', 'ವಿಪತ್',
-                    'ಕ್ಷೇಮ', 'ಪ್ರತ್ಯಕ್', 'ಸಾಧಕ',
-                    'ವಧ', 'ಮಿತ್ರ', 'ಪ.ಮಿತ್ರ',
+                  final taraLabels = [
+                    AppLocale.l('tJanma'), AppLocale.l('tSampat'), AppLocale.l('tVipat'),
+                    AppLocale.l('tKshema'), AppLocale.l('tPratyak'), AppLocale.l('tSadhaka'),
+                    AppLocale.l('tVadha'), AppLocale.l('tMitra'), AppLocale.l('tParaMitra'),
                   ];
                   const defaultGood = [1, 3, 5, 7, 8];
                   final selected = _rules.allowedTaras.contains(i);
@@ -244,32 +244,32 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
               ),
               const SizedBox(height: 4),
             ],
-            _buildToggle('ಗುರು ಬಲ ಅಗತ್ಯ', _rules.requireGuruBala, (v) {
+            _buildToggle(AppLocale.l('mNeedGuruBala'), _rules.requireGuruBala, (v) {
               setState(() => _rules.requireGuruBala = v);
               _onChanged();
             }),
-            _buildToggle('ಲಗ್ನಕ್ಕೆ ಗುರು ಅನುಕೂಲ', _rules.requireGuruAnukoolaForLagna, (v) {
+            _buildToggle(AppLocale.l('mGuruFavorLagna'), _rules.requireGuruAnukoolaForLagna, (v) {
               setState(() => _rules.requireGuruAnukoolaForLagna = v);
               _onChanged();
             }),
-            _buildToggle('ಪೂರ್ಣ ದಿನ ಲಗ್ನ ಸ್ಕ್ಯಾನ್', _rules.fullDayScan, (v) {
+            _buildToggle(AppLocale.l('mFullDayScan'), _rules.fullDayScan, (v) {
               setState(() => _rules.fullDayScan = v);
               _onChanged();
             }),
             const SizedBox(height: 14),
 
             // ── 6. Lagna Shuddhi ──
-            _buildSectionTitle('ಲಗ್ನ ಶುದ್ಧಿ ಅಗತ್ಯಗಳು', Icons.verified),
+            _buildSectionTitle(AppLocale.l('mLagnaShuddhiReqs'), Icons.verified),
             const SizedBox(height: 6),
             Wrap(
               spacing: 6, runSpacing: 6,
               children: ShuddhiType.values.map((s) {
                 final labels = {
-                  ShuddhiType.lagna: 'ಲಗ್ನ',
-                  ShuddhiType.saptama: 'ಸಪ್ತಮ',
-                  ShuddhiType.ashtama: 'ಅಷ್ಟಮ',
-                  ShuddhiType.dashama: 'ದಶಮ',
-                  ShuddhiType.chandraSaptama: 'ಚಂದ್ರ ಸಪ್ತಮ',
+                  ShuddhiType.lagna: AppLocale.l('mLagna'),
+                  ShuddhiType.saptama: AppLocale.l('mSaptama'),
+                  ShuddhiType.ashtama: AppLocale.l('mAshtama'),
+                  ShuddhiType.dashama: AppLocale.l('mDashama'),
+                  ShuddhiType.chandraSaptama: AppLocale.l('mChandraSaptama'),
                 };
                 final selected = _rules.requiredShuddhis.contains(s);
                 return FilterChip(
@@ -295,7 +295,7 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
             const SizedBox(height: 14),
 
             // ── 7. Lagna Rashi ──
-            _buildSectionTitle('ಅನುಮತಿಸಿದ ಲಗ್ನ ರಾಶಿ', Icons.grid_view),
+            _buildSectionTitle(AppLocale.l('mAllowedLagnaRashi'), Icons.grid_view),
             const SizedBox(height: 6),
             _buildChipGroup(
               itemCount: 12,
