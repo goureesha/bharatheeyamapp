@@ -1,11 +1,12 @@
 """
 Bharatheeyam Panchanga Data Generator
 Generates .bdat files for the Bharatheeyam app.
-Uses Swiss Ephemeris (pyswisseph) for accurate calculations.
+Uses PyEphem for astronomical calculations.
 
 Usage:
-  pip install pyswisseph
-  python generate_bdat.py --zone Bengaluru --lat 12.97 --lon 77.59 --years 20
+  pip install ephem
+  python generate_bdat.py --zone Bengaluru --years 20
+  python generate_bdat.py --all-zones --years 20
 """
 
 import argparse
@@ -15,18 +16,33 @@ import math
 import os
 from datetime import datetime, timedelta
 
-try:
-    import swisseph as swe
-except ImportError:
-    print("ERROR: pyswisseph not installed. Run: pip install pyswisseph")
-    exit(1)
+import ephem
 
-# ─── Constants ───────────────────────────────────────────────
+# ─── Ayanamsha (Lahiri) ─────────────────────────────────────
+
+def lahiri_ayanamsha(jd):
+    """Calculate Lahiri Ayanamsha for a given Julian Day.
+    Approximation using IAU 2006 precession model.
+    Reference epoch J2000.0 = JD 2451545.0, ayanamsha = 23.8530°
+    Rate ~50.29 arcseconds per year.
+    """
+    T = (jd - 2451545.0) / 36525.0  # Julian centuries from J2000
+    # Lahiri ayanamsha at J2000 ≈ 23.853°, rate ≈ 50.29"/year
+    ayan = 23.853 + (50.29 * T * 100) / 3600.0
+    return ayan
+
+def tropical_to_sidereal(tropical_lon, jd):
+    """Convert tropical longitude to sidereal (Lahiri)"""
+    ayan = lahiri_ayanamsha(jd)
+    sid = (tropical_lon - ayan + 360) % 360
+    return sid
+
+# ─── Kannada names ───────────────────────────────────────────
 
 KN_TITHI = [
     'ಪಾಡ್ಯಮಿ', 'ಬಿದಿಗೆ', 'ತದಿಗೆ', 'ಚವತಿ', 'ಪಂಚಮಿ',
     'ಷಷ್ಠೀ', 'ಸಪ್ತಮೀ', 'ಅಷ್ಟಮೀ', 'ನವಮೀ', 'ದಶಮೀ',
-    'ಏಕಾದಶೀ', 'ದ್ವಾದಶೀ', 'ತ್ರಯೋದಶೀ', 'ಚತುರ್ದಶೀ', 'ಹುಣ್ಣಿಮೆ/ಅಮಾವಾಸ್ಯೆ',
+    'ಏಕಾದಶೀ', 'ದ್ವಾದಶೀ', 'ತ್ರಯೋದಶೀ', 'ಚತುರ್ದಶೀ', 'ಹುಣ್ಣಿಮೆ',
     'ಪಾಡ್ಯಮಿ', 'ಬಿದಿಗೆ', 'ತದಿಗೆ', 'ಚವತಿ', 'ಪಂಚಮಿ',
     'ಷಷ್ಠೀ', 'ಸಪ್ತಮೀ', 'ಅಷ್ಟಮೀ', 'ನವಮೀ', 'ದಶಮೀ',
     'ಏಕಾದಶೀ', 'ದ್ವಾದಶೀ', 'ತ್ರಯೋದಶೀ', 'ಚತುರ್ದಶೀ', 'ಅಮಾವಾಸ್ಯೆ',
@@ -62,196 +78,162 @@ KN_RASHI = [
     'ತುಲಾ', 'ವೃಶ್ಚಿಕ', 'ಧನು', 'ಮಕರ', 'ಕುಂಭ', 'ಮೀನ',
 ]
 
-# ─── Swiss Ephemeris helpers ─────────────────────────────────
+# ─── PyEphem Helpers ─────────────────────────────────────────
 
-def init_swe():
-    """Initialize Swiss Ephemeris with Lahiri ayanamsha"""
-    swe.set_sid_mode(swe.SIDM_LAHIRI)
+def get_observer(lat, lon, date_obj):
+    """Create PyEphem observer"""
+    obs = ephem.Observer()
+    obs.lat = str(lat)
+    obs.lon = str(lon)
+    obs.date = date_obj
+    obs.elevation = 0
+    obs.pressure = 0  # No atmospheric refraction (user request!)
+    obs.horizon = '0'  # Geometric horizon
+    return obs
 
-def jd_from_date(year, month, day, hour=0.0):
-    """Get Julian Day from date"""
-    return swe.julday(year, month, day, hour)
+def get_planet_lon(body, date_ephem, jd):
+    """Get sidereal longitude of a body at given ephem date"""
+    body.compute(date_ephem)
+    trop_lon_deg = math.degrees(float(body.ra))
+    # Actually, ephem gives ecliptic longitude via body.hlong or we need to compute
+    # For Sun: use body.ra is RA not ecliptic longitude
+    # Use ephem's ecliptic coordinates
+    eq = ephem.Equatorial(body.ra, body.dec, epoch=date_ephem)
+    ecl = ephem.Ecliptic(eq, epoch=date_ephem)
+    trop_lon = math.degrees(float(ecl.lon))
+    return tropical_to_sidereal(trop_lon, jd)
 
-def get_sidereal_lon(jd, planet):
-    """Get sidereal longitude of a planet"""
-    flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL
-    result = swe.calc_ut(jd, planet, flags)
-    return result[0][0]  # longitude
-
-def get_tropical_lon(jd, planet):
-    """Get tropical longitude of a planet"""
-    flags = swe.FLG_SWIEPH
-    result = swe.calc_ut(jd, planet, flags)
-    return result[0][0]
-
-def find_sunrise_sunset(jd, lat, lon, tz_offset=5.5):
-    """
-    Find sunrise and sunset for a date.
-    Returns (sunrise_jd, sunset_jd) or approximate if rise_trans fails.
-    Uses geometric horizon (0 degrees, no refraction).
-    """
-    # Local midnight in UT
-    local_midnight_ut = jd - (tz_offset / 24.0)
+def find_sunrise_sunset(lat, lon, year, month, day, tz_offset=5.5):
+    """Find sunrise and sunset times. Returns (sunrise_str, sunset_str)"""
+    obs = ephem.Observer()
+    obs.lat = str(lat)
+    obs.lon = str(lon)
+    obs.elevation = 0
+    obs.pressure = 0  # No refraction
+    obs.horizon = '-0:34'  # Disc center with standard semi-diameter
+    # Actually user wants NO refraction, geometric horizon = 0 degrees
+    obs.horizon = '0'
+    
+    # Set to midnight UTC of the given date
+    obs.date = f'{year}/{month}/{day} 00:00:00'
+    
+    sun = ephem.Sun()
     
     try:
-        # Sunrise - geometric (no refraction)
-        rise_result = swe.rise_trans(
-            local_midnight_ut, swe.SUN,
-            geopos=(lon, lat, 0),
-            rsmi=swe.CALC_RISE | swe.BIT_DISC_CENTER | swe.BIT_NO_REFRACTION
-        )
-        sunrise_jd = rise_result[1][0]
+        rise = obs.next_rising(sun, use_center=True)
+        rise_local = ephem.Date(rise + tz_offset / 24.0)
+        rise_tuple = ephem.Date(rise_local).tuple()
+        rise_str = f"{int(rise_tuple[3]):02d}:{int(rise_tuple[4]):02d}"
     except:
-        # Fallback: approximate
-        sunrise_jd = local_midnight_ut + 0.25  # ~6 AM
+        rise_str = "06:00"
+        rise = obs.date + 0.25
     
     try:
-        # Sunset
-        set_result = swe.rise_trans(
-            local_midnight_ut, swe.SUN,
-            geopos=(lon, lat, 0),
-            rsmi=swe.CALC_SET | swe.BIT_DISC_CENTER | swe.BIT_NO_REFRACTION
-        )
-        sunset_jd = set_result[1][0]
+        sett = obs.next_setting(sun, use_center=True)
+        set_local = ephem.Date(sett + tz_offset / 24.0)
+        set_tuple = ephem.Date(set_local).tuple()
+        set_str = f"{int(set_tuple[3]):02d}:{int(set_tuple[4]):02d}"
     except:
-        sunset_jd = local_midnight_ut + 0.75  # ~6 PM
+        set_str = "18:00"
+        sett = obs.date + 0.75
     
-    return sunrise_jd, sunset_jd
+    return rise_str, set_str, rise
 
-def jd_to_time_str(jd, tz_offset=5.5):
-    """Convert JD to HH:MM time string in local time"""
-    local_jd = jd + (tz_offset / 24.0)
-    frac = (local_jd + 0.5) % 1.0
-    hours = frac * 24.0
-    h = int(hours)
-    m = int((hours - h) * 60)
-    return f"{h:02d}:{m:02d}"
+def jd_from_ephem(ephem_date):
+    """Convert PyEphem date to Julian Day"""
+    return float(ephem_date) + 2415020.0
 
-def is_combust(jd, planet):
-    """Check if a planet is combust (too close to Sun)"""
-    sun_lon = get_tropical_lon(jd, swe.SUN)
-    planet_lon = get_tropical_lon(jd, planet)
-    diff = abs(sun_lon - planet_lon)
-    if diff > 180:
-        diff = 360 - diff
-    
-    # Combustion degrees
-    if planet == swe.JUPITER:
-        return diff < 11  # Jupiter combust within 11 degrees
-    elif planet == swe.VENUS:
-        return diff < 10  # Venus combust within 10 degrees
-    return False
-
-def find_tithi_end(jd_start, tithi_idx, tz_offset=5.5):
-    """Find when the current tithi ends (approximate)"""
-    # Average tithi duration ~0.98 days
-    jd = jd_start
-    for _ in range(50):
-        sun_lon = get_sidereal_lon(jd, swe.SUN)
-        moon_lon = get_sidereal_lon(jd, swe.MOON)
-        diff = (moon_lon - sun_lon + 360) % 360
-        cur_tithi = int(diff / 12)
-        if cur_tithi != tithi_idx:
-            # Binary search for exact transition
-            lo, hi = jd - 0.05, jd
-            for _ in range(20):
-                mid = (lo + hi) / 2
-                s = get_sidereal_lon(mid, swe.SUN)
-                m = get_sidereal_lon(mid, swe.MOON)
-                d = (m - s + 360) % 360
-                t = int(d / 12)
-                if t == tithi_idx:
-                    lo = mid
-                else:
-                    hi = mid
-            return jd_to_time_str(hi, tz_offset)
-        jd += 0.05  # Step ~72 minutes
-    return '--:--'
-
-def find_nak_end(jd_start, nak_idx, tz_offset=5.5):
-    """Find when the current nakshatra ends (approximate)"""
-    nak_span = 360.0 / 27.0
-    jd = jd_start
-    for _ in range(50):
-        moon_lon = get_sidereal_lon(jd, swe.MOON)
-        cur_nak = int(moon_lon / nak_span) % 27
-        if cur_nak != nak_idx:
-            lo, hi = jd - 0.05, jd
-            for _ in range(20):
-                mid = (lo + hi) / 2
-                m = get_sidereal_lon(mid, swe.MOON)
-                t = int(m / nak_span) % 27
-                if t == nak_idx:
-                    lo = mid
-                else:
-                    hi = mid
-            return jd_to_time_str(hi, tz_offset)
-        jd += 0.05
-    return '--:--'
-
-# ─── Main computation ────────────────────────────────────────
+def ephem_date_to_time_str(ed, tz_offset=5.5):
+    """Convert ephem date to local time string"""
+    local = ephem.Date(ed + tz_offset / 24.0)
+    t = local.tuple()
+    return f"{int(t[3]):02d}:{int(t[4]):02d}"
 
 def compute_day(year, month, day, lat, lon, tz_offset=5.5):
     """Compute all panchanga data for a single day"""
-    jd_noon = jd_from_date(year, month, day, 12.0)
-    
-    # Sunrise/Sunset
-    sr_jd, ss_jd = find_sunrise_sunset(jd_noon, lat, lon, tz_offset)
-    sunrise_str = jd_to_time_str(sr_jd, tz_offset)
-    sunset_str = jd_to_time_str(ss_jd, tz_offset)
+    # Sunrise
+    rise_str, set_str, rise_ephem = find_sunrise_sunset(lat, lon, year, month, day, tz_offset)
     
     # Compute at sunrise
-    sun_lon = get_sidereal_lon(sr_jd, swe.SUN)
-    moon_lon = get_sidereal_lon(sr_jd, swe.MOON)
-    jup_lon = get_sidereal_lon(sr_jd, swe.JUPITER)
+    jd = jd_from_ephem(rise_ephem)
     
-    # Tithi (0-29)
+    sun = ephem.Sun()
+    moon = ephem.Moon()
+    jupiter = ephem.Jupiter()
+    venus = ephem.Venus()
+    
+    sun.compute(rise_ephem)
+    moon.compute(rise_ephem)
+    jupiter.compute(rise_ephem)
+    venus.compute(rise_ephem)
+    
+    # Ecliptic longitudes (tropical)
+    sun_ecl = ephem.Ecliptic(ephem.Equatorial(sun.ra, sun.dec, epoch=rise_ephem), epoch=rise_ephem)
+    moon_ecl = ephem.Ecliptic(ephem.Equatorial(moon.ra, moon.dec, epoch=rise_ephem), epoch=rise_ephem)
+    jup_ecl = ephem.Ecliptic(ephem.Equatorial(jupiter.ra, jupiter.dec, epoch=rise_ephem), epoch=rise_ephem)
+    ven_ecl = ephem.Ecliptic(ephem.Equatorial(venus.ra, venus.dec, epoch=rise_ephem), epoch=rise_ephem)
+    
+    sun_trop = math.degrees(float(sun_ecl.lon))
+    moon_trop = math.degrees(float(moon_ecl.lon))
+    jup_trop = math.degrees(float(jup_ecl.lon))
+    ven_trop = math.degrees(float(ven_ecl.lon))
+    
+    # Convert to sidereal
+    sun_lon = tropical_to_sidereal(sun_trop, jd)
+    moon_lon = tropical_to_sidereal(moon_trop, jd)
+    jup_lon = tropical_to_sidereal(jup_trop, jd)
+    ven_lon = tropical_to_sidereal(ven_trop, jd)
+    
+    # ─── Tithi (0-29) ───
     tithi_diff = (moon_lon - sun_lon + 360) % 360
     tithi_idx = int(tithi_diff / 12)
+    if tithi_idx >= 30: tithi_idx = 29
     tithi_name = KN_TITHI[tithi_idx]
     
-    # Nakshatra (0-26)
+    # ─── Nakshatra (0-26) ───
     nak_span = 360.0 / 27.0
     nak_idx = int(moon_lon / nak_span) % 27
     nak_name = KN_NAK[nak_idx]
     nak_percent = (moon_lon % nak_span) / nak_span
-    pada = int(nak_percent * 4) + 1
-    if pada > 4: pada = 4
+    pada = min(int(nak_percent * 4) + 1, 4)
     
-    # Yoga (0-26)
+    # ─── Yoga (0-26) ───
     yoga_val = (sun_lon + moon_lon) % 360
     yoga_idx = int(yoga_val / nak_span) % 27
     yoga_name = KN_YOGA[yoga_idx]
     
-    # Karana
-    karana_val = tithi_idx * 2 + int((tithi_diff % 12) / 6)
+    # ─── Karana ───
+    karana_val = tithi_idx * 2 + (1 if (tithi_diff % 12) >= 6 else 0)
     if karana_val >= 57:
-        fixed_karanas = [KN_KARANA[7], KN_KARANA[8], KN_KARANA[9], KN_KARANA[10]]
-        karana_name = fixed_karanas[karana_val - 57] if (karana_val - 57) < 4 else KN_KARANA[0]
+        fixed = [KN_KARANA[7], KN_KARANA[8], KN_KARANA[9], KN_KARANA[10]]
+        karana_name = fixed[karana_val - 57] if (karana_val - 57) < 4 else KN_KARANA[0]
     else:
         karana_name = KN_KARANA[karana_val % 7]
     
-    # Vara
+    # ─── Vara ───
     dt = datetime(year, month, day)
-    vara_idx = dt.weekday()  # Monday=0
-    # Convert to Sun=0 system
-    vara_idx = (vara_idx + 1) % 7
+    vara_idx = (dt.weekday() + 1) % 7  # Mon=0 → Sun=0
     vara_name = KN_VARA[vara_idx]
     
-    # Rashi
+    # ─── Rashi ───
     sun_rashi = int(sun_lon / 30) % 12
     moon_rashi = int(moon_lon / 30) % 12
     jup_rashi = int(jup_lon / 30) % 12
     
-    # Combustion
-    guru_combust = is_combust(sr_jd, swe.JUPITER)
-    venus_combust = is_combust(sr_jd, swe.VENUS)
+    # ─── Combustion ───
+    sun_ven_diff = abs(sun_trop - ven_trop)
+    if sun_ven_diff > 180: sun_ven_diff = 360 - sun_ven_diff
+    venus_combust = sun_ven_diff < 10
     
-    # End times
-    tithi_end = find_tithi_end(sr_jd, tithi_idx, tz_offset)
-    nak_end = find_nak_end(sr_jd, nak_idx, tz_offset)
+    sun_jup_diff = abs(sun_trop - jup_trop)
+    if sun_jup_diff > 180: sun_jup_diff = 360 - sun_jup_diff
+    guru_combust = sun_jup_diff < 11
     
-    # Chandra Rashi name
+    # ─── End times (approximate using stepping) ───
+    tithi_end = _find_tithi_end(rise_ephem, tithi_idx, jd, tz_offset)
+    nak_end = _find_nak_end(rise_ephem, nak_idx, jd, tz_offset)
+    
+    # ─── Chandra Rashi ───
     chandra_rashi = KN_RASHI[moon_rashi]
     
     # Compact format matching CachedPanchangaDay.toCompact()
@@ -265,7 +247,7 @@ def compute_day(year, month, day, lat, lon, tz_offset=5.5):
         moon_rashi, jup_rashi, sun_rashi,
         1 if guru_combust else 0,
         1 if venus_combust else 0,
-        sunrise_str, sunset_str,
+        rise_str, set_str,
         round(sun_lon * 100) / 100.0,
         round(moon_lon * 100) / 100.0,
         round(jup_lon * 100) / 100.0,
@@ -274,10 +256,81 @@ def compute_day(year, month, day, lat, lon, tz_offset=5.5):
         chandra_rashi,
     ]
 
+def _get_sid_lon(body, ephem_date, jd):
+    """Get sidereal longitude at a given ephem date"""
+    body.compute(ephem_date)
+    ecl = ephem.Ecliptic(ephem.Equatorial(body.ra, body.dec, epoch=ephem_date), epoch=ephem_date)
+    trop = math.degrees(float(ecl.lon))
+    return tropical_to_sidereal(trop, jd)
+
+def _find_tithi_end(start_ephem, tithi_idx, jd_start, tz_offset):
+    """Find when current tithi ends"""
+    ed = start_ephem
+    sun = ephem.Sun()
+    moon = ephem.Moon()
+    step = 1.0 / 24.0  # 1 hour
+    
+    for _ in range(50):
+        ed_next = ephem.Date(ed + step)
+        jd_next = jd_from_ephem(ed_next)
+        
+        s_lon = _get_sid_lon(sun, ed_next, jd_next)
+        m_lon = _get_sid_lon(moon, ed_next, jd_next)
+        diff = (m_lon - s_lon + 360) % 360
+        cur = int(diff / 12)
+        if cur >= 30: cur = 29
+        
+        if cur != tithi_idx:
+            # Binary search
+            lo, hi = ed, ed_next
+            for _ in range(20):
+                mid = ephem.Date((float(lo) + float(hi)) / 2)
+                jd_m = jd_from_ephem(mid)
+                s = _get_sid_lon(sun, mid, jd_m)
+                m = _get_sid_lon(moon, mid, jd_m)
+                d = (m - s + 360) % 360
+                t = int(d / 12)
+                if t >= 30: t = 29
+                if t == tithi_idx:
+                    lo = mid
+                else:
+                    hi = mid
+            return ephem_date_to_time_str(hi, tz_offset)
+        ed = ed_next
+    return '--:--'
+
+def _find_nak_end(start_ephem, nak_idx, jd_start, tz_offset):
+    """Find when current nakshatra ends"""
+    ed = start_ephem
+    moon = ephem.Moon()
+    nak_span = 360.0 / 27.0
+    step = 1.0 / 24.0
+    
+    for _ in range(50):
+        ed_next = ephem.Date(ed + step)
+        jd_next = jd_from_ephem(ed_next)
+        m_lon = _get_sid_lon(moon, ed_next, jd_next)
+        cur = int(m_lon / nak_span) % 27
+        
+        if cur != nak_idx:
+            lo, hi = ed, ed_next
+            for _ in range(20):
+                mid = ephem.Date((float(lo) + float(hi)) / 2)
+                jd_m = jd_from_ephem(mid)
+                m = _get_sid_lon(moon, mid, jd_m)
+                t = int(m / nak_span) % 27
+                if t == nak_idx:
+                    lo = mid
+                else:
+                    hi = mid
+            return ephem_date_to_time_str(hi, tz_offset)
+        ed = ed_next
+    return '--:--'
+
+# ─── Main ────────────────────────────────────────────────────
+
 def generate_bdat(zone_name, lat, lon, years, tz_offset=5.5, output_dir='.'):
     """Generate .bdat file for a zone"""
-    init_swe()
-    
     now = datetime.now()
     start = datetime(now.year, now.month, now.day)
     end = start + timedelta(days=365 * years)
@@ -285,25 +338,29 @@ def generate_bdat(zone_name, lat, lon, years, tz_offset=5.5, output_dir='.'):
     total_days = (end - start).days + 1
     days = []
     
-    print(f"\nGenerating panchanga data for {zone_name}")
-    print(f"  Location: {lat}N, {lon}E")
-    print(f"  Period: {start.strftime('%Y-%m-%d')} to {end.strftime('%Y-%m-%d')}")
+    print(f"\n{'='*60}")
+    print(f"  Generating: {zone_name}")
+    print(f"  Location:   {lat}°N, {lon}°E")
+    print(f"  Period:     {start.strftime('%Y-%m-%d')} to {end.strftime('%Y-%m-%d')}")
     print(f"  Total days: {total_days}")
-    print()
+    print(f"{'='*60}")
     
     cur = start
     count = 0
+    errors = 0
     while cur <= end:
         try:
             day_data = compute_day(cur.year, cur.month, cur.day, lat, lon, tz_offset)
             days.append(day_data)
         except Exception as e:
-            print(f"  ERROR on {cur}: {e}")
+            errors += 1
+            if errors <= 5:
+                print(f"  ERROR on {cur}: {e}")
         
         count += 1
-        if count % 100 == 0:
+        if count % 500 == 0:
             pct = (count / total_days) * 100
-            print(f"  [{pct:5.1f}%] {count}/{total_days} days processed...")
+            print(f"  [{pct:5.1f}%] {count}/{total_days} days...")
         
         cur += timedelta(days=1)
     
@@ -331,10 +388,9 @@ def generate_bdat(zone_name, lat, lon, years, tz_offset=5.5, output_dir='.'):
     raw_mb = len(json_str.encode('utf-8')) / (1024 * 1024)
     comp_mb = len(compressed) / (1024 * 1024)
     
-    print(f"\n  DONE!")
-    print(f"  Days generated: {len(days)}")
-    print(f"  Raw JSON size: {raw_mb:.2f} MB")
-    print(f"  Compressed size: {comp_mb:.2f} MB")
+    print(f"\n  ✅ DONE!")
+    print(f"  Days: {len(days)} | Errors: {errors}")
+    print(f"  Raw: {raw_mb:.2f} MB | Compressed: {comp_mb:.2f} MB")
     print(f"  File: {filepath}")
     
     return filepath
@@ -342,32 +398,33 @@ def generate_bdat(zone_name, lat, lon, years, tz_offset=5.5, output_dir='.'):
 # ─── Karnataka Zones ─────────────────────────────────────────
 
 KARNATAKA_ZONES = {
-    'Kalaburagi': (17.33, 76.83),    # Zone 1: North-East
-    'Bengaluru':  (12.97, 77.59),    # Zone 2: South-East
-    'Mysuru':     (12.30, 76.66),    # Zone 3: Central
-    'Shivamogga': (13.93, 75.57),    # Zone 4: West
-    'Mangaluru':  (12.87, 74.88),    # Zone 5: Coastal
+    'Kalaburagi': (17.33, 76.83),
+    'Bengaluru':  (12.97, 77.59),
+    'Mysuru':     (12.30, 76.66),
+    'Shivamogga': (13.93, 75.57),
+    'Mangaluru':  (12.87, 74.88),
 }
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate Bharatheeyam Panchanga .bdat files')
-    parser.add_argument('--zone', type=str, default='Bengaluru', help='Zone name (city)')
-    parser.add_argument('--lat', type=float, help='Latitude (overrides zone default)')
-    parser.add_argument('--lon', type=float, help='Longitude (overrides zone default)')
-    parser.add_argument('--years', type=int, default=20, help='Number of years to generate')
-    parser.add_argument('--tz', type=float, default=5.5, help='Timezone offset from UTC')
-    parser.add_argument('--all-zones', action='store_true', help='Generate all 5 Karnataka zones')
+    parser.add_argument('--zone', type=str, default='Bengaluru', help='Zone name')
+    parser.add_argument('--lat', type=float, help='Latitude')
+    parser.add_argument('--lon', type=float, help='Longitude')
+    parser.add_argument('--years', type=int, default=20, help='Years to generate')
+    parser.add_argument('--tz', type=float, default=5.5, help='Timezone UTC offset')
+    parser.add_argument('--all-zones', action='store_true', help='Generate all Karnataka zones')
     parser.add_argument('--output', type=str, default='.', help='Output directory')
     
     args = parser.parse_args()
     
+    os.makedirs(args.output, exist_ok=True)
+    
     if args.all_zones:
-        print("=" * 60)
-        print("GENERATING ALL KARNATAKA ZONES")
+        print("\n" + "=" * 60)
+        print("  GENERATING ALL KARNATAKA ZONES")
         print("=" * 60)
         for zone_name, (lat, lon) in KARNATAKA_ZONES.items():
             generate_bdat(zone_name, lat, lon, args.years, args.tz, args.output)
-            print()
     else:
         lat = args.lat
         lon = args.lon
@@ -376,7 +433,7 @@ if __name__ == '__main__':
                 lat, lon = KARNATAKA_ZONES[args.zone]
             else:
                 print(f"Unknown zone '{args.zone}'. Available: {list(KARNATAKA_ZONES.keys())}")
-                print("Or specify --lat and --lon manually.")
                 exit(1)
-        
         generate_bdat(args.zone, lat, lon, args.years, args.tz, args.output)
+    
+    print("\n✅ All done!")
