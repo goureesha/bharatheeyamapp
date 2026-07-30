@@ -1179,14 +1179,14 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         title: Row(children: [
           Icon(Icons.picture_as_pdf, color: Colors.red, size: 24),
           const SizedBox(width: 8),
-          Expanded(child: Text('ವಿವಾಹ ಹೊಂದಾಣಿಕೆ PDF', style: TextStyle(fontWeight: FontWeight.w900, color: kText, fontSize: 18))),
+          Expanded(child: Text(AppLocale.l('matchPdfTitle'), style: TextStyle(fontWeight: FontWeight.w900, color: kText, fontSize: 18))),
         ]),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('ಮಂಗಳ ಶ್ಲೋಕ / ಆಹ್ವಾನ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+              Text(AppLocale.l('mangalaShloka'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
               const SizedBox(height: 4),
               TextField(
                 controller: _mInvocationCtrl,
@@ -1194,25 +1194,25 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                 onChanged: (_) => _saveMatchJyotishiDetails(),
               ),
               const SizedBox(height: 14),
-              Text('ಜ್ಯೋತಿಷಿ ವಿವರ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+              Text(AppLocale.l('jyotishiDetails'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
               const SizedBox(height: 4),
               TextField(
                 controller: _mJyotishiNameCtrl,
-                decoration: InputDecoration(labelText: 'ಹೆಸರು', prefixIcon: Icon(Icons.storefront, size: 18), isDense: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+                decoration: InputDecoration(labelText: AppLocale.l('nameLabel'), prefixIcon: Icon(Icons.storefront, size: 18), isDense: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
                 onChanged: (_) => _saveMatchJyotishiDetails(),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: _mJyotishiAddressCtrl,
                 maxLines: 2,
-                decoration: InputDecoration(labelText: 'ವಿಳಾಸ', prefixIcon: Icon(Icons.location_on_outlined, size: 18), isDense: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+                decoration: InputDecoration(labelText: AppLocale.l('addressLabel'), prefixIcon: Icon(Icons.location_on_outlined, size: 18), isDense: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
                 onChanged: (_) => _saveMatchJyotishiDetails(),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: _mJyotishiPhoneCtrl,
                 keyboardType: TextInputType.phone,
-                decoration: InputDecoration(labelText: 'ದೂರವಾಣಿ', prefixIcon: Icon(Icons.phone, size: 18), isDense: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+                decoration: InputDecoration(labelText: AppLocale.l('phoneLabel'), prefixIcon: Icon(Icons.phone, size: 18), isDense: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
                 onChanged: (_) => _saveMatchJyotishiDetails(),
               ),
               const SizedBox(height: 12),
@@ -1220,16 +1220,16 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('ವರ: ${_gNameCtrl.text}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.blue.shade700)),
-                  Text('ವಧು: ${_bNameCtrl.text}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.pink.shade700)),
-                  Text('ಕೂಟ: ${_kootaMode == 0 ? "ಅಷ್ಟಕೂಟ" : "ದ್ವಾದಶಕೂಟ"}', style: TextStyle(fontSize: 11, color: kMuted)),
+                  Text('${AppLocale.l('groom')}: ${_gNameCtrl.text}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.blue.shade700)),
+                  Text('${AppLocale.l('bride')}: ${_bNameCtrl.text}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.pink.shade700)),
+                  Text('${AppLocale.l('koota')}: ${_kootaMode == 0 ? AppLocale.l('ashtaKoota') : AppLocale.l('dvadashaKoota')}', style: TextStyle(fontSize: 11, color: kMuted)),
                 ]),
               ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('ರದ್ದು', style: TextStyle(color: kMuted))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocale.l('cancel'), style: TextStyle(color: kMuted))),
           ElevatedButton.icon(
             onPressed: () async {
               Navigator.pop(ctx);
@@ -1237,11 +1237,11 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
               final bDobStr = '${_bDob.day.toString().padLeft(2, '0')}-${_bDob.month.toString().padLeft(2, '0')}-${_bDob.year}';
               final gDobStr = '${_gDob.day.toString().padLeft(2, '0')}-${_gDob.month.toString().padLeft(2, '0')}-${_gDob.year}';
               final data = MatchPdfData(
-                groomName: _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : 'ವರ',
+                groomName: _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : AppLocale.l('groom'),
                 groomDob: gDobStr,
                 groomTime: '${_gHour.toString().padLeft(2, '0')}:${_gMinute.toString().padLeft(2, '0')} $_gAmpm',
                 groomPlace: _gPlaceCtrl.text,
-                brideName: _bNameCtrl.text.isNotEmpty ? _bNameCtrl.text : 'ವಧು',
+                brideName: _bNameCtrl.text.isNotEmpty ? _bNameCtrl.text : AppLocale.l('bride'),
                 brideDob: bDobStr,
                 brideTime: '${_bHour.toString().padLeft(2, '0')}:${_bMinute.toString().padLeft(2, '0')} $_bAmpm',
                 bridePlace: _bPlaceCtrl.text,
@@ -1258,7 +1258,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
               await MatchPdfService.generateAndPrint(data, theme: selectedTheme);
             },
             icon: const Icon(Icons.picture_as_pdf, size: 18),
-            label: const Text('PDF ರಚಿಸಿ'),
+            label: Text(AppLocale.l('createPdf')),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
           ),
         ],
