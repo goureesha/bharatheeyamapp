@@ -1871,86 +1871,42 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             ]),
             const SizedBox(height: 14),
 
-            // ── Cache Status & Generate ──
+            // ── Panchanga Data Status ──
             Builder(builder: (_) {
               final cache = PanchangaCache.instance;
-              if (_cacheGenerating) {
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0x15FF9800),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0x40FF9800)),
-                  ),
-                  child: Column(children: [
-                    Row(children: [
-                      SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: kPurple1)),
-                      const SizedBox(width: 8),
-                      Text(AppLocale.l('mCachePrep'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
-                    ]),
-                    const SizedBox(height: 8),
-                    LinearProgressIndicator(
-                      value: _cacheTotal > 0 ? _cacheProgress / _cacheTotal : null,
-                      backgroundColor: kBorder,
-                      valueColor: AlwaysStoppedAnimation(kPurple1),
-                    ),
-                    const SizedBox(height: 4),
-                    Text('$_cacheProgress / $_cacheTotal ${AppLocale.l('mDaysLabel')}', style: TextStyle(fontSize: 11, color: kMuted)),
-                  ]),
-                );
-              }
               if (cache.isLoaded) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
                     color: const Color(0x104CAF50),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: const Color(0x404CAF50)),
                   ),
-                  child: Column(children: [
-                    Row(children: [
-                      Icon(Icons.check_circle, color: kTeal, size: 16),
-                      const SizedBox(width: 6),
-                      Expanded(child: Text(
-                        '${cache.dayCount} ${AppLocale.l('mCacheReady')} (${cache.startDate?.year}–${cache.endDate?.year})',
-                        style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w600),
-                      )),
-                    ]),
-                    const SizedBox(height: 6),
-                    Row(children: [
-                      Expanded(child: TextButton.icon(
-                        onPressed: _generateCache,
-                        icon: Icon(Icons.refresh, size: 14, color: kMuted),
-                        label: Text(AppLocale.l('mRegenerate'), style: TextStyle(fontSize: 10, color: kMuted)),
-                      )),
-                      Expanded(child: TextButton.icon(
-                        onPressed: () async {
-                          final ok = await PanchangaCache.instance.exportToBdat(
-                            customZoneName: LocationService.place,
-                          );
-                          if (mounted && ok) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('✅ .bdat ಫೈಲ್ ಎಕ್ಸ್‌ಪೋರ್ಟ್ ಆಯಿತು'),
-                              backgroundColor: Colors.green,
-                            ));
-                          }
-                        },
-                        icon: Icon(Icons.share, size: 14, color: kPurple2),
-                        label: Text('Export .bdat', style: TextStyle(fontSize: 10, color: kPurple2)),
-                      )),
-                    ]),
+                  child: Row(children: [
+                    Icon(Icons.check_circle, color: kTeal, size: 16),
+                    const SizedBox(width: 6),
+                    Expanded(child: Text(
+                      '⚡ ${cache.statusSummary}',
+                      style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w600),
+                    )),
                   ]),
                 );
               }
-              return ElevatedButton.icon(
-                onPressed: _generateCache,
-                icon: Icon(Icons.build_circle_outlined, size: 18),
-                label: Text(AppLocale.l('mGenerateCache'), style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF9800), foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              return Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: kOrange.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: kOrange.withOpacity(0.3)),
                 ),
+                child: Row(children: [
+                  Icon(Icons.info_outline, color: kOrange, size: 16),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text(
+                    'ಪಂಚಾಂಗ ದತ್ತಾಂಶ ಲೋಡ್ ಆಗಿಲ್ಲ. Settings → Panchanga Data → Import .bdat',
+                    style: TextStyle(fontSize: 11, color: kOrange, fontWeight: FontWeight.w600),
+                  )),
+                ]),
               );
             }),
             const SizedBox(height: 10),
