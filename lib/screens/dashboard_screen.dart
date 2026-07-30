@@ -3131,7 +3131,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 children: [
                   Icon(Icons.picture_as_pdf, color: Colors.deepOrange, size: 24),
                   const SizedBox(width: 8),
-                  Expanded(child: Text('ಟಿಪ್ಪಣಿ PDF', style: TextStyle(fontWeight: FontWeight.w900, color: kText, fontSize: 18))),
+                  Expanded(child: Text(AppLocale.l('tippaniPdf'), style: TextStyle(fontWeight: FontWeight.w900, color: kText, fontSize: 18))),
                 ],
               ),
               content: SizedBox(
@@ -3141,7 +3141,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text('ಮಂಗಳ ಶ್ಲೋಕ / ಆಹ್ವಾನ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                      Text(AppLocale.l('mangalaShloka'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
                       const SizedBox(height: 4),
                       TextField(
                         controller: _tippaniInvocationCtrl,
@@ -3154,12 +3154,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                         onChanged: (_) => _saveJyotishiDetails(),
                       ),
                       const SizedBox(height: 14),
-                      Text('ಜ್ಯೋತಿಷಿ ವಿವರ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                      Text(AppLocale.l('jyotishiDetails'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
                       const SizedBox(height: 4),
                       TextField(
                         controller: _jyotishiNameCtrl,
                         decoration: InputDecoration(
-                          labelText: 'ಹೆಸರು',
+                          labelText: AppLocale.l('nameLabel'),
                           prefixIcon: Icon(Icons.storefront, size: 18),
                           isDense: true,
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -3170,7 +3170,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       TextField(
                         controller: _tippaniAddressCtrl,
                         decoration: InputDecoration(
-                          labelText: 'ವಿಳಾಸ',
+                          labelText: AppLocale.l('addressLabel'),
                           prefixIcon: Icon(Icons.location_on_outlined, size: 18),
                           isDense: true,
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -3182,7 +3182,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       TextField(
                         controller: _jyotishiPhoneCtrl,
                         decoration: InputDecoration(
-                          labelText: 'ದೂರವಾಣಿ',
+                          labelText: AppLocale.l('phoneLabel'),
                           prefixIcon: Icon(Icons.phone, size: 18),
                           isDense: true,
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -3196,7 +3196,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       if (noteEntries.isNotEmpty) ...[
                         Row(
                           children: [
-                            Text('📝 ಟಿಪ್ಪಣಿ ಆಯ್ಕೆ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                            Text(AppLocale.l('noteSelection'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
                             const Spacer(),
                             Text('$selectedCount/${noteEntries.length}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
                             const SizedBox(width: 8),
@@ -3210,7 +3210,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 });
                               },
                               child: Text(
-                                selectedNotes.every((s) => s) ? 'ಎಲ್ಲಾ ತೆಗೆ' : 'ಎಲ್ಲಾ ಆಯ್ಕೆ',
+                                selectedNotes.every((s) => s) ? AppLocale.l('deselectAll') : AppLocale.l('selectAll'),
                                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.deepOrange),
                               ),
                             ),
@@ -3270,7 +3270,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: Text('ರದ್ದು', style: TextStyle(color: kMuted)),
+                  child: Text(AppLocale.l('cancel'), style: TextStyle(color: kMuted)),
                 ),
                 ElevatedButton.icon(
                   onPressed: selectedCount == 0 && noteEntries.isNotEmpty ? null : () async {
@@ -3300,7 +3300,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     await TippaniPdfService.generateAndPrint(data, theme: selectedTheme);
                   },
                   icon: const Icon(Icons.picture_as_pdf, size: 18),
-                  label: Text('PDF ರಚಿಸಿ ($selectedCount)'),
+                  label: Text('${AppLocale.l('createPdf')} ($selectedCount)'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepOrange, foregroundColor: Colors.white,
                   ),
