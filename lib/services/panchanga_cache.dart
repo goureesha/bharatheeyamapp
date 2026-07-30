@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:file_picker/file_picker.dart';
 import '../core/calculator.dart';
 import '../core/ephemeris.dart';
 import '../core/muhurta_rules.dart';
@@ -147,8 +149,10 @@ class PanchangaCache {
   /// Location info stored with the cache
   double? _cachedLat;
   double? _cachedLon;
+  String? _zoneName;
   double? get cachedLat => _cachedLat;
   double? get cachedLon => _cachedLon;
+  String? get zoneName => _zoneName;
 
   /// Get cache file path
   Future<File> get _cacheFile async {
@@ -182,12 +186,124 @@ class PanchangaCache {
     if (_days == null) return;
     final file = await _cacheFile;
     final json = {
-      'v': 1,
+      'v': 2,
+      'zone': _zoneName ?? '',
       'lat': _cachedLat,
       'lon': _cachedLon,
       'days': _days!.map((d) => d.toCompact()).toList(),
     };
     await file.writeAsString(jsonEncode(json));
+  }
+
+  /// ────────────────────────────────────────────────────────────
+  /// EXPORT: Save cache as compressed .bdat file and share
+  /// ────────────────────────────────────────────────────────────
+  Future<bool> exportToBdat({String? customZoneName}) async {
+    if (_days == null || _days!.isEmpty) return false;
+    try {
+      final json = {
+        'v': 2,
+        'zone': customZoneName ?? _zoneName ?? 'Unknown',
+        'lat': _cachedLat,
+        'lon': _cachedLon,
+        'from': '${_days!.first.date.year}-${_days!.first.date.month.toString().padLeft(2, '0')}-${_days!.first.date.day.toString().padLeft(2, '0')}',
+        'to': '${_days!.last.date.year}-${_days!.last.date.month.toString().padLeft(2, '0')}-${_days!.last.date.day.toString().padLeft(2, '0')}',
+        'days': _days!.map((d) => d.toCompact()).toList(),
+      };
+      final jsonStr = jsonEncode(json);
+      final compressed = GZipCodec().encode(utf8.encode(jsonStr));
+
+      final dir = await getApplicationDocumentsDirectory();
+      final zoneSafe = (customZoneName ?? _zoneName ?? 'data').replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
+      final fileName = 'bharatheeyam_panchanga_${zoneSafe}.bdat';
+      final outFile = File('${dir.path}/$fileName');
+      await outFile.writeAsBytes(compressed);
+
+      // Share the file
+      await Share.shareXFiles(
+        [XFile(outFile.path)],
+        subject: 'Bharatheeyam Panchanga Data - ${customZoneName ?? _zoneName ?? ''}',
+      );
+      return true;
+    } catch (e) {
+      debugPrint('Export .bdat failed: $e');
+      return false;
+    }
+  }
+
+  /// ────────────────────────────────────────────────────────────
+  /// IMPORT: Load .bdat file from user-selected path
+  /// Returns status message (null = success)
+  /// ────────────────────────────────────────────────────────────
+  Future<String?> importFromBdat() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: false,
+      );
+      if (result == null || result.files.isEmpty) return 'cancelled';
+
+      final filePath = result.files.single.path;
+      if (filePath == null) return 'ಫೈಲ್ ಓದಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ';
+
+      return await importFromPath(filePath);
+    } catch (e) {
+      debugPrint('Import .bdat failed: $e');
+      return 'Import failed: $e';
+    }
+  }
+
+  /// Import from a specific file path
+  Future<String?> importFromPath(String filePath) async {
+    try {
+      final file = File(filePath);
+      if (!await file.exists()) return 'ಫೈಲ್ ಕಂಡುಬರಲಿಲ್ಲ';
+
+      final bytes = await file.readAsBytes();
+
+      // Try to decompress (gzip)
+      String jsonStr;
+      try {
+        final decompressed = GZipCodec().decode(bytes);
+        jsonStr = utf8.decode(decompressed);
+      } catch (_) {
+        // Maybe it's not compressed, try reading as plain JSON
+        jsonStr = utf8.decode(bytes);
+      }
+
+      final Map<String, dynamic> json = jsonDecode(jsonStr);
+
+      // Validate
+      if (json['days'] == null || (json['days'] as List).isEmpty) {
+        return 'ಅಮಾನ್ಯ ದತ್ತಾಂಶ ಫೈಲ್';
+      }
+
+      _cachedLat = (json['lat'] as num?)?.toDouble();
+      _cachedLon = (json['lon'] as num?)?.toDouble();
+      _zoneName = json['zone'] as String?;
+
+      final List<dynamic> daysJson = json['days'] as List<dynamic>;
+      _days = daysJson.map((d) => CachedPanchangaDay.fromCompact(d as List<dynamic>)).toList();
+      _buildIndex();
+
+      // Save to internal storage for persistence
+      await saveToStorage();
+
+      return null; // Success
+    } catch (e) {
+      debugPrint('Import from path failed: $e');
+      return 'Import failed: $e';
+    }
+  }
+
+  /// Get a summary string for display
+  String get statusSummary {
+    if (!isLoaded) return '';
+    final from = _days!.first.date;
+    final to = _days!.last.date;
+    final years = ((to.difference(from).inDays) / 365).ceil();
+    final zone = _zoneName?.isNotEmpty == true ? _zoneName! : 'Custom';
+    return '$years ವರ್ಷ ದತ್ತಾಂಶ (${from.year}-${to.year}) - $zone';
   }
 
   void _buildIndex() {
@@ -376,6 +492,7 @@ class PanchangaCache {
     required double lat,
     required double lon,
     required double tzOffset,
+    String? zoneName,
     void Function(int current, int total)? onProgress,
   }) async {
     await Ephemeris.initSweph();
@@ -475,6 +592,7 @@ class PanchangaCache {
     _days = days;
     _cachedLat = lat;
     _cachedLon = lon;
+    _zoneName = zoneName;
     _buildIndex();
 
     // Save to persistent storage

@@ -14,6 +14,7 @@ import '../main.dart';
 import '../services/tester_service.dart';
 import '../services/local_export_service.dart';
 import '../services/drive_backup_service.dart';
+import '../services/panchanga_cache.dart';
 import 'support_screen.dart';
 
 import 'about_screen.dart';
@@ -797,6 +798,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 24),
                     Divider(color: kBorder),
                     const SizedBox(height: 24),
+
+                    // Panchanga Data File
+                    SectionTitle('ಪಂಚಾಂಗ ದತ್ತಾಂಶ / Panchanga Data'),
+                    const SizedBox(height: 8),
+                    Text('ಮುಹೂರ್ತ ಶೋಧನೆಗೆ ಪಂಚಾಂಗ ದತ್ತಾಂಶ ಫೈಲ್ ಬೇಕು. .bdat ಫೈಲ್ ಇಂಪೋರ್ಟ್ ಮಾಡಿ.',
+                      style: TextStyle(fontSize: 12, color: kMuted)),
+                    const SizedBox(height: 12),
+                    _buildPanchangaDataSection(),
+
+                    const SizedBox(height: 24),
+                    Divider(color: kBorder),
+                    const SizedBox(height: 24),
                     
                     // App Status
                     SectionTitle('${AppLocale.l('appStatus')} / App Status'),
@@ -1140,6 +1153,122 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   // Old Online Search dialog removed in favor of inline Geocode search
+
+  Widget _buildPanchangaDataSection() {
+    final cache = PanchangaCache.instance;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cache.isLoaded ? Colors.green.withOpacity(0.08) : kBorder.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: cache.isLoaded ? Colors.green.withOpacity(0.3) : kBorder.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (cache.isLoaded) ...[
+            Row(children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 24),
+              const SizedBox(width: 10),
+              Expanded(child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('✅ ದತ್ತಾಂಶ ಲೋಡ್ ಆಗಿದೆ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 14)),
+                  Text(cache.statusSummary, style: TextStyle(fontSize: 12, color: kMuted)),
+                  Text('${cache.dayCount} ದಿನಗಳು', style: TextStyle(fontSize: 11, color: kMuted)),
+                ],
+              )),
+            ]),
+            const SizedBox(height: 12),
+            Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: Icon(Icons.file_upload_outlined, color: kPurple2, size: 18),
+                  label: Text('ಬೇರೆ ಫೈಲ್ ಇಂಪೋರ್ಟ್', style: TextStyle(color: kText, fontSize: 12)),
+                  onPressed: () => _importPanchangaData(),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    side: BorderSide(color: kBorder),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: Icon(Icons.delete_outline, color: Colors.red, size: 18),
+                  label: Text('ಡೇಟಾ ಅಳಿಸಿ', style: TextStyle(color: Colors.red, fontSize: 12)),
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        backgroundColor: kCard,
+                        title: Text('ಪಂಚಾಂಗ ದತ್ತಾಂಶ ಅಳಿಸಿ?', style: TextStyle(color: kText)),
+                        content: Text('ಮುಹೂರ್ತ ಶೋಧನೆಗೆ ಮತ್ತೆ ಇಂಪೋರ್ಟ್ ಮಾಡಬೇಕಾಗುತ್ತದೆ.', style: TextStyle(color: kMuted)),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppLocale.l('cancel'), style: TextStyle(color: kMuted))),
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(ctx, true),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                            child: Text('ಅಳಿಸಿ'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm == true) {
+                      await cache.clear();
+                      if (mounted) setState(() {});
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    side: BorderSide(color: Colors.red.withOpacity(0.3)),
+                  ),
+                ),
+              ),
+            ]),
+          ] else ...[
+            Row(children: [
+              Icon(Icons.info_outline, color: kOrange, size: 24),
+              const SizedBox(width: 10),
+              Expanded(child: Text(
+                'ಪಂಚಾಂಗ ದತ್ತಾಂಶ ಲೋಡ್ ಆಗಿಲ್ಲ. ಮುಹೂರ್ತ ಶೋಧನೆಗೆ .bdat ಫೈಲ್ ಇಂಪೋರ್ಟ್ ಮಾಡಿ.',
+                style: TextStyle(fontSize: 13, color: kText),
+              )),
+            ]),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: () => _importPanchangaData(),
+              icon: const Icon(Icons.file_upload),
+              label: Text('.bdat ಫೈಲ್ ಇಂಪೋರ್ಟ್ ಮಾಡಿ'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPurple2,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Future<void> _importPanchangaData() async {
+    final cache = PanchangaCache.instance;
+    final err = await cache.importFromBdat();
+    if (!mounted) return;
+    if (err == null) {
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('✅ ${cache.dayCount} ದಿನಗಳ ಪಂಚಾಂಗ ದತ್ತಾಂಶ ಲೋಡ್ ಆಗಿದೆ!'),
+        backgroundColor: Colors.green,
+      ));
+    } else if (err != 'cancelled') {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('❌ Import ವಿಫಲ: $err'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
 
   Widget _buildDriveBackupSection() {
     return Container(

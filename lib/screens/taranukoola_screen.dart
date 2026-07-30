@@ -947,15 +947,43 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     return '${h12.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $ampm';
   }
 
-  /// Generate 1-year panchanga cache
+  /// Generate panchanga cache (configurable years)
   Future<void> _generateCache() async {
     if (_cacheGenerating) return;
+
+    // Ask user for year range
+    final years = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: kCard,
+        title: Text('ಪಂಚಾಂಗ ತಯಾರಿಸಿ', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('ಎಷ್ಟು ವರ್ಷ ದತ್ತಾಂಶ ತಯಾರಿಸಬೇಕು?\nLocation: ${LocationService.place}',
+              style: TextStyle(color: kMuted, fontSize: 13)),
+            const SizedBox(height: 12),
+            ...[1, 5, 10, 20].map((y) => ListTile(
+              dense: true,
+              title: Text('$y ವರ್ಷ (~${y * 365} ದಿನ)', style: TextStyle(color: kText, fontWeight: FontWeight.w600)),
+              trailing: Icon(Icons.arrow_forward_ios, size: 14, color: kMuted),
+              onTap: () => Navigator.pop(ctx, y),
+            )),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocale.l('cancel'), style: TextStyle(color: kMuted))),
+        ],
+      ),
+    );
+    if (years == null) return;
+
     setState(() { _cacheGenerating = true; _cacheComplete = false; _cacheProgress = 0; _cacheTotal = 0; });
     await Future.delayed(const Duration(milliseconds: 50));
 
     final now = DateTime.now();
     final startDate = DateTime(now.year, now.month, now.day);
-    final endDate = now.add(const Duration(days: 365));
+    final endDate = now.add(Duration(days: 365 * years));
 
     await PanchangaCache.instance.generate(
       startDate: startDate,
@@ -963,6 +991,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       lat: LocationService.lat,
       lon: LocationService.lon,
       tzOffset: LocationService.tzOffset,
+      zoneName: LocationService.place,
       onProgress: (cur, total) {
         if (mounted) setState(() { _cacheProgress = cur; _cacheTotal = total; });
       },
@@ -1878,17 +1907,38 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: const Color(0x404CAF50)),
                   ),
-                  child: Row(children: [
-                    Icon(Icons.check_circle, color: kTeal, size: 16),
-                    const SizedBox(width: 6),
-                    Expanded(child: Text(
-                      '${cache.dayCount} ${AppLocale.l('mCacheReady')} (${cache.startDate?.year}–${cache.endDate?.year})',
-                      style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w600),
-                    )),
-                    TextButton(
-                      onPressed: _generateCache,
-                      child: Text(AppLocale.l('mRegenerate'), style: TextStyle(fontSize: 10)),
-                    ),
+                  child: Column(children: [
+                    Row(children: [
+                      Icon(Icons.check_circle, color: kTeal, size: 16),
+                      const SizedBox(width: 6),
+                      Expanded(child: Text(
+                        '${cache.dayCount} ${AppLocale.l('mCacheReady')} (${cache.startDate?.year}–${cache.endDate?.year})',
+                        style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w600),
+                      )),
+                    ]),
+                    const SizedBox(height: 6),
+                    Row(children: [
+                      Expanded(child: TextButton.icon(
+                        onPressed: _generateCache,
+                        icon: Icon(Icons.refresh, size: 14, color: kMuted),
+                        label: Text(AppLocale.l('mRegenerate'), style: TextStyle(fontSize: 10, color: kMuted)),
+                      )),
+                      Expanded(child: TextButton.icon(
+                        onPressed: () async {
+                          final ok = await PanchangaCache.instance.exportToBdat(
+                            customZoneName: LocationService.place,
+                          );
+                          if (mounted && ok) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('✅ .bdat ಫೈಲ್ ಎಕ್ಸ್‌ಪೋರ್ಟ್ ಆಯಿತು'),
+                              backgroundColor: Colors.green,
+                            ));
+                          }
+                        },
+                        icon: Icon(Icons.share, size: 14, color: kPurple2),
+                        label: Text('Export .bdat', style: TextStyle(fontSize: 10, color: kPurple2)),
+                      )),
+                    ]),
                   ]),
                 );
               }
