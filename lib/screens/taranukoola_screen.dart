@@ -1857,7 +1857,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     Row(children: [
                       SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: kPurple1)),
                       const SizedBox(width: 8),
-                      Text('ಪಂಚಾಂಗ ದತ್ತಾಂಶ ತಯಾರಿಸಲಾಗುತ್ತಿದೆ... ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                      Text(AppLocale.l('mCachePrep'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
                     ]),
                     const SizedBox(height: 8),
                     LinearProgressIndicator(
@@ -1866,7 +1866,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                       valueColor: AlwaysStoppedAnimation(kPurple1),
                     ),
                     const SizedBox(height: 4),
-                    Text('$_cacheProgress / $_cacheTotal ದಿನಗಳು', style: TextStyle(fontSize: 11, color: kMuted)),
+                    Text('$_cacheProgress / $_cacheTotal ${AppLocale.l('mDaysLabel')}', style: TextStyle(fontSize: 11, color: kMuted)),
                   ]),
                 );
               }
@@ -1882,12 +1882,12 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     Icon(Icons.check_circle, color: kTeal, size: 16),
                     const SizedBox(width: 6),
                     Expanded(child: Text(
-                      '${cache.dayCount} ದಿನಗಳ ದತ್ತಾಂಶ ಸಿದ್ಧ (${cache.startDate?.year}–${cache.endDate?.year})',
+                      '${cache.dayCount} ${AppLocale.l('mCacheReady')} (${cache.startDate?.year}–${cache.endDate?.year})',
                       style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w600),
                     )),
                     TextButton(
                       onPressed: _generateCache,
-                      child: Text('ಮರು ತಯಾರಿ', style: TextStyle(fontSize: 10)),
+                      child: Text(AppLocale.l('mRegenerate'), style: TextStyle(fontSize: 10)),
                     ),
                   ]),
                 );
@@ -1895,7 +1895,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               return ElevatedButton.icon(
                 onPressed: _generateCache,
                 icon: Icon(Icons.build_circle_outlined, size: 18),
-                label: Text('1 ವರ್ಷ ಪಂಚಾಂಗ ತಯಾರಿಸಿ (ಒಮ್ಮೆ ಮಾತ್ರ)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                label: Text(AppLocale.l('mGenerateCache'), style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF9800), foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -1937,9 +1937,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           if (_mfResults.isNotEmpty) ...[
             Row(
               children: [
-                Text('${_mfResults.length} ದಿನಗಳು ಸಿಕ್ಕಿವೆ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
+                Text('${_mfResults.length} ${AppLocale.l('mDaysFound')}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
                 const SizedBox(width: 8),
-                Text('(${_mfResults.where((r) => r['isPerfect'] == true).length} ಪರಿಪೂರ್ಣ, ${_mfResults.where((r) => r['isCandidate'] == true).length} ಷರತ್ತುಬದ್ಧ)',
+                Text('(${_mfResults.where((r) => r['isPerfect'] == true).length} ${AppLocale.l('mPerfect')}, ${_mfResults.where((r) => r['isCandidate'] == true).length} ${AppLocale.l('mConditional')})',
                   style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
               ],
             ),
@@ -1955,7 +1955,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                 child: TextButton.icon(
                   onPressed: () => setState(() { _mfDisplayCount += 20; }),
                   icon: Icon(Icons.expand_more, color: kPurple2),
-                  label: Text('ಇನ್ನಷ್ಟು ತೋರಿಸಿ (${_mfResults.length - _mfDisplayCount} ಉಳಿದಿವೆ)',
+                  label: Text('${AppLocale.l('mShowMore')} (${_mfResults.length - _mfDisplayCount} ${AppLocale.l('mRemaining')})',
                     style: TextStyle(color: kPurple2, fontWeight: FontWeight.w700)),
                 ),
               ),
@@ -2038,43 +2038,43 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                isNoPerfect ? 'ಆಯ್ದ ಅವಧಿಯಲ್ಲಿ ಪರಿಪೂರ್ಣ ಮುಹೂರ್ತ ಸಿಗಲಿಲ್ಲ' : 'ಮುಹೂರ್ತ ಶೋಧನೆ ಸಾರಾಂಶ',
+                isNoPerfect ? AppLocale.l('mNoPerfectMuhurta') : AppLocale.l('mSearchSummary'),
                 style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: isNoPerfect ? Colors.orange.shade900 : kText),
               ),
             ),
           ]),
           const SizedBox(height: 6),
           Text(
-            'ಒಟ್ಟು ಪರಿಶೀಲಿಸಿದ ದಿನಗಳು: $totalDays | ಪರಿಪೂರ್ಣ ಮುಹೂರ್ತ: $perfectCount | ಷರತ್ತುಬದ್ಧ ದಿನಗಳು: $candidateCount',
+            '${AppLocale.l('mTotalChecked')}: $totalDays | ${AppLocale.l('mPerfectMuhurta')}: $perfectCount | ${AppLocale.l('mConditionalDays')}: $candidateCount',
             style: TextStyle(fontSize: 12, color: kMuted, fontWeight: FontWeight.w600),
           ),
           const Divider(height: 16),
-          Text('ಮುಹೂರ್ತ ಸಿಗದಿರಲು/ತಿರಸ್ಕರಿಸಲು ಕಾರಣಗಳ ವಿವರ:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kText)),
+          Text(AppLocale.l('mRejectionReasons'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kText)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8, runSpacing: 6,
             children: [
-              if (((stats['rejTithi'] as int?) ?? 0) > 0) _diagChip('ತಿಥಿ ಕೊರತೆ', (stats['rejTithi'] as int?) ?? 0, Colors.teal),
-              if (((stats['rejNak'] as int?) ?? 0) > 0) _diagChip('ನಕ್ಷತ್ರ ಕೊರತೆ', (stats['rejNak'] as int?) ?? 0, Colors.indigo),
-              if (((stats['rejVara'] as int?) ?? 0) > 0) _diagChip('ವಾರ ಕೊರತೆ', (stats['rejVara'] as int?) ?? 0, Colors.brown),
-              if (((stats['rejYoga'] as int?) ?? 0) > 0) _diagChip('ಯೋಗ ಕೊರತೆ', (stats['rejYoga'] as int?) ?? 0, Colors.pink),
-              if (((stats['rejKarana'] as int?) ?? 0) > 0) _diagChip('ಕರಣ ಕೊರತೆ', (stats['rejKarana'] as int?) ?? 0, Colors.cyan.shade800),
-              if (((stats['rejShukla'] as int?) ?? 0) > 0) _diagChip('ಶುಕ್ಲಪಕ್ಷ', (stats['rejShukla'] as int?) ?? 0, Colors.grey),
-              if (((stats['rejUttarayana'] as int?) ?? 0) > 0) _diagChip('ಉತ್ತರಾಯಣ', (stats['rejUttarayana'] as int?) ?? 0, Colors.blue),
-              if (((stats['rejDagdha'] as int?) ?? 0) > 0) _diagChip('ದಗ್ಧ ಯೋಗ', (stats['rejDagdha'] as int?) ?? 0, Colors.red.shade800),
-              if (((stats['rejGuruAsta'] as int?) ?? 0) > 0) _diagChip('ಗುರು ಅಸ್ತ', (stats['rejGuruAsta'] as int?) ?? 0, Colors.deepPurple),
-              if (((stats['rejShukraAsta'] as int?) ?? 0) > 0) _diagChip('ಶುಕ್ರ ಅಸ್ತ', (stats['rejShukraAsta'] as int?) ?? 0, Colors.purple),
-              if (countPanchanga > 0 && stats['rejTithi'] == null) _diagChip('ಪಂಚಾಂಗ ದೋಷ', countPanchanga, Colors.red),
-              if (countTara > 0) _diagChip('ತಾರಾನುಕೂಲ ಕೊರತೆ', countTara, Colors.deepOrange),
-              if (countGuru > 0) _diagChip('ಗುರು ಬಲ ಕೊರತೆ', countGuru, Colors.amber.shade900),
-              if (countCombust > 0) _diagChip('ಗುರು/ಶುಕ್ರ ಅಸ್ತ ದೋಷ', countCombust, Colors.purple),
-              if (countLagna > 0) _diagChip('ಲಗ್ನ ಶುದ್ಧಿ ಕೊರತೆ', countLagna, Colors.blueGrey),
+              if (((stats['rejTithi'] as int?) ?? 0) > 0) _diagChip(AppLocale.l('mTithiLack'), (stats['rejTithi'] as int?) ?? 0, Colors.teal),
+              if (((stats['rejNak'] as int?) ?? 0) > 0) _diagChip(AppLocale.l('mNakshatraLack'), (stats['rejNak'] as int?) ?? 0, Colors.indigo),
+              if (((stats['rejVara'] as int?) ?? 0) > 0) _diagChip(AppLocale.l('mVaraLack'), (stats['rejVara'] as int?) ?? 0, Colors.brown),
+              if (((stats['rejYoga'] as int?) ?? 0) > 0) _diagChip(AppLocale.l('mYogaLack'), (stats['rejYoga'] as int?) ?? 0, Colors.pink),
+              if (((stats['rejKarana'] as int?) ?? 0) > 0) _diagChip(AppLocale.l('mKaranaLack'), (stats['rejKarana'] as int?) ?? 0, Colors.cyan.shade800),
+              if (((stats['rejShukla'] as int?) ?? 0) > 0) _diagChip(AppLocale.l('mShuklapaksha'), (stats['rejShukla'] as int?) ?? 0, Colors.grey),
+              if (((stats['rejUttarayana'] as int?) ?? 0) > 0) _diagChip(AppLocale.l('mUttarayana'), (stats['rejUttarayana'] as int?) ?? 0, Colors.blue),
+              if (((stats['rejDagdha'] as int?) ?? 0) > 0) _diagChip(AppLocale.l('mDagdhaYoga'), (stats['rejDagdha'] as int?) ?? 0, Colors.red.shade800),
+              if (((stats['rejGuruAsta'] as int?) ?? 0) > 0) _diagChip(AppLocale.l('mGuruAsta'), (stats['rejGuruAsta'] as int?) ?? 0, Colors.deepPurple),
+              if (((stats['rejShukraAsta'] as int?) ?? 0) > 0) _diagChip(AppLocale.l('mShukraAsta'), (stats['rejShukraAsta'] as int?) ?? 0, Colors.purple),
+              if (countPanchanga > 0 && stats['rejTithi'] == null) _diagChip(AppLocale.l('mPanchDosha'), countPanchanga, Colors.red),
+              if (countTara > 0) _diagChip(AppLocale.l('mTaraLack'), countTara, Colors.deepOrange),
+              if (countGuru > 0) _diagChip(AppLocale.l('mGuruBalaLack'), countGuru, Colors.amber.shade900),
+              if (countCombust > 0) _diagChip(AppLocale.l('mGuruShukraAstaDosha'), countCombust, Colors.purple),
+              if (countLagna > 0) _diagChip(AppLocale.l('mLagnaShuddhi'), countLagna, Colors.blueGrey),
             ],
           ),
           // Detailed per-rule rejection breakdown — clickable chips
           if (stats['rejectedDays'] != null) ...[
             const SizedBox(height: 10),
-            Text('ನಿಯಮದ ಪ್ರಕಾರ ತಿರಸ್ಕೃತ ದಿನಗಳು (ಒತ್ತಿ ನೋಡಿ):', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
+            Text(AppLocale.l('mRejectedByRule'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kMuted)),
             const SizedBox(height: 4),
             Builder(builder: (_) {
               final rejDays = stats['rejectedDays'] as Map<String, List>;
@@ -2082,18 +2082,18 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                 spacing: 6, runSpacing: 4,
                 children: [
                   for (final entry in {
-                    'tithi': ('ತಿಥಿ', Colors.teal),
-                    'nakshatra': ('ನಕ್ಷತ್ರ', Colors.indigo),
-                    'vara': ('ವಾರ', Colors.brown),
-                    'yoga': ('ಯೋಗ', Colors.pink),
-                    'karana': ('ಕರಣ', Colors.cyan.shade800),
-                    'dagdha': ('ದಗ್ಧ ಯೋಗ', Colors.red.shade800),
-                    'shukla': ('ಶುಕ್ಲಪಕ್ಷ', Colors.grey),
-                    'uttarayana': ('ಉತ್ತರಾಯಣ', Colors.blue),
-                    'tara': ('ತಾರಾಬಲ', Colors.deepOrange),
-                    'guru': ('ಗುರುಬಲ', Colors.amber.shade900),
-                    'guruAsta': ('ಗುರು ಅಸ್ತ', Colors.deepPurple),
-                    'shukraAsta': ('ಶುಕ್ರ ಅಸ್ತ', Colors.purple),
+                    'tithi': (AppLocale.l('mTithi'), Colors.teal),
+                    'nakshatra': (AppLocale.l('mNakshatra'), Colors.indigo),
+                    'vara': (AppLocale.l('mVara'), Colors.brown),
+                    'yoga': (AppLocale.l('mYogaLack'), Colors.pink),
+                    'karana': (AppLocale.l('mKaranaLack'), Colors.cyan.shade800),
+                    'dagdha': (AppLocale.l('mDagdhaYoga'), Colors.red.shade800),
+                    'shukla': (AppLocale.l('mShuklapaksha'), Colors.grey),
+                    'uttarayana': (AppLocale.l('mUttarayana'), Colors.blue),
+                    'tara': (AppLocale.l('mTaraBala'), Colors.deepOrange),
+                    'guru': (AppLocale.l('mGuruBala'), Colors.amber.shade900),
+                    'guruAsta': (AppLocale.l('mGuruAsta'), Colors.deepPurple),
+                    'shukraAsta': (AppLocale.l('mShukraAsta'), Colors.purple),
                   }.entries)
                     if ((rejDays[entry.key]?.isNotEmpty ?? false))
                       _clickableDiagChip(
@@ -2117,7 +2117,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'ಕೆಳಗೆ ನೀಡಲಾದ ಷರತ್ತುಬದ್ಧ ಮುಹೂರ್ತ ದಿನಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ನಿಮ್ಮ ಅನುಕೂಲಕ್ಕೆ ತಕ್ಕಂತೆ ಆಯ್ಕೆ ಮಾಡಿಕೊಳ್ಳಬಹುದು.',
+                    AppLocale.l('mConditionalAdvice'),
                     style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.amber.shade900),
                   ),
                 ),
@@ -2137,7 +2137,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: color.withOpacity(0.3)),
       ),
-      child: Text('$label: $count ದಿನ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+      child: Text('$label: $count ${AppLocale.l('mDayUnit')}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
     );
   }
 
@@ -2154,7 +2154,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('$label: $count ದಿನ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+            Text('$label: $count ${AppLocale.l('mDayUnit')}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
             const SizedBox(width: 4),
             Icon(Icons.open_in_new, size: 11, color: color),
           ],
@@ -2191,7 +2191,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '\"$ruleName\" ನಿಯಮದಿಂದ ತಿರಸ್ಕೃತ: ${rejectedDays.length} ದಿನಗಳು',
+                        '\"$ruleName\" ${AppLocale.l('mRejectedByRuleTitle')}: ${rejectedDays.length} ${AppLocale.l('mDaysLabel')}',
                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color),
                       ),
                     ),
