@@ -791,6 +791,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         birthTime: '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $ampm',
         birthPlace: placeCtrl.text,
         lat: lat, lon: lon,
+        tzOffset: LocationService.tzOffset,
         notes: '',
       );
       final members = ClientService.getMembersForClient(cId);

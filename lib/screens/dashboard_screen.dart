@@ -49,6 +49,7 @@ class DashboardScreen extends StatefulWidget {
   final String ampm;
   final double lat;
   final double lon;
+  final double tz;
   final String initialNotes;
   final Map<String, int> initialAroodhas;
   final int? initialJanmaNakshatraIdx;
@@ -67,6 +68,7 @@ class DashboardScreen extends StatefulWidget {
     required this.ampm,
     required this.lat,
     required this.lon,
+    required this.tz,
     this.initialNotes = '',
     this.initialAroodhas = const {},
     this.initialJanmaNakshatraIdx,
@@ -88,6 +90,7 @@ class _PersonEntry {
   final String ampm;
   final double lat;
   final double lon;
+  final double tz;
   final String place;
   String notes;
 
@@ -100,6 +103,7 @@ class _PersonEntry {
     required this.ampm,
     required this.lat,
     required this.lon,
+    required this.tz,
     required this.place,
     this.notes = '',
   });
@@ -150,6 +154,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   late String _primaryAmpm;
   late double _primaryLat;
   late double _primaryLon;
+  late double _primaryTz;
   late String _primaryPlace;
 
   bool _syncing = false;
@@ -203,6 +208,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     _primaryAmpm = widget.ampm;
     _primaryLat = widget.lat;
     _primaryLon = widget.lon;
+    _primaryTz = widget.tz;
     _primaryPlace = widget.place;
 
 
@@ -434,7 +440,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       }
       if (mounted) {
         setState(() {
-          _extraPersons.add(_PersonEntry(name: p.name, result: result, dob: dob, hour: p.hour, minute: p.minute, ampm: p.ampm, lat: p.lat, lon: p.lon, place: p.place, notes: p.notes));
+          _extraPersons.add(_PersonEntry(name: p.name, result: result, dob: dob, hour: p.hour, minute: p.minute, ampm: p.ampm, lat: p.lat, lon: p.lon, tz: p.tzOffset, place: p.place, notes: p.notes));
         });
       }
     } catch (e) {
@@ -688,7 +694,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   
                   if (mounted) {
                     setState(() {
-                      _extraPersons.add(_PersonEntry(name: name, result: result, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, place: placeCtrl.text));
+                      _extraPersons.add(_PersonEntry(name: name, result: result, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, tz: tz, place: placeCtrl.text));
                     });
                     HistoryService.add(HistoryEntry(
                       name: name,
@@ -722,7 +728,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     final placeCtrl = TextEditingController(text: existing.place);
     final latCtrl = TextEditingController(text: existing.lat.toStringAsFixed(4));
     final lonCtrl = TextEditingController(text: existing.lon.toStringAsFixed(4));
-    final tzCtrl = TextEditingController(text: '+5.5');
+    final tzCtrl = TextEditingController(text: '${existing.tz >= 0 ? '+' : ''}${existing.tz}');
 
     DateTime dob = existing.dob;
     int hour = existing.hour;
@@ -924,7 +930,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                   if (mounted) {
                     setState(() {
-                      _extraPersons[idx] = _PersonEntry(name: name, result: result, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, place: placeCtrl.text, notes: existing.notes);
+                      _extraPersons[idx] = _PersonEntry(name: name, result: result, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, tz: tz, place: placeCtrl.text, notes: existing.notes);
                     });
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ $name ${AppLocale.l('calcSuccess')}'), backgroundColor: Colors.green));
                   }
@@ -946,7 +952,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     final placeCtrl = TextEditingController(text: _primaryPlace);
     final latCtrl = TextEditingController(text: _primaryLat.toStringAsFixed(4));
     final lonCtrl = TextEditingController(text: _primaryLon.toStringAsFixed(4));
-    final tzCtrl = TextEditingController(text: '+5.5');
+    final tzCtrl = TextEditingController(text: '${_primaryTz >= 0 ? '+' : ''}$_primaryTz');
 
     DateTime dob = _primaryDob;
     int hour = _primaryHour;
@@ -1211,7 +1217,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           newEntries.add(_PersonEntry(
             name: p.name, result: result, dob: dob,
             hour: p.hour, minute: p.minute, ampm: p.ampm,
-            lat: p.lat, lon: p.lon, place: p.place, notes: p.notes,
+            lat: p.lat, lon: p.lon, tz: p.tzOffset, place: p.place, notes: p.notes,
           ));
         }
       } catch (e) {
@@ -3086,7 +3092,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       StorageService.save(Profile(
         name: widget.name, date: '${widget.dob.year}-${widget.dob.month.toString().padLeft(2, '0')}-${widget.dob.day.toString().padLeft(2, '0')}',
         hour: widget.hour, minute: widget.minute, ampm: widget.ampm, lat: widget.lat, lon: widget.lon, place: widget.place,
-        tzOffset: LocationService.tzOffset, notes: newNotes, aroodhas: _aroodhas, janmaNakshatraIdx: _janmaNakshatraIdx, clientId: (cId is String && cId.isNotEmpty) ? cId : null,
+        tzOffset: _primaryTz, notes: newNotes, aroodhas: _aroodhas, janmaNakshatraIdx: _janmaNakshatraIdx, clientId: (cId is String && cId.isNotEmpty) ? cId : null,
       ));
       if (cId is String && cId.isNotEmpty) {
         ClientService.updateFamilyMember(FamilyMember(clientId: cId, memberName: widget.name, relation: 'Self', dob: '${widget.dob.year}-${widget.dob.month.toString().padLeft(2, '0')}-${widget.dob.day.toString().padLeft(2, '0')}', birthTime: '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}', birthPlace: widget.place, lat: widget.lat, lon: widget.lon, notes: newNotes));
@@ -3095,7 +3101,7 @@ class _DashboardScreenState extends State<DashboardScreen>
        final dateStr = '${entry.dob.year}-${entry.dob.month.toString().padLeft(2, '0')}-${entry.dob.day.toString().padLeft(2, '0')}';
        StorageService.save(Profile(
          name: entry.name, date: dateStr, hour: entry.hour, minute: entry.minute, ampm: entry.ampm, lat: entry.lat, lon: entry.lon, place: entry.place,
-         tzOffset: LocationService.tzOffset, notes: newNotes, clientId: (cId is String && cId.isNotEmpty) ? cId : null,
+         tzOffset: entry.tz, notes: newNotes, clientId: (cId is String && cId.isNotEmpty) ? cId : null,
        ));
        if (cId is String && cId.isNotEmpty) {
          ClientService.updateFamilyMember(FamilyMember(clientId: cId, memberName: entry.name, relation: 'Group Member', dob: dateStr, birthTime: '${entry.hour.toString().padLeft(2,'0')}:${entry.minute.toString().padLeft(2,'0')} ${entry.ampm}', birthPlace: entry.place, lat: entry.lat, lon: entry.lon, notes: newNotes));

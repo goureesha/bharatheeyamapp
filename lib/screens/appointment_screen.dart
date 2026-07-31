@@ -113,6 +113,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> with SingleTicker
               birthTime: '${p.hour.toString().padLeft(2,'0')}:${p.minute.toString().padLeft(2,'0')} ${p.ampm}',
               birthPlace: p.place,
               lat: p.lat, lon: p.lon,
+              tzOffset: p.tzOffset,
               notes: p.notes,
             ));
           }

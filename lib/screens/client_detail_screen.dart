@@ -423,6 +423,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                 birthTime: m.birthTime,
                 birthPlace: m.birthPlace,
                 lat: m.lat, lon: m.lon,
+                tzOffset: m.tzOffset,
                 notes: notes,
               );
               ClientService.updateFamilyMember(updated);
@@ -641,6 +642,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                         birthPlace: placeCtrl.text,
                         lat: double.tryParse(latCtrl.text) ?? 14.98,
                         lon: double.tryParse(lonCtrl.text) ?? 74.73,
+                        tzOffset: LocationService.tzOffset,
                       );
 
                       final ok = await ClientService.addFamilyMember(member);

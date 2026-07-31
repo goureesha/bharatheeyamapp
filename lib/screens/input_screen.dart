@@ -158,6 +158,7 @@ class _InputScreenState extends State<InputScreen> {
             birthTime: '${profile.hour.toString().padLeft(2,'0')}:${profile.minute.toString().padLeft(2,'0')} ${profile.ampm}',
             birthPlace: profile.place,
             lat: profile.lat, lon: profile.lon,
+            tzOffset: profile.tzOffset,
             notes: profile.notes,
           ));
         }
@@ -181,7 +182,7 @@ class _InputScreenState extends State<InputScreen> {
             place: m.birthPlace,
             notes: m.notes,
             clientId: client.clientId,
-            tzOffset: LocationService.tzOffset,
+            tzOffset: m.tzOffset,
           );
           await StorageService.save(newProfile);
           p[m.memberName] = newProfile;
@@ -387,6 +388,7 @@ class _InputScreenState extends State<InputScreen> {
             ampm: _ampm,
             lat: lat,
             lon: lon,
+            tz: tzOffset,
             extraInfo: {'clientId': activeClientId ?? '', 'ayanamsa': _ayanamsa, 'nodeMode': _nodeMode},
             initialNotes: uiNotes,
             initialAroodhas: _loadedAroodhas,
@@ -444,6 +446,7 @@ class _InputScreenState extends State<InputScreen> {
         birthPlace: p.place,
         lat: p.lat,
         lon: p.lon,
+        tzOffset: p.tzOffset,
         notes: p.notes,
       );
       final members = ClientService.getMembersForClient(cId);
@@ -506,7 +509,7 @@ class _InputScreenState extends State<InputScreen> {
                 // Not in StorageService at all
                 unifiedProfiles[m.memberName] = Profile(
                   name: m.memberName, date: m.dob, hour: m.hour12, minute: m.minute, ampm: m.ampm,
-                  lat: m.lat, lon: m.lon, place: m.birthPlace, notes: m.notes, tzOffset: LocationService.tzOffset,
+                  lat: m.lat, lon: m.lon, place: m.birthPlace, notes: m.notes, tzOffset: m.tzOffset,
                   clientId: m.clientId,
                 );
               } else {
