@@ -646,6 +646,19 @@ class AppLocale {
       'mLagnaShuddhi': 'ಲಗ್ನ ಶುದ್ಧಿ ಕೊರತೆ',
       'mTaraBala': 'ತಾರಾಬಲ',
       'mGuruBala': 'ಗುರುಬಲ',
+      
+      // New additions for Muhurta Search localization
+      'mCacheNotLoaded': 'ಪಂಚಾಂಗ ದತ್ತಾಂಶ ಲೋಡ್ ಆಗಿಲ್ಲ. Settings → Panchanga Data → Import .bdat',
+      'mTaraAnukoola': 'ತಾರಾನುಕೂಲ ಮಧ್ಯಮ/ಅಶುಭ',
+      'mGuruAstaDosha': 'ಗುರು ಅಸ್ತ ದೋಷ',
+      'mShukraAstaDosha': 'ಶುಕ್ರ ಅಸ್ತ ದೋಷ',
+      'mPartialLagna': 'ಲಗ್ನ ಶುದ್ಧಿ ಭಾಗಶಃ',
+      'mNoLagna': 'ಲಗ್ನ ಶುದ್ಧಿ ಲಭ್ಯವಿಲ್ಲ',
+      'mConditionalMuhurta': 'ಷರತ್ತುಬದ್ಧ ಮುಹೂರ್ತ (Candidate Muhurta)',
+      'mGenerateCacheTitle': 'ಪಂಚಾಂಗ ತಯಾರಿಸಿ',
+      'mYearsCachePrompt': 'ಎಷ್ಟು ವರ್ಷ ದತ್ತಾಂಶ ತಯಾರಿಸಬೇಕು?',
+      'mYear': 'ವರ್ಷ',
+      'mDaysApprox': 'ದಿನ',
 
       // PDF Dialog UI
       'tippaniPdf': 'ಟಿಪ್ಪಣಿ PDF',

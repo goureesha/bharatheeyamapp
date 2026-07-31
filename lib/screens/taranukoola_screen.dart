@@ -956,16 +956,16 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: kCard,
-        title: Text('ಪಂಚಾಂಗ ತಯಾರಿಸಿ', style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
+        title: Text(AppLocale.l('mGenerateCacheTitle'), style: TextStyle(color: kText, fontWeight: FontWeight.w800)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('ಎಷ್ಟು ವರ್ಷ ದತ್ತಾಂಶ ತಯಾರಿಸಬೇಕು?\nLocation: ${LocationService.place}',
+            Text('${AppLocale.l('mYearsCachePrompt')}\nLocation: ${LocationService.place}',
               style: TextStyle(color: kMuted, fontSize: 13)),
             const SizedBox(height: 12),
             ...[1, 5, 10, 20].map((y) => ListTile(
               dense: true,
-              title: Text('$y ವರ್ಷ (~${y * 365} ದಿನ)', style: TextStyle(color: kText, fontWeight: FontWeight.w600)),
+              title: Text('$y ${AppLocale.l('mYear')} (~${y * 365} ${AppLocale.l('mDaysApprox')})', style: TextStyle(color: kText, fontWeight: FontWeight.w600)),
               trailing: Icon(Icons.arrow_forward_ios, size: 14, color: kMuted),
               onTap: () => Navigator.pop(ctx, y),
             )),
@@ -1264,7 +1264,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             if (abhijitHouses != null && abhijitHouses.ascmc.length >= 1) {
               final abhijitSidDeg = ((abhijitHouses.ascmc[0] as double) - ayn) % 360.0;
               final abhijitRashi = (abhijitSidDeg / 30).floor() % 12;
-            final knRashiNames = ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ'];
+            final knRashiNames = [for (final r in ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ']) trAll(r)];
             dayLagnaWindows.add(LagnaWindow(
               rashiIndex: abhijitRashi,
               rashiName: '${knRashiNames[abhijitRashi]} (ಅಭಿಜಿತ್)',
@@ -1623,7 +1623,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                 if (abhijitHouses != null && abhijitHouses.ascmc.length >= 1) {
                   final abhijitSidDeg = ((abhijitHouses.ascmc[0] as double) - ayn) % 360.0;
                   final abhijitRashi = (abhijitSidDeg / 30).floor() % 12;
-                  final knRashiNames = ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ'];
+                  final knRashiNames = [for (final r in ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ']) trAll(r)];
                   dayLagnaWindows.add(LagnaWindow(
                     rashiIndex: abhijitRashi,
                     rashiName: '${knRashiNames[abhijitRashi]} (ಅಭಿಜಿತ್)',
@@ -1650,19 +1650,19 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           final is100PercentPerfect = allChecksPassed && isTaraOk && isGuruOk && isAstaOk && hasPerfectLagna;
 
           final partialReasons = <String>[];
-          if (!isTaraOk) partialReasons.add('ತಾರಾನುಕೂಲ ಮಧ್ಯಮ/ಅಶುಭ');
-          if (!isGuruOk) partialReasons.add('ಗುರು ಬಲ ಕೊರತೆ');
-          if (guruCombust) partialReasons.add('ಗುರು ಅಸ್ತ ದೋಷ');
-          if (shukraCombust) partialReasons.add('ಶುಕ್ರ ಅಸ್ತ ದೋಷ');
+          if (!isTaraOk) partialReasons.add(AppLocale.l('mTaraAnukoola'));
+          if (!isGuruOk) partialReasons.add(AppLocale.l('mGuruBalaLack'));
+          if (guruCombust) partialReasons.add(AppLocale.l('mGuruAstaDosha'));
+          if (shukraCombust) partialReasons.add(AppLocale.l('mShukraAstaDosha'));
           if (!allChecksPassed) {
             final failedList = mResult.checks.where((c) => !c.passed).map((c) => c.label).join(', ');
-            partialReasons.add('ಪಂಚಾಂಗ ದೋಷ ($failedList)');
+            partialReasons.add('${AppLocale.l('mPanchDosha')} ($failedList)');
           }
           if (!hasPerfectLagna) {
             if (hasShubhaLagna) {
-              partialReasons.add('ಲಗ್ನ ಶುದ್ಧಿ ಭಾಗಶಃ');
+              partialReasons.add(AppLocale.l('mPartialLagna'));
             } else {
-              partialReasons.add('ಲಗ್ನ ಶುದ್ಧಿ ಲಭ್ಯವಿಲ್ಲ');
+              partialReasons.add(AppLocale.l('mNoLagna'));
             }
           }
 
@@ -1698,7 +1698,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'isCandidate': !is100PercentPerfect && (hasShubhaLagna || dayLagnaWindows.isNotEmpty),
             'partialReasons': partialReasons,
             'score': is100PercentPerfect ? mResult.score : (mResult.score * 0.75).round(),
-            'verdict': is100PercentPerfect ? mResult.verdict : 'ಷರತ್ತುಬದ್ಧ',
+            'verdict': is100PercentPerfect ? mResult.verdict : AppLocale.l('mConditional'),
             'needsLagna': false,
           });
         } catch (_) {}
@@ -1903,7 +1903,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                   Icon(Icons.info_outline, color: kOrange, size: 16),
                   const SizedBox(width: 6),
                   Expanded(child: Text(
-                    'ಪಂಚಾಂಗ ದತ್ತಾಂಶ ಲೋಡ್ ಆಗಿಲ್ಲ. Settings → Panchanga Data → Import .bdat',
+                    AppLocale.l('mCacheNotLoaded'),
                     style: TextStyle(fontSize: 11, color: kOrange, fontWeight: FontWeight.w600),
                   )),
                 ]),
@@ -2170,7 +2170,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   }
 
   void _showRejectedDatesSheet(List rejectedDays, String ruleName, Color color) {
-    final varaNames = ['ರವಿ', 'ಸೋಮ', 'ಮಂಗಳ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ'];
+    final varaNames = [for (final v in ['ರವಿ', 'ಸೋಮ', 'ಮಂಗಳ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ']) trAll(v)];
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -2247,7 +2247,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                             ]),
                             const SizedBox(height: 4),
                             Text(
-                              'ತಿಥಿ: $tithi  |  ನಕ್ಷತ್ರ: $nakshatra  |  ಯೋಗ: $yoga',
+                              '${AppLocale.l('tithiLabel')}: $tithi  |  ${AppLocale.l('nakshatraShort')}: $nakshatra  |  ${AppLocale.l('yogaLabel')}: $yoga',
                               style: TextStyle(fontSize: 11, color: Colors.white70),
                             ),
                           ],
@@ -2342,7 +2342,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                   Row(children: [
                     Icon(Icons.info_outline, size: 14, color: Colors.amber.shade900),
                     const SizedBox(width: 6),
-                    Text('ಷರತ್ತುಬದ್ಧ ಮುಹೂರ್ತ (Candidate Muhurta)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.amber.shade900)),
+                    Text(AppLocale.l('mConditionalMuhurta'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.amber.shade900)),
                   ]),
                   if (partialReasons.isNotEmpty) ...[
                     const SizedBox(height: 2),
