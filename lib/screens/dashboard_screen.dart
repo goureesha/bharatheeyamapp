@@ -3307,17 +3307,19 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
-                  onPressed: () async {
-                    final filteredNotes = noteEntries.where((e) => _tippaniNoteSelection[noteEntries.indexOf(e)]).toList();
-                    if (filteredNotes.isEmpty) return;
-                    final rashi = entry?.result?.planets['ಚಂದ್ರ']?.rashi ?? '';
-                    final nakshatra = entry?.result?.panchang.nakshatra ?? '';
-                    final clientId = entry?.result?.clientId;
+                  onPressed: selectedCount == 0 && noteEntries.isNotEmpty ? null : () async {
+                    Navigator.pop(ctx);
+                    final rashi = activeResult.panchang.chandraRashi;
+                    final nakshatra = activeResult.panchang.nakshatra;
+                    final filteredNotes = <Map<String, String>>[];
+                    for (int i = 0; i < noteEntries.length; i++) {
+                      if (selectedNotes[i]) filteredNotes.add(noteEntries[i]);
+                    }
                     final data = TippaniData(
                       name: name,
-                      dateStr: isPrimary ? '${widget.dob.day.toString().padLeft(2,'0')}-${widget.dob.month.toString().padLeft(2,'0')}-${widget.dob.year}' : (entry != null ? '${entry.dob.day.toString().padLeft(2,'0')}-${entry.dob.month.toString().padLeft(2,'0')}-${entry.dob.year}' : ''),
-                      timeStr: isPrimary ? '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}' : (entry != null ? '${entry.hour.toString().padLeft(2,'0')}:${entry.minute.toString().padLeft(2,'0')} ${entry.ampm}' : ''),
-                      place: isPrimary ? widget.place : (entry?.place ?? ''),
+                      dateStr: dobStr,
+                      timeStr: timeStr,
+                      place: birthPlace,
                       clientId: clientId is String ? clientId : '',
                       rashi: rashi,
                       nakshatra: nakshatra,
