@@ -964,7 +964,7 @@ MuhurtaDayResult evaluateMuhurta({
   if (tithiPassed) totalPoints += 15;
   checks.add(MuhurtaCheckItem(
     label: AppLocale.l('mTithi'),
-    value: tithiName,
+    value: trAll(tithiName),
     passed: tithiPassed,
     note: hasSiddhaYoga ? AppLocale.l('mSiddhaYogaBhanga') : null,
   ));
@@ -983,15 +983,15 @@ MuhurtaDayResult evaluateMuhurta({
     hasAmritaSiddhi = true;
     if (!nakPassed) {
       nakPassed = true;
-      doshaBhangas.add('${AppLocale.l('mAmritaSiddhiBonus')}($varaName + $cleanNakName) — ${AppLocale.l('mNakshatra')} ದೋಷ ಭಂಗ');
+      doshaBhangas.add('${AppLocale.l('mAmritaSiddhiBonus')}(${trAll(varaName)} + ${trAll(cleanNakName)})');
     }
   }
   if (nakPassed) totalPoints += 15;
   checks.add(MuhurtaCheckItem(
     label: AppLocale.l('mNakshatra'),
-    value: nakshatraName,
+    value: trAll(nakshatraName),
     passed: nakPassed,
-    note: hasAmritaSiddhi ? '${AppLocale.l('mAmritaSiddhi')}$varaName + $cleanNakName ${AppLocale.l('mNakshatra')}' : null,
+    note: hasAmritaSiddhi ? '${AppLocale.l('mAmritaSiddhi')}${trAll(varaName)} + ${trAll(cleanNakName)}' : null,
   ));
 
 
@@ -1005,7 +1005,7 @@ MuhurtaDayResult evaluateMuhurta({
   if (varaPassed) totalPoints += 10;
   checks.add(MuhurtaCheckItem(
     label: AppLocale.l('mVara'),
-    value: varaName,
+    value: trAll(varaName),
     passed: varaPassed,
   ));
 
@@ -1015,7 +1015,7 @@ MuhurtaDayResult evaluateMuhurta({
   if (yogaPassed) totalPoints += 5;
   checks.add(MuhurtaCheckItem(
     label: AppLocale.l('yogaLabel'),
-    value: yogaName,
+    value: trAll(yogaName),
     passed: yogaPassed,
     note: yogaPassed ? null : AppLocale.l('ashubhaYoga'),
   ));
@@ -1030,7 +1030,7 @@ MuhurtaDayResult evaluateMuhurta({
   if (karanaPassed) totalPoints += 5;
   checks.add(MuhurtaCheckItem(
     label: AppLocale.l('karanaLabel'),
-    value: karanaName,
+    value: trAll(karanaName),
     passed: karanaPassed,
   ));
 

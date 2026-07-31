@@ -2402,7 +2402,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                   Text('👤 ${AppLocale.l('yourBalas')}', style: TextStyle(fontWeight: FontWeight.w800, color: kPurple1, fontSize: 13)),
                   const SizedBox(height: 6),
                   _balaChipRow(AppLocale.l('taraBala'),
-                    '${(r['taraBala'] as TaraResult).taraName} (${(r['taraBala'] as TaraResult).isGood ? AppLocale.l('shubha') : AppLocale.l('ashubha')})',
+                    '${trAll((r['taraBala'] as TaraResult).taraName)} (${(r['taraBala'] as TaraResult).isGood ? AppLocale.l('shubha') : AppLocale.l('ashubha')})',
                     (r['taraBala'] as TaraResult).isGood),
                   if (r['chandraBala'] != null)
                     _balaChipRow(AppLocale.l('chandraBala'),

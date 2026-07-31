@@ -506,7 +506,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             style: TextStyle(color: kText, fontSize: 14),
                             maxLines: 2,
                             decoration: InputDecoration(
-                              labelText: 'Address / ವಿಳಾಸ',
+                              labelText: '${AppLocale.l('jyotishiAddress')} / Address',
                               labelStyle: TextStyle(color: kMuted, fontSize: 13),
                               prefixIcon: Icon(Icons.location_on, color: kPurple2, size: 20),
                               filled: true, fillColor: kCard,
