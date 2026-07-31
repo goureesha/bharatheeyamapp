@@ -1290,6 +1290,19 @@ class AppLocale {
       'mTaraBala': 'ताराबल',
       'mGuruBala': 'गुरुबल',
 
+      // Muhurta Search localization
+      'mCacheNotLoaded': 'पंचांग डेटा लोड नहीं. Settings → Panchanga Data → Import .bdat',
+      'mTaraAnukoola': 'तारानुकूल मध्यम/अशुभ',
+      'mGuruAstaDosha': 'गुरु अस्त दोष',
+      'mShukraAstaDosha': 'शुक्र अस्त दोष',
+      'mPartialLagna': 'लग्न शुद्धि आंशिक',
+      'mNoLagna': 'लग्न शुद्धि उपलब्ध नहीं',
+      'mConditionalMuhurta': 'सशर्त मुहूर्त (Candidate Muhurta)',
+      'mGenerateCacheTitle': 'पंचांग तैयार करें',
+      'mYearsCachePrompt': 'कितने वर्ष का डेटा तैयार करना है?',
+      'mYear': 'वर्ष',
+      'mDaysApprox': 'दिन',
+
       // PDF Dialog UI
       'tippaniPdf': 'टिप्पणी PDF',
       'mangalaShloka': 'मंगल श्लोक / आह्वान',
@@ -1915,6 +1928,19 @@ class AppLocale {
       'mLagnaShuddhi': 'லக்ன சுத்தி குறைபாடு',
       'mTaraBala': 'தாரா பலம்',
       'mGuruBala': 'குரு பலம்',
+
+      // Muhurta Search localization
+      'mCacheNotLoaded': 'பஞ்சாங்க தரவு ஏற்றப்படவில்லை. Settings → Panchanga Data → Import .bdat',
+      'mTaraAnukoola': 'தாரா அனுகூலம் மத்திம/அசுப',
+      'mGuruAstaDosha': 'குரு அஸ்த தோஷம்',
+      'mShukraAstaDosha': 'சுக்ர அஸ்த தோஷம்',
+      'mPartialLagna': 'லக்ன சுத்தி பகுதி',
+      'mNoLagna': 'லக்ன சுத்தி கிடைக்கவில்லை',
+      'mConditionalMuhurta': 'நிபந்தனை முஹூர்த்தம் (Candidate Muhurta)',
+      'mGenerateCacheTitle': 'பஞ்சாங்கம் தயாரிக்கவும்',
+      'mYearsCachePrompt': 'எத்தனை ஆண்டு தரவு தயாரிக்க வேண்டும்?',
+      'mYear': 'ஆண்டு',
+      'mDaysApprox': 'நாள்',
 
       // PDF Dialog UI
       'tippaniPdf': 'குறிப்பு PDF',
@@ -2542,6 +2568,19 @@ class AppLocale {
       'mTaraBala': 'తారాబలం',
       'mGuruBala': 'గురుబలం',
 
+      // Muhurta Search localization
+      'mCacheNotLoaded': 'పంచాంగ డేటా లోడ్ కాలేదు. Settings → Panchanga Data → Import .bdat',
+      'mTaraAnukoola': 'తారానుకూలం మధ్యమ/అశుభ',
+      'mGuruAstaDosha': 'గురు అస్త దోషం',
+      'mShukraAstaDosha': 'శుక్ర అస్త దోషం',
+      'mPartialLagna': 'లగ్న శుద్ధి భాగశః',
+      'mNoLagna': 'లగ్న శుద్ధి లభ్యం కాదు',
+      'mConditionalMuhurta': 'షరతు ముహూర్తం (Candidate Muhurta)',
+      'mGenerateCacheTitle': 'పంచాంగం తయారు చేయండి',
+      'mYearsCachePrompt': 'ఎన్ని సంవత్సరాల డేటా తయారు చేయాలి?',
+      'mYear': 'సంవత్సరం',
+      'mDaysApprox': 'రోజు',
+
       // PDF Dialog UI
       'tippaniPdf': 'గమనికలు PDF',
       'mangalaShloka': 'మంగళ శ్లోకం / ఆహ్వానం',
@@ -3167,6 +3206,19 @@ class AppLocale {
       'mLagnaShuddhi': 'ലഗ്ന ശുദ്ധി കുറവ്',
       'mTaraBala': 'താരാബലം',
       'mGuruBala': 'ഗുരുബലം',
+
+      // Muhurta Search localization
+      'mCacheNotLoaded': 'പഞ്ചാംഗ ഡാറ്റ ലോഡ് ആയില്ല. Settings → Panchanga Data → Import .bdat',
+      'mTaraAnukoola': 'താരാനുകൂലം മധ്യമ/അശുഭ',
+      'mGuruAstaDosha': 'ഗുരു അസ്ത ദോഷം',
+      'mShukraAstaDosha': 'ശുക്ര അസ്ത ദോഷം',
+      'mPartialLagna': 'ലഗ്ന ശുദ്ധി ഭാഗികം',
+      'mNoLagna': 'ലഗ്ന ശുദ്ധി ലഭ്യമല്ല',
+      'mConditionalMuhurta': 'സോപാധിക മുഹൂർത്തം (Candidate Muhurta)',
+      'mGenerateCacheTitle': 'പഞ്ചാംഗം തയ്യാറാക്കുക',
+      'mYearsCachePrompt': 'എത്ര വർഷത്തെ ഡാറ്റ തയ്യാറാക്കണം?',
+      'mYear': 'വർഷം',
+      'mDaysApprox': 'ദിവസം',
 
       // PDF Dialog UI
       'tippaniPdf': 'കുറിപ്പുകൾ PDF',
