@@ -1,3 +1,4 @@
+import '../widgets/common.dart';
 // Muhurta Rules Engine — based on Muhurta Chintamani
 
 // ============================================================
@@ -957,15 +958,15 @@ MuhurtaDayResult evaluateMuhurta({
     if (siddhaList != null && siddhaList.contains(pakshaRelTithi)) {
       hasSiddhaYoga = true;
       tithiPassed = true;
-      doshaBhangas.add('ಸಿದ್ಧ ಯೋಗ — ತಿಥಿ ದೋಷ ಭಂಗ');
+      doshaBhangas.add(AppLocale.l('mSiddhaYoga'));
     }
   }
   if (tithiPassed) totalPoints += 15;
   checks.add(MuhurtaCheckItem(
-    label: 'ತಿಥಿ',
+    label: AppLocale.l('mTithi'),
     value: tithiName,
     passed: tithiPassed,
-    note: hasSiddhaYoga ? 'ಸಿದ್ಧ ಯೋಗ — ದೋಷ ಭಂಗ' : null,
+    note: hasSiddhaYoga ? AppLocale.l('mSiddhaYogaBhanga') : null,
   ));
 
   // ── 2. NAKSHATRA CHECK (15 points) ──
@@ -982,15 +983,15 @@ MuhurtaDayResult evaluateMuhurta({
     hasAmritaSiddhi = true;
     if (!nakPassed) {
       nakPassed = true;
-      doshaBhangas.add('ಅಮೃತ ಸಿದ್ಧಿ ಯೋಗ ($varaName + $cleanNakName) — ನಕ್ಷತ್ರ ದೋಷ ಭಂಗ');
+      doshaBhangas.add('${AppLocale.l('mAmritaSiddhiBonus')}($varaName + $cleanNakName) — ${AppLocale.l('mNakshatra')} ದೋಷ ಭಂಗ');
     }
   }
   if (nakPassed) totalPoints += 15;
   checks.add(MuhurtaCheckItem(
-    label: 'ನಕ್ಷತ್ರ',
+    label: AppLocale.l('mNakshatra'),
     value: nakshatraName,
     passed: nakPassed,
-    note: hasAmritaSiddhi ? 'ಅಮೃತ ಸಿದ್ಧಿ: $varaName + $cleanNakName ನಕ್ಷತ್ರ' : null,
+    note: hasAmritaSiddhi ? '${AppLocale.l('mAmritaSiddhi')}$varaName + $cleanNakName ${AppLocale.l('mNakshatra')}' : null,
   ));
 
 
@@ -1003,7 +1004,7 @@ MuhurtaDayResult evaluateMuhurta({
   }
   if (varaPassed) totalPoints += 10;
   checks.add(MuhurtaCheckItem(
-    label: 'ವಾರ',
+    label: AppLocale.l('mVara'),
     value: varaName,
     passed: varaPassed,
   ));
@@ -1013,10 +1014,10 @@ MuhurtaDayResult evaluateMuhurta({
   bool yogaPassed = !blockedYogaIndices.contains(yogaIndex);
   if (yogaPassed) totalPoints += 5;
   checks.add(MuhurtaCheckItem(
-    label: 'ಯೋಗ',
+    label: AppLocale.l('yogaLabel'),
     value: yogaName,
     passed: yogaPassed,
-    note: yogaPassed ? null : 'ಅಶುಭ ಯೋಗ',
+    note: yogaPassed ? null : AppLocale.l('ashubhaYoga'),
   ));
 
   // ── 5. KARANA CHECK (5 points) ──
@@ -1024,11 +1025,11 @@ MuhurtaDayResult evaluateMuhurta({
   bool karanaPassed = true;
   if (rules.avoidVishti && karanaName.contains('ವಿಷ್ಟಿ') || karanaName.contains('ಭದ್ರಾ')) {
     karanaPassed = false;
-    doshas.add('ವಿಷ್ಟಿ (ಭದ್ರಾ) ಕರಣ');
+    doshas.add(AppLocale.l('mVishtiKarana'));
   }
   if (karanaPassed) totalPoints += 5;
   checks.add(MuhurtaCheckItem(
-    label: 'ಕರಣ',
+    label: AppLocale.l('karanaLabel'),
     value: karanaName,
     passed: karanaPassed,
   ));
@@ -1039,14 +1040,14 @@ MuhurtaDayResult evaluateMuhurta({
   final dagdhaList = dagdhaYogaTable[varaIndex];
   if (dagdhaList != null && dagdhaList.contains(nakshatraIndex)) {
     hasDagdha = true;
-    doshas.add('ದಗ್ಧ ಯೋಗ — ಸರ್ವಥಾ ನಿಷಿದ್ಧ');
+    doshas.add(AppLocale.l('mDagdhaNishedha'));
   }
   if (!hasDagdha) totalPoints += 5;
   checks.add(MuhurtaCheckItem(
-    label: 'ದಗ್ಧ ಯೋಗ',
-    value: hasDagdha ? 'ಇದೆ ❌' : 'ಇಲ್ಲ ✓',
+    label: AppLocale.l('mDagdhaYoga'),
+    value: hasDagdha ? '${AppLocale.l('yesExists')} ❌' : '${AppLocale.l('noExists')} ✓',
     passed: !hasDagdha,
-    note: hasDagdha ? 'ದೋಷ ಭಂಗ ಇಲ್ಲ — ನಿಷೇಧ' : null,
+    note: hasDagdha ? AppLocale.l('mDoshaBhanga') : null,
   ));
 
   // ── 7. TARA BALA (10 pts per person) ──
@@ -1064,7 +1065,7 @@ MuhurtaDayResult evaluateMuhurta({
   // Tara dosha bhanga: Amrita Siddhi cancels minor tara dosha
   if (!tara1Passed && hasAmritaSiddhi) {
     tara1Passed = true;
-    doshaBhangas.add('ಅಮೃತ ಸಿದ್ಧಿ — ತಾರಾ ದೋಷ ಭಂಗ (ವ್ಯಕ್ತಿ 1)');
+    doshaBhangas.add(AppLocale.l('mAmritaTara1'));
   }
   if (tara1Passed) totalPoints += 10;
 
@@ -1076,12 +1077,12 @@ MuhurtaDayResult evaluateMuhurta({
     totalPoints += 10;
   } else if (guru1.score == 1) {
     totalPoints += 5; // Poojya gives partial points
-    doshaBhangas.add('ಗುರು ಬಲ: ಪೂಜ್ಯ ಸ್ಥಾನ (ಶಾಂತಿ ಮಾಡಿ)');
+    doshaBhangas.add('${AppLocale.l('mGuruBala')}: ${AppLocale.l('mPoojyaGuru')}');
   }
 
-  checks.add(MuhurtaCheckItem(label: 'ತಾರಾ ಬಲ', value: tara1.taraName, passed: tara1Passed));
+  checks.add(MuhurtaCheckItem(label: AppLocale.l('mTaraBala'), value: tara1.taraName, passed: tara1Passed));
   // Chandra Bala check item removed
-  checks.add(MuhurtaCheckItem(label: 'ಗುರು ಬಲ', value: guru1.label, passed: guru1.score > 0));
+  checks.add(MuhurtaCheckItem(label: AppLocale.l('mGuruBala'), value: guru1.label, passed: guru1.score > 0));
 
   // Person 2 (if provided)
   if (janmaNakIdx2 != null && janmaRashiIdx2 != null) {
@@ -1095,7 +1096,7 @@ MuhurtaDayResult evaluateMuhurta({
     bool tara2Passed = tara2.isGood;
     if (!tara2Passed && hasAmritaSiddhi) {
       tara2Passed = true;
-      doshaBhangas.add('ಅಮೃತ ಸಿದ್ಧಿ — ತಾರಾ ದೋಷ ಭಂಗ (ವ್ಯಕ್ತಿ 2)');
+      doshaBhangas.add(AppLocale.l('mAmritaTara2'));
     }
     if (tara2Passed) totalPoints += 10;
     // chandra2 scoring removed
@@ -1104,7 +1105,7 @@ MuhurtaDayResult evaluateMuhurta({
       totalPoints += 10;
     } else if (guru2.score == 1) {
       totalPoints += 5;
-      doshaBhangas.add('ಗುರು ಬಲ (ವ್ಯಕ್ತಿ 2): ಪೂಜ್ಯ ಸ್ಥಾನ (ಶಾಂತಿ ಮಾಡಿ)');
+      doshaBhangas.add('${AppLocale.l('mGuruBala')} (2): ${AppLocale.l('mPoojyaGuru')}');
     }
 
     // Tara dosha bhanga for Vivaha: same rashi lord cancels
@@ -1112,7 +1113,7 @@ MuhurtaDayResult evaluateMuhurta({
       final rashiLords = [4, 5, 3, 1, 0, 3, 5, 4, 8, 6, 6, 8]; // Mars,Venus,Mercury,Moon,Sun,Mercury,Venus,Mars,Jupiter,Saturn,Saturn,Jupiter
       if (rashiLords[janmaRashiIdx1] == rashiLords[janmaRashiIdx2]) {
         if (!tara1.isGood || !tara2.isGood) {
-          doshaBhangas.add('ಸಮಾನ ರಾಶ್ಯಧಿಪತಿ — ತಾರಾ ದೋಷ ಭಂಗ');
+          doshaBhangas.add(AppLocale.l('mSamanaRashi'));
         }
       }
     }
@@ -1122,8 +1123,8 @@ MuhurtaDayResult evaluateMuhurta({
   if (hasAmritaSiddhi) {
     totalPoints += 5; // Bonus
     maxPoints += 5;
-    final txt = 'ಅಮೃತ ಸಿದ್ಧಿ ಯೋಗ: $varaName + $cleanNakName';
-    if (!doshaBhangas.any((d) => d.contains('ಅಮೃತ ಸಿದ್ಧಿ'))) {
+    final txt = '${AppLocale.l('mAmritaSiddhiBonus')}$varaName + $cleanNakName';
+    if (!doshaBhangas.any((d) => d.contains(AppLocale.l('mAmritaSiddhiBonus').split(':')[0]))) {
       doshaBhangas.add(txt);
     }
   }
@@ -1136,12 +1137,12 @@ MuhurtaDayResult evaluateMuhurta({
     maxPoints += 5;
     totalPoints += 5;
     abhijitApplied = true;
-    doshaBhangas.add('ಅಭಿಜಿತ್ ಮುಹೂರ್ತ ಲಭ್ಯ ($abhijitTimeWindow)');
+    doshaBhangas.add('${AppLocale.l('mAbhijitAvail')} ($abhijitTimeWindow)');
     checks.add(MuhurtaCheckItem(
-      label: 'ಅಭಿಜಿತ್',
+      label: AppLocale.l('abhijitLabel'),
       value: abhijitTimeWindow,
       passed: true,
-      note: 'ಸರ್ವ ಕಾರ್ಯ ಶುಭ — ಮಧ್ಯಾಹ್ನ ಮುಹೂರ್ತ',
+      note: AppLocale.l('mSarvaKarya'),
     ));
   }
 
@@ -1154,12 +1155,12 @@ MuhurtaDayResult evaluateMuhurta({
     maxPoints += 5;
     totalPoints += 5;
     godhuliApplied = true;
-    doshaBhangas.add('ಗೋಧೂಳಿ ಲಗ್ನ ಲಭ್ಯ ($godhuliTimeWindow)');
+    doshaBhangas.add('${AppLocale.l('mGodhuliAvail')} ($godhuliTimeWindow)');
     checks.add(MuhurtaCheckItem(
-      label: 'ಗೋಧೂಳಿ',
+      label: AppLocale.l('godhuliLabel'),
       value: godhuliTimeWindow,
       passed: true,
-      note: 'ವಿವಾಹಕ್ಕೆ ಅತ್ಯಂತ ಶುಭ',
+      note: AppLocale.l('mVivahaShubha'),
     ));
   }
 
@@ -1171,11 +1172,11 @@ MuhurtaDayResult evaluateMuhurta({
 
   String verdict;
   if (finalScore >= 80) {
-    verdict = 'ಶ್ರೇಷ್ಠ';
+    verdict = AppLocale.l('mVerdictExcellent');
   } else if (finalScore >= 60) {
-    verdict = 'ಮಧ್ಯಮ';
+    verdict = AppLocale.l('mVerdictMedium');
   } else {
-    verdict = 'ಅಶುಭ';
+    verdict = AppLocale.l('mVerdictBad');
   }
 
   return MuhurtaDayResult(

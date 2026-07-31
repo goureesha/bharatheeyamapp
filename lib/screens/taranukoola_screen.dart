@@ -2314,7 +2314,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     Text('$dateStr  ${trAll(r['vara'])}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kText)),
                     const SizedBox(height: 2),
                     Text(
-                      isPerfect ? '✅ ಪರಿಪೂರ್ಣ ಮುಹೂರ್ತ' : (isCandidate ? '⚠ ಷರತ್ತುಬದ್ಧ' : '📅 ಮುಹೂರ್ತ'),
+                      isPerfect ? '✅ ${AppLocale.l('mPerfectMuhurtaLabel')}' : (isCandidate ? '⚠ ${AppLocale.l('mConditionalLabel')}' : '📅 ${AppLocale.l('muhurtaLabel')}'),
                       style: TextStyle(fontSize: 11, color: scoreColor, fontWeight: FontWeight.w700),
                     ),
                   ],
@@ -2346,7 +2346,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                   ]),
                   if (partialReasons.isNotEmpty) ...[
                     const SizedBox(height: 2),
-                    Text('ಕಾರಣಗಳು: ${partialReasons.join(" • ")}', style: TextStyle(fontSize: 11, color: Colors.amber.shade900, fontWeight: FontWeight.w600)),
+                    Text('${AppLocale.l('mReasonsLabel')}: ${partialReasons.join(" • ")}', style: TextStyle(fontSize: 11, color: Colors.amber.shade900, fontWeight: FontWeight.w600)),
                   ],
                 ],
               ),
@@ -2409,7 +2409,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                       (r['chandraBala'] as bool) ? AppLocale.l('anukoola') : AppLocale.l('pratikoola'),
                       r['chandraBala'] as bool),
                   if (r['guruBala'] != null)
-                    _balaChipRow('ಗುರು ಬಲ (${trAll(knRashi[r['jupRashi'] as int])})',
+                    _balaChipRow('${AppLocale.l('mGuruBala')} (${trAll(knRashi[r['jupRashi'] as int])})',
                       (r['guruBala'] as BalaScore).label,
                       (r['guruBala'] as BalaScore).score > 0),
                 ]),
@@ -2445,7 +2445,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               child: Row(children: [
                 SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: kPurple1)),
                 const SizedBox(width: 8),
-                Text('ಲಗ್ನ ಲೆಕ್ಕಾಚಾರ ಮಾಡಲಾಗುತ್ತಿದೆ...', style: TextStyle(fontSize: 12, color: kMuted, fontWeight: FontWeight.w600)),
+                Text(AppLocale.l('mLagnaComputing'), style: TextStyle(fontSize: 12, color: kMuted, fontWeight: FontWeight.w600)),
               ]),
             ),
 
@@ -2511,7 +2511,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                                 border: Border.all(color: lw.guruAnukoola ? Colors.amber.shade600 : Colors.grey.shade300, width: 0.5),
                               ),
                               child: Text(
-                                lw.guruAnukoola ? 'ಗುರು ✓ (${lw.guruFromLagna})' : 'ಗುರು ✗ (${lw.guruFromLagna})',
+                                lw.guruAnukoola ? '${AppLocale.l('guruLabel')} ✓ (${lw.guruFromLagna})' : '${AppLocale.l('guruLabel')} ✗ (${lw.guruFromLagna})',
                                 style: TextStyle(fontSize: 9, color: lw.guruAnukoola ? Colors.amber.shade800 : kMuted, fontWeight: FontWeight.w700),
                               ),
                             ),
