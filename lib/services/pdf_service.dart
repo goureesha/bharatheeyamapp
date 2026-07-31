@@ -8,7 +8,7 @@ import '../widgets/common.dart';
 /// Generates a professional Kundali PDF with all astrological data
 class PdfService {
   /// Generate and show print/share dialog for the Kundali PDF
-  static Future<void> generateAndPrint({
+  static Future<Uint8List> _generatePdfBytes({
     required String name,
     required String place,
     required DateTime dob,
@@ -250,10 +250,50 @@ class PdfService {
       ));
     }
 
-    // Show print/share dialog
+    return pdf.save();
+  }
+
+  /// Generate and show print dialog for the Kundali PDF
+  static Future<void> generateAndPrint({
+    required String name,
+    required String place,
+    required DateTime dob,
+    required int hour,
+    required int minute,
+    required String ampm,
+    required double lat,
+    required double lon,
+    required KundaliResult result,
+    required String notes,
+  }) async {
+    final bytes = await _generatePdfBytes(
+      name: name, place: place, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, result: result, notes: notes
+    );
     await Printing.layoutPdf(
-      onLayout: (format) async => pdf.save(),
+      onLayout: (format) async => bytes,
       name: 'Kundali_$name.pdf',
+    );
+  }
+
+  /// Generate and show share dialog for the Kundali PDF
+  static Future<void> generateAndShare({
+    required String name,
+    required String place,
+    required DateTime dob,
+    required int hour,
+    required int minute,
+    required String ampm,
+    required double lat,
+    required double lon,
+    required KundaliResult result,
+    required String notes,
+  }) async {
+    final bytes = await _generatePdfBytes(
+      name: name, place: place, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, result: result, notes: notes
+    );
+    await Printing.sharePdf(
+      bytes: bytes,
+      filename: 'Kundali_$name.pdf',
     );
   }
 

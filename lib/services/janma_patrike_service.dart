@@ -177,7 +177,7 @@ class JanmaPatrikeService {
     });
   }
 
-  static Future<void> generateAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages}) async {
+  static Future<Uint8List> _generatePdfBytes(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages}) async {
     theme ??= PdfThemes.traditional;
     final pages = selectedPages ?? [true, true, true, true, true, true];
     final controller = ScreenshotController();
@@ -302,10 +302,20 @@ class JanmaPatrikeService {
       }
     }
 
+    return doc.save();
+  }
+
+  static Future<void> generateAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages}) async {
+    final bytes = await _generatePdfBytes(user, result, theme: theme, selectedPages: selectedPages);
     await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => doc.save(),
+      onLayout: (PdfPageFormat format) async => bytes,
       name: '${user.name}_janmapatrike',
     );
+  }
+
+  static Future<void> generateAndShare(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages}) async {
+    final bytes = await _generatePdfBytes(user, result, theme: theme, selectedPages: selectedPages);
+    await Printing.sharePdf(bytes: bytes, filename: '${user.name}_janmapatrike.pdf');
   }
 
   static Widget _buildPageWrapper({

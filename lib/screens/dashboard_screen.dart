@@ -3305,6 +3305,38 @@ class _DashboardScreenState extends State<DashboardScreen>
                     backgroundColor: Colors.deepOrange, foregroundColor: Colors.white,
                   ),
                 ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final filteredNotes = noteEntries.where((e) => _tippaniNoteSelection[noteEntries.indexOf(e)]).toList();
+                    if (filteredNotes.isEmpty) return;
+                    final rashi = entry?.result?.planets['ಚಂದ್ರ']?.rashi ?? '';
+                    final nakshatra = entry?.result?.panchang.nakshatra ?? '';
+                    final clientId = entry?.result?.clientId;
+                    final data = TippaniData(
+                      name: name,
+                      dateStr: isPrimary ? '${widget.dob.day.toString().padLeft(2,'0')}-${widget.dob.month.toString().padLeft(2,'0')}-${widget.dob.year}' : (entry != null ? '${entry.dob.day.toString().padLeft(2,'0')}-${entry.dob.month.toString().padLeft(2,'0')}-${entry.dob.year}' : ''),
+                      timeStr: isPrimary ? '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}' : (entry != null ? '${entry.hour.toString().padLeft(2,'0')}:${entry.minute.toString().padLeft(2,'0')} ${entry.ampm}' : ''),
+                      place: isPrimary ? widget.place : (entry?.place ?? ''),
+                      clientId: clientId is String ? clientId : '',
+                      rashi: rashi,
+                      nakshatra: nakshatra,
+                      invocationText: _tippaniInvocationCtrl.text.trim(),
+                      astrologerName: _jyotishiNameCtrl.text.trim(),
+                      astrologerAddress: _tippaniAddressCtrl.text.trim(),
+                      astrologerPhone: _jyotishiPhoneCtrl.text.trim(),
+                      notes: filteredNotes,
+                    );
+                    final selectedTheme = PdfThemes.all.firstWhere((t) => t.id == _selectedThemeId, orElse: () => PdfThemes.traditional);
+                    await TippaniPdfService.generateAndShare(data, theme: selectedTheme);
+                  },
+                  icon: const Icon(Icons.share, size: 18),
+                  label: Text('${AppLocale.l('pdfShareDirect')} ($selectedCount)'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.deepOrange,
+                    side: const BorderSide(color: Colors.deepOrange, width: 1.5),
+                  ),
+                ),
               ],
             );
           },
@@ -4397,6 +4429,49 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                       try {
                         await JanmaPatrikeService.generateAndPrint(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection);
+                      } catch (e) {
+                         ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('❌ ${AppLocale.l('errorLabel')}: $e'), backgroundColor: Colors.red)
+                        );
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Share Button
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: selectedTheme.primaryLight,
+                      side: BorderSide(color: selectedTheme.primaryLight, width: 1.5),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    icon: const Icon(Icons.share),
+                    label: Text('${AppLocale.l('pdfShareDirect')} — ${AppLocale.current == 'kn' ? selectedTheme.nameKn : selectedTheme.nameEn}', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                    onPressed: () async {
+                      final dateStr = '${widget.dob.day.toString().padLeft(2,'0')}-${widget.dob.month.toString().padLeft(2,'0')}-${widget.dob.year}';
+                      final timeStr = '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}';
+
+                      final ud = UserDetails(
+                        name: widget.name,
+                        dateStr: dateStr,
+                        timeStr: timeStr,
+                        place: widget.place,
+                        fatherName: _fatherNameCtrl.text.trim(),
+                        motherName: _motherNameCtrl.text.trim(),
+                        gotra: _gotraCtrl.text.trim(),
+                        jyotishiName: _jyotishiNameCtrl.text.trim(),
+                        jyotishiPhone: _jyotishiPhoneCtrl.text.trim(),
+                      );
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('⏳ ${AppLocale.l('pdfShareDirect')}...'))
+                      );
+
+                      try {
+                        await JanmaPatrikeService.generateAndShare(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection);
                       } catch (e) {
                          ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('❌ ${AppLocale.l('errorLabel')}: $e'), backgroundColor: Colors.red)

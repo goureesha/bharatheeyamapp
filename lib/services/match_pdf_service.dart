@@ -37,7 +37,7 @@ class MatchPdfService {
   static const double _pw = 793.0;
   static const double _ph = 1122.0;
 
-  static Future<void> generateAndPrint(MatchPdfData d, {PdfThemeConfig? theme}) async {
+  static Future<Uint8List> _generatePdfBytes(MatchPdfData d, {PdfThemeConfig? theme}) async {
     theme ??= PdfThemes.traditional;
     final controller = ScreenshotController();
     final targetSize = const Size(_pw, _ph);
@@ -59,9 +59,22 @@ class MatchPdfService {
     final p3b = await controller.captureFromWidget(p3, targetSize: targetSize, pixelRatio: 3.0, delay: const Duration(milliseconds: 200));
     _addPage(doc, p3b);
 
+    return doc.save();
+  }
+
+  static Future<void> generateAndPrint(MatchPdfData d, {PdfThemeConfig? theme}) async {
+    final bytes = await _generatePdfBytes(d, theme: theme);
     await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => doc.save(),
+      onLayout: (PdfPageFormat format) async => bytes,
       name: '${d.groomName}_${d.brideName}_match',
+    );
+  }
+
+  static Future<void> generateAndShare(MatchPdfData d, {PdfThemeConfig? theme}) async {
+    final bytes = await _generatePdfBytes(d, theme: theme);
+    await Printing.sharePdf(
+      bytes: bytes,
+      filename: '${d.groomName}_${d.brideName}_match.pdf',
     );
   }
 

@@ -1261,6 +1261,39 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
             label: Text(AppLocale.l('createPdf')),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
           ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: (_groomResult == null || _brideResult == null || _fullResult == null) ? null : () async {
+              final gDobStr = '${_gDob.day.toString().padLeft(2, '0')}-${_gDob.month.toString().padLeft(2, '0')}-${_gDob.year}';
+              final bDobStr = '${_bDob.day.toString().padLeft(2, '0')}-${_bDob.month.toString().padLeft(2, '0')}-${_bDob.year}';
+              final data = MatchPdfData(
+                groomName: _gNameCtrl.text.isNotEmpty ? _gNameCtrl.text : AppLocale.l('groom'),
+                groomDob: gDobStr,
+                groomTime: '${_gHour.toString().padLeft(2, '0')}:${_gMinute.toString().padLeft(2, '0')} $_gAmpm',
+                groomPlace: _gPlaceCtrl.text,
+                brideName: _bNameCtrl.text.isNotEmpty ? _bNameCtrl.text : AppLocale.l('bride'),
+                brideDob: bDobStr,
+                brideTime: '${_bHour.toString().padLeft(2, '0')}:${_bMinute.toString().padLeft(2, '0')} $_bAmpm',
+                bridePlace: _bPlaceCtrl.text,
+                groomResult: _groomResult!,
+                brideResult: _brideResult!,
+                fullResult: _fullResult!,
+                kootaMode: _kootaMode,
+                invocationText: _mInvocationCtrl.text.trim(),
+                astrologerName: _mJyotishiNameCtrl.text.trim(),
+                astrologerAddress: _mJyotishiAddressCtrl.text.trim(),
+                astrologerPhone: _mJyotishiPhoneCtrl.text.trim(),
+              );
+              final selectedTheme = PdfThemes.all.firstWhere((t) => t.id == _mSelectedThemeId, orElse: () => PdfThemes.traditional);
+              await MatchPdfService.generateAndShare(data, theme: selectedTheme);
+            },
+            icon: const Icon(Icons.share, size: 18),
+            label: Text(AppLocale.l('pdfShareDirect')),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.red,
+              side: const BorderSide(color: Colors.red, width: 1.5),
+            ),
+          ),
         ],
       ),
     );

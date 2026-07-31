@@ -123,8 +123,7 @@ class TippaniPdfService {
     return pages;
   }
 
-  /// Generate and print Tippani PDF (multi-page)
-  static Future<void> generateAndPrint(TippaniData data, {PdfThemeConfig? theme}) async {
+  static Future<Uint8List> _generatePdfBytes(TippaniData data, {PdfThemeConfig? theme}) async {
     theme ??= PdfThemes.traditional;
     final controller = ScreenshotController();
     final targetSize = const Size(_pw, _ph);
@@ -145,9 +144,23 @@ class TippaniPdfService {
       _addPage(doc, bytes);
     }
 
+    return doc.save();
+  }
+
+  /// Generate and print Tippani PDF (multi-page)
+  static Future<void> generateAndPrint(TippaniData data, {PdfThemeConfig? theme}) async {
+    final bytes = await _generatePdfBytes(data, theme: theme);
     await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => doc.save(),
+      onLayout: (PdfPageFormat format) async => bytes,
       name: '${data.name}_tippani',
+    );
+  }
+
+  static Future<void> generateAndShare(TippaniData data, {PdfThemeConfig? theme}) async {
+    final bytes = await _generatePdfBytes(data, theme: theme);
+    await Printing.sharePdf(
+      bytes: bytes,
+      filename: '${data.name}_tippani.pdf',
     );
   }
 
