@@ -783,8 +783,7 @@ class JanmaPatrikeService {
   // PAGE 3: Antardasha Details
   // ════════════════════════════════════════════════════════
   static Widget _buildPage3Content(UserDetails user, KundaliResult result, PdfThemeConfig t) {
-    String title = AppLocale.l('jpAntardashaTitle');
-    if (title == 'jpAntardashaTitle') title = 'ಅಂತರ್ದಶಾ ವಿವರ';
+    final title = AppLocale.l('jpAntardashaTitle');
 
     List<Widget> tables = [];
     for (final md in result.dashas) {
@@ -874,8 +873,7 @@ class JanmaPatrikeService {
   // PAGE 4: Varga Kundalis
   // ════════════════════════════════════════════════════════
   static Widget _buildPage4Content(UserDetails user, KundaliResult result, PdfThemeConfig t) {
-    String title = AppLocale.l('jpVargaKundaliTitle');
-    if (title == 'jpVargaKundaliTitle') title = 'ವರ್ಗ ಕುಂಡಲಿಗಳು';
+    final title = AppLocale.l('jpVargaKundaliTitle');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -886,11 +884,11 @@ class JanmaPatrikeService {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D1 ರಾಶಿ'), _rashiChart(result), t))),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(AppLocale.l('jpD1Rashi'), _rashiChart(result), t))),
               const SizedBox(width: 8),
-              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D2 ಹೋರಾ'), _horaChart(result), t))),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(AppLocale.l('jpD2Hora'), _horaChart(result), t))),
               const SizedBox(width: 8),
-              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D3 ದ್ರೇಕ್ಕಾಣ'), _drekkanaChart(result), t))),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(AppLocale.l('jpD3Drekkana'), _drekkanaChart(result), t))),
             ],
           ),
         ),
@@ -899,11 +897,11 @@ class JanmaPatrikeService {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D9 ನವಾಂಶ'), _navamshaChart(result), t))),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(AppLocale.l('jpD9Navamsha'), _navamshaChart(result), t))),
               const SizedBox(width: 8),
-              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D12 ದ್ವಾದಶಾಂಶ'), _dvadashamshaChart(result), t))),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(AppLocale.l('jpD12Dvadasha'), _dvadashamshaChart(result), t))),
               const SizedBox(width: 8),
-              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(trAll('D30 ತ್ರಿಂಶಾಂಶ'), _trimshamshaChart(result), t))),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWidget(AppLocale.l('jpD30Trimsha'), _trimshamshaChart(result), t))),
             ],
           ),
         ),
@@ -916,8 +914,7 @@ class JanmaPatrikeService {
   // PAGE 5: Ashtakavarga
   // ════════════════════════════════════════════════════════
   static Widget _buildPage5Content(UserDetails user, KundaliResult result, PdfThemeConfig t) {
-    String title = AppLocale.l('jpAshtakavargaTitle');
-    if (title == 'jpAshtakavargaTitle') title = 'ಅಷ್ಟಕವರ್ಗ';
+    final title = AppLocale.l('jpAshtakavargaTitle');
 
     final Map<String, int> rashiPositions = {};
     for (final p in AshtakaVarga.planetsWithLagna) {
@@ -999,10 +996,9 @@ class JanmaPatrikeService {
   // PAGE 6: Shadbala
   // ════════════════════════════════════════════════════════
   static Widget _buildPage6Content(UserDetails user, KundaliResult result, PdfThemeConfig t) {
-    String title = AppLocale.l('jpShadbalaTitle');
-    if (title == 'jpShadbalaTitle') title = 'ಷಡ್ಬಲ ವಿವರ';
+    final title = AppLocale.l('jpShadbalaTitle');
 
-    List<String> headers = ['ಗ್ರಹ', 'ಸ್ಥಾನ', 'ದಿಕ್', 'ಕಾಲ', 'ಚೇಷ್ಟಾ', 'ನೈಸರ್ಗಿಕ', 'ದೃಕ್', 'ಒಟ್ಟು (ರೂಪ)', 'ಅಗತ್ಯ', 'ಸ್ಥಿತಿ'];
+    List<String> headers = [AppLocale.l('sbGraha'), AppLocale.l('sbSthana'), AppLocale.l('sbDik'), AppLocale.l('sbKala'), AppLocale.l('sbCheshta'), AppLocale.l('sbNaisargika'), AppLocale.l('sbDrik'), AppLocale.l('sbTotal'), AppLocale.l('sbRequired'), AppLocale.l('sbStatus')];
     List<TableRow> rows = [
       TableRow(
         decoration: BoxDecoration(color: t.tableHeaderBg),
@@ -1020,7 +1016,7 @@ class JanmaPatrikeService {
       final isEven = (rowIndex++) % 2 == 0;
       bool isStrong = sb['IsStrong'] ?? false;
       Color statusColor = isStrong ? Colors.green.shade100 : Colors.red.shade100;
-      String statusStr = isStrong ? 'ಬಲ' : 'ದುರ್ಬಲ';
+      String statusStr = isStrong ? AppLocale.l('sbStrong') : AppLocale.l('sbWeak');
       
       List<String> cells = [
         trAll(appPlanetNames[engName] ?? engName),
