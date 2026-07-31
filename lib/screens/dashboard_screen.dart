@@ -3738,7 +3738,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           else if (_gocharData != null) ...[
             // ── GURU GOCHAR ──
             AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Text('🪐 ${trAll('ಗುರು ಗೋಚಾರ')} — $_gocharYear', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple1)),
+              Text('🪐 ${AppLocale.l('guruGochara')} — $_gocharYear', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple1)),
               const SizedBox(height: 12),
               ...guruSegments.map((seg) {
                 final house = houseFromMoon(seg.rashiIdx);
@@ -3768,7 +3768,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
             // ── SHANI GOCHAR ──
             AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Text('🪨 ${trAll('ಶನಿ ಗೋಚಾರ')} — $_gocharYear', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple1)),
+              Text('🪨 ${AppLocale.l('shaniGochara')} — $_gocharYear', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple1)),
               const SizedBox(height: 12),
               ...shaniSegments.map((seg) {
                 final house = houseFromMoon(seg.rashiIdx);
@@ -3777,9 +3777,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                 final isPanchama = house == 5;
                 final isBad = isSadeSati || isAshtama || isPanchama;
                 String label = '✅ ${trAll('ಇಲ್ಲ')}';
-                if (isSadeSati) label = '⚠️ ${trAll('ಸಾಡೇ ಸಾತಿ')}';
-                else if (isAshtama) label = '💀 ${trAll('ಅಷ್ಟಮ ಶನಿ')}';
-                else if (isPanchama) label = '⚡ ${trAll('ಪಂಚಮ ಶನಿ')}';
+                if (isSadeSati) label = '⚠️ ${AppLocale.l('sadeSati')}';
+                else if (isAshtama) label = '💀 ${AppLocale.l('ashtamaShani')}';
+                else if (isPanchama) label = '⚡ ${AppLocale.l('panchamaShani')}';
                 return Padding(padding: const EdgeInsets.only(bottom: 8), child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(

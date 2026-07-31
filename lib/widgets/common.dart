@@ -688,6 +688,13 @@ class AppLocale {
       'shubhaYogagalu': 'ಶುಭ ಯೋಗಗಳು',
       'ashubhaYogagalu': 'ಅಶುಭ ಯೋಗಗಳು',
       'noYogaFound': 'ಯಾವ ಯೋಗವೂ ಕಂಡುಬಂದಿಲ್ಲ',
+
+      // Gochara UI
+      'guruGochara': 'ಗುರು ಗೋಚಾರ',
+      'shaniGochara': 'ಶನಿ ಗೋಚಾರ',
+      'sadeSati': 'ಸಾಡೇ ಸಾತಿ',
+      'ashtamaShani': 'ಅಷ್ಟಮ ಶನಿ',
+      'panchamaShani': 'ಪಂಚಮ ಶನಿ',
       
       // New additions for Muhurta Search localization
       'mCacheNotLoaded': 'ಪಂಚಾಂಗ ದತ್ತಾಂಶ ಲೋಡ್ ಆಗಿಲ್ಲ. Settings → Panchanga Data → Import .bdat',
@@ -1374,6 +1381,13 @@ class AppLocale {
       'ashubhaYogagalu': 'अशुभ योग',
       'noYogaFound': 'कोई योग नहीं मिला',
 
+      // Gochara UI
+      'guruGochara': 'गुरु गोचर',
+      'shaniGochara': 'शनि गोचर',
+      'sadeSati': 'साढ़े साती',
+      'ashtamaShani': 'अष्टम शनि',
+      'panchamaShani': 'पंचम शनि',
+
       // Muhurta Search localization
       'mCacheNotLoaded': 'पंचांग डेटा लोड नहीं. Settings → Panchanga Data → Import .bdat',
       'mTaraAnukoola': 'तारानुकूल मध्यम/अशुभ',
@@ -2054,6 +2068,13 @@ class AppLocale {
       'shubhaYogagalu': 'சுப யோகங்கள்',
       'ashubhaYogagalu': 'அசுப யோகங்கள்',
       'noYogaFound': 'யோகம் எதுவும் கண்டறியவில்லை',
+
+      // Gochara UI
+      'guruGochara': 'குரு கோசாரம்',
+      'shaniGochara': 'சனி கோசாரம்',
+      'sadeSati': 'சாடே சாதி',
+      'ashtamaShani': 'அஷ்டம சனி',
+      'panchamaShani': 'பஞ்சம சனி',
 
       // Muhurta Search localization
       'mCacheNotLoaded': 'பஞ்சாங்க தரவு ஏற்றப்படவில்லை. Settings → Panchanga Data → Import .bdat',
@@ -2736,6 +2757,13 @@ class AppLocale {
       'ashubhaYogagalu': 'అశుభ యోగాలు',
       'noYogaFound': 'ఎటువంటి యోగం కనుగొనలేదు',
 
+      // Gochara UI
+      'guruGochara': 'గురు గోచారం',
+      'shaniGochara': 'శని గోచారం',
+      'sadeSati': 'సాడే సాతి',
+      'ashtamaShani': 'అష్టమ శని',
+      'panchamaShani': 'పంచమ శని',
+
       // Muhurta Search localization
       'mCacheNotLoaded': 'పంచాంగ డేటా లోడ్ కాలేదు. Settings → Panchanga Data → Import .bdat',
       'mTaraAnukoola': 'తారానుకూలం మధ్యమ/అశుభ',
@@ -3416,6 +3444,13 @@ class AppLocale {
       'shubhaYogagalu': 'ശുഭ യോഗങ്ങൾ',
       'ashubhaYogagalu': 'അശുഭ യോഗങ്ങൾ',
       'noYogaFound': 'ഒരു യോഗവും കണ്ടെത്തിയില്ല',
+
+      // Gochara UI
+      'guruGochara': 'ഗുരു ഗോചാരം',
+      'shaniGochara': 'ശനി ഗോചാരം',
+      'sadeSati': 'സാഡേ സാതി',
+      'ashtamaShani': 'അഷ്ടമ ശനി',
+      'panchamaShani': 'പഞ്ചമ ശനി',
 
       // Muhurta Search localization
       'mCacheNotLoaded': 'പഞ്ചാംഗ ഡാറ്റ ലോഡ് ആയില്ല. Settings → Panchanga Data → Import .bdat',
