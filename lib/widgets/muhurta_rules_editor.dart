@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/muhurta_rules.dart';
 import '../core/user_muhurta_rules.dart';
-import '../constants/strings.dart';
 import '../widgets/common.dart';
 
 /// ──────────────────────────────────────────────────────────────
@@ -25,18 +24,7 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
   bool _isExpanded = false;
   late UserMuhurtaRules _rules;
 
-  // Uses dynamic theme colors from common.dart (kText, kMuted, kBg, etc.)
-
-  static const knTithi = [
-    'ಪ್ರತಿಪದಾ','ದ್ವಿತೀಯಾ','ತೃತೀಯಾ','ಚತುರ್ಥೀ','ಪಂಚಮೀ',
-    'ಷಷ್ಠೀ','ಸಪ್ತಮೀ','ಅಷ್ಟಮೀ','ನವಮೀ','ದಶಮೀ',
-    'ಏಕಾದಶೀ','ದ್ವಾದಶೀ','ತ್ರಯೋದಶೀ','ಚತುರ್ದಶೀ','ಪೂರ್ಣಿಮಾ',
-    'ಪ್ರತಿಪದಾ','ದ್ವಿತೀಯಾ','ತೃತೀಯಾ','ಚತುರ್ಥೀ','ಪಂಚಮೀ',
-    'ಷಷ್ಠೀ','ಸಪ್ತಮೀ','ಅಷ್ಟಮೀ','ನವಮೀ','ದಶಮೀ',
-    'ಏಕಾದಶೀ','ದ್ವಾದಶೀ','ತ್ರಯೋದಶೀ','ಚತುರ್ದಶೀ','ಅಮಾವಾಸ್ಯಾ',
-  ];
-
-  static const knVaraShort = ['ರವಿ','ಸೋಮ','ಮಂಗಳ','ಬುಧ','ಗುರು','ಶುಕ್ರ','ಶನಿ'];
+  // All names localized via AppLocale.l() keys
 
   @override
   void initState() {
@@ -107,7 +95,7 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
             const SizedBox(height: 6),
             _buildChipGroup(
               itemCount: 30,
-              labelBuilder: (i) => '${knTithi[i]}${i < 15 ? " ${AppLocale.l('mShukla')}" : " ${AppLocale.l('mKrishna')}"}',
+              labelBuilder: (i) => '${AppLocale.l('bt${i % 15}')}${i < 15 ? " ${AppLocale.l('mShukla')}" : " ${AppLocale.l('mKrishna')}"}',
               shortLabelBuilder: (i) => '${(i % 15) + 1}${i < 15 ? AppLocale.l('mShukla') : AppLocale.l('mKrishna')}',
               selectedIndices: _rules.allowedTithis,
               onChanged: (selected) {
@@ -122,8 +110,8 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
             const SizedBox(height: 6),
             _buildChipGroup(
               itemCount: 27,
-              labelBuilder: (i) => knNak[i],
-              shortLabelBuilder: (i) => knNak[i].substring(0, knNak[i].length > 4 ? 4 : knNak[i].length),
+              labelBuilder: (i) { final n = AppLocale.l('nak$i'); return n; },
+              shortLabelBuilder: (i) { final n = AppLocale.l('nak$i'); return n.length > 4 ? n.substring(0, 4) : n; },
               selectedIndices: _rules.allowedNakshatras,
               onChanged: (selected) {
                 setState(() => _rules.allowedNakshatras = selected.isEmpty ? null : selected);
@@ -137,8 +125,8 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
             const SizedBox(height: 6),
             _buildChipGroup(
               itemCount: 7,
-              labelBuilder: (i) => knVaraShort[i],
-              shortLabelBuilder: (i) => knVaraShort[i],
+              labelBuilder: (i) => AppLocale.l('varaS$i'),
+              shortLabelBuilder: (i) => AppLocale.l('varaS$i'),
               selectedIndices: _rules.allowedVaras,
               onChanged: (selected) {
                 setState(() => _rules.allowedVaras = selected.isEmpty ? null : selected);
@@ -152,8 +140,8 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
             const SizedBox(height: 6),
             _buildChipGroup(
               itemCount: 27,
-              labelBuilder: (i) => knYoga[i],
-              shortLabelBuilder: (i) => knYoga[i].substring(0, knYoga[i].length > 4 ? 4 : knYoga[i].length),
+              labelBuilder: (i) { final y = AppLocale.l('yoga$i'); return y; },
+              shortLabelBuilder: (i) { final y = AppLocale.l('yoga$i'); return y.length > 4 ? y.substring(0, 4) : y; },
               selectedIndices: _rules.blockedYogas,
               isBlockedMode: true,
               onChanged: (selected) {
@@ -292,8 +280,8 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
             const SizedBox(height: 6),
             _buildChipGroup(
               itemCount: 12,
-              labelBuilder: (i) => knRashi[i],
-              shortLabelBuilder: (i) => knRashi[i],
+              labelBuilder: (i) => AppLocale.l('rashi$i'),
+              shortLabelBuilder: (i) => AppLocale.l('rashi$i'),
               selectedIndices: _rules.allowedLagnas,
               onChanged: (selected) {
                 setState(() => _rules.allowedLagnas = selected.isEmpty ? null : selected);
