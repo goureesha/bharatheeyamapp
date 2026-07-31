@@ -46,17 +46,17 @@ class MatchPdfService {
 
     // Page 1: Header + Birth Details + Charts
     final p1 = _wrap(theme, _buildPage1(d, theme));
-    final p1b = await controller.captureFromWidget(p1, targetSize: targetSize, pixelRatio: 3.0, delay: const Duration(milliseconds: 200));
+    final p1b = await controller.captureFromWidget(p1, targetSize: targetSize, pixelRatio: 2.5, delay: const Duration(milliseconds: 10));
     _addPage(doc, p1b);
 
     // Page 2: Koota Table + Kuja Dosha + Papa Dosha
     final p2 = _wrap(theme, _buildPage2(d, theme));
-    final p2b = await controller.captureFromWidget(p2, targetSize: targetSize, pixelRatio: 3.0, delay: const Duration(milliseconds: 200));
+    final p2b = await controller.captureFromWidget(p2, targetSize: targetSize, pixelRatio: 2.5, delay: const Duration(milliseconds: 10));
     _addPage(doc, p2b);
 
     // Page 3: Graha Maitri + Dasha Sandhi + Shashta/Dvirdvadasha
     final p3 = _wrap(theme, _buildPage3(d, theme));
-    final p3b = await controller.captureFromWidget(p3, targetSize: targetSize, pixelRatio: 3.0, delay: const Duration(milliseconds: 200));
+    final p3b = await controller.captureFromWidget(p3, targetSize: targetSize, pixelRatio: 2.5, delay: const Duration(milliseconds: 10));
     _addPage(doc, p3b);
 
     return doc.save();

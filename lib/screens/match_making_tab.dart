@@ -1280,7 +1280,15 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                 astrologerPhone: _mJyotishiPhoneCtrl.text.trim(),
               );
               final selectedTheme = PdfThemes.all.firstWhere((t) => t.id == _mSelectedThemeId, orElse: () => PdfThemes.traditional);
-              await MatchPdfService.generateAndPrint(data, theme: selectedTheme);
+              showDialog(context: context, barrierDismissible: false, builder: (_) => Center(child: Container(padding: const EdgeInsets.all(24), decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)), child: Column(mainAxisSize: MainAxisSize.min, children: [CircularProgressIndicator(color: kPurple1), const SizedBox(height: 16), Text(AppLocale.l('pdfCreating'), style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none))]))));
+              await Future.delayed(const Duration(milliseconds: 50));
+              try {
+                await MatchPdfService.generateAndPrint(data, theme: selectedTheme);
+                if (mounted) Navigator.of(context, rootNavigator: true).pop();
+              } catch (e) {
+                if (mounted) Navigator.of(context, rootNavigator: true).pop();
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ $e'), backgroundColor: Colors.red));
+              }
             },
             icon: const Icon(Icons.picture_as_pdf, size: 18),
             label: Text(AppLocale.l('createPdf')),
@@ -1310,7 +1318,16 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                 astrologerPhone: _mJyotishiPhoneCtrl.text.trim(),
               );
               final selectedTheme = PdfThemes.all.firstWhere((t) => t.id == _mSelectedThemeId, orElse: () => PdfThemes.traditional);
-              await MatchPdfService.generateAndShare(data, theme: selectedTheme);
+              Navigator.pop(ctx);
+              showDialog(context: context, barrierDismissible: false, builder: (_) => Center(child: Container(padding: const EdgeInsets.all(24), decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)), child: Column(mainAxisSize: MainAxisSize.min, children: [CircularProgressIndicator(color: kPurple1), const SizedBox(height: 16), Text(AppLocale.l('pdfCreating'), style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none))]))));
+              await Future.delayed(const Duration(milliseconds: 50));
+              try {
+                await MatchPdfService.generateAndShare(data, theme: selectedTheme);
+                if (mounted) Navigator.of(context, rootNavigator: true).pop();
+              } catch (e) {
+                if (mounted) Navigator.of(context, rootNavigator: true).pop();
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ $e'), backgroundColor: Colors.red));
+              }
             },
             icon: const Icon(Icons.share, size: 18),
             label: Text(AppLocale.l('pdfShareDirect')),

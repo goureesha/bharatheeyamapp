@@ -923,10 +923,24 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(_p('cancel'), style: TextStyle(color: kMuted))),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.pop(ctx);
+              setState(() {
+                _list.purohitName = nameCtrl.text.trim();
+                _list.purohitPhone = phoneCtrl.text.trim();
+                _list.purohitAddress = addressCtrl.text.trim();
+              });
+              _saveList();
+              _generatePoojaPdf(dateCtrl.text.trim(), shareMode: true);
+            },
+            icon: const Icon(Icons.share, size: 18),
+            label: Text(AppLocale.l('pdfShareDirect')),
+            style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF4A148C), side: BorderSide(color: const Color(0xFF4A148C))),
+          ),
           ElevatedButton.icon(
             onPressed: () {
               Navigator.pop(ctx);
-              // Save purohit info
               setState(() {
                 _list.purohitName = nameCtrl.text.trim();
                 _list.purohitPhone = phoneCtrl.text.trim();
@@ -944,7 +958,24 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
     );
   }
 
-  void _generatePoojaPdf(String poojaDate) async {
+  void _generatePoojaPdf(String poojaDate, {bool shareMode = false}) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Center(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            CircularProgressIndicator(color: const Color(0xFF4A148C)),
+            const SizedBox(height: 16),
+            Text(AppLocale.l('pdfCreating'), style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none)),
+          ]),
+        ),
+      ),
+    );
+    await Future.delayed(const Duration(milliseconds: 50));
     try {
       final controller = ScreenshotController();
       const double pageWidth = 793.0;
@@ -1140,8 +1171,8 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
         final Uint8List imageBytes = await controller.captureFromWidget(
           pageWidget,
           targetSize: targetSize,
-          pixelRatio: 3.0,
-          delay: const Duration(milliseconds: 100),
+          pixelRatio: 2.5,
+          delay: const Duration(milliseconds: 10),
         );
 
         doc.addPage(
@@ -1158,8 +1189,14 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
         );
       }
 
-      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => doc.save(), name: '${_list.name}_list.pdf');
+      if (shareMode) {
+        await Printing.sharePdf(bytes: doc.save(), filename: '${_list.name}_list.pdf');
+      } else {
+        await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => doc.save(), name: '${_list.name}_list.pdf');
+      }
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
     } catch (e) {
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF export failed: $e'), backgroundColor: Colors.red));
     }
   }
