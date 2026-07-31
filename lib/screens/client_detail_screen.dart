@@ -581,7 +581,17 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   optionsBuilder: (v) {
                     if (v.text.isEmpty) return offlinePlaces.keys.take(10);
                     final q = v.text.toLowerCase();
-                    return offlinePlaces.keys.where((n) => n.toLowerCase().contains(q));
+                    final offline = offlinePlaces.keys.where((n) => n.toLowerCase().contains(q)).toList();
+                    if (worldCitiesLoaded) {
+                      final worldResults = searchWorldCities(v.text, limit: 15);
+                      for (final w in worldResults) {
+                        final label = '${w['n']} (${w['c']})';
+                        if (!offline.any((o) => o.toLowerCase() == label.toLowerCase())) {
+                          offline.add(label);
+                        }
+                      }
+                    }
+                    return offline.take(20);
                   },
                   fieldViewBuilder: (context, textCtrl, focusNode, onSubmit) {
                     return TextField(
@@ -598,6 +608,16 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                         latCtrl.text = coords[0].toStringAsFixed(4);
                         lonCtrl.text = coords[1].toStringAsFixed(4);
                       });
+                    } else {
+                      final worldResults = searchWorldCities(selection.split(' (').first, limit: 1);
+                      if (worldResults.isNotEmpty) {
+                        final w = worldResults.first;
+                        setS(() {
+                          placeCtrl.text = selection;
+                          latCtrl.text = (w['la'] as num).toDouble().toStringAsFixed(4);
+                          lonCtrl.text = (w['lo'] as num).toDouble().toStringAsFixed(4);
+                        });
+                      }
                     }
                   },
                 ),

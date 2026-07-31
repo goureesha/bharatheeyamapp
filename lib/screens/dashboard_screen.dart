@@ -572,7 +572,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                       return offlinePlaces.keys.take(15);
                     }
                     final query = textEditingValue.text.toLowerCase();
-                    return offlinePlaces.keys.where((name) => name.toLowerCase().contains(query));
+                    final offline = offlinePlaces.keys.where((name) => name.toLowerCase().contains(query)).toList();
+                    if (worldCitiesLoaded) {
+                      final worldResults = searchWorldCities(textEditingValue.text, limit: 15);
+                      for (final w in worldResults) {
+                        final label = '${w['n']} (${w['c']})';
+                        if (!offline.any((o) => o.toLowerCase() == label.toLowerCase())) {
+                          offline.add(label);
+                        }
+                      }
+                    }
+                    return offline.take(20);
                   },
                   fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
                     // Start with the Place populated, unlike input_screen which manages it via state
@@ -607,14 +617,28 @@ class _DashboardScreenState extends State<DashboardScreen>
                   onSelected: (String selection) async {
                     if (offlinePlaces.containsKey(selection)) {
                       final coords = offlinePlaces[selection]!;
-                      final autoTz = await getTimezoneForPlace(selection, coords[0], coords[1]);
                       setS(() {
                         placeCtrl.text = selection;
                         latCtrl.text = coords[0].toStringAsFixed(4);
                         lonCtrl.text = coords[1].toStringAsFixed(4);
-                        tzCtrl.text = '${autoTz >= 0 ? '+' : ''}$autoTz';
-                        geoStatus = '📍 $selection (TZ: ${autoTz >= 0 ? '+' : ''}$autoTz)';
+                        tzCtrl.text = '${coords[2] >= 0 ? '+' : ''}${coords[2]}';
+                        geoStatus = '📍 $selection (TZ: ${coords[2] >= 0 ? '+' : ''}${coords[2]})';
                       });
+                    } else {
+                      final worldResults = searchWorldCities(selection.split(' (').first, limit: 1);
+                      if (worldResults.isNotEmpty) {
+                        final w = worldResults.first;
+                        final lat = (w['la'] as num).toDouble();
+                        final lon = (w['lo'] as num).toDouble();
+                        final tz = (w['tz'] as num).toDouble();
+                        setS(() {
+                          placeCtrl.text = selection;
+                          latCtrl.text = lat.toStringAsFixed(4);
+                          lonCtrl.text = lon.toStringAsFixed(4);
+                          tzCtrl.text = '${tz >= 0 ? '+' : ''}$tz';
+                          geoStatus = '📍 $selection (TZ: ${tz >= 0 ? '+' : ''}$tz)';
+                        });
+                      }
                     }
                   },
                   optionsViewBuilder: (context, onSelected, options) {
@@ -834,7 +858,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                   optionsBuilder: (TextEditingValue textEditingValue) {
                     if (textEditingValue.text.isEmpty) return offlinePlaces.keys.take(15);
                     final query = textEditingValue.text.toLowerCase();
-                    return offlinePlaces.keys.where((name) => name.toLowerCase().contains(query));
+                    final offline = offlinePlaces.keys.where((name) => name.toLowerCase().contains(query)).toList();
+                    if (worldCitiesLoaded) {
+                      final worldResults = searchWorldCities(textEditingValue.text, limit: 15);
+                      for (final w in worldResults) {
+                        final label = '${w['n']} (${w['c']})';
+                        if (!offline.any((o) => o.toLowerCase() == label.toLowerCase())) {
+                          offline.add(label);
+                        }
+                      }
+                    }
+                    return offline.take(20);
                   },
                   fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
                     if (placeCtrl.text.isNotEmpty && textEditingController.text.isEmpty) {
@@ -855,14 +889,28 @@ class _DashboardScreenState extends State<DashboardScreen>
                   onSelected: (String selection) async {
                     if (offlinePlaces.containsKey(selection)) {
                       final coords = offlinePlaces[selection]!;
-                      final autoTz = await getTimezoneForPlace(selection, coords[0], coords[1]);
                       setS(() {
                         placeCtrl.text = selection;
                         latCtrl.text = coords[0].toStringAsFixed(4);
                         lonCtrl.text = coords[1].toStringAsFixed(4);
-                        tzCtrl.text = '${autoTz >= 0 ? '+' : ''}$autoTz';
-                        geoStatus = '📍 $selection (TZ: ${autoTz >= 0 ? '+' : ''}$autoTz)';
+                        tzCtrl.text = '${coords[2] >= 0 ? '+' : ''}${coords[2]}';
+                        geoStatus = '📍 $selection (TZ: ${coords[2] >= 0 ? '+' : ''}${coords[2]})';
                       });
+                    } else {
+                      final worldResults = searchWorldCities(selection.split(' (').first, limit: 1);
+                      if (worldResults.isNotEmpty) {
+                        final w = worldResults.first;
+                        final lat = (w['la'] as num).toDouble();
+                        final lon = (w['lo'] as num).toDouble();
+                        final tz = (w['tz'] as num).toDouble();
+                        setS(() {
+                          placeCtrl.text = selection;
+                          latCtrl.text = lat.toStringAsFixed(4);
+                          lonCtrl.text = lon.toStringAsFixed(4);
+                          tzCtrl.text = '${tz >= 0 ? '+' : ''}$tz';
+                          geoStatus = '📍 $selection (TZ: ${tz >= 0 ? '+' : ''}$tz)';
+                        });
+                      }
                     }
                   },
                   optionsViewBuilder: (context, onSelected, options) {
@@ -1058,7 +1106,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                   optionsBuilder: (TextEditingValue textEditingValue) {
                     if (textEditingValue.text.isEmpty) return offlinePlaces.keys.take(15);
                     final query = textEditingValue.text.toLowerCase();
-                    return offlinePlaces.keys.where((name) => name.toLowerCase().contains(query));
+                    final offline = offlinePlaces.keys.where((name) => name.toLowerCase().contains(query)).toList();
+                    if (worldCitiesLoaded) {
+                      final worldResults = searchWorldCities(textEditingValue.text, limit: 15);
+                      for (final w in worldResults) {
+                        final label = '${w['n']} (${w['c']})';
+                        if (!offline.any((o) => o.toLowerCase() == label.toLowerCase())) {
+                          offline.add(label);
+                        }
+                      }
+                    }
+                    return offline.take(20);
                   },
                   fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
                     if (placeCtrl.text.isNotEmpty && textEditingController.text.isEmpty) {
@@ -1079,14 +1137,28 @@ class _DashboardScreenState extends State<DashboardScreen>
                   onSelected: (String selection) async {
                     if (offlinePlaces.containsKey(selection)) {
                       final coords = offlinePlaces[selection]!;
-                      final autoTz = await getTimezoneForPlace(selection, coords[0], coords[1]);
                       setS(() {
                         placeCtrl.text = selection;
                         latCtrl.text = coords[0].toStringAsFixed(4);
                         lonCtrl.text = coords[1].toStringAsFixed(4);
-                        tzCtrl.text = '${autoTz >= 0 ? '+' : ''}$autoTz';
-                        geoStatus = '📍 $selection (TZ: ${autoTz >= 0 ? '+' : ''}$autoTz)';
+                        tzCtrl.text = '${coords[2] >= 0 ? '+' : ''}${coords[2]}';
+                        geoStatus = '📍 $selection (TZ: ${coords[2] >= 0 ? '+' : ''}${coords[2]})';
                       });
+                    } else {
+                      final worldResults = searchWorldCities(selection.split(' (').first, limit: 1);
+                      if (worldResults.isNotEmpty) {
+                        final w = worldResults.first;
+                        final lat = (w['la'] as num).toDouble();
+                        final lon = (w['lo'] as num).toDouble();
+                        final tz = (w['tz'] as num).toDouble();
+                        setS(() {
+                          placeCtrl.text = selection;
+                          latCtrl.text = lat.toStringAsFixed(4);
+                          lonCtrl.text = lon.toStringAsFixed(4);
+                          tzCtrl.text = '${tz >= 0 ? '+' : ''}$tz';
+                          geoStatus = '📍 $selection (TZ: ${tz >= 0 ? '+' : ''}$tz)';
+                        });
+                      }
                     }
                   },
                   optionsViewBuilder: (context, onSelected, options) {

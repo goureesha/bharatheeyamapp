@@ -45,6 +45,7 @@ flutter:
   assets:
     - assets/images/
     - assets/data/
+    - assets/world_cities.json
   fonts:
     - family: NotoSansKannada
       fonts:

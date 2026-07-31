@@ -347,8 +347,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           return offlinePlaces.keys.take(15);
                         }
                         final query = textEditingValue.text.toLowerCase();
-                        return offlinePlaces.keys.where(
-                            (name) => name.toLowerCase().contains(query));
+                        final offline = offlinePlaces.keys.where((name) => name.toLowerCase().contains(query)).toList();
+                        if (worldCitiesLoaded) {
+                          final worldResults = searchWorldCities(textEditingValue.text, limit: 15);
+                          for (final w in worldResults) {
+                            final label = '${w['n']} (${w['c']})';
+                            if (!offline.any((o) => o.toLowerCase() == label.toLowerCase())) {
+                              offline.add(label);
+                            }
+                          }
+                        }
+                        return offline.take(20);
                       },
                       fieldViewBuilder: (context, controller, focusNode, onSubmitted) {
                         return TextField(
@@ -378,18 +387,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onSelected: (String selection) async {
                         if (offlinePlaces.containsKey(selection)) {
                           final coords = offlinePlaces[selection]!;
-                          final autoTz = await getTimezoneForPlace(selection, coords[0], coords[1]);
-                          _tzCtrl.text = '${autoTz >= 0 ? '+' : ''}$autoTz';
-                          await LocationService.setLocation(selection, coords[0], coords[1], autoTz);
-                          if (mounted) {
-                            setState(() {
-                              _geoStatus = '';
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('${AppLocale.l('defaultLocationSet')}: $selection'),
-                              backgroundColor: Colors.green,
-                            ));
+                          _tzCtrl.text = '${coords[2] >= 0 ? '+' : ''}${coords[2]}';
+                          await LocationService.setLocation(selection, coords[0], coords[1], coords[2]);
+                        } else {
+                          final worldResults = searchWorldCities(selection.split(' (').first, limit: 1);
+                          if (worldResults.isNotEmpty) {
+                            final w = worldResults.first;
+                            final lat = (w['la'] as num).toDouble();
+                            final lon = (w['lo'] as num).toDouble();
+                            final tz = (w['tz'] as num).toDouble();
+                            _tzCtrl.text = '${tz >= 0 ? '+' : ''}$tz';
+                            await LocationService.setLocation(selection, lat, lon, tz);
                           }
+                        }
+                        if (mounted) {
+                          setState(() {
+                            _geoStatus = '';
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('${AppLocale.l('defaultLocationSet')}: $selection'),
+                            backgroundColor: Colors.green,
+                          ));
                         }
                       },
                       optionsViewBuilder: (context, onSelected, options) {

@@ -912,7 +912,18 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         key: ValueKey(placeCtrl.text),
         optionsBuilder: (TextEditingValue v) {
           if (v.text.isEmpty) return offlinePlaces.keys.take(15);
-          return offlinePlaces.keys.where((n) => n.toLowerCase().contains(v.text.toLowerCase()));
+          final query = v.text.toLowerCase();
+          final offline = offlinePlaces.keys.where((n) => n.toLowerCase().contains(query)).toList();
+          if (worldCitiesLoaded) {
+            final worldResults = searchWorldCities(v.text, limit: 15);
+            for (final w in worldResults) {
+              final label = '${w['n']} (${w['c']})';
+              if (!offline.any((o) => o.toLowerCase() == label.toLowerCase())) {
+                offline.add(label);
+              }
+            }
+          }
+          return offline.take(20);
         },
         fieldViewBuilder: (context, textCtrl, focusNode, onSubmit) {
           if (textCtrl.text.isEmpty && placeCtrl.text.isNotEmpty) textCtrl.text = placeCtrl.text;
@@ -936,13 +947,26 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         onSelected: (String selection) async {
           if (offlinePlaces.containsKey(selection)) {
             final coords = offlinePlaces[selection]!;
-            final autoTz = await getTimezoneForPlace(selection, coords[0], coords[1]);
             setState(() {
               placeCtrl.text = selection;
               latCtrl.text = coords[0].toStringAsFixed(4);
               lonCtrl.text = coords[1].toStringAsFixed(4);
-              tzCtrl.text = '${autoTz >= 0 ? '+' : ''}$autoTz';
+              tzCtrl.text = '${coords[2] >= 0 ? '+' : ''}${coords[2]}';
             });
+          } else {
+            final worldResults = searchWorldCities(selection.split(' (').first, limit: 1);
+            if (worldResults.isNotEmpty) {
+              final w = worldResults.first;
+              final lat = (w['la'] as num).toDouble();
+              final lon = (w['lo'] as num).toDouble();
+              final tz = (w['tz'] as num).toDouble();
+              setState(() {
+                placeCtrl.text = selection;
+                latCtrl.text = lat.toStringAsFixed(4);
+                lonCtrl.text = lon.toStringAsFixed(4);
+                tzCtrl.text = '${tz >= 0 ? '+' : ''}$tz';
+              });
+            }
           }
         },
         optionsViewBuilder: (context, onSelected, options) => Align(alignment: Alignment.topLeft, child: Material(elevation: 4.0, borderRadius: BorderRadius.circular(8),

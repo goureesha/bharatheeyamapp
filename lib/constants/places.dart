@@ -1,6 +1,7 @@
 /// Comprehensive offline place database
-/// Karnataka Taluks + Major Indian cities + World capitals
+/// Karnataka Taluks + Major Indian cities + 34,000+ World cities
 import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 
 const Map<String, List<double>> karnatakaPlaces = {
@@ -286,37 +287,89 @@ const Map<String, List<double>> otherPlaces = {
   'Kathmandu (Nepal)': [27.72, 85.32],
 };
 
-/// Combined offline places map
+/// Combined offline places map (Karnataka + Indian cities + old world capitals)
+/// Format: name -> [lat, lon, tz]
 final Map<String, List<double>> offlinePlaces = {
-  ...karnatakaPlaces,
-  ...otherPlaces,
+  for (final e in karnatakaPlaces.entries) e.key: [...e.value, 5.5],
+  for (final e in otherPlaces.entries) e.key: [...e.value, 5.5],
 };
 
-/// Known timezone offsets for international cities (non-IST).
-/// All Karnataka + other Indian cities default to 5.5 (IST).
-const Map<String, double> _knownTimezones = {
-  'London (UK)': 0.0,
-  'New York (USA)': -5.0,
-  'Dubai (UAE)': 4.0,
-  'Singapore': 8.0,
-  'Sydney (Australia)': 10.0,
-  'Toronto (Canada)': -5.0,
-  'Tokyo (Japan)': 9.0,
-  'Colombo (Sri Lanka)': 5.5,
-  'Kathmandu (Nepal)': 5.75,
-};
+// ─── World Cities Database (loaded from asset) ───
 
-/// Returns the timezone offset for a known place, or calculates it dynamically from latency constraints using TimeAPI.io
-Future<double> getTimezoneForPlace(String placeName, double lat, double lon) async {
-  // Check known international timezones first
-  if (_knownTimezones.containsKey(placeName)) {
-    return _knownTimezones[placeName]!;
+/// Loaded world cities: name -> {c: country, la: lat, lo: lon, tz: offset}
+List<Map<String, dynamic>>? _worldCities;
+bool _worldCitiesLoading = false;
+
+/// Load world cities from bundled JSON asset
+Future<void> loadWorldCities() async {
+  if (_worldCities != null || _worldCitiesLoading) return;
+  _worldCitiesLoading = true;
+  try {
+    final jsonStr = await rootBundle.loadString('assets/world_cities.json');
+    final List<dynamic> data = jsonDecode(jsonStr);
+    _worldCities = data.cast<Map<String, dynamic>>();
+  } catch (e) {
+    _worldCities = [];
+  }
+  _worldCitiesLoading = false;
+}
+
+/// Whether world cities have been loaded
+bool get worldCitiesLoaded => _worldCities != null && _worldCities!.isNotEmpty;
+
+/// Search world cities by query string (case-insensitive prefix/contains match)
+/// Returns up to [limit] results as: {'n': name, 'c': country, 'la': lat, 'lo': lon, 'tz': offset}
+List<Map<String, dynamic>> searchWorldCities(String query, {int limit = 20}) {
+  if (_worldCities == null || query.trim().isEmpty) return [];
+  final q = query.trim().toLowerCase();
+  final results = <Map<String, dynamic>>[];
+  
+  // First pass: prefix matches (higher priority)
+  for (final city in _worldCities!) {
+    if (results.length >= limit) break;
+    final name = (city['n'] as String).toLowerCase();
+    if (name.startsWith(q)) {
+      results.add(city);
+    }
   }
   
-  // All known internal offline places (Karnataka + Indian cities) are IST
-  if (offlinePlaces.containsKey(placeName) && !_knownTimezones.containsKey(placeName)) {
-    return 5.5;
+  // Second pass: contains matches (if we need more results)
+  if (results.length < limit) {
+    for (final city in _worldCities!) {
+      if (results.length >= limit) break;
+      if (results.contains(city)) continue;
+      final name = (city['n'] as String).toLowerCase();
+      if (name.contains(q)) {
+        results.add(city);
+      }
+    }
   }
+  
+  return results;
+}
+
+/// Get world city timezone by exact name match
+double? getWorldCityTz(String cityName) {
+  if (_worldCities == null) return null;
+  final q = cityName.trim().toLowerCase();
+  for (final city in _worldCities!) {
+    if ((city['n'] as String).toLowerCase() == q) {
+      return (city['tz'] as num).toDouble();
+    }
+  }
+  return null;
+}
+
+/// Returns the timezone offset for a known place, or calculates it dynamically
+Future<double> getTimezoneForPlace(String placeName, double lat, double lon) async {
+  // Check Karnataka / Indian offline places (all IST)
+  if (offlinePlaces.containsKey(placeName)) {
+    return offlinePlaces[placeName]![2]; // tz is 3rd element
+  }
+  
+  // Check world cities database
+  final worldTz = getWorldCityTz(placeName);
+  if (worldTz != null) return worldTz;
   
   // For online Nominatim searches, check if the place is in India
   final lowerName = placeName.toLowerCase();
@@ -324,7 +377,7 @@ Future<double> getTimezoneForPlace(String placeName, double lat, double lon) asy
     return 5.5;
   }
   
-  // Dynmaic fetch strategy for accurate international offsets (e.g. Istanbul = +3)
+  // Dynamic fetch for accurate international offsets
   try {
     final url = Uri.parse('https://timeapi.io/api/TimeZone/coordinate?latitude=$lat&longitude=$lon');
     final resp = await http.get(url).timeout(const Duration(seconds: 4));
@@ -339,6 +392,7 @@ Future<double> getTimezoneForPlace(String placeName, double lat, double lon) asy
     // API failed, gracefully fallback to physical longitude
   }
   
-  // Unknown place and API failed: estimate from longitude, rounded to nearest 0.5
+  // Unknown place and API failed: estimate from longitude
   return (lon / 15.0 * 2).round() / 2.0;
 }
+

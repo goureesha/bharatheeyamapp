@@ -12,6 +12,7 @@ import 'services/app_access_service.dart';
 import 'services/trusted_time_service.dart';
 import 'services/google_auth_service.dart';
 import 'core/transit_cache.dart';
+import 'constants/places.dart';
 
 import 'services/device_binding_service.dart';
 import 'services/firebase_service.dart';
@@ -66,6 +67,7 @@ Future<void> main() async {
   // Phase 3: Heavy tasks AFTER first frame (no more black screen)
   WidgetsBinding.instance.addPostFrameCallback((_) async {
     await ephFuture; // Ensure ephemeris is ready before sunrise calc
+    loadWorldCities(); // Load 34K+ world cities in background
     await _initAuthAndBinding();
     TesterService.init();
     _deferredInit();
