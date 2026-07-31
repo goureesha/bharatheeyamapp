@@ -1190,7 +1190,7 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
       }
 
       if (shareMode) {
-        await Printing.sharePdf(bytes: doc.save(), filename: '${_list.name}_list.pdf');
+        await Printing.sharePdf(bytes: await doc.save(), filename: '${_list.name}_list.pdf');
       } else {
         await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => doc.save(), name: '${_list.name}_list.pdf');
       }
