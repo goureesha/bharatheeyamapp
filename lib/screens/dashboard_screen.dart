@@ -347,7 +347,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               lon: m.lon,
               place: m.birthPlace,
               notes: m.notes,
-              tzOffset: LocationService.tzOffset,
+              tzOffset: m.tzOffset,
               clientId: m.clientId,
             ));
           } else {
@@ -1448,7 +1448,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                               date: dateStr,
                               hour: widget.hour, minute: widget.minute, ampm: widget.ampm,
                               lat: widget.lat, lon: widget.lon, place: widget.place,
-                              tzOffset: LocationService.tzOffset,
+                              tzOffset: _primaryTz,
                               notes: _notes,
                               aroodhas: _aroodhas,
                               janmaNakshatraIdx: _janmaNakshatraIdx,
@@ -1466,6 +1466,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 birthTime: '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}',
                                 birthPlace: widget.place,
                                 lat: widget.lat, lon: widget.lon,
+                                tzOffset: _primaryTz,
                                 notes: _notes,
                               ));
                             }
@@ -1478,7 +1479,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 date: epDateStr,
                                 hour: ep.hour, minute: ep.minute, ampm: ep.ampm,
                                 lat: ep.lat, lon: ep.lon, place: ep.place,
-                                tzOffset: LocationService.tzOffset,
+                                tzOffset: ep.tz,
                                 notes: ep.notes,
                                 clientId: resolvedCId,
                               ));
@@ -1492,6 +1493,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   birthTime: '${ep.hour.toString().padLeft(2,'0')}:${ep.minute.toString().padLeft(2,'0')} ${ep.ampm}',
                                   birthPlace: ep.place,
                                   lat: ep.lat, lon: ep.lon,
+                                  tzOffset: ep.tz,
                                   notes: ep.notes,
                                 ));
                               }
