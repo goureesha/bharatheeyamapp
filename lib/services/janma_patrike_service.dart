@@ -808,9 +808,9 @@ class JanmaPatrikeService {
         TableRow(
           decoration: BoxDecoration(color: t.tableHeaderBg),
           children: [
-            Padding(padding: const EdgeInsets.all(2), child: Text(AppLocale.l('jpAntardasha') != 'jpAntardasha' ? AppLocale.l('jpAntardasha') : 'ಅಂತರ್ದಶಾ', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.tableHeaderText))),
-            Padding(padding: const EdgeInsets.all(2), child: Text(AppLocale.l('jpStart') != 'jpStart' ? AppLocale.l('jpStart') : 'ಆರಂಭ', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.tableHeaderText))),
-            Padding(padding: const EdgeInsets.all(2), child: Text(AppLocale.l('jpEnd') != 'jpEnd' ? AppLocale.l('jpEnd') : 'ಅಂತ್ಯ', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.tableHeaderText))),
+            Padding(padding: const EdgeInsets.all(2), child: Text(AppLocale.l('jpAntardasha'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.tableHeaderText))),
+            Padding(padding: const EdgeInsets.all(2), child: Text(AppLocale.l('jpStart'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.tableHeaderText))),
+            Padding(padding: const EdgeInsets.all(2), child: Text(AppLocale.l('jpEnd'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.tableHeaderText))),
           ],
         )
       ];
@@ -844,7 +844,7 @@ class JanmaPatrikeService {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   decoration: BoxDecoration(color: t.sectionTitleBg, borderRadius: const BorderRadius.vertical(top: Radius.circular(3))),
-                  child: Text('${trAll(md.lord)} ${AppLocale.l('jpMahaDasha') != 'jpMahaDasha' ? AppLocale.l('jpMahaDasha') : 'ಮಹಾದಶಾ'}', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.sectionTitleText)),
+                  child: Text('${trAll(md.lord)} ${AppLocale.l('jpMahaDasha')}', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.sectionTitleText)),
                 ),
                 Expanded(
                   child: Table(
