@@ -204,8 +204,8 @@ class JanmaPatrikeService {
       page1Bytes = await controller.captureFromWidget(
         page1Widget,
         targetSize: targetSize,
-        pixelRatio: 3.0,
-        delay: const Duration(milliseconds: 100),
+        pixelRatio: 2.5,
+        delay: const Duration(milliseconds: 10),
       );
     }
 
@@ -220,8 +220,8 @@ class JanmaPatrikeService {
       page2Bytes = await controller.captureFromWidget(
         page2Widget,
         targetSize: targetSize,
-        pixelRatio: 3.0,
-        delay: const Duration(milliseconds: 100),
+        pixelRatio: 2.5,
+        delay: const Duration(milliseconds: 10),
       );
     }
 
@@ -236,8 +236,8 @@ class JanmaPatrikeService {
       page3Bytes = await controller.captureFromWidget(
         page3Widget,
         targetSize: targetSize,
-        pixelRatio: 3.0,
-        delay: const Duration(milliseconds: 100),
+        pixelRatio: 2.5,
+        delay: const Duration(milliseconds: 10),
       );
     }
 
@@ -252,8 +252,8 @@ class JanmaPatrikeService {
       page4Bytes = await controller.captureFromWidget(
         page4Widget,
         targetSize: targetSize,
-        pixelRatio: 3.0,
-        delay: const Duration(milliseconds: 100),
+        pixelRatio: 2.5,
+        delay: const Duration(milliseconds: 10),
       );
     }
 
@@ -268,8 +268,8 @@ class JanmaPatrikeService {
       page5Bytes = await controller.captureFromWidget(
         page5Widget,
         targetSize: targetSize,
-        pixelRatio: 3.0,
-        delay: const Duration(milliseconds: 100),
+        pixelRatio: 2.5,
+        delay: const Duration(milliseconds: 10),
       );
     }
 
@@ -284,8 +284,8 @@ class JanmaPatrikeService {
       page6Bytes = await controller.captureFromWidget(
         page6Widget,
         targetSize: targetSize,
-        pixelRatio: 3.0,
-        delay: const Duration(milliseconds: 100),
+        pixelRatio: 2.5,
+        delay: const Duration(milliseconds: 10),
       );
     }
 

@@ -4510,14 +4510,29 @@ class _DashboardScreenState extends State<DashboardScreen>
                         jyotishiPhone: _jyotishiPhoneCtrl.text.trim(),
                       );
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('⏳ ${AppLocale.current == 'kn' ? selectedTheme.nameKn : selectedTheme.nameEn} ${AppLocale.l('pdfCreating')}'))
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) => Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)),
+                            child: Column(mainAxisSize: MainAxisSize.min, children: [
+                              CircularProgressIndicator(color: kPurple1),
+                              const SizedBox(height: 16),
+                              Text('${AppLocale.l('pdfCreating')}', style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none)),
+                            ]),
+                          ),
+                        ),
                       );
 
                       try {
+                        await Future.delayed(const Duration(milliseconds: 50));
                         await JanmaPatrikeService.generateAndPrint(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection);
+                        if (mounted) Navigator.of(context, rootNavigator: true).pop();
                       } catch (e) {
-                         ScaffoldMessenger.of(context).showSnackBar(
+                        if (mounted) Navigator.of(context, rootNavigator: true).pop();
+                        if (mounted) ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('❌ ${AppLocale.l('errorLabel')}: $e'), backgroundColor: Colors.red)
                         );
                       }
@@ -4556,14 +4571,30 @@ class _DashboardScreenState extends State<DashboardScreen>
                         jyotishiPhone: _jyotishiPhoneCtrl.text.trim(),
                       );
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('⏳ ${AppLocale.l('pdfShareDirect')}...'))
+                      // Show loading dialog
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) => Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)),
+                            child: Column(mainAxisSize: MainAxisSize.min, children: [
+                              CircularProgressIndicator(color: kPurple1),
+                              const SizedBox(height: 16),
+                              Text('${AppLocale.l('pdfCreating')}', style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none)),
+                            ]),
+                          ),
+                        ),
                       );
 
                       try {
+                        await Future.delayed(const Duration(milliseconds: 50)); // Let dialog render
                         await JanmaPatrikeService.generateAndShare(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection);
+                        if (mounted) Navigator.of(context, rootNavigator: true).pop();
                       } catch (e) {
-                         ScaffoldMessenger.of(context).showSnackBar(
+                        if (mounted) Navigator.of(context, rootNavigator: true).pop();
+                        if (mounted) ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('❌ ${AppLocale.l('errorLabel')}: $e'), backgroundColor: Colors.red)
                         );
                       }
