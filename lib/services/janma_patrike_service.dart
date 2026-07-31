@@ -15,6 +15,9 @@ class UserDetails {
   final String dateStr;
   final String timeStr;
   final String place;
+  final double lat;
+  final double lon;
+  final double tz;
   final String fatherName;
   final String motherName;
   final String gotra;
@@ -26,6 +29,9 @@ class UserDetails {
     required this.dateStr,
     required this.timeStr,
     required this.place,
+    this.lat = 0,
+    this.lon = 0,
+    this.tz = 5.5,
     required this.fatherName,
     required this.motherName,
     required this.gotra,
@@ -364,6 +370,7 @@ class JanmaPatrikeService {
         _buildDetailBox([
           [AppLocale.l('jpNativeName'), user.name, AppLocale.l('jpBirthPlace'), user.place],
           [AppLocale.l('jpDob'), user.dateStr, AppLocale.l('jpTime'), user.timeStr],
+          [AppLocale.l('jpLatLon'), '${user.lat.toStringAsFixed(4)}°, ${user.lon.toStringAsFixed(4)}°', AppLocale.l('jpTimezone'), '${user.tz >= 0 ? "+" : ""}${user.tz}'],
           [AppLocale.l('jpFather'), user.fatherName, AppLocale.l('jpMother'), user.motherName],
           [AppLocale.l('jpGotra'), user.gotra, AppLocale.l('jpLagnaRashi'), trAll(lagnaRashi)],
         ], t),
