@@ -25,14 +25,7 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
   bool _isExpanded = false;
   late UserMuhurtaRules _rules;
 
-  // Color constants (matching app theme)
-  static const kPurple1 = Color(0xFF6C3FA5);
-  static const kTeal = Color(0xFF009688);
-  static const kText = Color(0xFFE0E0E0);
-  static const kMuted = Color(0xFF9E9E9E);
-  static const kBg = Color(0xFF1A1A2E);
-  static const kCard = Color(0xFF16213E);
-  static const kBorder = Color(0xFF2A2A4A);
+  // Uses dynamic theme colors from common.dart (kText, kMuted, kBg, etc.)
 
   static const knTithi = [
     'ಪ್ರತಿಪದಾ','ದ್ವಿತೀಯಾ','ತೃತೀಯಾ','ಚತುರ್ಥೀ','ಪಂಚಮೀ',
@@ -210,7 +203,7 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
               const SizedBox(height: 6),
               Padding(
                 padding: const EdgeInsets.only(left: 8),
-                child: Text(AppLocale.l('mAllowedTaras'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7))),
+                child: Text(AppLocale.l('mAllowedTaras'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
               ),
               const SizedBox(height: 4),
               Wrap(
@@ -225,12 +218,12 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
                   final selected = _rules.allowedTaras.contains(i);
                   final isDefault = defaultGood.contains(i);
                   return FilterChip(
-                    label: Text(taraLabels[i], style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                    label: Text(taraLabels[i], style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: selected ? (isDefault ? Colors.green.shade700 : Colors.orange.shade700) : kText)),
                     selected: selected,
                     selectedColor: isDefault ? Colors.green.withOpacity(0.2) : Colors.orange.withOpacity(0.2),
                     checkmarkColor: isDefault ? Colors.green.shade700 : Colors.orange.shade700,
-                    backgroundColor: Colors.grey.withOpacity(0.1),
-                    side: BorderSide(color: selected ? (isDefault ? Colors.green : Colors.orange) : Colors.grey.shade400, width: 0.5),
+                    backgroundColor: kBg,
+                    side: BorderSide(color: selected ? (isDefault ? Colors.green : Colors.orange) : kBorder, width: 0.5),
                     onSelected: (sel) {
                       setState(() {
                         final mutable = List<int>.from(_rules.allowedTaras);
