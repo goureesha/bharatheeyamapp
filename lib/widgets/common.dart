@@ -678,6 +678,16 @@ class AppLocale {
       'mVivahaShubha': 'ವಿವಾಹಕ್ಕೆ ಅತ್ಯಂತ ಶುಭ',
       'mVishtiKarana': 'ವಿಷ್ಟಿ (ಭದ್ರಾ) ಕರಣ',
       'mDagdhaNishedha': 'ದಗ್ಧ ಯೋಗ — ಸರ್ವಥಾ ನಿಷಿದ್ಧ',
+
+      // Yoga Tab UI
+      'shubhakara': 'ಶುಭಕರ',
+      'ashubhakara': 'ಅಶುಭಕರ',
+      'totalYoga': 'ಒಟ್ಟು ಯೋಗ',
+      'shubha': 'ಶುಭ',
+      'ashubha': 'ಅಶುಭ',
+      'shubhaYogagalu': 'ಶುಭ ಯೋಗಗಳು',
+      'ashubhaYogagalu': 'ಅಶುಭ ಯೋಗಗಳು',
+      'noYogaFound': 'ಯಾವ ಯೋಗವೂ ಕಂಡುಬಂದಿಲ್ಲ',
       
       // New additions for Muhurta Search localization
       'mCacheNotLoaded': 'ಪಂಚಾಂಗ ದತ್ತಾಂಶ ಲೋಡ್ ಆಗಿಲ್ಲ. Settings → Panchanga Data → Import .bdat',
@@ -1354,6 +1364,16 @@ class AppLocale {
       'mVishtiKarana': 'विष्टि (भद्रा) करण',
       'mDagdhaNishedha': 'दग्ध योग — सर्वथा निषिद्ध',
 
+      // Yoga Tab UI
+      'shubhakara': 'शुभकर',
+      'ashubhakara': 'अशुभकर',
+      'totalYoga': 'कुल योग',
+      'shubha': 'शुभ',
+      'ashubha': 'अशुभ',
+      'shubhaYogagalu': 'शुभ योग',
+      'ashubhaYogagalu': 'अशुभ योग',
+      'noYogaFound': 'कोई योग नहीं मिला',
+
       // Muhurta Search localization
       'mCacheNotLoaded': 'पंचांग डेटा लोड नहीं. Settings → Panchanga Data → Import .bdat',
       'mTaraAnukoola': 'तारानुकूल मध्यम/अशुभ',
@@ -2024,6 +2044,16 @@ class AppLocale {
       'mVivahaShubha': 'திருமணத்திற்கு மிகவும் சுபம்',
       'mVishtiKarana': 'விஷ்டி (பத்ரா) கரணம்',
       'mDagdhaNishedha': 'தக்த யோகம் — முற்றிலும் தடை',
+
+      // Yoga Tab UI
+      'shubhakara': 'சுபகரம்',
+      'ashubhakara': 'அசுபகரம்',
+      'totalYoga': 'மொத்த யோகம்',
+      'shubha': 'சுப',
+      'ashubha': 'அசுப',
+      'shubhaYogagalu': 'சுப யோகங்கள்',
+      'ashubhaYogagalu': 'அசுப யோகங்கள்',
+      'noYogaFound': 'யோகம் எதுவும் கண்டறியவில்லை',
 
       // Muhurta Search localization
       'mCacheNotLoaded': 'பஞ்சாங்க தரவு ஏற்றப்படவில்லை. Settings → Panchanga Data → Import .bdat',
@@ -2696,6 +2726,16 @@ class AppLocale {
       'mVishtiKarana': 'విష్టి (భద్రా) కరణం',
       'mDagdhaNishedha': 'దగ్ధ యోగ — సర్వథా నిషేధం',
 
+      // Yoga Tab UI
+      'shubhakara': 'శుభకర',
+      'ashubhakara': 'అశుభకర',
+      'totalYoga': 'మొత్తం యోగ',
+      'shubha': 'శుభ',
+      'ashubha': 'అశుభ',
+      'shubhaYogagalu': 'శుభ యోగాలు',
+      'ashubhaYogagalu': 'అశుభ యోగాలు',
+      'noYogaFound': 'ఎటువంటి యోగం కనుగొనలేదు',
+
       // Muhurta Search localization
       'mCacheNotLoaded': 'పంచాంగ డేటా లోడ్ కాలేదు. Settings → Panchanga Data → Import .bdat',
       'mTaraAnukoola': 'తారానుకూలం మధ్యమ/అశుభ',
@@ -3366,6 +3406,16 @@ class AppLocale {
       'mVivahaShubha': 'വിവാഹത്തിന് വളരെ ശുഭം',
       'mVishtiKarana': 'വിഷ്ടി (ഭദ്രാ) കരണം',
       'mDagdhaNishedha': 'ദഗ്ധ യോഗ — തികച്ചും നിഷിദ്ധം',
+
+      // Yoga Tab UI
+      'shubhakara': 'ശുഭകരം',
+      'ashubhakara': 'അശുഭകരം',
+      'totalYoga': 'ആകെ യോഗം',
+      'shubha': 'ശുഭ',
+      'ashubha': 'അശുഭ',
+      'shubhaYogagalu': 'ശുഭ യോഗങ്ങൾ',
+      'ashubhaYogagalu': 'അശുഭ യോഗങ്ങൾ',
+      'noYogaFound': 'ഒരു യോഗവും കണ്ടെത്തിയില്ല',
 
       // Muhurta Search localization
       'mCacheNotLoaded': 'പഞ്ചാംഗ ഡാറ്റ ലോഡ് ആയില്ല. Settings → Panchanga Data → Import .bdat',

@@ -4095,13 +4095,14 @@ class _DashboardScreenState extends State<DashboardScreen>
             }
           }
           String _catLabel(String cat) {
+            final isKn = AppLocale.current == 'kn';
             switch (cat) {
-              case 'raja': return 'ರಾಜಯೋಗ';
-              case 'dhana': return 'ಧನಯೋಗ';
-              case 'pancha': return 'ಪಂಚ ಮಹಾಪುರುಷ';
-              case 'chandra': return 'ಚಂದ್ರ ಯೋಗ';
-              case 'graha': return 'ಗ್ರಹ ಯೋಗ';
-              default: return 'ಇತರ ಯೋಗ';
+              case 'raja': return isKn ? 'ರಾಜಯೋಗ' : 'Raja Yoga';
+              case 'dhana': return isKn ? 'ಧನಯೋಗ' : 'Dhana Yoga';
+              case 'pancha': return isKn ? 'ಪಂಚ ಮಹಾಪುರುಷ' : 'Pancha Mahapurusha';
+              case 'chandra': return isKn ? 'ಚಂದ್ರ ಯೋಗ' : 'Chandra Yoga';
+              case 'graha': return isKn ? 'ಗ್ರಹ ಯೋಗ' : 'Graha Yoga';
+              default: return isKn ? 'ಇತರ ಯೋಗ' : 'Other Yoga';
             }
           }
 
@@ -4126,7 +4127,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       Icon(_catIcon(y.category), size: 18, color: isPos ? _catColor(y.category) : Colors.red),
                       const SizedBox(width: 6),
                       Expanded(
-                        child: Text(y.nameKn, style: TextStyle(
+                        child: Text(AppLocale.current == 'kn' ? y.nameKn : y.nameEn, style: TextStyle(
                           fontSize: 15, fontWeight: FontWeight.w900,
                           color: isPos ? _catColor(y.category) : Colors.red,
                         )),
@@ -4138,7 +4139,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          isPos ? 'ಶುಭಕರ' : 'ಅಶುಭಕರ',
+                          isPos ? AppLocale.l('shubhakara') : AppLocale.l('ashubhakara'),
                           style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
                             color: isPos ? Colors.green.shade700 : Colors.red.shade700),
                         ),
@@ -4146,11 +4147,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ],
                   ),
                   const SizedBox(height: 2),
-                  Text(y.nameEn, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kMuted)),
+                  if (AppLocale.current == 'kn') Text(y.nameEn, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kMuted)),
+                  if (AppLocale.current != 'kn') Text(y.nameKn, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kMuted)),
                   const SizedBox(height: 2),
                   Text(_catLabel(y.category), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _catColor(y.category).withOpacity(0.7))),
                   const SizedBox(height: 6),
-                  Text(y.descKn, style: TextStyle(fontSize: 12, color: kText, height: 1.4)),
+                  Text(AppLocale.current == 'kn' ? y.descKn : y.descEn, style: TextStyle(fontSize: 12, color: kText, height: 1.4)),
                 ],
               ),
             );
@@ -4179,15 +4181,15 @@ class _DashboardScreenState extends State<DashboardScreen>
                   children: [
                     Column(children: [
                       Text('${yogas.length}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: kPurple2)),
-                      Text('ಒಟ್ಟು ಯೋಗ', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                      Text(AppLocale.l('totalYoga'), style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
                     ]),
                     Column(children: [
                       Text('${shubha.length}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.green)),
-                      Text('ಶುಭ', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                      Text(AppLocale.l('shubha'), style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
                     ]),
                     Column(children: [
                       Text('${ashubha.length}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.red)),
-                      Text('ಅಶುಭ', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                      Text(AppLocale.l('ashubha'), style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
                     ]),
                   ],
                 ),
@@ -4200,7 +4202,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   child: Row(children: [
                     Icon(Icons.check_circle, size: 16, color: Colors.green),
                     const SizedBox(width: 6),
-                    Text('ಶುಭ ಯೋಗಗಳು (${shubha.length})', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.green.shade700)),
+                    Text('${AppLocale.l('shubhaYogagalu')} (${shubha.length})', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.green.shade700)),
                   ]),
                 ),
                 ...shubha.map(yogaCard),
@@ -4214,7 +4216,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   child: Row(children: [
                     Icon(Icons.warning_amber, size: 16, color: Colors.red),
                     const SizedBox(width: 6),
-                    Text('ಅಶುಭ ಯೋಗಗಳು (${ashubha.length})', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.red.shade700)),
+                    Text('${AppLocale.l('ashubhaYogagalu')} (${ashubha.length})', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.red.shade700)),
                   ]),
                 ),
                 ...ashubha.map(yogaCard),
@@ -4223,7 +4225,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               if (yogas.isEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 40),
-                  child: Center(child: Text('ಯಾವ ಯೋಗವೂ ಕಂಡುಬಂದಿಲ್ಲ', style: TextStyle(color: kMuted, fontSize: 14))),
+                  child: Center(child: Text(AppLocale.l('noYogaFound'), style: TextStyle(color: kMuted, fontSize: 14))),
                 ),
 
               if (allPersons.length > 1) Divider(thickness: 2, color: kBorder),
