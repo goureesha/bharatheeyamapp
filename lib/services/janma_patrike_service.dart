@@ -803,10 +803,8 @@ class JanmaPatrikeService {
       ['ಶುಕ್ರ', 'ರವಿ'],
     ];
 
-    const dashaYears = <String, int>{
-      'ಕೇತು': 7, 'ಶುಕ್ರ': 20, 'ರವಿ': 6, 'ಚಂದ್ರ': 10,
-      'ಕುಜ': 7, 'ರಾಹು': 18, 'ಗುರು': 16, 'ಶನಿ': 19, 'ಬುಧ': 17,
-    };
+
+
 
     // Alternate names for display: ಗುರು→ಬೃಹಸ್ಪತಿ, ರವಿ→ಆದಿತ್ಯ
     String altName(String lord) {
@@ -828,9 +826,7 @@ class JanmaPatrikeService {
       if (!isTarget) continue;
 
       final transitionDate = ending.end;
-      final endYears = dashaYears[ending.lord] ?? 10;
-      final startYears = dashaYears[starting.lord] ?? 10;
-      final sandhiMonths = ((endYears + startYears) / 6.0).round().clamp(1, 12);
+      const sandhiMonths = 6;
 
       final lord1 = altName(ending.lord);
       final lord2 = altName(starting.lord);
