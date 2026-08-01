@@ -129,6 +129,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   final _jyotishiNameCtrl = TextEditingController();
   final _jyotishiPhoneCtrl = TextEditingController();
   String _selectedThemeId = 'traditional';
+  String _selectedGender = 'male';
   List<bool> _pdfPageSelection = [true, true, true, true, true, true]; // 6 pages
 
   // Tippani PDF fields
@@ -4389,6 +4390,28 @@ class _DashboardScreenState extends State<DashboardScreen>
                   controller: _gotraCtrl,
                   decoration: InputDecoration(labelText: AppLocale.l('gotraLabel'), prefixIcon: Icon(Icons.hub_outlined, size: 18), isDense: true),
                 ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Icon(Icons.wc, size: 18, color: kMuted),
+                    const SizedBox(width: 8),
+                    Text(AppLocale.l('jpGender'), style: TextStyle(fontSize: 13, color: kMuted)),
+                    const SizedBox(width: 12),
+                    ChoiceChip(
+                      label: Text(AppLocale.l('jpMale')),
+                      selected: _selectedGender == 'male',
+                      selectedColor: kPurple2.withOpacity(0.2),
+                      onSelected: (_) => setState(() => _selectedGender = 'male'),
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: Text(AppLocale.l('jpFemale')),
+                      selected: _selectedGender == 'female',
+                      selectedColor: kPurple2.withOpacity(0.2),
+                      onSelected: (_) => setState(() => _selectedGender = 'female'),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 20),
 
                 // Jyotishi Details
@@ -4438,6 +4461,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         jyotishiName: _jyotishiNameCtrl.text.trim(),
                         jyotishiPhone: _jyotishiPhoneCtrl.text.trim(),
                         jyotishiAddress: _tippaniAddressCtrl.text.trim(),
+                        gender: _selectedGender,
                       );
 
                       showDialog(
@@ -4500,6 +4524,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         jyotishiName: _jyotishiNameCtrl.text.trim(),
                         jyotishiPhone: _jyotishiPhoneCtrl.text.trim(),
                         jyotishiAddress: _tippaniAddressCtrl.text.trim(),
+                        gender: _selectedGender,
                       );
 
                       // Show loading dialog

@@ -24,6 +24,7 @@ class UserDetails {
   final String jyotishiName;
   final String jyotishiPhone;
   final String jyotishiAddress;
+  final String gender; // 'male' or 'female'
 
   UserDetails({
     required this.name,
@@ -39,6 +40,7 @@ class UserDetails {
     required this.jyotishiName,
     required this.jyotishiPhone,
     this.jyotishiAddress = '',
+    this.gender = 'male',
   });
 }
 
@@ -374,7 +376,8 @@ class JanmaPatrikeService {
           [AppLocale.l('jpDob'), user.dateStr, AppLocale.l('jpTime'), user.timeStr],
           [AppLocale.l('jpLatLon'), '${user.lat.toStringAsFixed(4)}°, ${user.lon.toStringAsFixed(4)}°', AppLocale.l('jpTimezone'), '${user.tz >= 0 ? "+" : ""}${user.tz}'],
           [AppLocale.l('jpFather'), user.fatherName, AppLocale.l('jpMother'), user.motherName],
-          [AppLocale.l('jpGotra'), user.gotra, AppLocale.l('jpLagnaRashi'), trAll(lagnaRashi)],
+          [AppLocale.l('jpGotra'), user.gotra, AppLocale.l('jpGender'), user.gender == 'female' ? AppLocale.l('jpFemale') : AppLocale.l('jpMale')],
+          ['', '', AppLocale.l('jpLagnaRashi'), trAll(lagnaRashi)],
         ], t),
         const SizedBox(height: 2),
 
@@ -439,7 +442,12 @@ class JanmaPatrikeService {
 
         _buildSectionTitle(AppLocale.l('jpMahaDasha'), t),
         _buildDashaTable(result, t),
-        const SizedBox(height: 15),
+        const SizedBox(height: 10),
+
+        _buildSectionTitle(AppLocale.l('jpDashaSandhi'), t),
+        const SizedBox(height: 4),
+        _buildDashaSandhiTable(result, t),
+        const SizedBox(height: 10),
 
         Container(
           alignment: Alignment.center,
@@ -780,6 +788,71 @@ class JanmaPatrikeService {
             );
           }),
         ],
+      ),
+    );
+  }
+
+  static Widget _buildDashaSandhiTable(KundaliResult result, PdfThemeConfig t) {
+    final dashas = result.dashas;
+    if (dashas.length < 2) return const SizedBox();
+
+    const dashaYears = <String, int>{
+      'ಕೇತು': 7, 'ಶುಕ್ರ': 20, 'ರವಿ': 6, 'ಚಂದ್ರ': 10,
+      'ಕುಜ': 7, 'ರಾಹು': 18, 'ಗುರು': 16, 'ಶನಿ': 19, 'ಬುಧ': 17,
+    };
+
+    String fmtDate(DateTime d) => '${d.day.toString().padLeft(2, '0')}-${d.month.toString().padLeft(2, '0')}-${d.year}';
+
+    final headers = [AppLocale.l('jpSandhiTransition'), AppLocale.l('jpEndDate'), AppLocale.l('jpSandhiPeriod')];
+
+    List<TableRow> rows = [
+      TableRow(
+        decoration: BoxDecoration(color: t.tableHeaderBg, borderRadius: const BorderRadius.vertical(top: Radius.circular(5))),
+        children: headers.map((h) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 4),
+          child: Text(h, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: t.tableHeaderText)),
+        )).toList(),
+      ),
+    ];
+
+    for (int i = 0; i < dashas.length - 1; i++) {
+      final ending = dashas[i];
+      final starting = dashas[i + 1];
+      final transitionDate = ending.end;
+
+      final endYears = dashaYears[ending.lord] ?? 10;
+      final startYears = dashaYears[starting.lord] ?? 10;
+      final sandhiMonths = ((endYears + startYears) / 6.0).round().clamp(1, 12);
+      final halfSandhi = (sandhiMonths / 2.0).ceil();
+
+      final sandhiStart = DateTime(transitionDate.year, transitionDate.month - halfSandhi, transitionDate.day);
+      final sandhiEnd = DateTime(transitionDate.year, transitionDate.month + halfSandhi, transitionDate.day);
+
+      final isEven = i % 2 == 0;
+      rows.add(TableRow(
+        decoration: BoxDecoration(color: isEven ? Colors.white : t.dashaAltRow),
+        children: [
+          Padding(padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+            child: Text('${trAll(ending.lord)} → ${trAll(starting.lord)}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 11))),
+          Padding(padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+            child: Text(fmtDate(transitionDate), textAlign: TextAlign.center, style: const TextStyle(fontSize: 11))),
+          Padding(padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+            child: Text('${fmtDate(sandhiStart)} - ${fmtDate(sandhiEnd)}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10))),
+        ],
+      ));
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: t.detailBorder),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Table(
+        border: const TableBorder(
+          horizontalInside: BorderSide(color: Color(0xFFE0E0E0), width: 0.5),
+          verticalInside: BorderSide(color: Color(0xFFE0E0E0), width: 0.5),
+        ),
+        children: rows,
       ),
     );
   }
