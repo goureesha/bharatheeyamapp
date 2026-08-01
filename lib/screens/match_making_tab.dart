@@ -954,7 +954,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
               tzCtrl.text = '${coords[2] >= 0 ? '+' : ''}${coords[2]}';
             });
           } else {
-            final worldResults = searchWorldCities(selection.split(' (').first, limit: 1);
+            final worldResults = searchWorldCities(selection.split(', ').first, limit: 1);
             if (worldResults.isNotEmpty) {
               final w = worldResults.first;
               final lat = (w['la'] as num).toDouble();

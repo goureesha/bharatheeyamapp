@@ -609,7 +609,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                         lonCtrl.text = coords[1].toStringAsFixed(4);
                       });
                     } else {
-                      final worldResults = searchWorldCities(selection.split(' (').first, limit: 1);
+                      final worldResults = searchWorldCities(selection.split(', ').first, limit: 1);
                       if (worldResults.isNotEmpty) {
                         final w = worldResults.first;
                         setS(() {

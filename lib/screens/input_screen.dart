@@ -1114,7 +1114,7 @@ class _InputScreenState extends State<InputScreen> {
                   _geoStatus = '📍 $selection (TZ: ${coords[2] >= 0 ? '+' : ''}${coords[2]})';
                 });
               } else {
-                final worldResults = searchWorldCities(selection.split(' (').first, limit: 1);
+                final worldResults = searchWorldCities(selection.split(', ').first, limit: 1);
                 if (worldResults.isNotEmpty) {
                   final w = worldResults.first;
                   final lat = (w['la'] as num).toDouble();
@@ -1127,6 +1127,10 @@ class _InputScreenState extends State<InputScreen> {
                     _tzCtrl.text = '${tz >= 0 ? '+' : ''}$tz';
                     _geoStatus = '📍 $selection (TZ: ${tz >= 0 ? '+' : ''}$tz)';
                   });
+                } else {
+                  // Fallback: online geocode
+                  _placeCtrl.text = selection;
+                  _geocodeMultiple(selection);
                 }
               }
             },
