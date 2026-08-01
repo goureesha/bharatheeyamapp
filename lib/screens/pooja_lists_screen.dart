@@ -1364,29 +1364,8 @@ class _PoojaListDetailScreenState extends State<_PoojaListDetailScreen> {
               child: Text('$total ${_p('items')}', style: TextStyle(fontSize: 13, color: kMuted, fontWeight: FontWeight.w600)),
             ),
 
-          // Purohit info
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            color: kCard,
-            child: Row(children: [
-              Icon(Icons.person, color: kPurple2, size: 22),
-              const SizedBox(width: 10),
-              Expanded(child: GestureDetector(
-                onTap: _editPurohitInfo,
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(_list.purohitName.isNotEmpty ? _list.purohitName : _p('addPurohit'),
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _list.purohitName.isNotEmpty ? kText : kMuted)),
-                  if (_list.purohitPhone.isNotEmpty)
-                    Text(_list.purohitPhone, style: TextStyle(fontSize: 13, color: kMuted)),
-                ]),
-              )),
-              IconButton(icon: Icon(Icons.edit_outlined, color: kPurple2, size: 20), onPressed: _editPurohitInfo, tooltip: 'Edit Purohit', visualDensity: VisualDensity.compact),
-              if (_list.purohitPhone.isNotEmpty)
-                IconButton(icon: Icon(Icons.phone, color: kGreen, size: 20), onPressed: () => launchUrl(Uri.parse('tel:${_list.purohitPhone}')), tooltip: 'Call Purohit', visualDensity: VisualDensity.compact),
-            ]),
-          ),
-          const Divider(height: 1, color: Color(0xFF2a2a3a)),
+
+
 
           // Items list
           Expanded(
