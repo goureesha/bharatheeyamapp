@@ -2410,7 +2410,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                       r['chandraBala'] as bool),
                   if (r['guruBala'] != null)
                     _balaChipRow('${AppLocale.l('mGuruBala')} (${trAll(knRashi[r['jupRashi'] as int])})',
-                      (r['guruBala'] as BalaScore).label,
+                      (r['guruBala'] as BalaScore).score > 0 ? AppLocale.l('shubha') : AppLocale.l('ashubha'),
                       (r['guruBala'] as BalaScore).score > 0),
                 ]),
               ),
