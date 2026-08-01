@@ -23,6 +23,7 @@ class UserDetails {
   final String gotra;
   final String jyotishiName;
   final String jyotishiPhone;
+  final String jyotishiAddress;
 
   UserDetails({
     required this.name,
@@ -37,6 +38,7 @@ class UserDetails {
     required this.gotra,
     required this.jyotishiName,
     required this.jyotishiPhone,
+    this.jyotishiAddress = '',
   });
 }
 
@@ -392,7 +394,7 @@ class JanmaPatrikeService {
 
         _buildSectionTitle(AppLocale.l('jpGrahaStithi'), t),
         _buildGrahaTable(result, t),
-        const SizedBox(height: 2),
+        const SizedBox(height: 1),
 
         Expanded(
           child: Row(
@@ -406,6 +408,10 @@ class JanmaPatrikeService {
             ],
           ),
         ),
+
+        // Astrologer Details section
+        if (user.jyotishiName.isNotEmpty || user.jyotishiAddress.isNotEmpty || user.jyotishiPhone.isNotEmpty)
+          _buildAstrologerSection(user, t),
 
         _buildFooter(user.jyotishiName, user.jyotishiPhone, t),
       ],
@@ -773,6 +779,35 @@ class JanmaPatrikeService {
               )).toList(),
             );
           }),
+        ],
+      ),
+    );
+  }
+
+  static Widget _buildAstrologerSection(UserDetails user, PdfThemeConfig t) {
+    return Container(
+      margin: const EdgeInsets.only(top: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: t.tableHeaderBg.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: t.detailBorder.withOpacity(0.4)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          if (user.jyotishiName.isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(user.jyotishiName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: t.footerText)),
+                if (user.jyotishiAddress.isNotEmpty)
+                  Text(user.jyotishiAddress, style: TextStyle(fontSize: 9, color: t.footerText.withOpacity(0.7))),
+              ],
+            ),
+          if (user.jyotishiPhone.isNotEmpty)
+            Text('📞 ${user.jyotishiPhone}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: t.footerText)),
         ],
       ),
     );

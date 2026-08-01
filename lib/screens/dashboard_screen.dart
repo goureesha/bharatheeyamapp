@@ -4437,6 +4437,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         gotra: _gotraCtrl.text.trim(),
                         jyotishiName: _jyotishiNameCtrl.text.trim(),
                         jyotishiPhone: _jyotishiPhoneCtrl.text.trim(),
+                        jyotishiAddress: _tippaniAddressCtrl.text.trim(),
                       );
 
                       showDialog(
@@ -4498,6 +4499,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         gotra: _gotraCtrl.text.trim(),
                         jyotishiName: _jyotishiNameCtrl.text.trim(),
                         jyotishiPhone: _jyotishiPhoneCtrl.text.trim(),
+                        jyotishiAddress: _tippaniAddressCtrl.text.trim(),
                       );
 
                       // Show loading dialog
