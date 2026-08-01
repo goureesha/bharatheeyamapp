@@ -843,10 +843,10 @@ class JanmaPatrikeService {
           .replaceAll('{2}', sandhiMonths.toString());
 
       cards.add(SizedBox(
-        height: 62,
+        height: 50,
         child: Container(
-          margin: const EdgeInsets.only(bottom: 4),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+          margin: const EdgeInsets.only(bottom: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
             border: Border.all(color: t.detailBorder),
             borderRadius: BorderRadius.circular(6),
@@ -855,10 +855,9 @@ class JanmaPatrikeService {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: t.primaryDark)),
-              Text(dateLine, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 10, color: Colors.black87)),
-              const SizedBox(height: 2),
-              Expanded(child: Text(desc, style: const TextStyle(fontSize: 9, color: Colors.black87))),
+              Text('$title  —  $dateLine', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: t.primaryDark)),
+              const SizedBox(height: 1),
+              Expanded(child: Text(desc, style: const TextStyle(fontSize: 8, color: Colors.black87))),
             ],
           ),
         ),
