@@ -1080,9 +1080,9 @@ MuhurtaDayResult evaluateMuhurta({
     doshaBhangas.add('${AppLocale.l('mGuruBala')}: ${AppLocale.l('mPoojyaGuru')}');
   }
 
-  checks.add(MuhurtaCheckItem(label: AppLocale.l('mTaraBala'), value: tara1.taraName, passed: tara1Passed));
+  checks.add(MuhurtaCheckItem(label: AppLocale.l('mTaraBala'), value: AppLocale.l('tara${tara1.taraIndex}'), passed: tara1Passed));
   // Chandra Bala check item removed
-  checks.add(MuhurtaCheckItem(label: AppLocale.l('mGuruBala'), value: guru1.label, passed: guru1.score > 0));
+  checks.add(MuhurtaCheckItem(label: AppLocale.l('mGuruBala'), value: guru1.score > 0 ? AppLocale.l('shubha') : AppLocale.l('ashubha'), passed: guru1.score > 0));
 
   // Person 2 (if provided)
   if (janmaNakIdx2 != null && janmaRashiIdx2 != null) {
