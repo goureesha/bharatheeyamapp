@@ -572,7 +572,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     if (worldCitiesLoaded) {
                       final worldResults = searchWorldCities(textEditingValue.text, limit: 15);
                       for (final w in worldResults) {
-                        final label = '${w['n']} (${w['c']})';
+                        final label = worldCityLabel(w);
                         if (!offline.any((o) => o.toLowerCase() == label.toLowerCase())) {
                           offline.add(label);
                         }
@@ -858,7 +858,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     if (worldCitiesLoaded) {
                       final worldResults = searchWorldCities(textEditingValue.text, limit: 15);
                       for (final w in worldResults) {
-                        final label = '${w['n']} (${w['c']})';
+                        final label = worldCityLabel(w);
                         if (!offline.any((o) => o.toLowerCase() == label.toLowerCase())) {
                           offline.add(label);
                         }
@@ -1106,7 +1106,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     if (worldCitiesLoaded) {
                       final worldResults = searchWorldCities(textEditingValue.text, limit: 15);
                       for (final w in worldResults) {
-                        final label = '${w['n']} (${w['c']})';
+                        final label = worldCityLabel(w);
                         if (!offline.any((o) => o.toLowerCase() == label.toLowerCase())) {
                           offline.add(label);
                         }

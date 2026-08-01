@@ -585,7 +585,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                     if (worldCitiesLoaded) {
                       final worldResults = searchWorldCities(v.text, limit: 15);
                       for (final w in worldResults) {
-                        final label = '${w['n']} (${w['c']})';
+                        final label = worldCityLabel(w);
                         if (!offline.any((o) => o.toLowerCase() == label.toLowerCase())) {
                           offline.add(label);
                         }

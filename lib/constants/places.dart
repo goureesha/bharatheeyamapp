@@ -4,6 +4,48 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 
+/// Map 2-letter country codes to full country names
+const Map<String, String> _countryCodes = {
+  'IN': 'India', 'US': 'USA', 'GB': 'United Kingdom', 'CA': 'Canada', 'AU': 'Australia',
+  'DE': 'Germany', 'FR': 'France', 'IT': 'Italy', 'ES': 'Spain', 'PT': 'Portugal',
+  'NL': 'Netherlands', 'BE': 'Belgium', 'AT': 'Austria', 'CH': 'Switzerland', 'SE': 'Sweden',
+  'NO': 'Norway', 'DK': 'Denmark', 'FI': 'Finland', 'PL': 'Poland', 'CZ': 'Czech Republic',
+  'RO': 'Romania', 'HU': 'Hungary', 'GR': 'Greece', 'BG': 'Bulgaria', 'HR': 'Croatia',
+  'RS': 'Serbia', 'UA': 'Ukraine', 'RU': 'Russia', 'TR': 'Turkey', 'IE': 'Ireland',
+  'JP': 'Japan', 'CN': 'China', 'KR': 'South Korea', 'TW': 'Taiwan', 'SG': 'Singapore',
+  'MY': 'Malaysia', 'ID': 'Indonesia', 'TH': 'Thailand', 'VN': 'Vietnam', 'PH': 'Philippines',
+  'BD': 'Bangladesh', 'PK': 'Pakistan', 'LK': 'Sri Lanka', 'NP': 'Nepal', 'MM': 'Myanmar',
+  'AE': 'UAE', 'SA': 'Saudi Arabia', 'QA': 'Qatar', 'KW': 'Kuwait', 'OM': 'Oman',
+  'BH': 'Bahrain', 'IL': 'Israel', 'EG': 'Egypt', 'ZA': 'South Africa', 'NG': 'Nigeria',
+  'KE': 'Kenya', 'ET': 'Ethiopia', 'GH': 'Ghana', 'TZ': 'Tanzania',
+  'BR': 'Brazil', 'MX': 'Mexico', 'AR': 'Argentina', 'CO': 'Colombia', 'CL': 'Chile',
+  'PE': 'Peru', 'VE': 'Venezuela', 'EC': 'Ecuador', 'UY': 'Uruguay',
+  'NZ': 'New Zealand', 'FJ': 'Fiji', 'AF': 'Afghanistan', 'IQ': 'Iraq', 'IR': 'Iran',
+  'JO': 'Jordan', 'LB': 'Lebanon', 'KG': 'Kyrgyzstan', 'UZ': 'Uzbekistan', 'TM': 'Turkmenistan',
+  'KZ': 'Kazakhstan', 'GE': 'Georgia', 'AM': 'Armenia', 'AZ': 'Azerbaijan',
+  'LT': 'Lithuania', 'LV': 'Latvia', 'EE': 'Estonia', 'SK': 'Slovakia', 'SI': 'Slovenia',
+  'BA': 'Bosnia', 'MK': 'North Macedonia', 'AL': 'Albania', 'ME': 'Montenegro', 'XK': 'Kosovo',
+  'CY': 'Cyprus', 'MT': 'Malta', 'LU': 'Luxembourg', 'IS': 'Iceland', 'LI': 'Liechtenstein',
+  'MC': 'Monaco', 'AD': 'Andorra', 'SM': 'San Marino', 'VA': 'Vatican City',
+  'JM': 'Jamaica', 'TT': 'Trinidad', 'CU': 'Cuba', 'DO': 'Dominican Republic', 'HT': 'Haiti',
+  'CR': 'Costa Rica', 'PA': 'Panama', 'GT': 'Guatemala', 'SV': 'El Salvador', 'HN': 'Honduras',
+  'NI': 'Nicaragua', 'BZ': 'Belize', 'PR': 'Puerto Rico', 'BM': 'Bermuda',
+  'DZ': 'Algeria', 'MA': 'Morocco', 'TN': 'Tunisia', 'LY': 'Libya', 'SD': 'Sudan',
+  'SN': 'Senegal', 'CM': 'Cameroon', 'CI': 'Ivory Coast', 'MG': 'Madagascar',
+  'MZ': 'Mozambique', 'AO': 'Angola', 'ZW': 'Zimbabwe', 'ZM': 'Zambia', 'BW': 'Botswana',
+  'UG': 'Uganda', 'RW': 'Rwanda', 'CD': 'DR Congo', 'CG': 'Congo',
+  'BF': 'Burkina Faso', 'ML': 'Mali', 'NE': 'Niger', 'TD': 'Chad', 'GM': 'Gambia',
+  'MN': 'Mongolia', 'KH': 'Cambodia', 'LA': 'Laos', 'BN': 'Brunei',
+  'PW': 'Palau', 'FM': 'Micronesia', 'NR': 'Nauru', 'TV': 'Tuvalu',
+  'GL': 'Greenland', 'FO': 'Faroe Islands', 'GU': 'Guam',
+};
+
+/// Get full country name from 2-letter code
+String countryName(String code) => _countryCodes[code] ?? code;
+
+/// Format world city label as "City, Country"
+String worldCityLabel(Map<String, dynamic> w) => '${w['n']}, ${countryName(w['c'] as String)}';
+
 const Map<String, List<double>> karnatakaPlaces = {
   // ─── Bagalkot District ───
   'ಬಾಗಲಕೋಟ (Bagalkot)': [16.18, 75.70],
