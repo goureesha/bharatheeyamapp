@@ -32,7 +32,15 @@ class MatchPdfData {
 }
 
 class MatchPdfService {
-  static String _fontForLocale() => 'NotoSansKannada';
+  static String _fontForLocale() {
+    switch (AppLocale.current) {
+      case 'hi': return 'NotoSansDevanagari';
+      case 'ta': return 'NotoSansTamil';
+      case 'te': return 'NotoSansTelugu';
+      case 'ml': return 'NotoSansMalayalam';
+      default: return 'NotoSansKannada';
+    }
+  }
 
   static const double _pw = 793.0;
   static const double _ph = 1122.0;
@@ -113,32 +121,32 @@ class MatchPdfService {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _birthCard('ವರ (Groom)', d.groomName, d.groomDob, d.groomTime, d.groomPlace, d.groomResult, t, Colors.blue.shade700)),
+              Expanded(child: _birthCard('${AppLocale.l('groom')} (Groom)', d.groomName, d.groomDob, d.groomTime, d.groomPlace, d.groomResult, t, Colors.blue.shade700)),
               const SizedBox(width: 12),
-              Expanded(child: _birthCard('ವಧು (Bride)', d.brideName, d.brideDob, d.brideTime, d.bridePlace, d.brideResult, t, Colors.pink.shade700)),
+              Expanded(child: _birthCard('${AppLocale.l('bride')} (Bride)', d.brideName, d.brideDob, d.brideTime, d.bridePlace, d.brideResult, t, Colors.pink.shade700)),
             ],
           ),
           const SizedBox(height: 10),
-          _sectionTitle('ಕುಂಡಲಿ', t),
+          _sectionTitle(AppLocale.l('kundaliLabel'), t),
           const SizedBox(height: 6),
           // Charts: 3 columns x 2 rows (groom top, bride bottom)
           Row(
             children: [
-              Expanded(child: _chartBox(d.groomResult, 1, false, 'ರಾಶಿ', t)),
+              Expanded(child: _chartBox(d.groomResult, 1, false, AppLocale.l('rashi'), t)),
               const SizedBox(width: 6),
-              Expanded(child: _chartBox(d.groomResult, 9, false, 'ನವಾಂಶ', t)),
+              Expanded(child: _chartBox(d.groomResult, 9, false, AppLocale.l('navamsha'), t)),
               const SizedBox(width: 6),
-              Expanded(child: _chartBox(d.groomResult, 1, true, 'ಭಾವ', t)),
+              Expanded(child: _chartBox(d.groomResult, 1, true, AppLocale.l('bhavaLabel'), t)),
             ],
           ),
           const SizedBox(height: 6),
           Row(
             children: [
-              Expanded(child: _chartBox(d.brideResult, 1, false, 'ರಾಶಿ', t)),
+              Expanded(child: _chartBox(d.brideResult, 1, false, AppLocale.l('rashi'), t)),
               const SizedBox(width: 6),
-              Expanded(child: _chartBox(d.brideResult, 9, false, 'ನವಾಂಶ', t)),
+              Expanded(child: _chartBox(d.brideResult, 9, false, AppLocale.l('navamsha'), t)),
               const SizedBox(width: 6),
-              Expanded(child: _chartBox(d.brideResult, 1, true, 'ಭಾವ', t)),
+              Expanded(child: _chartBox(d.brideResult, 1, true, AppLocale.l('bhavaLabel'), t)),
             ],
           ),
           const Spacer(),
@@ -161,27 +169,27 @@ class MatchPdfService {
         children: [
           _miniHeader(d, t),
           const SizedBox(height: 8),
-          _sectionTitle(isAshta ? 'ಅಷ್ಟಕೂಟ ಮಿಲನ (36)' : 'ದ್ವಾದಶ ಕೂಟ ಮಿಲನ (40)', t),
+          _sectionTitle(isAshta ? '${AppLocale.l('ashtaKoota')} ${AppLocale.l('milan')} (36)' : '${AppLocale.l('dvadashaKoota')} ${AppLocale.l('milan')} (40)', t),
           const SizedBox(height: 6),
           _buildKootaTable(koota, isAshta, t),
           const SizedBox(height: 14),
-          _sectionTitle('ಕುಜ ದೋಷ', t),
+          _sectionTitle(AppLocale.l('kujaDosha'), t),
           const SizedBox(height: 6),
           Row(
             children: [
-              Expanded(child: _buildDoshaCard('ವರ', fr['groomKujaDosha'] as Map<String, dynamic>, t, Colors.blue.shade700)),
+              Expanded(child: _buildDoshaCard(AppLocale.l('groom'), fr['groomKujaDosha'] as Map<String, dynamic>, t, Colors.blue.shade700)),
               const SizedBox(width: 10),
-              Expanded(child: _buildDoshaCard('ವಧು', fr['brideKujaDosha'] as Map<String, dynamic>, t, Colors.pink.shade700)),
+              Expanded(child: _buildDoshaCard(AppLocale.l('bride'), fr['brideKujaDosha'] as Map<String, dynamic>, t, Colors.pink.shade700)),
             ],
           ),
           const SizedBox(height: 14),
-          _sectionTitle('ಪಾಪ ದೋಷ', t),
+          _sectionTitle(AppLocale.l('papaDosha'), t),
           const SizedBox(height: 6),
           Row(
             children: [
-              Expanded(child: _buildPapaCard('ವರ', fr['groomPapaDosha'] as Map<String, dynamic>, t, Colors.blue.shade700)),
+              Expanded(child: _buildPapaCard(AppLocale.l('groom'), fr['groomPapaDosha'] as Map<String, dynamic>, t, Colors.blue.shade700)),
               const SizedBox(width: 10),
-              Expanded(child: _buildPapaCard('ವಧು', fr['bridePapaDosha'] as Map<String, dynamic>, t, Colors.pink.shade700)),
+              Expanded(child: _buildPapaCard(AppLocale.l('bride'), fr['bridePapaDosha'] as Map<String, dynamic>, t, Colors.pink.shade700)),
             ],
           ),
           const SizedBox(height: 8),
@@ -204,11 +212,11 @@ class MatchPdfService {
         children: [
           _miniHeader(d, t),
           const SizedBox(height: 8),
-          _sectionTitle('ಗ್ರಹ ಮೈತ್ರಿ', t),
+          _sectionTitle(AppLocale.l('grahaMaitriAmsha'), t),
           const SizedBox(height: 6),
           if (fr['grahaMaitri'] != null) _buildGrahaMaitriTable(fr['grahaMaitri'] as Map<String, dynamic>, t),
           const SizedBox(height: 14),
-          _sectionTitle('ದಶಾ ಸಂಧಿ', t),
+          _sectionTitle(AppLocale.l('dashaSandhi'), t),
           const SizedBox(height: 6),
           _buildDashaSandhi(d, t),
           const SizedBox(height: 14),
@@ -217,7 +225,7 @@ class MatchPdfService {
               Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _sectionTitle('ಷಷ್ಠಾಷ್ಟಕ', t),
+                  _sectionTitle(AppLocale.l('shathaAshtaka'), t),
                   const SizedBox(height: 6),
                   if (fr['shathaAshtaka'] != null) _buildRelationCard(fr['shathaAshtaka'] as Map<String, dynamic>, '6/8', t),
                 ],
@@ -226,7 +234,7 @@ class MatchPdfService {
               Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _sectionTitle('ದ್ವಿರ್ದ್ವಾದಶ', t),
+                  _sectionTitle(AppLocale.l('dvirdvadasha'), t),
                   const SizedBox(height: 6),
                   if (fr['dvirdvadasha'] != null) _buildRelationCard(fr['dvirdvadasha'] as Map<String, dynamic>, '2/12', t),
                 ],
@@ -266,14 +274,14 @@ class MatchPdfService {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
               decoration: BoxDecoration(color: t.headerBg.withOpacity(0.1), borderRadius: BorderRadius.circular(6), border: Border.all(color: t.primaryDark.withOpacity(0.2))),
-              child: Text('ವಿವಾಹ ಹೊಂದಾಣಿಕೆ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: t.primaryDark)),
+              child: Text(AppLocale.l('matchTitle'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: t.primaryDark)),
             ),
           ])),
           // Date (right)
           Expanded(flex: 3, child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('ದಿನಾಂಕ', style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+              Text(AppLocale.l('dinanka'), style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
               Text(_todayStr(), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: t.primaryDark)),
             ],
           )),
@@ -288,7 +296,7 @@ class MatchPdfService {
       children: [
         Image.asset('assets/images/logo.png', width: 28, height: 28),
         const SizedBox(width: 8),
-        Text('ವಿವಾಹ ಹೊಂದಾಣಿಕೆ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: t.primaryDark)),
+        Text(AppLocale.l('matchTitle'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: t.primaryDark)),
         const SizedBox(width: 8),
         Text('${d.groomName} ✕ ${d.brideName}', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
       ],
@@ -319,7 +327,7 @@ class MatchPdfService {
           Text('📅 $dob  🕰️ $time', style: const TextStyle(fontSize: 10)),
           Text('📍 $place', style: const TextStyle(fontSize: 10)),
           const SizedBox(height: 4),
-          Text('ರಾಶಿ: ${trAll(p.chandraRashi)}  |  ನಕ್ಷತ್ರ: ${trAll(p.nakshatra)}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: accent)),
+          Text('${AppLocale.l('rashi')}: ${trAll(p.chandraRashi)}  |  ${AppLocale.l('nakshatra')}: ${trAll(p.nakshatra)}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: accent)),
         ],
       ),
     );
@@ -344,7 +352,7 @@ class MatchPdfService {
     final items = <List<String>>[];
     final maxPts = <double>[];
     if (isAshta) {
-      for (final e in [['ವರ್ಣ', 'varna', 1], ['ವಶ್ಯ', 'vashya', 2], ['ತಾರಾ', 'tara', 3], ['ಯೋನಿ', 'yoni', 4], ['ಗ್ರಹ ಮೈತ್ರಿ', 'graha', 5], ['ಗಣ', 'gana', 6], ['ಭಕೂಟ', 'bhakoot', 7], ['ನಾಡಿ', 'nadi', 8]]) {
+      for (final e in [[trAll('ವರ್ಣ'), 'varna', 1], [trAll('ವಶ್ಯ'), 'vashya', 2], [trAll('ತಾರಾ'), 'tara', 3], [trAll('ಯೋನಿ'), 'yoni', 4], [trAll('ಗ್ರಹ ಮೈತ್ರಿ'), 'graha', 5], [trAll('ಗಣ'), 'gana', 6], [trAll('ಭಕೂಟ'), 'bhakoot', 7], [trAll('ನಾಡಿ'), 'nadi', 8]]) {
         final k = e[1] as String;
         final mx = (e[2] as int).toDouble();
         final v = (koota[k] as num?)?.toDouble() ?? 0;
@@ -352,7 +360,7 @@ class MatchPdfService {
         maxPts.add(mx);
       }
     } else {
-      for (final e in [['ವರ್ಣ', 'varna', 1], ['ವಶ್ಯ', 'vashya', 2], ['ತಾರಾ', 'tara', 3], ['ಯೋನಿ', 'yoni', 4], ['ಗ್ರಹ ಮೈತ್ರಿ', 'graha', 5], ['ಗಣ', 'gana', 6], ['ಭಕೂಟ', 'bhakoot', 7], ['ನಾಡಿ', 'nadi', 8], ['ಮಹೇಂದ್ರ', 'mahendra', 1], ['ಸ್ತ್ರೀ ದೀರ್ಘ', 'streeDeergha', 1], ['ರಜ್ಜು', 'rajju', 1], ['ವೇಧ', 'vedha', 1]]) {
+      for (final e in [[trAll('ವರ್ಣ'), 'varna', 1], [trAll('ವಶ್ಯ'), 'vashya', 2], [trAll('ತಾರಾ'), 'tara', 3], [trAll('ಯೋನಿ'), 'yoni', 4], [trAll('ಗ್ರಹ ಮೈತ್ರಿ'), 'graha', 5], [trAll('ಗಣ'), 'gana', 6], [trAll('ಭಕೂಟ'), 'bhakoot', 7], [trAll('ನಾಡಿ'), 'nadi', 8], [trAll('ಮಹೇಂದ್ರ'), 'mahendra', 1], [trAll('ಸ್ತ್ರೀ ದೀರ್ಘ'), 'streeDeergha', 1], [trAll('ರಜ್ಜು'), 'rajju', 1], [trAll('ವೇಧ'), 'vedha', 1]]) {
         final k = e[1] as String;
         final mx = (e[2] as int).toDouble();
         final v = (koota[k] as num?)?.toDouble() ?? 0;
@@ -371,9 +379,9 @@ class MatchPdfService {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(color: t.tableHeaderBg, borderRadius: const BorderRadius.vertical(top: Radius.circular(7))),
           child: Row(children: [
-            Expanded(flex: 3, child: Text('ಕೂಟ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: t.tableHeaderText))),
-            Expanded(flex: 2, child: Text('ಗರಿಷ್ಠ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: t.tableHeaderText), textAlign: TextAlign.center)),
-            Expanded(flex: 2, child: Text('ಪಡೆದ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: t.tableHeaderText), textAlign: TextAlign.center)),
+            Expanded(flex: 3, child: Text(AppLocale.l('koota'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: t.tableHeaderText))),
+            Expanded(flex: 2, child: Text(AppLocale.l('garishtha'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: t.tableHeaderText), textAlign: TextAlign.center)),
+            Expanded(flex: 2, child: Text(AppLocale.l('padeda'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: t.tableHeaderText), textAlign: TextAlign.center)),
           ]),
         ),
         // Rows
@@ -392,7 +400,7 @@ class MatchPdfService {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(color: t.headerBg.withOpacity(0.1), borderRadius: const BorderRadius.vertical(bottom: Radius.circular(7))),
           child: Row(children: [
-            Expanded(flex: 3, child: Text('ಒಟ್ಟು', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: t.primaryDark))),
+            Expanded(flex: 3, child: Text(AppLocale.l('ottu'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: t.primaryDark))),
             Expanded(flex: 2, child: Text(maxTotal.toStringAsFixed(0), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: t.primaryDark), textAlign: TextAlign.center)),
             Expanded(flex: 2, child: Text(total.toStringAsFixed(1), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: total >= maxTotal * 0.5 ? Colors.green.shade700 : Colors.red.shade600), textAlign: TextAlign.center)),
           ]),
@@ -418,12 +426,12 @@ class MatchPdfService {
           const SizedBox(width: 4),
           Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: accent)),
           const Spacer(),
-          Text(hasDosha ? 'ದೋಷ ಇದೆ' : 'ದೋಷ ಇಲ್ಲ', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: hasDosha ? Colors.red : Colors.green)),
+          Text(hasDosha ? AppLocale.l('doshaPresent') : AppLocale.l('doshaAbsent'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: hasDosha ? Colors.red : Colors.green)),
         ]),
         const SizedBox(height: 6),
-        _doshaRow('ಲಗ್ನದಿಂದ', dosha['fromLagna']),
-        _doshaRow('ಚಂದ್ರನಿಂದ', dosha['fromChandra']),
-        _doshaRow('ಶುಕ್ರನಿಂದ', dosha['fromShukra']),
+        _doshaRow(AppLocale.l('fromLagna'), dosha['fromLagna']),
+        _doshaRow(AppLocale.l('fromChandra'), dosha['fromChandra']),
+        _doshaRow(AppLocale.l('fromShukra'), dosha['fromShukra']),
       ]),
     );
   }
@@ -435,7 +443,7 @@ class MatchPdfService {
       child: Row(children: [
         Text(label, style: const TextStyle(fontSize: 10)),
         const Spacer(),
-        Text(v > 0 ? 'ಭಾವ $v ✗' : '✓', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: v > 0 ? Colors.red : Colors.green)),
+        Text(v > 0 ? '${AppLocale.l('bhavaLabel')} $v ✗' : '✓', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: v > 0 ? Colors.red : Colors.green)),
       ]),
     );
   }
@@ -448,12 +456,12 @@ class MatchPdfService {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: accent)),
         const SizedBox(height: 4),
-        _papaRow('ಲಗ್ನದಿಂದ', papa['fromLagna']),
-        _papaRow('ಚಂದ್ರನಿಂದ', papa['fromChandra']),
-        _papaRow('ಶುಕ್ರನಿಂದ', papa['fromShukra']),
+        _papaRow(AppLocale.l('fromLagna'), papa['fromLagna']),
+        _papaRow(AppLocale.l('fromChandra'), papa['fromChandra']),
+        _papaRow(AppLocale.l('fromShukra'), papa['fromShukra']),
         const Divider(height: 8),
         Row(children: [
-          const Text('ಒಟ್ಟು', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+          Text(AppLocale.l('ottu'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
           const Spacer(),
           Text('$total', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: total > 0 ? Colors.orange.shade800 : Colors.green)),
         ]),
@@ -484,11 +492,11 @@ class MatchPdfService {
       child: Row(children: [
         Icon(isSamya ? Icons.check_circle : Icons.info_outline, size: 16, color: isSamya ? Colors.green : Colors.orange),
         const SizedBox(width: 8),
-        Text('ಪಾಪ ಸಾಮ್ಯ: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: t.primaryDark)),
-        Text('ವರ ${samya['groomPapaTotal']} | ವಧು ${samya['bridePapaTotal']} | ವ್ಯತ್ಯಾಸ ${samya['difference']}',
+        Text('${AppLocale.l('papaSamya')}: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: t.primaryDark)),
+        Text('${AppLocale.l('groom')} ${samya['groomPapaTotal']} | ${AppLocale.l('bride')} ${samya['bridePapaTotal']} | ${AppLocale.l('vyatyasa')} ${samya['difference']}',
             style: TextStyle(fontSize: 11, color: isSamya ? Colors.green.shade700 : Colors.orange.shade700)),
         const Spacer(),
-        Text(isSamya ? 'ಸಾಮ್ಯ ✓' : 'ಅಸಾಮ್ಯ ✗', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: isSamya ? Colors.green : Colors.orange)),
+        Text(isSamya ? AppLocale.l('samyaV') : AppLocale.l('asamyaX'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: isSamya ? Colors.green : Colors.orange)),
       ]),
     );
   }
@@ -497,7 +505,7 @@ class MatchPdfService {
 
   static Widget _buildGrahaMaitriTable(Map<String, dynamic> gm, PdfThemeConfig t) {
     final rows = gm['rows'] as List<dynamic>? ?? [];
-    if (rows.isEmpty) return Text('ಮಾಹಿತಿ ಲಭ್ಯವಿಲ್ಲ', style: TextStyle(fontSize: 11, color: Colors.grey));
+    if (rows.isEmpty) return Text(AppLocale.l('dataNotAvail'), style: TextStyle(fontSize: 11, color: Colors.grey));
 
     return Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: t.detailBorder.withOpacity(0.3))),
@@ -506,10 +514,10 @@ class MatchPdfService {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(color: t.tableHeaderBg, borderRadius: const BorderRadius.vertical(top: Radius.circular(7))),
           child: Row(children: [
-            Expanded(flex: 3, child: Text('ವಿವರ', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: t.tableHeaderText))),
-            Expanded(flex: 2, child: Text('ವರ', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: t.tableHeaderText), textAlign: TextAlign.center)),
-            Expanded(flex: 2, child: Text('ವಧು', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: t.tableHeaderText), textAlign: TextAlign.center)),
-            Expanded(flex: 2, child: Text('ಸಂಬಂಧ', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: t.tableHeaderText), textAlign: TextAlign.center)),
+            Expanded(flex: 3, child: Text(AppLocale.l('vivara'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: t.tableHeaderText))),
+            Expanded(flex: 2, child: Text(AppLocale.l('groom'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: t.tableHeaderText), textAlign: TextAlign.center)),
+            Expanded(flex: 2, child: Text(AppLocale.l('bride'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: t.tableHeaderText), textAlign: TextAlign.center)),
+            Expanded(flex: 2, child: Text(AppLocale.l('sambandha'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: t.tableHeaderText), textAlign: TextAlign.center)),
           ]),
         ),
         for (int i = 0; i < rows.length; i++)
@@ -558,7 +566,7 @@ class MatchPdfService {
         child: Row(children: [
           Icon(Icons.check_circle, size: 16, color: Colors.green),
           const SizedBox(width: 6),
-          Text('ದಶಾ ಸಂಧಿ ಇಲ್ಲ ✓', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.green.shade700)),
+          Text(AppLocale.l('dashaSandhiNilV'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.green.shade700)),
         ]),
       );
     }
@@ -572,7 +580,7 @@ class MatchPdfService {
           child: Row(children: [
             Icon(Icons.warning_amber, size: 14, color: Colors.orange),
             const SizedBox(width: 4),
-            Text('ದಶಾ ಸಂಧಿ ಕಂಡುಬಂದಿದೆ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.orange.shade800)),
+            Text(AppLocale.l('dashaSandhiFound'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.orange.shade800)),
           ]),
         ),
         for (int i = 0; i < matches.length; i++)
@@ -580,8 +588,8 @@ class MatchPdfService {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             color: i % 2 == 0 ? Colors.white : Colors.orange.shade50.withOpacity(0.3),
             child: Row(children: [
-              Expanded(child: Text('ವರ: ${trAll(matches[i]['groomLord'])} → ${_fmtDate(matches[i]['groomEnd'])}', style: const TextStyle(fontSize: 10))),
-              Expanded(child: Text('ವಧು: ${trAll(matches[i]['brideLord'])} → ${_fmtDate(matches[i]['brideEnd'])}', style: const TextStyle(fontSize: 10))),
+              Expanded(child: Text('${AppLocale.l('groom')}: ${trAll(matches[i]['groomLord'])} → ${_fmtDate(matches[i]['groomEnd'])}', style: const TextStyle(fontSize: 10))),
+              Expanded(child: Text('${AppLocale.l('bride')}: ${trAll(matches[i]['brideLord'])} → ${_fmtDate(matches[i]['brideEnd'])}', style: const TextStyle(fontSize: 10))),
             ]),
           ),
       ]),
@@ -606,16 +614,16 @@ class MatchPdfService {
         Row(children: [
           Icon(hasDosha ? Icons.warning_amber : Icons.check_circle, size: 14, color: hasDosha ? Colors.red : Colors.green),
           const SizedBox(width: 4),
-          Text(hasDosha ? '$type ದೋಷ ✗' : '$type ದೋಷ ಇಲ್ಲ ✓',
+          Text(hasDosha ? '$type ${AppLocale.l('doshaX')}' : '$type ${AppLocale.l('doshaIllaV')}',
               style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: hasDosha ? Colors.red : Colors.green)),
         ]),
         if (fromChandra != null && fromChandra['hasDosha'] == true) ...[
           const SizedBox(height: 4),
-          Text('ಚಂದ್ರ: ವರ→ವಧು ${fromChandra['brideFromGroom']} | ವಧು→ವರ ${fromChandra['groomFromBride']}', style: const TextStyle(fontSize: 10)),
+          Text('${trAll('ಚಂದ್ರ')}: ${AppLocale.l('groom')}→${AppLocale.l('bride')} ${fromChandra['brideFromGroom']} | ${AppLocale.l('bride')}→${AppLocale.l('groom')} ${fromChandra['groomFromBride']}', style: const TextStyle(fontSize: 10)),
         ],
         if (fromLagna != null && fromLagna['hasDosha'] == true) ...[
           const SizedBox(height: 2),
-          Text('ಲಗ್ನ: ವರ→ವಧು ${fromLagna['brideFromGroom']} | ವಧು→ವರ ${fromLagna['groomFromBride']}', style: const TextStyle(fontSize: 10)),
+          Text('${trAll('ಲಗ್ನ')}: ${AppLocale.l('groom')}→${AppLocale.l('bride')} ${fromLagna['brideFromGroom']} | ${AppLocale.l('bride')}→${AppLocale.l('groom')} ${fromLagna['groomFromBride']}', style: const TextStyle(fontSize: 10)),
         ],
       ]),
     );
