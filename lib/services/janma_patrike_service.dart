@@ -430,7 +430,7 @@ class JanmaPatrikeService {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildHeader(AppLocale.l('jpDashaTitle'), '${user.name} — ${user.dateStr}', t),
-        const SizedBox(height: 15),
+        const SizedBox(height: 8),
 
         _buildSectionTitle(AppLocale.l('jpNakDasha'), t),
         _buildDetailBox([
@@ -438,31 +438,31 @@ class JanmaPatrikeService {
           [AppLocale.l('jpNakParama'), p.paramaGhati, AppLocale.l('jpGataGhati'), p.gataGhati],
           [AppLocale.l('jpShishtaDasha'), trAll(p.dashaLord), AppLocale.l('jpShishtaShesha'), p.dashaBalance],
         ], t),
-        const SizedBox(height: 15),
+        const SizedBox(height: 8),
 
         _buildSectionTitle(AppLocale.l('jpMahaDasha'), t),
         _buildDashaTable(result, t),
-        const SizedBox(height: 10),
-
-        _buildSectionTitle(AppLocale.l('jpDashaSandhi'), t),
-        const SizedBox(height: 4),
-        _buildDashaSandhiTable(result, t),
-        const SizedBox(height: 10),
+        const SizedBox(height: 6),
 
         Container(
           alignment: Alignment.center,
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: t.dashaHighlight,
             border: Border.all(color: t.dashaHighlightBorder),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text('${AppLocale.l('jpShishtaDashe')} ${trAll(p.dashaLord)} — ${AppLocale.l('jpShesha')} ${p.dashaBalance}',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: t.dashaHighlightText)
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: t.dashaHighlightText)
           ),
         ),
+        const SizedBox(height: 8),
 
-        const SizedBox(height: 15),
+        _buildSectionTitle(AppLocale.l('jpDashaSandhi'), t),
+        const SizedBox(height: 3),
+        _buildDashaSandhiTable(result, t),
+
+        const Spacer(),
         _buildFooter(user.jyotishiName, user.jyotishiPhone, t),
       ],
     );
