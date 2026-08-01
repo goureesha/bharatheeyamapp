@@ -4412,23 +4412,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-
-                // Jyotishi Details
-                Text(AppLocale.l('jyotishiSection'), style: TextStyle(fontWeight: FontWeight.w800, color: kTeal)),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _jyotishiNameCtrl,
-                  decoration: InputDecoration(labelText: AppLocale.l('jyotishiName'), prefixIcon: Icon(Icons.storefront, size: 18), isDense: true),
-                  onChanged: (_) => _saveJyotishiDetails(),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _jyotishiPhoneCtrl,
-                  decoration: InputDecoration(labelText: AppLocale.l('jyotishiPhone'), prefixIcon: Icon(Icons.phone, size: 18), isDense: true),
-                  keyboardType: TextInputType.phone,
-                  onChanged: (_) => _saveJyotishiDetails(),
-                ),
                 const SizedBox(height: 24),
 
                 // Generate Button

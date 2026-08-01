@@ -902,13 +902,8 @@ class JanmaPatrikeService {
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: t.detailBorder, width: 1)),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(jyotishiName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: t.footerText)),
-          Text(AppLocale.l('jpBharatiyam'), style: TextStyle(fontWeight: FontWeight.normal, fontSize: 13, color: t.footerText.withOpacity(0.5))),
-          Text(jyotishiPhone, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: t.footerText)),
-        ],
+      child: Center(
+        child: Text(AppLocale.l('jpBharatiyam'), style: TextStyle(fontWeight: FontWeight.normal, fontSize: 13, color: t.footerText.withOpacity(0.5))),
       ),
     );
   }
