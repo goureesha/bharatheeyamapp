@@ -276,6 +276,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Divider(color: kBorder),
                     const SizedBox(height: 24),
 
+                    // Dasha/Bhukti highlight toggle
+                    FutureBuilder<SharedPreferences>(
+                      future: SharedPreferences.getInstance(),
+                      builder: (context, snap) {
+                        final prefs = snap.data;
+                        final enabled = prefs?.getBool('highlight_dasha_lords') ?? true;
+                        return SwitchListTile(
+                          value: enabled,
+                          onChanged: (val) async {
+                            await prefs?.setBool('highlight_dasha_lords', val);
+                            setState(() {});
+                          },
+                          activeColor: kPurple2,
+                          title: Text(AppLocale.l('dashaHighlightLabel'), style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
+                          subtitle: Text(AppLocale.l('dashaHighlightDesc'), style: TextStyle(fontSize: 11, color: kMuted)),
+                        );
+                      },
+                    ),
+
                     // Language selection
                     SectionTitle(AppLocale.l('language')),
                     const SizedBox(height: 10),

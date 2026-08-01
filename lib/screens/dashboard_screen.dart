@@ -155,6 +155,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   bool _syncing = false;
   int _gocharYear = DateTime.now().year;
+  bool _dashaHighlightEnabled = true;
 
   /// Translate dasha balance suffixes (ವ=years, ತಿ=months, ದಿ=days)
   String _trDashaBalance(String bal) {
@@ -220,10 +221,20 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
 
     _loadJyotishiDetails();
+    _loadDashaHighlightPref();
 
     // Rebuild charts when chart mode toggles change
     SingleLetterMode.notifier.addListener(_onChartModeChanged);
     SamshakaMode.notifier.addListener(_onChartModeChanged);
+  }
+
+  Future<void> _loadDashaHighlightPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _dashaHighlightEnabled = prefs.getBool('highlight_dasha_lords') ?? true;
+      });
+    }
   }
 
   @override
@@ -1746,6 +1757,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   bhavaPlanet: _bhavaPlanet,
                   onBhavaPlanetToggle: (pName) => setState(() => _bhavaPlanet = _bhavaPlanet == pName ? null : pName),
                   onPlanetTap: _showPlanetDetail,
+                  highlightDashaLords: _dashaHighlightEnabled,
                 ),
                 if (allPersons.length > 1) Divider(thickness: 1, color: kBorder),
               ],
@@ -2095,7 +2107,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 aroodhas: _aroodhas,
                                 centerLabel: _prastutaResult != null ? '${AppLocale.l('prastuta')}\n$label' : label,
                                 onPlanetTap: _showPlanetDetail,
-                                highlightPlanets: ((chart['varga'] as int) == 1 || (chart['varga'] as int) == 9 || isBhavaChart)
+                                highlightPlanets: _dashaHighlightEnabled && ((chart['varga'] as int) == 1 || (chart['varga'] as int) == 9 || isBhavaChart)
                                     ? _currentDashaLords(activeResult)
                                     : null,
                               ),
@@ -4583,6 +4595,7 @@ class _KundaliPageView extends StatefulWidget {
   final String? bhavaPlanet;
   final void Function(String) onBhavaPlanetToggle;
   final void Function(String) onPlanetTap;
+  final bool highlightDashaLords;
 
   const _KundaliPageView({
     required this.charts,
@@ -4590,6 +4603,7 @@ class _KundaliPageView extends StatefulWidget {
     required this.bhavaPlanet,
     required this.onBhavaPlanetToggle,
     required this.onPlanetTap,
+    this.highlightDashaLords = true,
   });
 
   @override
@@ -4605,7 +4619,7 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
     final label = chart['label'] as String;
     // Only highlight in Rashi (D1), Navamsha (D9), and Bhava charts
     final varga = chart['varga'] as int;
-    final shouldHighlight = (varga == 1 || varga == 9) || isBhava;
+    final shouldHighlight = widget.highlightDashaLords && ((varga == 1 || varga == 9) || isBhava);
     return KundaliChart(
       result: widget.personResult,
       varga: varga,
