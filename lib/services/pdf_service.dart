@@ -154,6 +154,13 @@ class PdfService {
           ],
         ),
 
+        pw.SizedBox(height: 12),
+
+        // Dasha Sandhi Details
+        _sectionTitle(AppLocale.l('pdfDashaSandhi'), headStyle),
+        pw.SizedBox(height: 6),
+        _buildDashaSandhiTable(result, cellStyle, cellBoldStyle),
+
         pw.SizedBox(height: 16),
 
         // Bhava Madhya Sputa
@@ -341,6 +348,58 @@ class PdfService {
         borderRadius: pw.BorderRadius.circular(4),
       ),
       child: pw.Text(text, style: style),
+    );
+  }
+
+  /// Build Dasha Sandhi table showing transition periods between consecutive Mahadashas.
+  static pw.Widget _buildDashaSandhiTable(KundaliResult result, pw.TextStyle cellStyle, pw.TextStyle cellBoldStyle) {
+    final dashas = result.dashas;
+    if (dashas.length < 2) return pw.SizedBox();
+
+    // Vimshottari dasha year durations
+    const dashaYears = <String, int>{
+      'ಕೇತು': 7, 'ಶುಕ್ರ': 20, 'ರವಿ': 6, 'ಚಂದ್ರ': 10,
+      'ಕುಜ': 7, 'ರಾಹು': 18, 'ಗುರು': 16, 'ಶನಿ': 19, 'ಬುಧ': 17,
+    };
+
+    String fmtDate(DateTime d) => '${d.day.toString().padLeft(2, '0')}-${d.month.toString().padLeft(2, '0')}-${d.year}';
+
+    final rows = <List<String>>[];
+    for (int i = 0; i < dashas.length - 1; i++) {
+      final ending = dashas[i];
+      final starting = dashas[i + 1];
+      final transitionDate = ending.end;
+
+      // Sandhi duration = (ending_years + starting_years) / 6 in months
+      final endYears = dashaYears[ending.lord] ?? 10;
+      final startYears = dashaYears[starting.lord] ?? 10;
+      final sandhiMonths = ((endYears + startYears) / 6.0).round().clamp(1, 12);
+      final halfSandhi = (sandhiMonths / 2.0).ceil();
+
+      final sandhiStart = DateTime(transitionDate.year, transitionDate.month - halfSandhi, transitionDate.day);
+      final sandhiEnd = DateTime(transitionDate.year, transitionDate.month + halfSandhi, transitionDate.day);
+
+      rows.add([
+        '${trAll(ending.lord)} → ${trAll(starting.lord)}',
+        fmtDate(transitionDate),
+        '${fmtDate(sandhiStart)} - ${fmtDate(sandhiEnd)}',
+      ]);
+    }
+
+    return pw.Table.fromTextArray(
+      headerStyle: cellBoldStyle.copyWith(color: PdfColors.white),
+      cellStyle: cellStyle.copyWith(fontSize: 8),
+      headerDecoration: pw.BoxDecoration(color: PdfColor.fromHex('#7B1FA2')),
+      cellPadding: const pw.EdgeInsets.all(3),
+      columnWidths: {
+        0: const pw.FlexColumnWidth(2.5),
+        1: const pw.FlexColumnWidth(2),
+        2: const pw.FlexColumnWidth(3.5),
+      },
+      data: [
+        [AppLocale.l('pdfSandhiTransition'), AppLocale.l('pdfEnd'), AppLocale.l('pdfSandhiPeriod')],
+        ...rows,
+      ],
     );
   }
 }
