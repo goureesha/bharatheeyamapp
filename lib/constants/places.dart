@@ -317,23 +317,24 @@ const Map<String, List<double>> otherPlaces = {
   'Chandigarh, Chandigarh, India': [30.73, 76.77],
   'Goa (Panaji), Goa, India': [15.50, 73.83],
 
-  // ─── World Capitals ───
-  'London, United Kingdom': [51.51, -0.13],
-  'New York, USA': [40.71, -74.01],
-  'Dubai, UAE': [25.20, 55.27],
-  'Singapore, Singapore': [1.35, 103.82],
-  'Sydney, Australia': [-33.87, 151.21],
-  'Toronto, Canada': [43.65, -79.38],
-  'Tokyo, Japan': [35.68, 139.69],
-  'Colombo, Sri Lanka': [6.93, 79.84],
-  'Kathmandu, Nepal': [27.72, 85.32],
+  // ─── World Capitals (with correct timezone offsets) ───
+  'London, United Kingdom': [51.51, -0.13, 0.0],
+  'New York, USA': [40.71, -74.01, -5.0],
+  'Dubai, UAE': [25.20, 55.27, 4.0],
+  'Singapore, Singapore': [1.35, 103.82, 8.0],
+  'Sydney, Australia': [-33.87, 151.21, 10.0],
+  'Toronto, Canada': [43.65, -79.38, -5.0],
+  'Tokyo, Japan': [35.68, 139.69, 9.0],
+  'Colombo, Sri Lanka': [6.93, 79.84, 5.5],
+  'Kathmandu, Nepal': [27.72, 85.32, 5.75],
 };
 
-/// Combined offline places map (Karnataka + Indian cities + old world capitals)
+/// Combined offline places map (Karnataka + Indian cities + world capitals)
 /// Format: name -> [lat, lon, tz]
 final Map<String, List<double>> offlinePlaces = {
   for (final e in karnatakaPlaces.entries) e.key: [...e.value, 5.5],
-  for (final e in otherPlaces.entries) e.key: [...e.value, 5.5],
+  for (final e in otherPlaces.entries)
+    e.key: e.value.length >= 3 ? e.value : [...e.value, 5.5],
 };
 
 // ─── World Cities Database (loaded from asset) ───
