@@ -576,7 +576,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
           final lat = double.parse(data[0]['lat']);
           final lon = double.parse(data[0]['lon']);
           final displayName = data[0]['display_name'] as String;
-          final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+          final autoTz = await getTimezoneForPlace(displayName, lat, lon, birthDate: dob);
           setState(() {
             latCtrl.text = lat.toStringAsFixed(4);
             lonCtrl.text = lon.toStringAsFixed(4);
@@ -612,7 +612,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                 Navigator.pop(ctx);
                 final lat = double.parse(place['lat']);
                 final lon = double.parse(place['lon']);
-                final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+                final autoTz = await getTimezoneForPlace(displayName, lat, lon, birthDate: dob);
                 setState(() {
                   latCtrl.text = lat.toStringAsFixed(4);
                   lonCtrl.text = lon.toStringAsFixed(4);

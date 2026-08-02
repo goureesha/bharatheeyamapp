@@ -243,7 +243,7 @@ class _InputScreenState extends State<InputScreen> {
           final lat = double.parse(data[0]['lat']);
           final lon = double.parse(data[0]['lon']);
           final displayName = data[0]['display_name'] as String;
-          final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+          final autoTz = await getTimezoneForPlace(displayName, lat, lon, birthDate: _dob);
           setState(() {
             _placeCtrl.text = placeName.trim();
             _latCtrl.text = lat.toStringAsFixed(4);
@@ -299,7 +299,7 @@ class _InputScreenState extends State<InputScreen> {
                       Navigator.pop(ctx);
                       final lat = double.parse(place['lat']);
                       final lon = double.parse(place['lon']);
-                      final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+                      final autoTz = await getTimezoneForPlace(displayName, lat, lon, birthDate: _dob);
                       setState(() {
                         _latCtrl.text = lat.toStringAsFixed(4);
                         _lonCtrl.text = lon.toStringAsFixed(4);

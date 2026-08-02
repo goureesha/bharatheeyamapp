@@ -26,6 +26,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sweph/sweph.dart' hide kIsWeb;
 import 'core/ephemeris.dart';
 import 'core/calculator.dart';
+import 'services/timezone_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +47,7 @@ Future<void> main() async {
 
   // Phase 1: FAST init — UI-critical only (theme, locale, location).
   // Auth + ephemeris run in parallel but we don't wait for ephemeris.
+  initTimezones(); // Initialize IANA timezone database (sync, ~50ms)
   final ephFuture = _initEphemeris(); // Start but don't await
   await Future.wait([
     GoogleAuthService.signInSilently(),

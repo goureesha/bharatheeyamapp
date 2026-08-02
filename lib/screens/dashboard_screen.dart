@@ -488,7 +488,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             final lat = double.parse(data[0]['lat']);
             final lon = double.parse(data[0]['lon']);
             final displayName = data[0]['display_name'] as String;
-            final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+            final autoTz = await getTimezoneForPlace(displayName, lat, lon, birthDate: dob);
             setS(() {
               placeCtrl.text = placeName.trim();
               latCtrl.text = lat.toStringAsFixed(4);
@@ -748,7 +748,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             final lat = double.parse(data[0]['lat']);
             final lon = double.parse(data[0]['lon']);
             final displayName = data[0]['display_name'] as String;
-            final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+            final autoTz = await getTimezoneForPlace(displayName, lat, lon, birthDate: dob);
             setS(() {
               placeCtrl.text = placeName.trim();
               latCtrl.text = lat.toStringAsFixed(4);
@@ -962,7 +962,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             final lat = double.parse(data[0]['lat']);
             final lon = double.parse(data[0]['lon']);
             final displayName = data[0]['display_name'] as String;
-            final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+            final autoTz = await getTimezoneForPlace(displayName, lat, lon, birthDate: dob);
             setS(() {
               placeCtrl.text = placeName.trim();
               latCtrl.text = lat.toStringAsFixed(4);

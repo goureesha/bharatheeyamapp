@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
+import '../services/timezone_service.dart';
 
 /// Map 2-letter country codes to full country names
 const Map<String, String> _countryCodes = {
@@ -403,16 +404,45 @@ double? getWorldCityTz(String cityName) {
   return null;
 }
 
-/// Returns the timezone offset for a known place, or calculates it dynamically
-Future<double> getTimezoneForPlace(String placeName, double lat, double lon) async {
-  // Check Karnataka / Indian offline places (all IST)
+/// Get world city country code by exact name match
+String? getWorldCityCountry(String cityName) {
+  if (_worldCities == null) return null;
+  final q = cityName.trim().toLowerCase();
+  for (final city in _worldCities!) {
+    if ((city['n'] as String).toLowerCase() == q) {
+      return city['c'] as String?;
+    }
+  }
+  return null;
+}
+
+/// Returns the timezone offset for a known place.
+/// When [birthDate] is provided and the place is international,
+/// uses IANA timezone database for DST-aware offset.
+Future<double> getTimezoneForPlace(String placeName, double lat, double lon, {DateTime? birthDate}) async {
+  // Check Karnataka / Indian offline places (all IST — no DST)
   if (offlinePlaces.containsKey(placeName)) {
     return offlinePlaces[placeName]![2]; // tz is 3rd element
   }
-  
-  // Check world cities database
+
+  // Check world cities database — DST-aware when birthDate is provided
   final worldTz = getWorldCityTz(placeName);
-  if (worldTz != null) return worldTz;
+  if (worldTz != null) {
+    if (birthDate != null) {
+      final countryCode = getWorldCityCountry(placeName);
+      if (countryCode != null) {
+        // Use IANA timezone for DST-aware offset
+        // Import lazily to avoid circular deps
+        try {
+          final offset = getDstAwareOffset(countryCode, lat, lon, birthDate);
+          return offset;
+        } catch (_) {
+          return worldTz; // fallback to static offset
+        }
+      }
+    }
+    return worldTz;
+  }
   
   // For online Nominatim searches, check if the place is in India
   final lowerName = placeName.toLowerCase();
@@ -438,4 +468,3 @@ Future<double> getTimezoneForPlace(String placeName, double lat, double lon) asy
   // Unknown place and API failed: estimate from longitude
   return (lon / 15.0 * 2).round() / 2.0;
 }
-
