@@ -9,6 +9,7 @@ import '../services/history_service.dart';
 import '../core/calculator.dart';
 import '../constants/places.dart';
 import '../core/ephemeris.dart';
+import '../widgets/date_time_input.dart';
 
 import '../services/google_auth_service.dart';
 import '../services/calendar_service.dart';
@@ -918,47 +919,21 @@ class _InputScreenState extends State<InputScreen> {
           ),
           const SizedBox(height: 14),
 
-          // Date picker
-          GestureDetector(
-            onTap: _pickDate,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: kCard,
-                border: Border.all(color: kBorder),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(children: [
-                Icon(Icons.calendar_today, color: kMuted),
-                const SizedBox(width: 10),
-                Text(
-                  '${AppLocale.l('date')}: ${_dob.day.toString().padLeft(2,'0')}-${_dob.month.toString().padLeft(2,'0')}-${_dob.year}',
-                  style: TextStyle(fontSize: 14, color: kText),
-                ),
-              ]),
-            ),
+          // Date input
+          DateInputRow(
+            date: _dob,
+            color: kPurple2,
+            onChanged: (d) => setState(() => _dob = d),
           ),
           const SizedBox(height: 14),
 
-          // Time picker
-          GestureDetector(
-            onTap: _pickTime,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: kCard,
-                border: Border.all(color: kBorder),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(children: [
-                Icon(Icons.access_time, color: kMuted),
-                const SizedBox(width: 10),
-                Text(
-                  '${AppLocale.l('timeLabel')}: ${_hour.toString().padLeft(2,'0')}:${_minute.toString().padLeft(2,'0')} $_ampm',
-                  style: TextStyle(fontSize: 14, color: kText),
-                ),
-              ]),
-            ),
+          // Time input
+          TimeInputRow(
+            hour: _hour,
+            minute: _minute,
+            ampm: _ampm,
+            color: kPurple2,
+            onChanged: (h, m, a) => setState(() { _hour = h; _minute = m; _ampm = a; }),
           ),
           const SizedBox(height: 8),
 
