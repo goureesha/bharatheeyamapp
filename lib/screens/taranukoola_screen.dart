@@ -2465,6 +2465,26 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     ),
                     ...displayLws.asMap().entries.map((entry) {
                       final lw = entry.value;
+                      final bool isAbhijitWindow = lw.rashiName.contains('ಅಭಿಜಿತ್');
+
+                      // ── Abhijit: simplified (just lagna name + timing) ──
+                      if (isAbhijitWindow) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withOpacity(0.08),
+                            border: entry.key < displayLws.length - 1 ? Border(bottom: BorderSide(color: kBorder.withOpacity(0.4))) : null,
+                          ),
+                          child: Row(children: [
+                            Icon(Icons.auto_awesome, color: Colors.amber.shade700, size: 14),
+                            const SizedBox(width: 6),
+                            Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(fontWeight: FontWeight.w800, color: Colors.amber.shade900, fontSize: 12))),
+                            Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(fontSize: 11, color: Colors.amber.shade800, fontWeight: FontWeight.w700)),
+                          ]),
+                        );
+                      }
+
+                      // ── Normal lagna window ──
                       final rowBg = lw.isPerfect
                           ? Colors.green.withOpacity(0.1)
                           : (lw.isShubha ? Colors.amber.withOpacity(0.08) : Colors.blue.withOpacity(0.04));
@@ -2505,6 +2525,20 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                                 style: TextStyle(fontSize: 9, color: lw.guruAnukoola ? Colors.amber.shade800 : kMuted, fontWeight: FontWeight.w700),
                               ),
                             ),
+                            // Bhava Shuddhi indicator
+                            if (lw.usedBhavaFallback && lw.isShubha)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: Colors.deepPurple.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Colors.deepPurple.shade300, width: 0.5),
+                                ),
+                                child: Text(
+                                  '${AppLocale.l('mUseBhavaShuddhi').split(' (')[0]} ✓',
+                                  style: TextStyle(fontSize: 9, color: Colors.deepPurple.shade700, fontWeight: FontWeight.w700),
+                                ),
+                              ),
                           ]),
                         ]),
                       );
