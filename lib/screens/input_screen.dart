@@ -1388,7 +1388,7 @@ class _InputScreenState extends State<InputScreen> {
     // Convert sunrise JD to local time string for display
     final sunriseStr = formatTimeFromJd(sunriseJd, tzOffset: tz);
 
-    // Convert birth JD to local time
+    // Convert birth JD to local civil DateTime
     final localJd = jdBirth + 0.5 + (tz / 24.0);
     double frac = localJd - localJd.floor();
     frac = ((frac % 1.0) + 1.0) % 1.0;
@@ -1398,11 +1398,18 @@ class _InputScreenState extends State<InputScreen> {
     int min = totalMinutes % 60;
     if (h24 >= 24) h24 -= 24;
 
+    // Compute the actual civil date from birth JD
+    // (when ghati pushes past midnight, the civil date advances by 1 day)
+    final birthUtcMs = ((jdBirth - 2440587.5) * 86400000).round();
+    final birthUtc = DateTime.fromMillisecondsSinceEpoch(birthUtcMs, isUtc: true);
+    final birthLocal = birthUtc.add(Duration(minutes: (tz * 60).round()));
+    final civilDate = DateTime(birthLocal.year, birthLocal.month, birthLocal.day);
+
     setState(() {
+      _dob = civilDate;
       _ampm = h24 >= 12 ? 'PM' : 'AM';
       _hour = h24 % 12 == 0 ? 12 : h24 % 12;
       _minute = min;
-
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
