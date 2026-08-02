@@ -2443,7 +2443,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           if (r['lagnaWindows'] != null) ...[
             () {
               final allLws = (r['lagnaWindows'] as List<LagnaWindow>);
-              final displayLws = allLws.where((w) => w.isPerfect || w.isShubha || w.isAllowed).toList();
+              final displayLws = allLws;
               if (displayLws.isEmpty) return const SizedBox();
 
               return Padding(
@@ -3188,14 +3188,15 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               // Helper: check if all planets in list are NOT in target bhava
               bool isClear(List<String> planets, int targetHouse) {
                 for (final planet in planets) {
+                  // Skip Mandi — it's a derived point without an ecliptic longitude
+                  // that can be mapped to a bhava. Rashi check still applies.
+                  if (planet == 'ಮಾಂದಿ') continue;
                   final engName = engToKn.entries.firstWhere(
                     (e) => e.value == planet,
                     orElse: () => const MapEntry('', ''),
                   ).key;
                   if (engName.isNotEmpty && pos.containsKey(engName)) {
                     if (getBhavaHouse(normDegMuhurta(pos[engName]![0]), cusps) == targetHouse) return false;
-                  } else if (planet == 'ಮಾಂದಿ') {
-                    return false; // Mandi stays
                   }
                 }
                 return true;
