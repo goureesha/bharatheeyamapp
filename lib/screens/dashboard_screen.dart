@@ -3669,8 +3669,10 @@ class _DashboardScreenState extends State<DashboardScreen>
             Padding(padding: const EdgeInsets.all(32), child: Center(child: CircularProgressIndicator(color: kPurple1)))
           else if (_gocharData != null) ...[
             // ── GURU GOCHAR ──
+            Text(AppLocale.l('guruBalaHead'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
+            const SizedBox(height: 6),
             AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Text('🪐 ${AppLocale.l('guruGochara')} — $_gocharYear', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple1)),
+              Text('${AppLocale.l('guruGochara')} — $_gocharYear', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple1)),
               const SizedBox(height: 12),
               ...guruSegments.map((seg) {
                 final house = houseFromMoon(seg.rashiIdx);
@@ -3699,8 +3701,10 @@ class _DashboardScreenState extends State<DashboardScreen>
             const SizedBox(height: 12),
 
             // ── SHANI GOCHAR ──
+            Text(AppLocale.l('shaniSadesatiHead'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
+            const SizedBox(height: 6),
             AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Text('🪨 ${AppLocale.l('shaniGochara')} — $_gocharYear', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple1)),
+              Text('${AppLocale.l('shaniGochara')} — $_gocharYear', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple1)),
               const SizedBox(height: 12),
               ...shaniSegments.map((seg) {
                 final house = houseFromMoon(seg.rashiIdx);

@@ -692,7 +692,9 @@ class AppLocale {
 
       // Gochara UI
       'guruGochara': 'ಗುರು ಗೋಚಾರ',
+      'guruBalaHead': 'ಗುರು ಬಲ',
       'shaniGochara': 'ಶನಿ ಗೋಚಾರ',
+      'shaniSadesatiHead': 'ಶನಿ ಸಾಡೇಸಾತಿ ವಿವರ',
       'sadeSati': 'ಸಾಡೇ ಸಾತಿ',
       'ashtamaShani': 'ಅಷ್ಟಮ ಶನಿ',
       'panchamaShani': 'ಪಂಚಮ ಶನಿ',
@@ -1399,7 +1401,9 @@ class AppLocale {
 
       // Gochara UI
       'guruGochara': 'गुरु गोचर',
+      'guruBalaHead': 'गुरु बल',
       'shaniGochara': 'शनि गोचर',
+      'shaniSadesatiHead': 'शनि साढेसाती विवरण',
       'sadeSati': 'साढ़े साती',
       'ashtamaShani': 'अष्टम शनि',
       'panchamaShani': 'पंचम शनि',
@@ -2102,7 +2106,9 @@ class AppLocale {
 
       // Gochara UI
       'guruGochara': 'குரு கோசாரம்',
+      'guruBalaHead': 'குரு பலம்',
       'shaniGochara': 'சனி கோசாரம்',
+      'shaniSadesatiHead': 'சனி சாடேசாதி விவரம்',
       'sadeSati': 'சாடே சாதி',
       'ashtamaShani': 'அஷ்டம சனி',
       'panchamaShani': 'பஞ்சம சனி',
@@ -2805,7 +2811,9 @@ class AppLocale {
 
       // Gochara UI
       'guruGochara': 'గురు గోచారం',
+      'guruBalaHead': 'గురు బలం',
       'shaniGochara': 'శని గోచారం',
+      'shaniSadesatiHead': 'శని సాడేసాతి వివరాలు',
       'sadeSati': 'సాడే సాతి',
       'ashtamaShani': 'అష్టమ శని',
       'panchamaShani': 'పంచమ శని',
@@ -3508,7 +3516,9 @@ class AppLocale {
 
       // Gochara UI
       'guruGochara': 'ഗുരു ഗോചാരം',
+      'guruBalaHead': 'ഗുരു ബലം',
       'shaniGochara': 'ശനി ഗോചാരം',
+      'shaniSadesatiHead': 'ശനി സാഡേസാതി വിവരങ്ങൾ',
       'sadeSati': 'സാഡേ സാതി',
       'ashtamaShani': 'അഷ്ടമ ശനി',
       'panchamaShani': 'പഞ്ചമ ശനി',
