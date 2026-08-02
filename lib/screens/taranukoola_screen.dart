@@ -1249,9 +1249,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             return true;
           }).toList();
 
-          // Abhijit muhurta is universally auspicious — always compute for every filtered day
+          // Abhijit muhurta is universally auspicious — compute only if toggle is ON
           // No panchanga or shuddhi checks needed
-          {
+          if (userRules.considerAbhijit) {
             // Abhijit muhurta = 8th muhurta of 15 daytime muhurtas (midday)
             final srMins = _parseTimeToMins(day.sunrise).toDouble();
             final ssMins = _parseTimeToMins(day.sunset).toDouble();
