@@ -16,6 +16,7 @@ import '../services/pdf_theme.dart';
 import '../core/ephemeris.dart';
 import 'package:sweph/sweph.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/date_time_input.dart';
 
 class MatchMakingTab extends StatefulWidget {
   const MatchMakingTab({super.key});
@@ -870,42 +871,18 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         decoration: InputDecoration(labelText: AppLocale.l('name'), prefixIcon: Icon(Icons.person_outline, color: kMuted), isDense: true),
       ),
       const SizedBox(height: 10),
-      GestureDetector(
-        onTap: () async {
-          final picked = await showDatePicker(context: context, initialDate: dob, firstDate: DateTime(1800), lastDate: DateTime(2100),
-            builder: (ctx, child) => Theme(data: Theme.of(ctx).copyWith(colorScheme: ColorScheme.light(primary: color)), child: child!));
-          if (picked != null) onDobChanged(picked);
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(10)),
-          child: Row(children: [
-            Icon(Icons.calendar_today, color: kMuted, size: 18),
-            const SizedBox(width: 8),
-            Text('${dob.day.toString().padLeft(2, "0")}-${dob.month.toString().padLeft(2, "0")}-${dob.year}', style: TextStyle(fontSize: 13, color: kText)),
-          ]),
-        ),
+      DateInputRow(
+        date: dob,
+        color: color,
+        onChanged: onDobChanged,
       ),
       const SizedBox(height: 10),
-      GestureDetector(
-        onTap: () async {
-          final picked = await showTimePicker(context: context,
-            initialTime: TimeOfDay(hour: ampm == 'PM' && hour != 12 ? hour + 12 : (ampm == 'AM' && hour == 12 ? 0 : hour), minute: minute),
-            builder: (ctx, child) => Theme(data: Theme.of(ctx).copyWith(colorScheme: ColorScheme.light(primary: color)), child: child!));
-          if (picked != null) {
-            final h24 = picked.hour;
-            onTimeChanged(h24 % 12 == 0 ? 12 : h24 % 12, picked.minute, h24 >= 12 ? 'PM' : 'AM');
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(10)),
-          child: Row(children: [
-            Icon(Icons.access_time, color: kMuted, size: 18),
-            const SizedBox(width: 8),
-            Text('${hour.toString().padLeft(2, "0")}:${minute.toString().padLeft(2, "0")} $ampm', style: TextStyle(fontSize: 13, color: kText)),
-          ]),
-        ),
+      TimeInputRow(
+        hour: hour,
+        minute: minute,
+        ampm: ampm,
+        color: color,
+        onChanged: onTimeChanged,
       ),
       const SizedBox(height: 10),
       Autocomplete<String>(

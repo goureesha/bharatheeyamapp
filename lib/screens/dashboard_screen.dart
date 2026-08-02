@@ -38,6 +38,7 @@ import 'package:sweph/sweph.dart' hide kIsWeb;
 import '../core/ephemeris.dart';
 import '../core/transit_cache.dart';
 import '../core/transit_calculator.dart';
+import '../widgets/date_time_input.dart';
 
 class DashboardScreen extends StatefulWidget {
   final KundaliResult result;
@@ -517,59 +518,21 @@ class _DashboardScreenState extends State<DashboardScreen>
                 TextField(controller: nameCtrl, decoration: InputDecoration(labelText: AppLocale.l('nameLabel'), prefixIcon: Icon(Icons.person_outline))),
                 const SizedBox(height: 14),
 
-                // Date picker
-                GestureDetector(
-                  onTap: () async {
-                    final d = await showDatePicker(
-                      context: ctx2,
-                      initialDate: dob,
-                      firstDate: DateTime(1800),
-                      lastDate: DateTime(2100),
-                      builder: (c, child) => Theme(data: Theme.of(c).copyWith(colorScheme: ColorScheme.light(primary: kPurple2)), child: child!),
-                    );
-                    if (d != null) setS(() => dob = d);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
-                    child: Row(children: [
-                      Icon(Icons.calendar_today, color: kMuted),
-                      const SizedBox(width: 10),
-                      Text('${AppLocale.l('dateLabel')}: ${dob.day.toString().padLeft(2,'0')}-${dob.month.toString().padLeft(2,'0')}-${dob.year}', style: TextStyle(fontSize: 14, color: kText)),
-                    ]),
-                  ),
+                // Date input
+                DateInputRow(
+                  date: dob,
+                  color: kPurple2,
+                  onChanged: (d) => setS(() => dob = d),
                 ),
                 const SizedBox(height: 14),
 
-                // Time picker
-                GestureDetector(
-                  onTap: () async {
-                    final picked = await showTimePicker(
-                      context: ctx2,
-                      initialTime: TimeOfDay(
-                        hour: ampm == 'PM' && hour != 12 ? hour + 12 : (ampm == 'AM' && hour == 12 ? 0 : hour),
-                        minute: minute,
-                      ),
-                      builder: (c, child) => Theme(data: Theme.of(c).copyWith(colorScheme: ColorScheme.light(primary: kPurple2)), child: child!),
-                    );
-                    if (picked != null) {
-                      setS(() {
-                        final h24 = picked.hour;
-                        ampm = h24 >= 12 ? 'PM' : 'AM';
-                        hour = h24 % 12 == 0 ? 12 : h24 % 12;
-                        minute = picked.minute;
-                      });
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
-                    child: Row(children: [
-                      Icon(Icons.access_time, color: kMuted),
-                      const SizedBox(width: 10),
-                      Text('${AppLocale.l('timeLabel')}: ${hour.toString().padLeft(2,'0')}:${minute.toString().padLeft(2,'0')} $ampm', style: TextStyle(fontSize: 14, color: kText)),
-                    ]),
-                  ),
+                // Time input
+                TimeInputRow(
+                  hour: hour,
+                  minute: minute,
+                  ampm: ampm,
+                  color: kPurple2,
+                  onChanged: (h, m, a) => setS(() { hour = h; minute = m; ampm = a; }),
                 ),
                 const SizedBox(height: 14),
 
@@ -814,52 +777,18 @@ class _DashboardScreenState extends State<DashboardScreen>
               children: [
                 TextField(controller: nameCtrl, decoration: InputDecoration(labelText: AppLocale.l('nameLabel'), prefixIcon: Icon(Icons.person_outline))),
                 const SizedBox(height: 14),
-                GestureDetector(
-                  onTap: () async {
-                    final d = await showDatePicker(
-                      context: ctx2, initialDate: dob,
-                      firstDate: DateTime(1800), lastDate: DateTime(2100),
-                      builder: (c, child) => Theme(data: Theme.of(c).copyWith(colorScheme: ColorScheme.light(primary: kPurple2)), child: child!),
-                    );
-                    if (d != null) setS(() => dob = d);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
-                    child: Row(children: [
-                      Icon(Icons.calendar_today, color: kMuted), const SizedBox(width: 10),
-                      Text('${AppLocale.l('dateLabel')}: ${dob.day.toString().padLeft(2,'0')}-${dob.month.toString().padLeft(2,'0')}-${dob.year}', style: TextStyle(fontSize: 14, color: kText)),
-                    ]),
-                  ),
+                DateInputRow(
+                  date: dob,
+                  color: kPurple2,
+                  onChanged: (d) => setS(() => dob = d),
                 ),
                 const SizedBox(height: 14),
-                GestureDetector(
-                  onTap: () async {
-                    final picked = await showTimePicker(
-                      context: ctx2,
-                      initialTime: TimeOfDay(
-                        hour: ampm == 'PM' && hour != 12 ? hour + 12 : (ampm == 'AM' && hour == 12 ? 0 : hour),
-                        minute: minute,
-                      ),
-                      builder: (c, child) => Theme(data: Theme.of(c).copyWith(colorScheme: ColorScheme.light(primary: kPurple2)), child: child!),
-                    );
-                    if (picked != null) {
-                      setS(() {
-                        final h24 = picked.hour;
-                        ampm = h24 >= 12 ? 'PM' : 'AM';
-                        hour = h24 % 12 == 0 ? 12 : h24 % 12;
-                        minute = picked.minute;
-                      });
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
-                    child: Row(children: [
-                      Icon(Icons.access_time, color: kMuted), const SizedBox(width: 10),
-                      Text('${AppLocale.l('timeLabel')}: ${hour.toString().padLeft(2,'0')}:${minute.toString().padLeft(2,'0')} $ampm', style: TextStyle(fontSize: 14, color: kText)),
-                    ]),
-                  ),
+                TimeInputRow(
+                  hour: hour,
+                  minute: minute,
+                  ampm: ampm,
+                  color: kPurple2,
+                  onChanged: (h, m, a) => setS(() { hour = h; minute = m; ampm = a; }),
                 ),
                 const SizedBox(height: 14),
                 Autocomplete<String>(
@@ -1062,52 +991,18 @@ class _DashboardScreenState extends State<DashboardScreen>
               children: [
                 TextField(controller: nameCtrl, decoration: InputDecoration(labelText: AppLocale.l('nameLabel'), prefixIcon: Icon(Icons.person_outline))),
                 const SizedBox(height: 14),
-                GestureDetector(
-                  onTap: () async {
-                    final d = await showDatePicker(
-                      context: ctx2, initialDate: dob,
-                      firstDate: DateTime(1800), lastDate: DateTime(2100),
-                      builder: (c, child) => Theme(data: Theme.of(c).copyWith(colorScheme: ColorScheme.light(primary: kPurple2)), child: child!),
-                    );
-                    if (d != null) setS(() => dob = d);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
-                    child: Row(children: [
-                      Icon(Icons.calendar_today, color: kMuted), const SizedBox(width: 10),
-                      Text('${AppLocale.l('dateLabel')}: ${dob.day.toString().padLeft(2,'0')}-${dob.month.toString().padLeft(2,'0')}-${dob.year}', style: TextStyle(fontSize: 14, color: kText)),
-                    ]),
-                  ),
+                DateInputRow(
+                  date: dob,
+                  color: kPurple2,
+                  onChanged: (d) => setS(() => dob = d),
                 ),
                 const SizedBox(height: 14),
-                GestureDetector(
-                  onTap: () async {
-                    final picked = await showTimePicker(
-                      context: ctx2,
-                      initialTime: TimeOfDay(
-                        hour: ampm == 'PM' && hour != 12 ? hour + 12 : (ampm == 'AM' && hour == 12 ? 0 : hour),
-                        minute: minute,
-                      ),
-                      builder: (c, child) => Theme(data: Theme.of(c).copyWith(colorScheme: ColorScheme.light(primary: kPurple2)), child: child!),
-                    );
-                    if (picked != null) {
-                      setS(() {
-                        final h24 = picked.hour;
-                        ampm = h24 >= 12 ? 'PM' : 'AM';
-                        hour = h24 % 12 == 0 ? 12 : h24 % 12;
-                        minute = picked.minute;
-                      });
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    decoration: BoxDecoration(color: kCard, border: Border.all(color: kBorder), borderRadius: BorderRadius.circular(12)),
-                    child: Row(children: [
-                      Icon(Icons.access_time, color: kMuted), const SizedBox(width: 10),
-                      Text('${AppLocale.l('timeLabel')}: ${hour.toString().padLeft(2,'0')}:${minute.toString().padLeft(2,'0')} $ampm', style: TextStyle(fontSize: 14, color: kText)),
-                    ]),
-                  ),
+                TimeInputRow(
+                  hour: hour,
+                  minute: minute,
+                  ampm: ampm,
+                  color: kPurple2,
+                  onChanged: (h, m, a) => setS(() { hour = h; minute = m; ampm = a; }),
                 ),
                 const SizedBox(height: 14),
                 Autocomplete<String>(
