@@ -1740,10 +1740,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   }
 
   Widget _buildMuhurtaFinderTab() {
-    // Gate: if muhurta not unlocked, show support screen
-    if (!AppAccessService.muhurtaUnlocked) {
-      return const SupportScreen(lockType: SupportLockType.muhurta);
-    }
+    // Gate removed: muhurta section is now always accessible
 
     final rashiNames = List.generate(12, (i) => trAll(knRashi[i]));
     final nakNames = List.generate(27, (i) => trAll(knNak[i]));
