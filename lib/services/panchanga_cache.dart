@@ -405,6 +405,7 @@ class PanchangaCache {
     final rej = <String, List<CachedPanchangaDay>>{
       'tithi': [], 'nakshatra': [], 'vara': [], 'yoga': [],
       'karana': [], 'dagdha': [], 'shukla': [], 'uttarayana': [], 'tara': [], 'guru': [],
+      'guruAsta': [], 'shukraAsta': [],
     };
 
     for (final day in daysInRange) {
@@ -472,6 +473,16 @@ class PanchangaCache {
         if (guruBala.score == 0) {
           rej['guru']!.add(day); rejected = true;
         }
+      }
+
+      // 11. Guru Asta (Jupiter combust) check
+      if (userRules.blockGuruAsta && day.guruCombust) {
+        rej['guruAsta']!.add(day); rejected = true;
+      }
+
+      // 12. Shukra Asta (Venus combust) check
+      if (userRules.blockShukraAsta && day.venusCombust) {
+        rej['shukraAsta']!.add(day); rejected = true;
       }
 
       if (rejected) continue;
