@@ -1398,24 +1398,29 @@ class _InputScreenState extends State<InputScreen> {
     int min = totalMinutes % 60;
     if (h24 >= 24) h24 -= 24;
 
-    // Compute the actual civil date from birth JD
-    // (when ghati pushes past midnight, the civil date advances by 1 day)
+    // Check if civil date differs from vedic date (time crossed midnight)
     final birthUtcMs = ((jdBirth - 2440587.5) * 86400000).round();
     final birthUtc = DateTime.fromMillisecondsSinceEpoch(birthUtcMs, isUtc: true);
     final birthLocal = birthUtc.add(Duration(minutes: (tz * 60).round()));
     final civilDate = DateTime(birthLocal.year, birthLocal.month, birthLocal.day);
+    final crossedMidnight = civilDate.day != _dob.day || civilDate.month != _dob.month || civilDate.year != _dob.year;
 
     setState(() {
-      _dob = civilDate;
+      // Keep _dob unchanged — vedic day (sunrise-to-sunrise) stays for correct panchanga
       _ampm = h24 >= 12 ? 'PM' : 'AM';
       _hour = h24 % 12 == 0 ? 12 : h24 % 12;
       _minute = min;
     });
 
+    final timeStr = '${_hour.toString().padLeft(2, '0')}:${_minute.toString().padLeft(2, '0')} $_ampm';
+    final civilStr = crossedMidnight
+        ? ' (${civilDate.day.toString().padLeft(2, '0')}-${civilDate.month.toString().padLeft(2, '0')}-${civilDate.year})'
+        : '';
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${AppLocale.l('timeAdjusted')}: ${_hour.toString().padLeft(2, '0')}:${_minute.toString().padLeft(2, '0')} $_ampm'),
+        content: Text('${AppLocale.l('timeAdjusted')}: $timeStr$civilStr'),
         backgroundColor: Colors.green,
+        duration: const Duration(seconds: 4),
       ),
     );
   }
