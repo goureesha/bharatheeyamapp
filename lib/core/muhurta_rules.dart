@@ -757,6 +757,11 @@ class LagnaWindow {
   // Event-specific required shuddhis
   final Set<ShuddhiType> requiredShuddhis;
 
+  // Bhava-based shuddhi (fallback when Rashi fails)
+  final bool usedBhavaFallback;       // true if bhava calc was used
+  final bool ashtamaBhavaShuddhi;     // true if 8th bhava is clear
+  final List<String> ashtamaBhavaGrahas; // planets in 8th bhava
+
   LagnaWindow({
     required this.rashiIndex,
     required this.rashiName,
@@ -776,14 +781,25 @@ class LagnaWindow {
     this.chandraSaptamaGrahas = const [],
     this.guruFromLagna = 0,
     this.requiredShuddhis = const {ShuddhiType.lagna},
+    this.usedBhavaFallback = false,
+    this.ashtamaBhavaShuddhi = true,
+    this.ashtamaBhavaGrahas = const [],
   });
 
   /// Event-aware shuddhi — only checks the shuddhis required for this event
+  /// Uses Bhava fallback for ashtama if available
   bool get isShubha {
     if (!isAllowed) return false;
     if (requiredShuddhis.contains(ShuddhiType.lagna) && !lagnaShuddhi) return false;
     if (requiredShuddhis.contains(ShuddhiType.saptama) && !saptamaShuddhi) return false;
-    if (requiredShuddhis.contains(ShuddhiType.ashtama) && !ashtamaShuddhi) return false;
+    if (requiredShuddhis.contains(ShuddhiType.ashtama)) {
+      // Use Bhava fallback if available and Rashi check failed
+      if (!ashtamaShuddhi && usedBhavaFallback) {
+        if (!ashtamaBhavaShuddhi) return false;
+      } else if (!ashtamaShuddhi) {
+        return false;
+      }
+    }
     if (requiredShuddhis.contains(ShuddhiType.dashama) && !dashamaShuddhi) return false;
     if (requiredShuddhis.contains(ShuddhiType.chandraSaptama) && !chandraSaptamaShuddhi) return false;
     return true;
@@ -825,6 +841,58 @@ List<String> findMaleficsInRashi(int rashiIdx, Map<String, int> planetRashis) {
   return found;
 }
 
+/// ──────────────────────────────────────────────────────────────
+/// Bhava House Determination using Sripathi Cusps
+/// ──────────────────────────────────────────────────────────────
+
+/// Normalize degree to [0, 360)
+double normDegMuhurta(double d) => ((d % 360.0) + 360.0) % 360.0;
+
+/// Calculate Sripathi Bhava cusps from tropical Ascendant and MC
+/// Returns 12 bhava madhya degrees [h1..h12]
+List<double> calcSripathiBhavaCusps(double tropicalAsc, double tropicalMC, double ayanamsa) {
+  final h1 = normDegMuhurta(tropicalAsc - ayanamsa);
+  final h10 = normDegMuhurta(tropicalMC - ayanamsa);
+  final h4 = normDegMuhurta(h10 + 180.0);
+  final h7 = normDegMuhurta(h1 + 180.0);
+
+  final dist14 = normDegMuhurta(h4 - h1);
+  final step14 = dist14 / 3.0;
+  final h2 = normDegMuhurta(h1 + step14);
+  final h3 = normDegMuhurta(h1 + 2.0 * step14);
+
+  final dist47 = normDegMuhurta(h7 - h4);
+  final step47 = dist47 / 3.0;
+  final h5 = normDegMuhurta(h4 + step47);
+  final h6 = normDegMuhurta(h4 + 2.0 * step47);
+
+  final h8 = normDegMuhurta(h2 + 180.0);
+  final h9 = normDegMuhurta(h3 + 180.0);
+  final h11 = normDegMuhurta(h5 + 180.0);
+  final h12 = normDegMuhurta(h6 + 180.0);
+
+  return [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12];
+}
+
+/// Determine which Bhava house (1-12) a planet falls in using Sripathi cusps.
+/// bhavaMadhyas: 12 cusp degrees [h1..h12] (Sripathi bhava madhyas)
+/// planetLong: sidereal longitude of the planet (0-360)
+int getBhavaHouse(double planetLong, List<double> bhavaMadhyas) {
+  final p = normDegMuhurta(planetLong);
+  // Calculate sandhis (boundaries) between consecutive houses
+  // Sandhi between house N and N+1 = midpoint of madhya[N] and madhya[N+1]
+  for (int i = 0; i < 12; i++) {
+    final nextI = (i + 1) % 12;
+    final m1 = bhavaMadhyas[i];
+    final m2 = bhavaMadhyas[nextI];
+    final sandhi = normDegMuhurta(m1 + normDegMuhurta(m2 - m1) / 2.0);
+    final nextSandhi = normDegMuhurta(m2 + normDegMuhurta(bhavaMadhyas[(nextI + 1) % 12] - m2) / 2.0);
+    final arc = normDegMuhurta(nextSandhi - sandhi);
+    final diff = normDegMuhurta(p - sandhi);
+    if (diff < arc) return nextI + 1; // 1-indexed house
+  }
+  return 1; // fallback
+}
 
 // ============================================================
 // DEITY-SPECIFIC TITHIS FOR DEVA PRATISHTHA

@@ -1229,7 +1229,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                   ? ssJd
                   : (srJd + 7.0 / 24.0).clamp(srJd, ssJd));
 
-          dayLagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules);
+          dayLagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules, useBhavaShuddhi: userRules.useBhavaShuddhi);
 
 
           // Filter rashi lagnas: only show windows that pass ALL required shuddhi checks
@@ -1593,7 +1593,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                       ? ssJd2
                       : (srJd2 + 7.0 / 24.0).clamp(srJd2, ssJd2));
 
-              dayLagnaWindows = _scanLagnaRange(srJd2, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules2);
+              dayLagnaWindows = _scanLagnaRange(srJd2, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules2, useBhavaShuddhi: userRules.useBhavaShuddhi);
 
               // Filter rashi lagnas: only show windows that pass ALL required shuddhi checks
               dayLagnaWindows = dayLagnaWindows.where((w) {
@@ -2953,6 +2953,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     if (_selectedDay == null || _selectedDayResult == null) return;
     final r = _selectedDayResult!;
     final rules = muhurtaRules[_selectedMuhurtaEvent];
+    final userRulesLocal = UserRulesManager.instance.getRules(_selectedMuhurtaEvent);
     final allowedLagnas = rules?.allowedLagnas;
 
     // Get planet rashi positions (exclude Mandi — we compute it per-period)
@@ -2996,7 +2997,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       final dayPlanetRashis = Map<String, int>.from(basePlanetRashis);
       if (dayMandiRashi >= 0) dayPlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
 
-      final dayW = _scanLagnaRange(srJd, ssJd, ayn, dayPlanetRashis, guruRashiIdx, allowedLagnas, rules);
+      final dayW = _scanLagnaRange(srJd, ssJd, ayn, dayPlanetRashis, guruRashiIdx, allowedLagnas, rules, useBhavaShuddhi: userRulesLocal.useBhavaShuddhi);
 
       // ── NIGHT Mandi ──
       final nextDay = _selectedDay!.add(const Duration(days: 1));
@@ -3021,7 +3022,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       final nightPlanetRashis = Map<String, int>.from(basePlanetRashis);
       if (nightMandiRashi >= 0) nightPlanetRashis['ಮಾಂದಿ'] = nightMandiRashi;
 
-      final nightW = _scanLagnaRange(ssJd, nextSrJd, ayn, nightPlanetRashis, guruRashiIdx, allowedLagnas, rules);
+      final nightW = _scanLagnaRange(ssJd, nextSrJd, ayn, nightPlanetRashis, guruRashiIdx, allowedLagnas, rules, useBhavaShuddhi: userRulesLocal.useBhavaShuddhi);
 
       if (mounted) setState(() {
         _dayLagnaWindows = dayW;
@@ -3053,7 +3054,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   }
 
   List<LagnaWindow> _scanLagnaRange(double startJd, double endJd, double ayn,
-      Map<String, int> planetRashis, int guruRashiIdx, List<int>? allowedLagnas, MuhurtaEventRules? rules) {
+      Map<String, int> planetRashis, int guruRashiIdx, List<int>? allowedLagnas, MuhurtaEventRules? rules, {bool useBhavaShuddhi = false}) {
     final double step = 10.0 / (24.0 * 60.0); // 10 min
     final List<_AscSample> samples = [];
     double jd = startJd;
@@ -3120,6 +3121,42 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         if (rashiLords[currentRashi] == rashiLords[ashtamaRashi]) ashtamaM.clear();
         final dashamaM = findAllPlanetsInRashi(dashamaRashi, windowPlanetRashis);
 
+        // ── Bhava Shuddhi Fallback ──
+        // Only triggered when: toggle ON + ashtama required + Rashi check fails
+        bool bhavaFallbackUsed = false;
+        bool ashtamaBhavaOk = true;
+        List<String> ashtamaBhavaGrahasList = [];
+        final reqShuddhis = rules?.requiredShuddhis ?? const {ShuddhiType.lagna};
+        if (useBhavaShuddhi && ashtamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.ashtama)) {
+          bhavaFallbackUsed = true;
+          // Calculate Sripathi Bhava cusps at this midpoint
+          final bhavaHouses = Ephemeris.placidusHousesFull(midJd, LocationService.lat, LocationService.lon);
+          if (bhavaHouses != null && bhavaHouses.ascmc.length >= 2) {
+            final bhavaCusps = calcSripathiBhavaCusps(
+              bhavaHouses.ascmc[0] as double,
+              bhavaHouses.ascmc[1] as double,
+              ayn,
+            );
+            // Check each planet that failed Rashi 8th house check
+            for (final planet in ashtamaM) {
+              final engName = engToKn.entries.firstWhere(
+                (e) => e.value == planet,
+                orElse: () => const MapEntry('', ''),
+              ).key;
+              if (engName.isNotEmpty && freshPositions.containsKey(engName)) {
+                final planetLong = normDegMuhurta(freshPositions[engName]![0]);
+                final bhavaHouse = getBhavaHouse(planetLong, bhavaCusps);
+                if (bhavaHouse == 8) {
+                  ashtamaBhavaGrahasList.add(planet); // still in 8th bhava
+                }
+              } else if (planet == 'ಮಾಂದಿ') {
+                ashtamaBhavaGrahasList.add(planet); // Mandi has no exact degree, keep as-is
+              }
+            }
+            ashtamaBhavaOk = ashtamaBhavaGrahasList.isEmpty;
+          }
+        }
+
         final chandraRashi = windowPlanetRashis['ಚಂದ್ರ'] ?? -1;
         final chandraSaptamaRashi = chandraRashi >= 0 ? (chandraRashi + 6) % 12 : -1;
         final List<String> chandraSaptamaM = [];
@@ -3151,7 +3188,10 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           dashamaGrahas: dashamaM,
           chandraSaptamaGrahas: chandraSaptamaM,
           guruFromLagna: guruHouse,
-          requiredShuddhis: rules?.requiredShuddhis ?? const {ShuddhiType.lagna},
+          requiredShuddhis: reqShuddhis,
+          usedBhavaFallback: bhavaFallbackUsed,
+          ashtamaBhavaShuddhi: ashtamaBhavaOk,
+          ashtamaBhavaGrahas: ashtamaBhavaGrahasList,
         ));
 
         currentRashi = samples[i].rashiIdx;

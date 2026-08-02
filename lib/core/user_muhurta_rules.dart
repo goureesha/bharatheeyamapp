@@ -32,6 +32,7 @@ class UserMuhurtaRules {
   bool requireGuruAnukoolaForLagna;
   bool blockGuruAsta;               // true = block days when Jupiter is combust
   bool blockShukraAsta;             // true = block days when Venus is combust
+  bool useBhavaShuddhi;             // true = use Bhava cusp fallback when Rashi shuddhi fails
 
   UserMuhurtaRules({
     this.allowedTithis,
@@ -52,6 +53,7 @@ class UserMuhurtaRules {
     this.requireGuruAnukoolaForLagna = true,
     this.blockGuruAsta = false,
     this.blockShukraAsta = false,
+    this.useBhavaShuddhi = false,
   });
 
   /// Create from default MuhurtaEventRules for a given event
@@ -77,6 +79,7 @@ class UserMuhurtaRules {
       requireGuruAnukoolaForLagna: true,
       blockGuruAsta: false,
       blockShukraAsta: false,
+      useBhavaShuddhi: false,
     );
   }
 
@@ -100,6 +103,7 @@ class UserMuhurtaRules {
     'reqGuruLagna': requireGuruAnukoolaForLagna,
     'blockGuruAsta': blockGuruAsta,
     'blockShukraAsta': blockShukraAsta,
+    'bhavaShuddhi': useBhavaShuddhi,
   };
 
   /// Deserialize from JSON map
@@ -125,6 +129,7 @@ class UserMuhurtaRules {
       requireGuruAnukoolaForLagna: json['reqGuruLagna'] ?? true,
       blockGuruAsta: json['blockGuruAsta'] ?? false,
       blockShukraAsta: json['blockShukraAsta'] ?? false,
+      useBhavaShuddhi: json['bhavaShuddhi'] ?? false,
     );
   }
 

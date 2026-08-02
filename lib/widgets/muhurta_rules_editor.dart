@@ -273,6 +273,19 @@ class _MuhurtaRulesEditorState extends State<MuhurtaRulesEditor> {
                 );
               }).toList(),
             ),
+            const SizedBox(height: 8),
+            // Bhava Shuddhi toggle (advanced)
+            SwitchListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              title: Text(AppLocale.l('mUseBhavaShuddhi'), style: const TextStyle(fontSize: 12)),
+              value: _rules.useBhavaShuddhi,
+              activeColor: kTeal,
+              onChanged: (v) {
+                setState(() => _rules.useBhavaShuddhi = v);
+                _onChanged();
+              },
+            ),
             const SizedBox(height: 14),
 
             // ── 7. Lagna Rashi ──
