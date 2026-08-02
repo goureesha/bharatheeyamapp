@@ -3387,6 +3387,21 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     style: TextStyle(fontSize: 10, color: lw.guruAnukoola ? Colors.amber.shade800 : kMuted, fontWeight: FontWeight.w700),
                   ),
                 ),
+                // Bhava Shuddhi indicator — shown when bhava fallback was used
+                if (lw.usedBhavaFallback && lw.isShubha && !lw.lagnaShuddhi || !lw.saptamaShuddhi || !lw.ashtamaShuddhi || !lw.dashamaShuddhi)
+                  if (lw.usedBhavaFallback && lw.isShubha)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.deepPurple.shade300, width: 0.5),
+                      ),
+                      child: Text(
+                        '${AppLocale.l('mUseBhavaShuddhi').split(' (')[0]} ✓',
+                        style: TextStyle(fontSize: 10, color: Colors.deepPurple.shade700, fontWeight: FontWeight.w700),
+                      ),
+                    ),
               ]),
             ]),
           );
