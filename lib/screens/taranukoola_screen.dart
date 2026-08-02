@@ -3401,8 +3401,33 @@ class LagnaWindow {
   final Set<ShuddhiType> requiredShuddhis;
   final List<String> issues;
 
-  bool get isPerfect => lagnaShuddhi && saptamaShuddhi && ashtamaShuddhi && dashamaShuddhi && guruAnukoola && isAllowed;
-  bool get isShubha => lagnaShuddhi && saptamaShuddhi && isAllowed;
+  // Bhava-based shuddhi (fallback when Rashi fails)
+  final bool usedBhavaFallback;
+  final bool lagnaBhavaShuddhi;
+  final bool saptamaBhavaShuddhi;
+  final bool ashtamaBhavaShuddhi;
+  final bool dashamaBhavaShuddhi;
+  final List<String> lagnaBhavaGrahas;
+  final List<String> saptamaBhavaGrahas;
+  final List<String> ashtamaBhavaGrahas;
+  final List<String> dashamaBhavaGrahas;
+
+  bool _checkShuddhi(bool rashiResult, bool bhavaResult) {
+    if (rashiResult) return true;
+    if (usedBhavaFallback) return bhavaResult;
+    return false;
+  }
+
+  bool get isPerfect => isShubha && guruAnukoola;
+  bool get isShubha {
+    if (!isAllowed) return false;
+    if (requiredShuddhis.contains(ShuddhiType.lagna) && !_checkShuddhi(lagnaShuddhi, lagnaBhavaShuddhi)) return false;
+    if (requiredShuddhis.contains(ShuddhiType.saptama) && !_checkShuddhi(saptamaShuddhi, saptamaBhavaShuddhi)) return false;
+    if (requiredShuddhis.contains(ShuddhiType.ashtama) && !_checkShuddhi(ashtamaShuddhi, ashtamaBhavaShuddhi)) return false;
+    if (requiredShuddhis.contains(ShuddhiType.dashama) && !_checkShuddhi(dashamaShuddhi, dashamaBhavaShuddhi)) return false;
+    if (requiredShuddhis.contains(ShuddhiType.chandraSaptama) && !chandraSaptamaShuddhi) return false;
+    return true;
+  }
 
   LagnaWindow({
     int? rashiIdx,
@@ -3425,6 +3450,15 @@ class LagnaWindow {
     this.guruFromLagna = 0,
     this.requiredShuddhis = const {ShuddhiType.lagna},
     this.issues = const [],
+    this.usedBhavaFallback = false,
+    this.lagnaBhavaShuddhi = true,
+    this.saptamaBhavaShuddhi = true,
+    this.ashtamaBhavaShuddhi = true,
+    this.dashamaBhavaShuddhi = true,
+    this.lagnaBhavaGrahas = const [],
+    this.saptamaBhavaGrahas = const [],
+    this.ashtamaBhavaGrahas = const [],
+    this.dashamaBhavaGrahas = const [],
   }) : rashiIdx = rashiIdx ?? rashiIndex;
 }
 
