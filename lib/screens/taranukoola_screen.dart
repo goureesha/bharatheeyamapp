@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:sweph/sweph.dart';
@@ -1740,7 +1741,10 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   }
 
   Widget _buildMuhurtaFinderTab() {
-    // Gate removed: muhurta section is now always accessible
+    // Gate: if muhurta not unlocked, show support screen (Android only — web is always open)
+    if (!kIsWeb && !AppAccessService.muhurtaUnlocked) {
+      return const SupportScreen(lockType: SupportLockType.muhurta);
+    }
 
     final rashiNames = List.generate(12, (i) => trAll(knRashi[i]));
     final nakNames = List.generate(27, (i) => trAll(knNak[i]));
