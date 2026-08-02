@@ -1406,7 +1406,7 @@ class _InputScreenState extends State<InputScreen> {
     final crossedMidnight = civilDate.day != _dob.day || civilDate.month != _dob.month || civilDate.year != _dob.year;
 
     setState(() {
-      // Keep _dob unchanged — vedic day (sunrise-to-sunrise) stays for correct panchanga
+      _dob = civilDate;
       _ampm = h24 >= 12 ? 'PM' : 'AM';
       _hour = h24 % 12 == 0 ? 12 : h24 % 12;
       _minute = min;
