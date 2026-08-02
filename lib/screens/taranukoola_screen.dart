@@ -1055,7 +1055,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           ? ssJd
           : (srJd + 7.0 / 24.0).clamp(srJd, ssJd);
 
-      final lagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx, allowedLagnas, rules);
+      final lagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx, allowedLagnas, rules, mandiSidDeg: _mandiDegFromJd(dayMandiJd));
 
       // Compute rahu kala and visha ghati
       final rahuKala = _rahuKalaTime(date, kr.panchang.sunrise, kr.panchang.sunset);
@@ -1229,7 +1229,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                   ? ssJd
                   : (srJd + 7.0 / 24.0).clamp(srJd, ssJd));
 
-          dayLagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules, useBhavaShuddhi: userRules.useBhavaShuddhi);
+          dayLagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules, useBhavaShuddhi: userRules.useBhavaShuddhi, mandiSidDeg: _mandiDegFromJd(dayMandiJd));
 
 
           // Filter rashi lagnas: only show windows that pass ALL required shuddhi checks
@@ -1593,7 +1593,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                       ? ssJd2
                       : (srJd2 + 7.0 / 24.0).clamp(srJd2, ssJd2));
 
-              dayLagnaWindows = _scanLagnaRange(srJd2, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules2, useBhavaShuddhi: userRules.useBhavaShuddhi);
+              dayLagnaWindows = _scanLagnaRange(srJd2, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules2, useBhavaShuddhi: userRules.useBhavaShuddhi, mandiSidDeg: _mandiDegFromJd(dayMandiJd));
 
               // Filter rashi lagnas: only show windows that pass ALL required shuddhi checks
               dayLagnaWindows = dayLagnaWindows.where((w) {
@@ -3021,7 +3021,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       final dayPlanetRashis = Map<String, int>.from(basePlanetRashis);
       if (dayMandiRashi >= 0) dayPlanetRashis['ಮಾಂದಿ'] = dayMandiRashi;
 
-      final dayW = _scanLagnaRange(srJd, ssJd, ayn, dayPlanetRashis, guruRashiIdx, allowedLagnas, rules, useBhavaShuddhi: userRulesLocal.useBhavaShuddhi);
+      final dayW = _scanLagnaRange(srJd, ssJd, ayn, dayPlanetRashis, guruRashiIdx, allowedLagnas, rules, useBhavaShuddhi: userRulesLocal.useBhavaShuddhi, mandiSidDeg: _mandiDegFromJd(dayMandiJd));
 
       // ── NIGHT Mandi ──
       final nextDay = _selectedDay!.add(const Duration(days: 1));
@@ -3046,7 +3046,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       final nightPlanetRashis = Map<String, int>.from(basePlanetRashis);
       if (nightMandiRashi >= 0) nightPlanetRashis['ಮಾಂದಿ'] = nightMandiRashi;
 
-      final nightW = _scanLagnaRange(ssJd, nextSrJd, ayn, nightPlanetRashis, guruRashiIdx, allowedLagnas, rules, useBhavaShuddhi: userRulesLocal.useBhavaShuddhi);
+      final nightW = _scanLagnaRange(ssJd, nextSrJd, ayn, nightPlanetRashis, guruRashiIdx, allowedLagnas, rules, useBhavaShuddhi: userRulesLocal.useBhavaShuddhi, mandiSidDeg: _mandiDegFromJd(nightMandiJd));
 
       if (mounted) setState(() {
         _dayLagnaWindows = dayW;
@@ -3077,8 +3077,23 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     return -1;
   }
 
+  /// Get Mandi's sidereal degree from its JD (for bhava house computation)
+  double _mandiDegFromJd(double mandiJd) {
+    try {
+      final houses = Ephemeris.placidusHousesFull(
+        mandiJd, LocationService.lat, LocationService.lon,
+      );
+      if (houses != null && houses.ascmc.length >= 1) {
+        Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+        final aMandi = Sweph.swe_get_ayanamsa(mandiJd);
+        return ((houses.ascmc[0] as double) - aMandi + 360.0) % 360.0;
+      }
+    } catch (_) {}
+    return -1.0;
+  }
+
   List<LagnaWindow> _scanLagnaRange(double startJd, double endJd, double ayn,
-      Map<String, int> planetRashis, int guruRashiIdx, List<int>? allowedLagnas, MuhurtaEventRules? rules, {bool useBhavaShuddhi = false}) {
+      Map<String, int> planetRashis, int guruRashiIdx, List<int>? allowedLagnas, MuhurtaEventRules? rules, {bool useBhavaShuddhi = false, double mandiSidDeg = -1.0}) {
     final double step = 10.0 / (24.0 * 60.0); // 10 min
     final List<_AscSample> samples = [];
     double jd = startJd;
@@ -3188,9 +3203,11 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               // Helper: check if all planets in list are NOT in target bhava
               bool isClear(List<String> planets, int targetHouse) {
                 for (final planet in planets) {
-                  // Skip Mandi — it's a derived point without an ecliptic longitude
-                  // that can be mapped to a bhava. Rashi check still applies.
-                  if (planet == 'ಮಾಂದಿ') continue;
+                  // Mandi: use pre-computed sidereal degree for bhava check
+                  if (planet == 'ಮಾಂದಿ') {
+                    if (mandiSidDeg >= 0 && getBhavaHouse(normDegMuhurta(mandiSidDeg), cusps) == targetHouse) return false;
+                    continue;
+                  }
                   final engName = engToKn.entries.firstWhere(
                     (e) => e.value == planet,
                     orElse: () => const MapEntry('', ''),
