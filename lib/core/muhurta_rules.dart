@@ -758,9 +758,15 @@ class LagnaWindow {
   final Set<ShuddhiType> requiredShuddhis;
 
   // Bhava-based shuddhi (fallback when Rashi fails)
-  final bool usedBhavaFallback;       // true if bhava calc was used
+  final bool usedBhavaFallback;       // true if bhava calc was used for any shuddhi
+  final bool lagnaBhavaShuddhi;       // true if 1st bhava is clear
+  final bool saptamaBhavaShuddhi;     // true if 7th bhava is clear
   final bool ashtamaBhavaShuddhi;     // true if 8th bhava is clear
-  final List<String> ashtamaBhavaGrahas; // planets in 8th bhava
+  final bool dashamaBhavaShuddhi;     // true if 10th bhava is clear
+  final List<String> lagnaBhavaGrahas;
+  final List<String> saptamaBhavaGrahas;
+  final List<String> ashtamaBhavaGrahas;
+  final List<String> dashamaBhavaGrahas;
 
   LagnaWindow({
     required this.rashiIndex,
@@ -782,25 +788,30 @@ class LagnaWindow {
     this.guruFromLagna = 0,
     this.requiredShuddhis = const {ShuddhiType.lagna},
     this.usedBhavaFallback = false,
+    this.lagnaBhavaShuddhi = true,
+    this.saptamaBhavaShuddhi = true,
     this.ashtamaBhavaShuddhi = true,
+    this.dashamaBhavaShuddhi = true,
+    this.lagnaBhavaGrahas = const [],
+    this.saptamaBhavaGrahas = const [],
     this.ashtamaBhavaGrahas = const [],
+    this.dashamaBhavaGrahas = const [],
   });
 
-  /// Event-aware shuddhi — only checks the shuddhis required for this event
-  /// Uses Bhava fallback for ashtama if available
+  /// Helper: check a shuddhi with bhava fallback
+  bool _checkShuddhi(bool rashiResult, bool bhavaResult) {
+    if (rashiResult) return true; // Rashi passed, no need for bhava
+    if (usedBhavaFallback) return bhavaResult; // Rashi failed, try bhava
+    return false; // Rashi failed, no bhava fallback
+  }
+
+  /// Event-aware shuddhi — checks required shuddhis with Bhava fallback
   bool get isShubha {
     if (!isAllowed) return false;
-    if (requiredShuddhis.contains(ShuddhiType.lagna) && !lagnaShuddhi) return false;
-    if (requiredShuddhis.contains(ShuddhiType.saptama) && !saptamaShuddhi) return false;
-    if (requiredShuddhis.contains(ShuddhiType.ashtama)) {
-      // Use Bhava fallback if available and Rashi check failed
-      if (!ashtamaShuddhi && usedBhavaFallback) {
-        if (!ashtamaBhavaShuddhi) return false;
-      } else if (!ashtamaShuddhi) {
-        return false;
-      }
-    }
-    if (requiredShuddhis.contains(ShuddhiType.dashama) && !dashamaShuddhi) return false;
+    if (requiredShuddhis.contains(ShuddhiType.lagna) && !_checkShuddhi(lagnaShuddhi, lagnaBhavaShuddhi)) return false;
+    if (requiredShuddhis.contains(ShuddhiType.saptama) && !_checkShuddhi(saptamaShuddhi, saptamaBhavaShuddhi)) return false;
+    if (requiredShuddhis.contains(ShuddhiType.ashtama) && !_checkShuddhi(ashtamaShuddhi, ashtamaBhavaShuddhi)) return false;
+    if (requiredShuddhis.contains(ShuddhiType.dashama) && !_checkShuddhi(dashamaShuddhi, dashamaBhavaShuddhi)) return false;
     if (requiredShuddhis.contains(ShuddhiType.chandraSaptama) && !chandraSaptamaShuddhi) return false;
     return true;
   }

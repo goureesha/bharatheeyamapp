@@ -3122,38 +3122,66 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         final dashamaM = findAllPlanetsInRashi(dashamaRashi, windowPlanetRashis);
 
         // ── Bhava Shuddhi Fallback ──
-        // Only triggered when: toggle ON + ashtama required + Rashi check fails
+        // Triggered when: toggle ON + any required shuddhi fails in Rashi chart
         bool bhavaFallbackUsed = false;
-        bool ashtamaBhavaOk = true;
-        List<String> ashtamaBhavaGrahasList = [];
+        bool lagnaBhavaOk = true, saptamaBhavaOk = true, ashtamaBhavaOk = true, dashamaBhavaOk = true;
+        List<String> lagnaBhavaGrahasList = [], saptamaBhavaGrahasList = [], ashtamaBhavaGrahasList = [], dashamaBhavaGrahasList = [];
         final reqShuddhis = rules?.requiredShuddhis ?? const {ShuddhiType.lagna};
-        if (useBhavaShuddhi && ashtamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.ashtama)) {
-          bhavaFallbackUsed = true;
-          // Calculate Sripathi Bhava cusps at this midpoint
+
+        final bool needsBhava = useBhavaShuddhi && (
+          (lagnaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.lagna)) ||
+          (saptamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.saptama)) ||
+          (ashtamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.ashtama)) ||
+          (dashamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.dashama))
+        );
+
+        if (needsBhava) {
           final bhavaHouses = Ephemeris.placidusHousesFull(midJd, LocationService.lat, LocationService.lon);
           if (bhavaHouses != null && bhavaHouses.ascmc.length >= 2) {
+            bhavaFallbackUsed = true;
             final bhavaCusps = calcSripathiBhavaCusps(
               bhavaHouses.ascmc[0] as double,
               bhavaHouses.ascmc[1] as double,
               ayn,
             );
-            // Check each planet that failed Rashi 8th house check
-            for (final planet in ashtamaM) {
-              final engName = engToKn.entries.firstWhere(
-                (e) => e.value == planet,
-                orElse: () => const MapEntry('', ''),
-              ).key;
-              if (engName.isNotEmpty && freshPositions.containsKey(engName)) {
-                final planetLong = normDegMuhurta(freshPositions[engName]![0]);
-                final bhavaHouse = getBhavaHouse(planetLong, bhavaCusps);
-                if (bhavaHouse == 8) {
-                  ashtamaBhavaGrahasList.add(planet); // still in 8th bhava
+
+            // Helper: check which planets are still in a given bhava house
+            List<String> checkBhava(List<String> failedPlanets, int targetHouse) {
+              final List<String> stillInHouse = [];
+              for (final planet in failedPlanets) {
+                final engName = engToKn.entries.firstWhere(
+                  (e) => e.value == planet,
+                  orElse: () => const MapEntry('', ''),
+                ).key;
+                if (engName.isNotEmpty && freshPositions.containsKey(engName)) {
+                  final planetLong = normDegMuhurta(freshPositions[engName]![0]);
+                  final bhavaHouse = getBhavaHouse(planetLong, bhavaCusps);
+                  if (bhavaHouse == targetHouse) {
+                    stillInHouse.add(planet);
+                  }
+                } else if (planet == 'ಮಾಂದಿ') {
+                  stillInHouse.add(planet); // Mandi has no exact degree
                 }
-              } else if (planet == 'ಮಾಂದಿ') {
-                ashtamaBhavaGrahasList.add(planet); // Mandi has no exact degree, keep as-is
               }
+              return stillInHouse;
             }
-            ashtamaBhavaOk = ashtamaBhavaGrahasList.isEmpty;
+
+            if (lagnaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.lagna)) {
+              lagnaBhavaGrahasList = checkBhava(lagnaM, 1);
+              lagnaBhavaOk = lagnaBhavaGrahasList.isEmpty;
+            }
+            if (saptamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.saptama)) {
+              saptamaBhavaGrahasList = checkBhava(saptamaM, 7);
+              saptamaBhavaOk = saptamaBhavaGrahasList.isEmpty;
+            }
+            if (ashtamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.ashtama)) {
+              ashtamaBhavaGrahasList = checkBhava(ashtamaM, 8);
+              ashtamaBhavaOk = ashtamaBhavaGrahasList.isEmpty;
+            }
+            if (dashamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.dashama)) {
+              dashamaBhavaGrahasList = checkBhava(dashamaM, 10);
+              dashamaBhavaOk = dashamaBhavaGrahasList.isEmpty;
+            }
           }
         }
 
@@ -3190,8 +3218,14 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           guruFromLagna: guruHouse,
           requiredShuddhis: reqShuddhis,
           usedBhavaFallback: bhavaFallbackUsed,
+          lagnaBhavaShuddhi: lagnaBhavaOk,
+          saptamaBhavaShuddhi: saptamaBhavaOk,
           ashtamaBhavaShuddhi: ashtamaBhavaOk,
+          dashamaBhavaShuddhi: dashamaBhavaOk,
+          lagnaBhavaGrahas: lagnaBhavaGrahasList,
+          saptamaBhavaGrahas: saptamaBhavaGrahasList,
           ashtamaBhavaGrahas: ashtamaBhavaGrahasList,
+          dashamaBhavaGrahas: dashamaBhavaGrahasList,
         ));
 
         currentRashi = samples[i].rashiIdx;
