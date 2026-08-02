@@ -3322,7 +3322,31 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         ...windows.asMap().entries.map((entry) {
           final i = entry.key;
           final lw = entry.value;
+          final bool isAbhijitWindow = lw.rashiName.contains('ಅಭಿಜಿತ್');
 
+          // ── Abhijit: simplified display (just lagna name + timing) ──
+          if (isAbhijitWindow) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.amber.withOpacity(0.08),
+                border: i < windows.length - 1 ? Border(bottom: BorderSide(color: kBorder.withOpacity(0.4))) : null,
+              ),
+              child: Row(children: [
+                Icon(Icons.auto_awesome, color: Colors.amber.shade700, size: 16),
+                const SizedBox(width: 8),
+                Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: Colors.amber.shade900, fontSize: 13,
+                ))),
+                Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(
+                  fontSize: 12, color: Colors.amber.shade800, fontWeight: FontWeight.w700,
+                )),
+              ]),
+            );
+          }
+
+          // ── Normal lagna window with shuddhi chips ──
           Color rowBg;
           IconData rowIcon;
           Color iconColor;
