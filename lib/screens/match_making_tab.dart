@@ -560,7 +560,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   }
 
   // Geocode helper
-  Future<void> _geocode(String placeName, TextEditingController latCtrl, TextEditingController lonCtrl, TextEditingController tzCtrl, void Function(bool) setGeoLoading, void Function(String) setGeoStatus) async {
+  Future<void> _geocode(String placeName, TextEditingController latCtrl, TextEditingController lonCtrl, TextEditingController tzCtrl, void Function(bool) setGeoLoading, void Function(String) setGeoStatus, {DateTime? birthDate}) async {
     if (placeName.trim().isEmpty) return;
     setGeoLoading(true);
     setGeoStatus('');
@@ -576,7 +576,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
           final lat = double.parse(data[0]['lat']);
           final lon = double.parse(data[0]['lon']);
           final displayName = data[0]['display_name'] as String;
-          final autoTz = await getTimezoneForPlace(displayName, lat, lon, birthDate: dob);
+          final autoTz = await getTimezoneForPlace(displayName, lat, lon, birthDate: birthDate);
           setState(() {
             latCtrl.text = lat.toStringAsFixed(4);
             lonCtrl.text = lon.toStringAsFixed(4);
@@ -612,7 +612,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                 Navigator.pop(ctx);
                 final lat = double.parse(place['lat']);
                 final lon = double.parse(place['lon']);
-                final autoTz = await getTimezoneForPlace(displayName, lat, lon, birthDate: dob);
+                final autoTz = await getTimezoneForPlace(displayName, lat, lon, birthDate: birthDate);
                 setState(() {
                   latCtrl.text = lat.toStringAsFixed(4);
                   lonCtrl.text = lon.toStringAsFixed(4);
@@ -912,12 +912,12 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                 ? const Padding(padding: EdgeInsets.all(12), child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)))
                 : IconButton(icon: Icon(Icons.my_location, color: kTeal, size: 18), onPressed: () {
                     placeCtrl.text = textCtrl.text;
-                    _geocode(textCtrl.text, latCtrl, lonCtrl, tzCtrl, (v) => setState(() => onGeoLoadingChanged(v)), (v) => setState(() => onGeoStatusChanged(v)));
+                    _geocode(textCtrl.text, latCtrl, lonCtrl, tzCtrl, (v) => setState(() => onGeoLoadingChanged(v)), (v) => setState(() => onGeoStatusChanged(v)), birthDate: dob);
                   }),
             ),
             onSubmitted: (_) {
               placeCtrl.text = textCtrl.text;
-              _geocode(textCtrl.text, latCtrl, lonCtrl, tzCtrl, (v) => setState(() => onGeoLoadingChanged(v)), (v) => setState(() => onGeoStatusChanged(v)));
+              _geocode(textCtrl.text, latCtrl, lonCtrl, tzCtrl, (v) => setState(() => onGeoLoadingChanged(v)), (v) => setState(() => onGeoStatusChanged(v)), birthDate: dob);
             },
           );
         },
