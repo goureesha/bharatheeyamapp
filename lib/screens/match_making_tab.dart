@@ -584,7 +584,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
           });
           setGeoStatus('📍 $displayName');
         } else {
-          if (mounted) _showPlaceDisambiguation(data, latCtrl, lonCtrl, tzCtrl, setGeoStatus);
+          if (mounted) _showPlaceDisambiguation(data, latCtrl, lonCtrl, tzCtrl, setGeoStatus, birthDate: birthDate);
         }
       }
     } catch (_) {
@@ -593,7 +593,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     setGeoLoading(false);
   }
 
-  void _showPlaceDisambiguation(List<dynamic> results, TextEditingController latCtrl, TextEditingController lonCtrl, TextEditingController tzCtrl, void Function(String) setGeoStatus) {
+  void _showPlaceDisambiguation(List<dynamic> results, TextEditingController latCtrl, TextEditingController lonCtrl, TextEditingController tzCtrl, void Function(String) setGeoStatus, {DateTime? birthDate}) {
     showModalBottomSheet(
       context: context, backgroundColor: kBg,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
