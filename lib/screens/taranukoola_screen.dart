@@ -3121,11 +3121,14 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         if (rashiLords[currentRashi] == rashiLords[ashtamaRashi]) ashtamaM.clear();
         final dashamaM = findAllPlanetsInRashi(dashamaRashi, windowPlanetRashis);
 
-        // ── Bhava Shuddhi Fallback ──
-        // Triggered when: toggle ON + any required shuddhi fails in Rashi chart
+        // ── Bhava Shuddhi Fallback (2-minute fine scan) ──
+        // When toggle ON + any required shuddhi fails in Rashi chart,
+        // scan in 2-min increments to find exact sub-windows where Bhava shuddhi is clear.
         bool bhavaFallbackUsed = false;
         bool lagnaBhavaOk = true, saptamaBhavaOk = true, ashtamaBhavaOk = true, dashamaBhavaOk = true;
         List<String> lagnaBhavaGrahasList = [], saptamaBhavaGrahasList = [], ashtamaBhavaGrahasList = [], dashamaBhavaGrahasList = [];
+        String? bhavaStartTime;
+        String? bhavaEndTime;
         final reqShuddhis = rules?.requiredShuddhis ?? const {ShuddhiType.lagna};
 
         final bool needsBhava = useBhavaShuddhi && (
@@ -3136,52 +3139,96 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         );
 
         if (needsBhava) {
-          final bhavaHouses = Ephemeris.placidusHousesFull(midJd, LocationService.lat, LocationService.lon);
-          if (bhavaHouses != null && bhavaHouses.ascmc.length >= 2) {
-            bhavaFallbackUsed = true;
-            final bhavaCusps = calcSripathiBhavaCusps(
-              bhavaHouses.ascmc[0] as double,
-              bhavaHouses.ascmc[1] as double,
-              ayn,
-            );
+          bhavaFallbackUsed = true;
+          // 2-minute scan within [windowStartJd, windowEndJd]
+          final double fineStep = 2.0 / (24.0 * 60.0); // 2 min in JD
+          double scanJd = windowStartJd;
+          double? cleanStart;
+          double cleanStartMins = 0;
 
-            // Helper: check which planets are still in a given bhava house
-            List<String> checkBhava(List<String> failedPlanets, int targetHouse) {
-              final List<String> stillInHouse = [];
-              for (final planet in failedPlanets) {
-                final engName = engToKn.entries.firstWhere(
-                  (e) => e.value == planet,
-                  orElse: () => const MapEntry('', ''),
-                ).key;
-                if (engName.isNotEmpty && freshPositions.containsKey(engName)) {
-                  final planetLong = normDegMuhurta(freshPositions[engName]![0]);
-                  final bhavaHouse = getBhavaHouse(planetLong, bhavaCusps);
-                  if (bhavaHouse == targetHouse) {
-                    stillInHouse.add(planet);
+          // Shuddhi types that failed in Rashi
+          final bool checkL = lagnaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.lagna);
+          final bool checkS = saptamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.saptama);
+          final bool checkA = ashtamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.ashtama);
+          final bool checkD = dashamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.dashama);
+
+          while (scanJd <= windowEndJd + fineStep * 0.5) {
+            final bh = Ephemeris.placidusHousesFull(scanJd, LocationService.lat, LocationService.lon);
+            bool allClear = true;
+
+            if (bh != null && bh.ascmc.length >= 2) {
+              final cusps = calcSripathiBhavaCusps(bh.ascmc[0] as double, bh.ascmc[1] as double, ayn);
+              // Recalculate planet positions at this exact moment
+              final pos = Ephemeris.calcAll(scanJd, 'lahiri', true);
+
+              // Helper: check if all planets in list are NOT in target bhava
+              bool isClear(List<String> planets, int targetHouse) {
+                for (final planet in planets) {
+                  final engName = engToKn.entries.firstWhere(
+                    (e) => e.value == planet,
+                    orElse: () => const MapEntry('', ''),
+                  ).key;
+                  if (engName.isNotEmpty && pos.containsKey(engName)) {
+                    if (getBhavaHouse(normDegMuhurta(pos[engName]![0]), cusps) == targetHouse) return false;
+                  } else if (planet == 'ಮಾಂದಿ') {
+                    return false; // Mandi stays
                   }
-                } else if (planet == 'ಮಾಂದಿ') {
-                  stillInHouse.add(planet); // Mandi has no exact degree
                 }
+                return true;
               }
-              return stillInHouse;
+
+              if (checkL && !isClear(lagnaM, 1)) allClear = false;
+              if (checkS && !isClear(saptamaM, 7)) allClear = false;
+              if (checkA && !isClear(ashtamaM, 8)) allClear = false;
+              if (checkD && !isClear(dashamaM, 10)) allClear = false;
+            } else {
+              allClear = false;
             }
 
-            if (lagnaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.lagna)) {
-              lagnaBhavaGrahasList = checkBhava(lagnaM, 1);
-              lagnaBhavaOk = lagnaBhavaGrahasList.isEmpty;
+            final localFrac = ((scanJd + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
+            final localMins = localFrac * 24.0 * 60.0;
+
+            if (allClear) {
+              if (cleanStart == null) {
+                cleanStart = scanJd;
+                cleanStartMins = localMins;
+              }
+            } else {
+              if (cleanStart != null) {
+                // Found a clean sub-window: cleanStartMins to localMins
+                bhavaStartTime = _minutesToTimeStr(cleanStartMins);
+                bhavaEndTime = _minutesToTimeStr(localMins);
+                lagnaBhavaOk = !checkL;
+                saptamaBhavaOk = !checkS;
+                ashtamaBhavaOk = !checkA;
+                dashamaBhavaOk = !checkD;
+                // Mark all as OK since the sub-window is clean
+                if (checkL) lagnaBhavaOk = true;
+                if (checkS) saptamaBhavaOk = true;
+                if (checkA) ashtamaBhavaOk = true;
+                if (checkD) dashamaBhavaOk = true;
+                break; // Use first clean window
+              }
             }
-            if (saptamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.saptama)) {
-              saptamaBhavaGrahasList = checkBhava(saptamaM, 7);
-              saptamaBhavaOk = saptamaBhavaGrahasList.isEmpty;
-            }
-            if (ashtamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.ashtama)) {
-              ashtamaBhavaGrahasList = checkBhava(ashtamaM, 8);
-              ashtamaBhavaOk = ashtamaBhavaGrahasList.isEmpty;
-            }
-            if (dashamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.dashama)) {
-              dashamaBhavaGrahasList = checkBhava(dashamaM, 10);
-              dashamaBhavaOk = dashamaBhavaGrahasList.isEmpty;
-            }
+            scanJd += fineStep;
+          }
+
+          // Handle clean window that extends to end of lagna window
+          if (cleanStart != null && bhavaStartTime == null) {
+            bhavaStartTime = _minutesToTimeStr(cleanStartMins);
+            bhavaEndTime = _minutesToTimeStr(endMins);
+            if (checkL) lagnaBhavaOk = true;
+            if (checkS) saptamaBhavaOk = true;
+            if (checkA) ashtamaBhavaOk = true;
+            if (checkD) dashamaBhavaOk = true;
+          }
+
+          // If no clean sub-window found, mark as failed
+          if (bhavaStartTime == null) {
+            lagnaBhavaOk = !checkL;
+            saptamaBhavaOk = !checkS;
+            ashtamaBhavaOk = !checkA;
+            dashamaBhavaOk = !checkD;
           }
         }
 
@@ -3201,8 +3248,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         windows.add(LagnaWindow(
           rashiIndex: currentRashi,
           rashiName: appRashi[currentRashi],
-          startTime: _minutesToTimeStr(startMins),
-          endTime: _minutesToTimeStr(endMins),
+          startTime: bhavaStartTime ?? _minutesToTimeStr(startMins),
+          endTime: bhavaEndTime ?? _minutesToTimeStr(endMins),
           isAllowed: isLagnaAllowed,
           lagnaShuddhi: lagnaM.isEmpty,
           saptamaShuddhi: saptamaM.isEmpty,
