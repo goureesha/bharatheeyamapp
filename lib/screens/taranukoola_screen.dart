@@ -2308,17 +2308,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               child: Row(children: [
                 Icon(isPerfect ? Icons.stars : (isCandidate ? Icons.warning_amber_rounded : Icons.calendar_today), size: 16, color: scoreColor),
                 const SizedBox(width: 8),
-                Expanded(child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('$dateStr  ${trAll(r['vara'])}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kText)),
-                    const SizedBox(height: 2),
-                    Text(
-                      isPerfect ? '✅ ${AppLocale.l('mPerfectMuhurtaLabel')}' : (isCandidate ? '⚠ ${AppLocale.l('mConditionalLabel')}' : '📅 ${AppLocale.l('muhurtaLabel')}'),
-                      style: TextStyle(fontSize: 11, color: scoreColor, fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                )),
+                Expanded(child: Text('$dateStr  ${trAll(r['vara'])}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kText))),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(color: scoreColor.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
