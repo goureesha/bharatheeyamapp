@@ -2409,7 +2409,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               ])),
               const SizedBox(height: 8),
               // ── 📋 Panchanga (5 Angas) ──
-              _sectionLabel('📋 ${AppLocale.l('panchaAngaVivar')}', kPurple2),
+              _sectionLabel('📋 ${AppLocale.l('pHeading')}', kPurple2),
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(children: [
