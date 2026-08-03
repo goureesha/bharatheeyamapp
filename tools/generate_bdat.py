@@ -78,6 +78,25 @@ KN_RASHI = [
     'ತುಲಾ', 'ವೃಶ್ಚಿಕ', 'ಧನು', 'ಮಕರ', 'ಕುಂಭ', 'ಮೀನ',
 ]
 
+# Soura Masa = Sun's Rashi name (same as KN_RASHI)
+KN_SOURA_MASA = KN_RASHI
+
+# Chandra Masa (Amavasyanta, indexed by Sun's Rashi at previous Amavasya)
+KN_CHANDRA_MASA = [
+    'ವೈಶಾಖ', 'ಜ್ಯೇಷ್ಠ', 'ಆಷಾಢ', 'ಶ್ರಾವಣ', 'ಭಾದ್ರಪದ', 'ಆಶ್ವಿನ',
+    'ಕಾರ್ತಿಕ', 'ಮಾರ್ಗಶಿರ', 'ಪುಷ್ಯ', 'ಮಾಘ', 'ಫಾಲ್ಗುಣ', 'ಚೈತ್ರ',
+]
+
+# Samvatsara (60-year cycle)
+KN_SAMVATSARA = [
+    'ಪ್ರಭವ','ವಿಭವ','ಶುಕ್ಲ','ಪ್ರಮೋದೂತ','ಪ್ರಜೋತ್ಪತ್ತಿ','ಆಂಗೀರಸ','ಶ್ರೀಮುಖ','ಭಾವ','ಯುವ','ಧಾತೃ',
+    'ಈಶ್ವರ','ಬಹುಧಾನ್ಯ','ಪ್ರಮಾಥಿ','ವಿಕ್ರಮ','ವೃಷ','ಚಿತ್ರಭಾನು','ಸುಭಾನು','ತಾರಣ','ಪಾರ್ಥಿವ','ವ್ಯಯ',
+    'ಸರ್ವಜಿತ್','ಸರ್ವಧಾರಿ','ವಿರೋಧಿ','ವಿಕೃತಿ','ಖರ','ನಂದನ','ವಿಜಯ','ಜಯ','ಮನ್ಮಥ','ದುರ್ಮುಖಿ',
+    'ಹೇವಿಳಂಬಿ','ವಿಳಂಬಿ','ವಿಕಾರಿ','ಶಾರ್ವರಿ','ಪ್ಲವ','ಶುಭಕೃತ್','ಶೋಭಕೃತ್','ಕ್ರೋಧಿ','ವಿಶ್ವಾವಸು','ಪರಾಭವ',
+    'ಪ್ಲವಂಗ','ಕೀಲಕ','ಸೌಮ್ಯ','ಸಾಧಾರಣ','ವಿರೋಧಕೃತ್','ಪರಿಧಾವಿ','ಪ್ರಮಾದೀಚ','ಆನಂದ','ರಾಕ್ಷಸ','ಅನಲ',
+    'ಪಿಂಗಳ','ಕಾಳಯುಕ್ತಿ','ಸಿದ್ಧಾರ್ಥಿ','ರೌದ್ರಿ','ದುರ್ಮತಿ','ದುಂದುಭಿ','ರುಧಿರೋದ್ಗಾರಿ','ರಕ್ತಾಕ್ಷಿ','ಕ್ರೋಧನ','ಅಕ್ಷಯ',
+]
+
 # ─── PyEphem Helpers ─────────────────────────────────────────
 
 def get_observer(lat, lon, date_obj):
@@ -236,6 +255,15 @@ def compute_day(year, month, day, lat, lon, tz_offset=5.5):
     # ─── Chandra Rashi ───
     chandra_rashi = KN_RASHI[moon_rashi]
     
+    # ─── Soura Masa (Sun's Rashi) ───
+    soura_masa = KN_SOURA_MASA[sun_rashi]
+    
+    # ─── Chandra Masa (Amavasyanta system) ───
+    chandra_masa = _compute_chandra_masa(rise_ephem, tithi_idx, sun_lon)
+    
+    # ─── Samvatsara (60-year cycle, Shalivahana Shaka) ───
+    samvatsara = _compute_samvatsara(year, month, chandra_masa)
+    
     # Compact format matching CachedPanchangaDay.toCompact()
     date_str = f"{year}-{month:02d}-{day:02d}"
     return [
@@ -254,6 +282,7 @@ def compute_day(year, month, day, lat, lon, tz_offset=5.5):
         pada, tithi_end, nak_end,
         round(nak_percent * 1000) / 1000.0,
         chandra_rashi,
+        chandra_masa, soura_masa, samvatsara,
     ]
 
 def _get_sid_lon(body, ephem_date, jd):
@@ -327,6 +356,79 @@ def _find_nak_end(start_ephem, nak_idx, jd_start, tz_offset):
         ed = ed_next
     return '--:--'
 
+def _compute_chandra_masa(rise_ephem, tithi_idx, sun_lon):
+    """Compute Chandra Masa (Pournimanta system).
+    
+    Pournimanta: month runs from Purnima to Purnima.
+    Krishna Paksha comes first, then Shukla Paksha.
+    In Pournimanta, Krishna paksha dates belong to the NEXT month.
+    Output matches Dart app format: 'ನಿಜ ವೈಶಾಖ' or 'ಅಧಿಕ ವೈಶಾಖ'
+    """
+    try:
+        # Find previous and next new moons
+        prev_nm = ephem.previous_new_moon(rise_ephem)
+        next_nm = ephem.next_new_moon(rise_ephem)
+        
+        # Sun's sidereal rashi at previous new moon
+        jd_prev = jd_from_ephem(prev_nm)
+        sun_prev = ephem.Sun()
+        sun_prev.compute(prev_nm)
+        ecl_prev = ephem.Ecliptic(ephem.Equatorial(sun_prev.ra, sun_prev.dec, epoch=prev_nm), epoch=prev_nm)
+        sun_prev_sid = tropical_to_sidereal(math.degrees(float(ecl_prev.lon)), jd_prev)
+        prev_rashi = int(sun_prev_sid / 30) % 12
+        
+        # Sun's sidereal rashi at next new moon
+        jd_next = jd_from_ephem(next_nm)
+        sun_next = ephem.Sun()
+        sun_next.compute(next_nm)
+        ecl_next = ephem.Ecliptic(ephem.Equatorial(sun_next.ra, sun_next.dec, epoch=next_nm), epoch=next_nm)
+        sun_next_sid = tropical_to_sidereal(math.degrees(float(ecl_next.lon)), jd_next)
+        next_rashi = int(sun_next_sid / 30) % 12
+        
+        # Check Adhika/Nija (Sankranti check)
+        has_sankranti = (prev_rashi != next_rashi)
+        
+        # Pournimanta: Krishna paksha (tithi 15-29) belongs to next month
+        if tithi_idx >= 15:
+            masa_rashi = (prev_rashi + 1) % 12
+        else:
+            masa_rashi = prev_rashi
+        
+        masa_name = KN_CHANDRA_MASA[masa_rashi]
+        
+        if has_sankranti:
+            return f"\u0ca8\u0cbf\u0c9c {masa_name}"   # ನಿಜ
+        else:
+            return f"\u0c85\u0ca7\u0cbf\u0c95 {masa_name}"  # ಅಧಿಕ
+    except Exception:
+        # Fallback: simple sun rashi mapping
+        sun_rashi = int(sun_lon / 30) % 12
+        if tithi_idx >= 15:
+            masa_rashi = (sun_rashi + 1) % 12
+        else:
+            masa_rashi = sun_rashi
+        return f"\u0ca8\u0cbf\u0c9c {KN_CHANDRA_MASA[masa_rashi]}"
+
+def _compute_samvatsara(year, month, chandra_masa):
+    """Compute Samvatsara (60-year Shalivahana Shaka cycle).
+    Current samvatsara (2026) = Parabhava.
+    """
+    shaka_year = year - 78
+    
+    # Shaka year increments at Ugadi (Chaitra Shukla Pratipada)
+    # If we're in months before Chaitra in the early part of Gregorian year,
+    # the Shaka year hasn't incremented yet
+    old_year_months = ['ಮಾರ್ಗಶಿರ', 'ಪುಷ್ಯ', 'ಮಾಘ', 'ಫಾಲ್ಗುಣ']
+    # Strip Adhika prefix for comparison
+    masa_clean = chandra_masa.replace('ಅಧಿಕ ', '')
+    before_ugadi = month <= 5 and masa_clean in old_year_months
+    
+    if before_ugadi:
+        shaka_year -= 1
+    
+    samvatsara_idx = (shaka_year + 11) % 60
+    return f"{KN_SAMVATSARA[samvatsara_idx]} (ಶಕ {shaka_year})"
+
 # ─── Main ────────────────────────────────────────────────────
 
 def generate_bdat(zone_name, lat, lon, years, tz_offset=5.5, output_dir='.'):
@@ -366,7 +468,7 @@ def generate_bdat(zone_name, lat, lon, years, tz_offset=5.5, output_dir='.'):
     
     # Build JSON
     data = {
-        'v': 2,
+        'v': 3,
         'zone': zone_name,
         'lat': lat,
         'lon': lon,
@@ -388,7 +490,7 @@ def generate_bdat(zone_name, lat, lon, years, tz_offset=5.5, output_dir='.'):
     raw_mb = len(json_str.encode('utf-8')) / (1024 * 1024)
     comp_mb = len(compressed) / (1024 * 1024)
     
-    print(f"\n  ✅ DONE!")
+    print(f"\n  DONE!")
     print(f"  Days: {len(days)} | Errors: {errors}")
     print(f"  Raw: {raw_mb:.2f} MB | Compressed: {comp_mb:.2f} MB")
     print(f"  File: {filepath}")
@@ -436,4 +538,4 @@ if __name__ == '__main__':
                 exit(1)
         generate_bdat(args.zone, lat, lon, args.years, args.tz, args.output)
     
-    print("\n✅ All done!")
+    print("\nAll done!")
