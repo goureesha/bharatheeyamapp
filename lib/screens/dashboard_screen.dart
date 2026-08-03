@@ -33,6 +33,7 @@ import '../services/janma_patrike_service.dart'; // NEW
 import '../services/tippani_pdf_service.dart';
 import '../services/pdf_theme.dart';
 import '../constants/places.dart';
+import '../services/timezone_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sweph/sweph.dart' hide kIsWeb;
 import '../core/ephemeris.dart';
@@ -601,7 +602,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                         final w = worldResults.first;
                         final lat = (w['la'] as num).toDouble();
                         final lon = (w['lo'] as num).toDouble();
-                        final tz = (w['tz'] as num).toDouble();
+                        final tz = (w['c'] != null)
+                            ? getDstAwareOffset(w['c'] as String, lat, lon, dob)
+                            : (w['tz'] as num).toDouble();
                         setS(() {
                           placeCtrl.text = selection;
                           latCtrl.text = lat.toStringAsFixed(4);
@@ -839,7 +842,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                         final w = worldResults.first;
                         final lat = (w['la'] as num).toDouble();
                         final lon = (w['lo'] as num).toDouble();
-                        final tz = (w['tz'] as num).toDouble();
+                        final tz = (w['c'] != null)
+                            ? getDstAwareOffset(w['c'] as String, lat, lon, dob)
+                            : (w['tz'] as num).toDouble();
                         setS(() {
                           placeCtrl.text = selection;
                           latCtrl.text = lat.toStringAsFixed(4);
@@ -1053,7 +1058,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                         final w = worldResults.first;
                         final lat = (w['la'] as num).toDouble();
                         final lon = (w['lo'] as num).toDouble();
-                        final tz = (w['tz'] as num).toDouble();
+                        final tz = (w['c'] != null)
+                            ? getDstAwareOffset(w['c'] as String, lat, lon, dob)
+                            : (w['tz'] as num).toDouble();
                         setS(() {
                           placeCtrl.text = selection;
                           latCtrl.text = lat.toStringAsFixed(4);

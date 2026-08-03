@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../constants/strings.dart';
 import '../constants/places.dart';
+import '../services/timezone_service.dart';
 import '../widgets/common.dart';
 import '../widgets/kundali_chart.dart';
 import '../widgets/dasha_widget.dart';
@@ -936,7 +937,9 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
               final w = worldResults.first;
               final lat = (w['la'] as num).toDouble();
               final lon = (w['lo'] as num).toDouble();
-              final tz = (w['tz'] as num).toDouble();
+              final tz = (w['c'] != null)
+                  ? getDstAwareOffset(w['c'] as String, lat, lon, dob)
+                  : (w['tz'] as num).toDouble();
               setState(() {
                 placeCtrl.text = selection;
                 latCtrl.text = lat.toStringAsFixed(4);

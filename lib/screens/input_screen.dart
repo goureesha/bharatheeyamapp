@@ -8,6 +8,7 @@ import '../services/client_service.dart';
 import '../services/history_service.dart';
 import '../core/calculator.dart';
 import '../constants/places.dart';
+import '../services/timezone_service.dart';
 import '../core/ephemeris.dart';
 import '../widgets/date_time_input.dart';
 
@@ -1094,7 +1095,10 @@ class _InputScreenState extends State<InputScreen> {
                   final w = worldResults.first;
                   final lat = (w['la'] as num).toDouble();
                   final lon = (w['lo'] as num).toDouble();
-                  final tz = (w['tz'] as num).toDouble();
+                  final cc = w['c'] as String? ?? '';
+                  final tz = cc.isNotEmpty
+                      ? getDstAwareOffset(cc, lat, lon, _dob)
+                      : (w['tz'] as num).toDouble();
                   setState(() {
                     _placeCtrl.text = selection;
                     _latCtrl.text = lat.toStringAsFixed(4);
