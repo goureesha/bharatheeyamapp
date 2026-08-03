@@ -48,6 +48,10 @@ class CachedPanchangaDay {
   final double nakPercent;
   // Chandra Rashi name
   final String chandraRashi;
+  // Masa & Samvatsara
+  final String chandraMasa;
+  final String souraMasa;
+  final String samvatsara;
 
   CachedPanchangaDay({
     required this.date,
@@ -75,6 +79,9 @@ class CachedPanchangaDay {
     required this.nakEndTime,
     required this.nakPercent,
     required this.chandraRashi,
+    this.chandraMasa = '',
+    this.souraMasa = '',
+    this.samvatsara = '',
   });
 
   /// Encode to compact list for storage
@@ -91,6 +98,7 @@ class CachedPanchangaDay {
     pada, tithiEndTime, nakEndTime,
     (nakPercent * 1000).round() / 1000.0,
     chandraRashi,
+    chandraMasa, souraMasa, samvatsara,
   ];
 
   /// Decode from compact list
@@ -125,7 +133,10 @@ class CachedPanchangaDay {
       tithiEndTime: arr[19] as String,
       nakEndTime: arr[20] as String,
       nakPercent: (arr[21] as num).toDouble(),
-      chandraRashi: arr[22] as String,
+      chandraRashi: arr.length > 22 ? arr[22] as String : '',
+      chandraMasa: arr.length > 23 ? arr[23] as String : '',
+      souraMasa: arr.length > 24 ? arr[24] as String : '',
+      samvatsara: arr.length > 25 ? arr[25] as String : '',
     );
   }
 }
@@ -586,6 +597,9 @@ class PanchangaCache {
             nakEndTime: pan.nakEndTime,
             nakPercent: pan.nakPercent,
             chandraRashi: pan.chandraRashi,
+            chandraMasa: pan.chandraMasa,
+            souraMasa: pan.souraMasa,
+            samvatsara: pan.samvatsara,
           ));
         }
       } catch (e) {

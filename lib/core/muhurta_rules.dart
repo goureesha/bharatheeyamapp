@@ -1043,7 +1043,7 @@ MuhurtaDayResult evaluateMuhurta({
   if (tithiPassed) totalPoints += 15;
   checks.add(MuhurtaCheckItem(
     label: AppLocale.l('mTithi'),
-    value: trAll(tithiName),
+    value: '${tithiIndex <= 14 ? AppLocale.l('shukla') : AppLocale.l('krishna')} ${trAll(tithiName)}',
     passed: tithiPassed,
     note: hasSiddhaYoga ? AppLocale.l('mSiddhaYogaBhanga') : null,
   ));

@@ -1300,6 +1300,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         'karana': day.karanaName,
         'sunrise': day.sunrise,
         'sunset': day.sunset,
+        'chandraMasa': day.chandraMasa,
+        'souraMasa': day.souraMasa,
+        'samvatsara': day.samvatsara,
         'taraBala': taraBala,
         'guruBala': guruBala,
         'chandraBala': null,
@@ -1677,6 +1680,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'karana': pan.karana,
             'sunrise': pan.sunrise,
             'sunset': pan.sunset,
+            'chandraMasa': pan.chandraMasa,
+            'souraMasa': pan.souraMasa,
+            'samvatsara': pan.samvatsara,
             'taraBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null,
             'guruBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].guruBala : null,
             'chandraBala': mResult.personResults.isNotEmpty ? mResult.personResults[0].chandraBala : null,
@@ -2377,6 +2383,38 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
               ),
             ),
 
+          // ── Masa & Samvatsara Info ──
+          if ((r['samvatsara'] as String? ?? '').isNotEmpty ||
+              (r['chandraMasa'] as String? ?? '').isNotEmpty ||
+              (r['souraMasa'] as String? ?? '').isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: kBorder),
+                  borderRadius: BorderRadius.circular(10),
+                  color: kCard,
+                ),
+                child: Column(children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withOpacity(0.08),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                    ),
+                    child: Text(AppLocale.l('masaVivar'), style: TextStyle(fontWeight: FontWeight.w800, color: Colors.orange, fontSize: 13)),
+                  ),
+                  if ((r['samvatsara'] as String? ?? '').isNotEmpty)
+                    _infoRow(AppLocale.l('samvatsara'), trAll(r['samvatsara'] as String)),
+                  if ((r['chandraMasa'] as String? ?? '').isNotEmpty)
+                    _infoRow(AppLocale.l('chandraMasa'), trAll(r['chandraMasa'] as String)),
+                  if ((r['souraMasa'] as String? ?? '').isNotEmpty)
+                    _infoRow(AppLocale.l('souraMasa'), trAll(r['souraMasa'] as String)),
+                ]),
+              ),
+            ),
+
           // ── Nimma Balagalu ──
           if (r['taraBala'] != null)
             Padding(
@@ -2822,6 +2860,18 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         const SizedBox(height: 8),
         _balaChipRow(AppLocale.l('taraBala'), taraName, isGoodTara),
         _balaChipRow(AppLocale.l('chandraBala'), chandraBala ? AppLocale.l('anukoola') : AppLocale.l('pratikoola'), chandraBala),
+      ]),
+    );
+  }
+
+  Widget _infoRow(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder.withOpacity(0.5)))),
+      child: Row(children: [
+        Text(label, style: TextStyle(fontWeight: FontWeight.w700, color: kText, fontSize: 12)),
+        const Spacer(),
+        Flexible(child: Text(value, style: TextStyle(color: kMuted, fontSize: 12), textAlign: TextAlign.end, overflow: TextOverflow.ellipsis)),
       ]),
     );
   }
