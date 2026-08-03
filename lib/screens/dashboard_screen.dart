@@ -2408,28 +2408,50 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ],
               ])),
               const SizedBox(height: 8),
+              // ── ☀️ Ravi (Sun) Details ──
+              _sectionLabel('☀️ ${AppLocale.l('raviVivar')}', Colors.orange),
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(children: [
-                  _tableRow([AppLocale.l('samvatsara'), trAll(pan.samvatsara)]),
-                  _tableRow([AppLocale.l('varaLabel'), trAll(pan.vara)]),
-                  _tableRow([AppLocale.l('tithiLabel'), '${trAll(pan.tithi)}${pan.tithiGata.isNotEmpty || pan.tithiParama.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.tithiGata}, ${AppLocale.l('paramaGhati')}: ${pan.tithiParama})' : ''}']),
-                  _tableRow([AppLocale.l('chandraNakshatra'), () { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p (${AppLocale.l('gataGhati')}: ${pan.gataGhati}, ${AppLocale.l('paramaGhati')}: ${pan.paramaGhati})'; }()]),
-                  _tableRow([AppLocale.l('yogaLabel'), '${trAll(pan.yoga)}${pan.yogaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.yogaGata})' : ''}']),
-                  _tableRow([AppLocale.l('karanaLabel'), '${trAll(pan.karana)}${pan.karanaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.karanaGata})' : ''}']),
-                  _tableRow([AppLocale.l('chandraRashiLabel'), trAll(pan.chandraRashi)]),
-                  _tableRow([AppLocale.l('chandraMasa'), trAll(pan.chandraMasa)]),
-                  _tableRow([AppLocale.l('suryaNakshatraLabel'), '${trAll(pan.suryaNakshatra)} - ${AppLocale.l('padaLabel')} ${pan.suryaPada}']),
-                  _tableRow([AppLocale.l('souraMasa'), trAll(pan.souraMasa)]),
-                  _tableRow([AppLocale.l('souraMasaGataDina'), pan.souraMasaGataDina]),
                   _tableRow([AppLocale.l('sunrise'), pan.sunrise]),
                   _tableRow([AppLocale.l('sunset'), pan.sunset]),
                   _tableRow([AppLocale.l('divamana'), pan.divamana]),
                   _tableRow([AppLocale.l('ratrimana'), pan.ratrimana]),
+                  _tableRow([AppLocale.l('suryaNakshatraLabel'), '${trAll(pan.suryaNakshatra)} - ${AppLocale.l('padaLabel')} ${pan.suryaPada}']),
+                  _tableRow([AppLocale.l('souraMasa'), trAll(pan.souraMasa)]),
+                  _tableRow([AppLocale.l('souraMasaGataDina'), pan.souraMasaGataDina]),
+                  _tableRow([AppLocale.l('samvatsara'), trAll(pan.samvatsara)]),
+                ]),
+              ),
+              const SizedBox(height: 8),
+
+              // ── 🌙 Chandra (Moon) Details ──
+              _sectionLabel('🌙 ${AppLocale.l('chandraVivar')}', Colors.blue),
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(children: [
+                  _tableRow([AppLocale.l('chandraNakshatra'), () { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p (${AppLocale.l('gataGhati')}: ${pan.gataGhati}, ${AppLocale.l('paramaGhati')}: ${pan.paramaGhati})'; }()]),
+                  _tableRow([AppLocale.l('chandraRashiLabel'), trAll(pan.chandraRashi)]),
+                  _tableRow([AppLocale.l('chandraMasa'), trAll(pan.chandraMasa)]),
+                  _tableRow([AppLocale.l('tithiLabel'), '${trAll(pan.tithi)}${pan.tithiGata.isNotEmpty || pan.tithiParama.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.tithiGata}, ${AppLocale.l('paramaGhati')}: ${pan.tithiParama})' : ''}']),
                   _tableRow([AppLocale.l('udayadiGhati'), pan.udayadiGhati]),
                   _tableRow([AppLocale.l('gataGhati'), pan.gataGhati]),
                   _tableRow([AppLocale.l('paramaGhati'), pan.paramaGhati]),
                   _tableRow([AppLocale.l('sheshaGhati'), pan.shesha]),
+                ]),
+              ),
+              const SizedBox(height: 8),
+
+              // ── 📋 Panchanga (5 Angas) ──
+              _sectionLabel('📋 ${AppLocale.l('panchaAngaVivar')}', kPurple2),
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(children: [
+                  _tableRow([AppLocale.l('varaLabel'), trAll(pan.vara)]),
+                  _tableRow([AppLocale.l('tithiLabel'), '${trAll(pan.tithi)}${pan.tithiGata.isNotEmpty || pan.tithiParama.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.tithiGata}, ${AppLocale.l('paramaGhati')}: ${pan.tithiParama})' : ''}']),
+                  _tableRow([AppLocale.l('chandraNakshatra'), () { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p'; }()]),
+                  _tableRow([AppLocale.l('yogaLabel'), '${trAll(pan.yoga)}${pan.yogaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.yogaGata})' : ''}']),
+                  _tableRow([AppLocale.l('karanaLabel'), '${trAll(pan.karana)}${pan.karanaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.karanaGata})' : ''}']),
                   _tableRow([AppLocale.l('vishaPraghati'), pan.vishaPraghati]),
                   _tableRow([AppLocale.l('amrutaPraghati'), pan.amrutaPraghati]),
                 ]),
@@ -4468,6 +4490,17 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
         )).toList(),
       ),
+    );
+  }
+
+  Widget _sectionLabel(String text, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 4, left: 4),
+      child: Row(children: [
+        Container(width: 4, height: 16, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
+        const SizedBox(width: 8),
+        Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color)),
+      ]),
     );
   }
 
