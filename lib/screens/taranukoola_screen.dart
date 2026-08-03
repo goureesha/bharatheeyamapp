@@ -1292,6 +1292,13 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       await Future.delayed(Duration.zero);
       if (mounted) setState(() {});
 
+      // If no lagna windows passed shuddhi → reject this date
+      if (dayLagnaWindows.isEmpty) {
+        rejectedDays.putIfAbsent('lagna', () => []);
+        rejectedDays['lagna']!.add(day);
+        continue;
+      }
+
       results.add({
         'date': day.date,
         'vara': day.varaName,
@@ -1315,7 +1322,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         'checks': mResult.checks,
         'shubhaMuhurtas': <Map<String, String>>[],
         'lagnaWindows': dayLagnaWindows,
-        'allLagnaWindows': allAllowedLagnas,
         'isPerfect': dayLagnaWindows.any((w) => w.isPerfect),
         'isCandidate': !dayLagnaWindows.any((w) => w.isPerfect) && dayLagnaWindows.isNotEmpty,
         'partialReasons': <String>[],
@@ -1335,7 +1341,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       'countGuruCombust': 0,
       'countShukraCombust': 0,
       'countPanchangaFailed': (rejectedDays['tithi']?.length ?? 0) + (rejectedDays['nakshatra']?.length ?? 0) + (rejectedDays['vara']?.length ?? 0) + (rejectedDays['yoga']?.length ?? 0) + (rejectedDays['karana']?.length ?? 0),
-      'countNoLagnaShuddhi': results.where((r) => !(r['lagnaWindows'] as List).any((w) => w.isPerfect)).length,
+      'countNoLagnaShuddhi': rejectedDays['lagna']?.length ?? 0,
       'rejectedDays': rejectedDays,
     };
 
@@ -1359,6 +1365,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       'tithi': [], 'nakshatra': [], 'vara': [], 'yoga': [],
       'karana': [], 'dagdha': [], 'shukla': [], 'uttarayana': [],
       'tara': [], 'guru': [], 'guruAsta': [], 'shukraAsta': [],
+      'lagna': [],
     };
 
     await Ephemeris.initSweph();
@@ -1654,6 +1661,12 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
           if (!hasPerfectLagna) countNoLagnaShuddhi++;
 
+          // If no lagna windows passed shuddhi → reject this date
+          if (dayLagnaWindows.isEmpty) {
+            rej['lagna']!.add({'date': date, 'vara': pan.vara, 'nakshatra': pan.nakshatra, 'tithi': pan.tithi});
+            continue;
+          }
+
           final is100PercentPerfect = allChecksPassed && isTaraOk && isGuruOk && isAstaOk && hasPerfectLagna;
 
           final partialReasons = <String>[];
@@ -1696,7 +1709,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'checks': mResult.checks,
             'shubhaMuhurtas': shubhaMuhurtas,
             'lagnaWindows': dayLagnaWindows,
-            'allLagnaWindows': allAllowedLagnas,
           };
 
           // Add ALL days to results (matching cached path behavior)
@@ -1729,7 +1741,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       'countGuruCombust': countGuruCombust,
       'countShukraCombust': countShukraCombust,
       'countPanchangaFailed': rej['tithi']!.length + rej['nakshatra']!.length + rej['vara']!.length + rej['yoga']!.length + rej['karana']!.length,
-      'countNoLagnaShuddhi': countNoLagnaShuddhi,
+      'countNoLagnaShuddhi': rej['lagna']!.length,
       'rejTithi': rej['tithi']!.length,
       'rejNak': rej['nakshatra']!.length,
       'rejVara': rej['vara']!.length,
@@ -2108,6 +2120,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                     'guru': (AppLocale.l('mGuruBala'), Colors.amber.shade900),
                     'guruAsta': (AppLocale.l('mGuruAsta'), Colors.deepPurple),
                     'shukraAsta': (AppLocale.l('mShukraAsta'), Colors.purple),
+                    'lagna': (AppLocale.l('mLagnaShuddhi'), Colors.blueGrey),
                   }.entries)
                     if ((rejDays[entry.key]?.isNotEmpty ?? false))
                       _clickableDiagChip(
@@ -2448,12 +2461,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             ),
 
           // ── Lagna Windows (shows perfect, shubha & allowed windows) ──
-          if (r['lagnaWindows'] != null || r['allLagnaWindows'] != null) ...[
+          if (r['lagnaWindows'] != null) ...[
             () {
-              final filteredLws = (r['lagnaWindows'] as List<LagnaWindow>?) ?? [];
-              final allLws = (r['allLagnaWindows'] as List<LagnaWindow>?) ?? [];
-              // Show filtered windows if available, otherwise show all allowed windows
-              final displayLws = filteredLws.isNotEmpty ? filteredLws : allLws;
+              final displayLws = (r['lagnaWindows'] as List<LagnaWindow>);
               if (displayLws.isEmpty) return const SizedBox();
 
               return Padding(
