@@ -80,6 +80,7 @@ class PanchangData {
   final String divamana;
   final String ratrimana;
   final String rutu;
+  final String vaidikaRutu;
   final String agniVasa;
   final String ayana;
   // Ghati-Vighati for Tithi, Karana, Yoga
@@ -131,6 +132,7 @@ class PanchangData {
     this.divamana = '',
     this.ratrimana = '',
     this.rutu = '',
+    this.vaidikaRutu = '',
     this.agniVasa = '',
     this.ayana = '',
     this.tithiGata = '',
@@ -952,6 +954,26 @@ class AstroCalculator {
       ];
       final rutuStr = rutuMap[sunRashiIdx];
 
+      // Vaidika Rutu — based on Chandra Masa (lunar month pairs)
+      // Chaitra+Vaishakha=Vasanta, Jyeshtha+Ashadha=Grishma,
+      // Shravana+Bhadrapada=Varsha, Ashvina+Kartika=Sharad,
+      // Margashira+Pushya=Hemanta, Magha+Phalguna=Shishira
+      final vaidikaRutuMap = {
+        '\u0c9a\u0cc8\u0ca4\u0ccd\u0cb0': AppLocale.l('rutuVasanta'),
+        '\u0cb5\u0cc8\u0cb6\u0cbe\u0c96': AppLocale.l('rutuVasanta'),
+        '\u0c9c\u0ccd\u0caf\u0cc7\u0cb7\u0ccd\u0ca0': AppLocale.l('rutuGrishma'),
+        '\u0c86\u0cb7\u0cbe\u0ca2': AppLocale.l('rutuGrishma'),
+        '\u0cb6\u0ccd\u0cb0\u0cbe\u0cb5\u0ca3': AppLocale.l('rutuVarsha'),
+        '\u0cad\u0cbe\u0ca6\u0ccd\u0cb0\u0caa\u0ca6': AppLocale.l('rutuVarsha'),
+        '\u0c86\u0cb6\u0ccd\u0cb5\u0cbf\u0ca8': AppLocale.l('rutuSharad'),
+        '\u0c95\u0cbe\u0cb0\u0ccd\u0ca4\u0cbf\u0c95': AppLocale.l('rutuSharad'),
+        '\u0cae\u0cbe\u0cb0\u0ccd\u0c97\u0cb6\u0cbf\u0cb0': AppLocale.l('rutuHemanta'),
+        '\u0caa\u0cc1\u0cb7\u0ccd\u0caf': AppLocale.l('rutuHemanta'),
+        '\u0cae\u0cbe\u0c98': AppLocale.l('rutuShishira'),
+        '\u0cab\u0cbe\u0cb2\u0ccd\u0c97\u0cc1\u0ca3': AppLocale.l('rutuShishira'),
+      };
+      final vaidikaRutuStr = vaidikaRutuMap[chandraMasaRaw] ?? rutuStr;
+
       // Divamana & Ratrimana
       final nextD = dob.add(const Duration(days: 1));
       final nextSrSs = Ephemeris.findSunriseSetForDate(nextD.year, nextD.month, nextD.day, lat, lon, tzOffset: hourUtcOffset);
@@ -1046,6 +1068,7 @@ class AstroCalculator {
         divamana: divamanaStr,
         ratrimana: ratrimanaStr,
         rutu: rutuStr,
+        vaidikaRutu: vaidikaRutuStr,
         agniVasa: agniVasaStr,
         ayana: (sDeg >= 270 || sDeg < 90) ? AppLocale.l('uttarayana') : AppLocale.l('dakshinayana'),
         tithiGata: tithiGataGhati,

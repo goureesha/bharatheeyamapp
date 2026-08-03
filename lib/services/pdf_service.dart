@@ -75,7 +75,8 @@ class PdfService {
           data: [
             [AppLocale.l('pdfTopic'), AppLocale.l('pdfDetail')],
             [AppLocale.l('samvatsara'), trAll(panchang.samvatsara)],
-            [AppLocale.l('rutu'), trAll(panchang.rutu)],
+            [AppLocale.l('drikRutu'), trAll(panchang.rutu)],
+            [AppLocale.l('vaidikaRutu'), trAll(panchang.vaidikaRutu)],
             [AppLocale.l('vara'), trAll(panchang.vara)],
             [AppLocale.l('tithiLabel'), trAll(panchang.tithi)],
             [AppLocale.l('nakshatra'), trAll(panchang.nakshatra)],
