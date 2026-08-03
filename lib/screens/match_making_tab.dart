@@ -156,6 +156,109 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   /// Get rashi index from nakshatra + pada
   int _rashiFromNakPada(int nakIdx, int padaIdx) => (nakIdx * 4 + padaIdx) ~/ 9;
 
+  /// Show a popup with all 108 syllables in a grid for tapping
+  void _showSyllablePicker({required bool isBride}) {
+    final Color accentColor = isBride ? kOrange : kTeal;
+    final int? selectedNak = isBride ? _nBrideNak : _nGroomNak;
+    final int? selectedPada = isBride ? _nBridePada : _nGroomPada;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF1A1218),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          minChildSize: 0.4,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (_, scrollCtrl) {
+            return Column(children: [
+              Container(width: 40, height: 4, margin: const EdgeInsets.only(top: 10, bottom: 8),
+                decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(children: [
+                  Icon(isBride ? Icons.female : Icons.male, color: accentColor, size: 22),
+                  const SizedBox(width: 8),
+                  Text(isBride ? 'ವಧು ನಾಮಾಕ್ಷರ ಆಯ್ಕೆ' : 'ವರ ನಾಮಾಕ್ಷರ ಆಯ್ಕೆ',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: accentColor)),
+                ]),
+              ),
+              const Divider(height: 1, color: Colors.white12),
+              Expanded(
+                child: ListView.builder(
+                  controller: scrollCtrl,
+                  padding: const EdgeInsets.all(12),
+                  itemCount: 27,
+                  itemBuilder: (_, nakIdx) {
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 6),
+                      decoration: BoxDecoration(
+                        color: kCard, borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: kBorder.withOpacity(0.5)),
+                      ),
+                      child: Row(children: [
+                        // Nakshatra name label
+                        Container(
+                          width: 90,
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: accentColor.withOpacity(0.06),
+                            borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
+                          ),
+                          child: Text(trAll(knNak[nakIdx]),
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: accentColor),
+                            maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ),
+                        // 4 pada syllable buttons
+                        ...List.generate(4, (padaIdx) {
+                          final syl = _nakSyllables[nakIdx][padaIdx];
+                          final isSelected = selectedNak == nakIdx && selectedPada == padaIdx;
+                          return Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (isBride) {
+                                    _nBrideNak = nakIdx; _nBridePada = padaIdx;
+                                    _nBrideInput = syl; _nResult = null;
+                                  } else {
+                                    _nGroomNak = nakIdx; _nGroomPada = padaIdx;
+                                    _nGroomInput = syl; _nResult = null;
+                                  }
+                                });
+                                Navigator.pop(ctx);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? accentColor : Colors.transparent,
+                                  border: Border(left: BorderSide(color: kBorder.withOpacity(0.3))),
+                                ),
+                                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                                  Text(syl, style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w900,
+                                    color: isSelected ? Colors.white : kText)),
+                                  Text('ಪಾದ ${padaIdx + 1}', style: TextStyle(
+                                    fontSize: 8, color: isSelected ? Colors.white70 : kMuted)),
+                                ]),
+                              ),
+                            ),
+                          );
+                        }),
+                      ]),
+                    );
+                  },
+                ),
+              ),
+            ]);
+          },
+        );
+      },
+    );
+  }
+
   void _calculateNamaaksharaKoota() {
     if (_nBrideNak == null || _nGroomNak == null) return;
     final bRashi = _rashiFromNakPada(_nBrideNak!, _nBridePada ?? 0);
@@ -2010,7 +2113,16 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
           Row(children: [
             Icon(Icons.female, color: kOrange, size: 20),
             const SizedBox(width: 8),
-            Text('ವಧು ನಾಮಾಕ್ಷರ', style: TextStyle(color: kOrange, fontWeight: FontWeight.w900, fontSize: 16)),
+            Expanded(child: Text('ವಧು ನಾಮಾಕ್ಷರ', style: TextStyle(color: kOrange, fontWeight: FontWeight.w900, fontSize: 16))),
+            TextButton.icon(
+              onPressed: () => _showSyllablePicker(isBride: true),
+              icon: Icon(Icons.grid_view_rounded, size: 16, color: kOrange),
+              label: Text('ಪಟ್ಟಿ', style: TextStyle(fontSize: 12, color: kOrange, fontWeight: FontWeight.w700)),
+              style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(color: kOrange.withOpacity(0.3)))),
+            ),
           ]),
           const SizedBox(height: 12),
           TextField(
@@ -2069,7 +2181,16 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
           Row(children: [
             Icon(Icons.male, color: kTeal, size: 20),
             const SizedBox(width: 8),
-            Text('ವರ ನಾಮಾಕ್ಷರ', style: TextStyle(color: kTeal, fontWeight: FontWeight.w900, fontSize: 16)),
+            Expanded(child: Text('ವರ ನಾಮಾಕ್ಷರ', style: TextStyle(color: kTeal, fontWeight: FontWeight.w900, fontSize: 16))),
+            TextButton.icon(
+              onPressed: () => _showSyllablePicker(isBride: false),
+              icon: Icon(Icons.grid_view_rounded, size: 16, color: kTeal),
+              label: Text('ಪಟ್ಟಿ', style: TextStyle(fontSize: 12, color: kTeal, fontWeight: FontWeight.w700)),
+              style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(color: kTeal.withOpacity(0.3)))),
+            ),
           ]),
           const SizedBox(height: 12),
           TextField(
