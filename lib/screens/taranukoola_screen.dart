@@ -1232,6 +1232,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
           dayLagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules, useBhavaShuddhi: userRules.useBhavaShuddhi, mandiSidDeg: _mandiDegFromJd(dayMandiJd));
 
+          // Keep all allowed windows (before shuddhi filtering) for display
+          final allAllowedLagnas = dayLagnaWindows.where((w) => w.isAllowed).toList();
 
           // Filter rashi lagnas: only show windows that pass ALL required shuddhi checks
           // (Abhijit muhurta is added separately below — it doesn't need shuddhi)
@@ -1313,6 +1315,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         'checks': mResult.checks,
         'shubhaMuhurtas': <Map<String, String>>[],
         'lagnaWindows': dayLagnaWindows,
+        'allLagnaWindows': allAllowedLagnas,
         'isPerfect': dayLagnaWindows.any((w) => w.isPerfect),
         'isCandidate': !dayLagnaWindows.any((w) => w.isPerfect) && dayLagnaWindows.isNotEmpty,
         'partialReasons': <String>[],
@@ -1596,6 +1599,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
               dayLagnaWindows = _scanLagnaRange(srJd2, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules2, useBhavaShuddhi: userRules.useBhavaShuddhi, mandiSidDeg: _mandiDegFromJd(dayMandiJd));
 
+              // Keep all allowed windows (before shuddhi filtering) for display
+              final allAllowedLagnas = dayLagnaWindows.where((w) => w.isAllowed).toList();
+
               // Filter rashi lagnas: only show windows that pass ALL required shuddhi checks
               dayLagnaWindows = dayLagnaWindows.where((w) {
                 if (!w.isAllowed) return false;
@@ -1690,6 +1696,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             'checks': mResult.checks,
             'shubhaMuhurtas': shubhaMuhurtas,
             'lagnaWindows': dayLagnaWindows,
+            'allLagnaWindows': allAllowedLagnas,
           };
 
           // Add ALL days to results (matching cached path behavior)
@@ -2441,10 +2448,12 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             ),
 
           // ── Lagna Windows (shows perfect, shubha & allowed windows) ──
-          if (r['lagnaWindows'] != null) ...[
+          if (r['lagnaWindows'] != null || r['allLagnaWindows'] != null) ...[
             () {
-              final allLws = (r['lagnaWindows'] as List<LagnaWindow>);
-              final displayLws = allLws;
+              final filteredLws = (r['lagnaWindows'] as List<LagnaWindow>?) ?? [];
+              final allLws = (r['allLagnaWindows'] as List<LagnaWindow>?) ?? [];
+              // Show filtered windows if available, otherwise show all allowed windows
+              final displayLws = filteredLws.isNotEmpty ? filteredLws : allLws;
               if (displayLws.isEmpty) return const SizedBox();
 
               return Padding(
