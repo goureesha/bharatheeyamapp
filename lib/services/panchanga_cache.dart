@@ -179,6 +179,12 @@ class PanchangaCache {
 
       final raw = await file.readAsString();
       final Map<String, dynamic> json = jsonDecode(raw);
+      final int cacheVersion = (json['v'] as int?) ?? 1;
+      if (cacheVersion < 3) {
+        debugPrint('PanchangaCache: old version $cacheVersion, needs rebuild');
+        await file.delete();
+        return false;
+      }
       _cachedLat = (json['lat'] as num?)?.toDouble();
       _cachedLon = (json['lon'] as num?)?.toDouble();
 
@@ -197,7 +203,7 @@ class PanchangaCache {
     if (_days == null) return;
     final file = await _cacheFile;
     final json = {
-      'v': 2,
+      'v': 3,
       'zone': _zoneName ?? '',
       'lat': _cachedLat,
       'lon': _cachedLon,
@@ -213,7 +219,7 @@ class PanchangaCache {
     if (_days == null || _days!.isEmpty) return false;
     try {
       final json = {
-        'v': 2,
+        'v': 3,
         'zone': customZoneName ?? _zoneName ?? 'Unknown',
         'lat': _cachedLat,
         'lon': _cachedLon,
