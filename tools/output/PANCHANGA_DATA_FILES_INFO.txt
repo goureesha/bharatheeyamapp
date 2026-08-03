@@ -1,0 +1,263 @@
+================================================================
+  BHARATHEEYAM PANCHANGA DATA FILES
+  District Coverage Guide
+================================================================
+
+Download the .bdat file for your district/city.
+Import it in the app: Settings > Panchanga Data > Import .bdat
+
+Each file covers 20 years of pre-computed panchanga data
+including Tithi, Nakshatra, Yoga, Karana, Sunrise, Sunset,
+Chandra Masa, Soura Masa, and Samvatsara.
+
+Maximum sunrise error within any zone: less than 5 minutes.
+
+================================================================
+  KARNATAKA (5 files)
+================================================================
+
+1. bharatheeyam_panchanga_Kalaburagi.bdat
+   Reference: Kalaburagi (17.33N, 76.83E)
+   Districts covered:
+   - Bidar
+   - Kalaburagi
+   - Raichur
+   - Yadgir
+   - Ballari
+   - Koppal
+
+2. bharatheeyam_panchanga_Bengaluru.bdat
+   Reference: Bengaluru (12.97N, 77.59E)
+   Districts covered:
+   - Bengaluru Urban
+   - Bengaluru Rural
+   - Ramanagara
+   - Kolar
+   - Chikkaballapura
+   - Tumakuru
+   - Vijayapura
+
+3. bharatheeyam_panchanga_Mysuru.bdat
+   Reference: Mysuru (12.30N, 76.66E)
+   Districts covered:
+   - Mysuru
+   - Mandya
+   - Chamarajanagar
+   - Davanagere
+   - Haveri
+   - Gadag
+   - Dharwad
+
+4. bharatheeyam_panchanga_Shivamogga.bdat
+   Reference: Shivamogga (13.93N, 75.57E)
+   Districts covered:
+   - Shivamogga
+   - Chikkamagaluru
+   - Hassan
+   - Kodagu
+   - Belagavi
+   - Uttara Kannada
+   - Vijayanagara
+
+5. bharatheeyam_panchanga_Mangaluru.bdat
+   Reference: Mangaluru (12.87N, 74.88E)
+   Districts covered:
+   - Dakshina Kannada
+   - Udupi
+
+================================================================
+  TAMIL NADU (3 files)
+================================================================
+
+6. bharatheeyam_panchanga_Chennai.bdat
+   Reference: Chennai (13.08N, 80.27E)
+   Districts covered:
+   - Chennai
+   - Tiruvallur
+   - Kancheepuram
+   - Chengalpattu
+   - Ranipet
+   - Vellore
+   - Tiruvannamalai
+   - Villupuram
+   - Cuddalore
+   - Kallakurichi
+
+7. bharatheeyam_panchanga_Coimbatore.bdat
+   Reference: Coimbatore (11.01N, 76.96E)
+   Districts covered:
+   - Coimbatore
+   - Tiruppur
+   - Erode
+   - Salem
+   - Namakkal
+   - Nilgiris
+   - Krishnagiri
+   - Dharmapuri
+
+8. bharatheeyam_panchanga_Madurai.bdat
+   Reference: Madurai (9.92N, 78.12E)
+   Districts covered:
+   - Madurai
+   - Dindigul
+   - Theni
+   - Virudhunagar
+   - Sivaganga
+   - Ramanathapuram
+   - Thanjavur
+   - Tiruchirappalli
+   - Pudukkottai
+   - Perambalur
+   - Ariyalur
+   - Nagapattinam
+   - Tiruvarur
+   - Mayiladuthurai
+   - Tenkasi
+   - Tirunelveli
+   - Thoothukudi
+   - Kanyakumari
+   - Karur
+
+================================================================
+  ANDHRA PRADESH (3 files)
+================================================================
+
+9. bharatheeyam_panchanga_Visakhapatnam.bdat
+   Reference: Visakhapatnam (17.69N, 83.22E)
+   Districts covered:
+   - Visakhapatnam
+   - Anakapalli
+   - Srikakulam
+   - Vizianagaram
+   - Parvathipuram Manyam
+   - Alluri Sitharama Raju
+   - East Godavari
+   - Kakinada
+
+10. bharatheeyam_panchanga_Vijayawada.bdat
+    Reference: Vijayawada (16.51N, 80.65E)
+    Districts covered:
+    - NTR (Vijayawada)
+    - Krishna
+    - Guntur
+    - Palnadu
+    - Bapatla
+    - Prakasam
+    - West Godavari
+    - Eluru
+    - Konaseema
+    - Nellore (Sri Potti Sriramulu)
+
+11. bharatheeyam_panchanga_Anantapur.bdat
+    Reference: Anantapur (14.68N, 77.60E)
+    Districts covered:
+    - Anantapur
+    - Sri Sathya Sai
+    - Kurnool
+    - Nandyal
+    - Kadapa (YSR)
+    - Annamayya
+    - Tirupati
+    - Chittoor
+
+================================================================
+  TELANGANA (2 files)
+================================================================
+
+12. bharatheeyam_panchanga_Hyderabad.bdat
+    Reference: Hyderabad (17.38N, 78.48E)
+    Districts covered:
+    - Hyderabad
+    - Rangareddy
+    - Medchal-Malkajgiri
+    - Sangareddy
+    - Medak
+    - Siddipet
+    - Kamareddy
+    - Nizamabad
+    - Jagtiyal
+    - Rajanna Sircilla
+    - Karimnagar
+    - Peddapalli
+    - Mancherial
+    - Kumuram Bheem Asifabad
+    - Adilabad
+    - Nirmal
+    - Vikarabad
+    - Wanaparthy
+    - Nagarkurnool
+    - Mahabubabad
+    - Narayanpet
+    - Jogulamba Gadwal
+
+13. bharatheeyam_panchanga_Khammam.bdat
+    Reference: Khammam (17.25N, 80.15E)
+    Districts covered:
+    - Khammam
+    - Kothagudem (Bhadradri)
+    - Warangal
+    - Hanamkonda
+    - Jangaon
+    - Suryapet
+    - Nalgonda
+    - Yadadri Bhuvanagiri
+    - Mahabubabad
+    - Mulugu
+    - Jayashankar Bhupalpally
+
+================================================================
+  GOA (1 file)
+================================================================
+
+14. bharatheeyam_panchanga_Panaji.bdat
+    Reference: Panaji (15.49N, 73.82E)
+    Districts covered:
+    - North Goa
+    - South Goa
+
+================================================================
+  KERALA (3 files)
+================================================================
+
+15. bharatheeyam_panchanga_Kannur.bdat
+    Reference: Kannur (11.87N, 75.37E)
+    Districts covered:
+    - Kasaragod
+    - Kannur
+    - Wayanad
+    - Kozhikode
+    - Malappuram
+
+16. bharatheeyam_panchanga_Kochi.bdat
+    Reference: Kochi (9.97N, 76.27E)
+    Districts covered:
+    - Thrissur
+    - Ernakulam (Kochi)
+    - Idukki
+    - Kottayam
+    - Palakkad
+
+17. bharatheeyam_panchanga_Thiruvananthapuram.bdat
+    Reference: Thiruvananthapuram (8.52N, 76.94E)
+    Districts covered:
+    - Thiruvananthapuram
+    - Kollam
+    - Pathanamthitta
+    - Alappuzha
+
+================================================================
+  SUMMARY
+================================================================
+
+  State              Files   Districts
+  -----------------------------------------
+  Karnataka            5       31
+  Tamil Nadu           3       38
+  Andhra Pradesh       3       26
+  Telangana            2       33
+  Goa                  1        2
+  Kerala               3       14
+  -----------------------------------------
+  TOTAL               17      144
+
+================================================================

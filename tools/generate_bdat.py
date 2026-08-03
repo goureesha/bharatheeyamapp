@@ -497,7 +497,7 @@ def generate_bdat(zone_name, lat, lon, years, tz_offset=5.5, output_dir='.'):
     
     return filepath
 
-# ─── Karnataka Zones ─────────────────────────────────────────
+# ─── Zone Definitions ────────────────────────────────────────
 
 KARNATAKA_ZONES = {
     'Kalaburagi': (17.33, 76.83),
@@ -505,6 +505,42 @@ KARNATAKA_ZONES = {
     'Mysuru':     (12.30, 76.66),
     'Shivamogga': (13.93, 75.57),
     'Mangaluru':  (12.87, 74.88),
+}
+
+TAMILNADU_ZONES = {
+    'Chennai':     (13.08, 80.27),
+    'Coimbatore':  (11.01, 76.96),
+    'Madurai':     (9.92, 78.12),
+}
+
+ANDHRA_ZONES = {
+    'Visakhapatnam': (17.69, 83.22),
+    'Vijayawada':    (16.51, 80.65),
+    'Anantapur':     (14.68, 77.60),
+}
+
+TELANGANA_ZONES = {
+    'Hyderabad': (17.38, 78.48),
+    'Khammam':   (17.25, 80.15),
+}
+
+GOA_ZONES = {
+    'Panaji': (15.49, 73.82),
+}
+
+KERALA_ZONES = {
+    'Kannur':              (11.87, 75.37),
+    'Kochi':               (9.97, 76.27),
+    'Thiruvananthapuram':  (8.52, 76.94),
+}
+
+ALL_STATES = {
+    'karnataka': KARNATAKA_ZONES,
+    'tamilnadu': TAMILNADU_ZONES,
+    'andhra': ANDHRA_ZONES,
+    'telangana': TELANGANA_ZONES,
+    'goa': GOA_ZONES,
+    'kerala': KERALA_ZONES,
 }
 
 if __name__ == '__main__':
@@ -515,27 +551,45 @@ if __name__ == '__main__':
     parser.add_argument('--years', type=int, default=20, help='Years to generate')
     parser.add_argument('--tz', type=float, default=5.5, help='Timezone UTC offset')
     parser.add_argument('--all-zones', action='store_true', help='Generate all Karnataka zones')
+    parser.add_argument('--state', type=str, help='State: karnataka, tamilnadu, andhra, telangana, goa, kerala')
+    parser.add_argument('--all-states', action='store_true', help='Generate all states')
     parser.add_argument('--output', type=str, default='.', help='Output directory')
     
     args = parser.parse_args()
-    
     os.makedirs(args.output, exist_ok=True)
     
-    if args.all_zones:
+    zones_to_gen = {}
+    if args.all_states:
+        for sz in ALL_STATES.values():
+            zones_to_gen.update(sz)
+    elif args.state:
+        key = args.state.lower()
+        if key in ALL_STATES:
+            zones_to_gen = ALL_STATES[key]
+        else:
+            print(f"Unknown state '{args.state}'. Available: {list(ALL_STATES.keys())}")
+            exit(1)
+    elif args.all_zones:
+        zones_to_gen = KARNATAKA_ZONES
+    
+    if zones_to_gen:
         print("\n" + "=" * 60)
-        print("  GENERATING ALL KARNATAKA ZONES")
+        print(f"  GENERATING {len(zones_to_gen)} ZONES")
         print("=" * 60)
-        for zone_name, (lat, lon) in KARNATAKA_ZONES.items():
-            generate_bdat(zone_name, lat, lon, args.years, args.tz, args.output)
+        for zn, (lat, lon) in zones_to_gen.items():
+            generate_bdat(zn, lat, lon, args.years, args.tz, args.output)
     else:
-        lat = args.lat
-        lon = args.lon
+        lat, lon = args.lat, args.lon
+        all_z = {}
+        for sz in ALL_STATES.values():
+            all_z.update(sz)
         if lat is None or lon is None:
-            if args.zone in KARNATAKA_ZONES:
-                lat, lon = KARNATAKA_ZONES[args.zone]
+            if args.zone in all_z:
+                lat, lon = all_z[args.zone]
             else:
-                print(f"Unknown zone '{args.zone}'. Available: {list(KARNATAKA_ZONES.keys())}")
+                print(f"Unknown zone '{args.zone}'. Available: {list(all_z.keys())}")
                 exit(1)
         generate_bdat(args.zone, lat, lon, args.years, args.tz, args.output)
     
     print("\nAll done!")
+
