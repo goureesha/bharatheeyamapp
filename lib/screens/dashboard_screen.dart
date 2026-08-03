@@ -2408,6 +2408,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ],
               ])),
               const SizedBox(height: 8),
+              // ── 📋 Panchanga (5 Angas) ──
+              _sectionLabel('📋 ${AppLocale.l('panchaAngaVivar')}', kPurple2),
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(children: [
+                  _tableRow([AppLocale.l('varaLabel'), trAll(pan.vara)]),
+                  _tableRow([AppLocale.l('tithiLabel'), '${trAll(pan.tithi)}${pan.tithiGata.isNotEmpty || pan.tithiParama.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.tithiGata}, ${AppLocale.l('paramaGhati')}: ${pan.tithiParama})' : ''}']),
+                  _tableRow([AppLocale.l('chandraNakshatra'), () { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p'; }()]),
+                  _tableRow([AppLocale.l('yogaLabel'), '${trAll(pan.yoga)}${pan.yogaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.yogaGata})' : ''}']),
+                  _tableRow([AppLocale.l('karanaLabel'), '${trAll(pan.karana)}${pan.karanaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.karanaGata})' : ''}']),
+                ]),
+              ),
+              const SizedBox(height: 8),
+
               // ── ☀️ Ravi (Sun) Details ──
               _sectionLabel('☀️ ${AppLocale.l('raviVivar')}', Colors.orange),
               AppCard(
@@ -2440,20 +2454,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                   _tableRow([AppLocale.l('sheshaGhati'), pan.shesha]),
                   _tableRow([AppLocale.l('vishaPraghati'), pan.vishaPraghati]),
                   _tableRow([AppLocale.l('amrutaPraghati'), pan.amrutaPraghati]),
-                ]),
-              ),
-              const SizedBox(height: 8),
-
-              // ── 📋 Panchanga (5 Angas) ──
-              _sectionLabel('📋 ${AppLocale.l('panchaAngaVivar')}', kPurple2),
-              AppCard(
-                padding: EdgeInsets.zero,
-                child: Column(children: [
-                  _tableRow([AppLocale.l('varaLabel'), trAll(pan.vara)]),
-                  _tableRow([AppLocale.l('tithiLabel'), '${trAll(pan.tithi)}${pan.tithiGata.isNotEmpty || pan.tithiParama.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.tithiGata}, ${AppLocale.l('paramaGhati')}: ${pan.tithiParama})' : ''}']),
-                  _tableRow([AppLocale.l('chandraNakshatra'), () { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p'; }()]),
-                  _tableRow([AppLocale.l('yogaLabel'), '${trAll(pan.yoga)}${pan.yogaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.yogaGata})' : ''}']),
-                  _tableRow([AppLocale.l('karanaLabel'), '${trAll(pan.karana)}${pan.karanaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.karanaGata})' : ''}']),
                 ]),
               ),
               if (allPersons.length > 1) Divider(thickness: 2, color: kBorder),
