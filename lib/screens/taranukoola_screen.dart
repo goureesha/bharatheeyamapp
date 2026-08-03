@@ -1232,22 +1232,11 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
           dayLagnaWindows = _scanLagnaRange(srJd, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules, useBhavaShuddhi: userRules.useBhavaShuddhi, mandiSidDeg: _mandiDegFromJd(dayMandiJd));
 
-          // Keep all allowed windows (before shuddhi filtering) for display
-          final allAllowedLagnas = dayLagnaWindows.where((w) => w.isAllowed).toList();
 
-          // Filter rashi lagnas: only show windows that pass ALL required shuddhi checks
-          // (Abhijit muhurta is added separately below — it doesn't need shuddhi)
+          // Filter: only keep windows that pass shuddhi (rashi OR bhava fallback)
           dayLagnaWindows = dayLagnaWindows.where((w) {
             if (!w.isAllowed) return false;
-            for (final s in userRules.requiredShuddhis) {
-              switch (s) {
-                case ShuddhiType.lagna: if (!w.lagnaShuddhi) return false;
-                case ShuddhiType.saptama: if (!w.saptamaShuddhi) return false;
-                case ShuddhiType.ashtama: if (!w.ashtamaShuddhi) return false;
-                case ShuddhiType.dashama: if (!w.dashamaShuddhi) return false;
-                case ShuddhiType.chandraSaptama: if (!w.chandraSaptamaShuddhi) return false;
-              }
-            }
+            if (!w.isShubha) return false;
             if (userRules.requireGuruAnukoolaForLagna && !w.guruAnukoola) return false;
             return true;
           }).toList();
@@ -1606,21 +1595,11 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
               dayLagnaWindows = _scanLagnaRange(srJd2, scanEndJd, ayn, basePlanetRashis, guruRashiIdx2, allowedLagnas, userOverrideRules2, useBhavaShuddhi: userRules.useBhavaShuddhi, mandiSidDeg: _mandiDegFromJd(dayMandiJd));
 
-              // Keep all allowed windows (before shuddhi filtering) for display
-              final allAllowedLagnas = dayLagnaWindows.where((w) => w.isAllowed).toList();
 
-              // Filter rashi lagnas: only show windows that pass ALL required shuddhi checks
+              // Filter: only keep windows that pass shuddhi (rashi OR bhava fallback)
               dayLagnaWindows = dayLagnaWindows.where((w) {
                 if (!w.isAllowed) return false;
-                for (final s in userRules.requiredShuddhis) {
-                  switch (s) {
-                    case ShuddhiType.lagna: if (!w.lagnaShuddhi) return false;
-                    case ShuddhiType.saptama: if (!w.saptamaShuddhi) return false;
-                    case ShuddhiType.ashtama: if (!w.ashtamaShuddhi) return false;
-                    case ShuddhiType.dashama: if (!w.dashamaShuddhi) return false;
-                    case ShuddhiType.chandraSaptama: if (!w.chandraSaptamaShuddhi) return false;
-                  }
-                }
+                if (!w.isShubha) return false;
                 if (userRules.requireGuruAnukoolaForLagna && !w.guruAnukoola) return false;
                 return true;
               }).toList();
