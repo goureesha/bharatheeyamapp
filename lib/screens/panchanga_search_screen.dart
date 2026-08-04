@@ -46,6 +46,9 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
   int? _selectedTithiInPaksha; // 0-14 within the selected paksha
   TimeOfDay _fromTime = const TimeOfDay(hour: 12, minute: 0);
   TimeOfDay _toTime = const TimeOfDay(hour: 15, minute: 0);
+  // Date range
+  late DateTime _fromMonth;
+  late DateTime _toMonth;
 
   // Results
   List<_SearchResult> _results = [];
@@ -53,6 +56,19 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
   int _scanProgress = 0;
   int _scanTotal = 0;
   bool _hasSearched = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _fromMonth = DateTime(now.year, now.month);
+    final cache = PanchangaCache.instance;
+    if (cache.isLoaded && cache.endDate != null) {
+      _toMonth = DateTime(cache.endDate!.year, cache.endDate!.month);
+    } else {
+      _toMonth = DateTime(now.year + 1, now.month);
+    }
+  }
 
   /// Compute the absolute tithi index (0-29) from paksha + tithi selection
   int? get _absoluteTithiIndex {
@@ -92,12 +108,11 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
       _hasSearched = true;
     });
 
-    // Run filter on cached data in an isolate-friendly way
-    final now = DateTime.now();
+    // Run filter on cached data
     final List<_SearchResult> found = [];
     final allDays = cache.getDaysInRange(
-      now,
-      cache.endDate ?? now.add(const Duration(days: 365)),
+      _fromMonth,
+      DateTime(_toMonth.year, _toMonth.month + 1, 0), // last day of _toMonth
     );
 
     setState(() => _scanTotal = allDays.length);
@@ -293,6 +308,63 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
     }
   }
 
+  Future<void> _pickMonth(bool isFrom) async {
+    final cache = PanchangaCache.instance;
+    final now = DateTime.now();
+    final firstDate = cache.isLoaded && cache.startDate != null
+        ? cache.startDate!
+        : now;
+    final lastDate = cache.isLoaded && cache.endDate != null
+        ? cache.endDate!
+        : now.add(const Duration(days: 365));
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: isFrom ? _fromMonth : _toMonth,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      helpText: isFrom ? 'Select start month' : 'Select end month',
+    );
+    if (picked != null && mounted) {
+      setState(() {
+        if (isFrom) {
+          _fromMonth = DateTime(picked.year, picked.month);
+          if (_fromMonth.isAfter(_toMonth)) _toMonth = _fromMonth;
+        } else {
+          _toMonth = DateTime(picked.year, picked.month);
+          if (_toMonth.isBefore(_fromMonth)) _fromMonth = _toMonth;
+        }
+      });
+    }
+  }
+
+  String _formatMonth(DateTime d) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return '${months[d.month - 1]} ${d.year}';
+  }
+
+  Widget _buildMonthButton(String label, DateTime month, bool isFrom) {
+    return GestureDetector(
+      onTap: () => _pickMonth(isFrom),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: kCard, border: Border.all(color: kBorder),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label, style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 4),
+          Row(children: [
+            Icon(Icons.calendar_month, size: 14, color: kPurple2),
+            const SizedBox(width: 6),
+            Text(_formatMonth(month), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+          ]),
+        ]),
+      ),
+    );
+  }
+
   String _formatTime(TimeOfDay t) {
     final h = t.hourOfPeriod == 0 ? 12 : t.hourOfPeriod;
     final m = t.minute.toString().padLeft(2, '0');
@@ -374,6 +446,14 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
                     ),
                     const SizedBox(height: 12),
                   ],
+
+                  // Date Range (Month pickers)
+                  Row(children: [
+                    Expanded(child: _buildMonthButton(AppLocale.l('fromDate'), _fromMonth, true)),
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildMonthButton(AppLocale.l('toDate'), _toMonth, false)),
+                  ]),
+                  const SizedBox(height: 12),
 
                   // Time Range
                   Row(children: [
