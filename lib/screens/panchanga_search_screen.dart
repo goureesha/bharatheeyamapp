@@ -4,6 +4,7 @@ import '../widgets/common.dart';
 import '../core/calculator.dart';
 import '../constants/strings.dart';
 import '../services/location_service.dart';
+import '../services/panchanga_cache.dart';
 
 class PanchangaSearchScreen extends StatefulWidget {
   const PanchangaSearchScreen({super.key});
@@ -60,6 +61,14 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
     return 15 + _selectedTithiInPaksha!;                            // Krishna 15-29
   }
 
+  /// How many years the cache covers (for UI label)
+  String get _scanRangeLabel {
+    final cache = PanchangaCache.instance;
+    if (!cache.isLoaded) return 'No cached data loaded';
+    final years = (cache.dayCount / 365.0).round();
+    return 'Scanning $years years of cached data (${cache.dayCount} days)';
+  }
+
   Future<void> _search() async {
     // At least one filter must be set
     if (_selectedChandraMasa == null && _selectedSouraMasa == null && _absoluteTithiIndex == null) {
@@ -69,6 +78,103 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
       return;
     }
 
+    final cache = PanchangaCache.instance;
+
+    // ── Fallback: if no cache loaded, use old AstroCalculator method ──
+    if (!cache.isLoaded) {
+      await _searchLegacy();
+      return;
+    }
+
+    setState(() {
+      _isSearching = true;
+      _results = [];
+      _hasSearched = true;
+    });
+
+    // Run filter on cached data in an isolate-friendly way
+    final now = DateTime.now();
+    final List<_SearchResult> found = [];
+    final allDays = cache.getDaysInRange(
+      now,
+      cache.endDate ?? now.add(const Duration(days: 365)),
+    );
+
+    setState(() => _scanTotal = allDays.length);
+
+    for (int i = 0; i < allDays.length; i++) {
+      if (!mounted) break;
+      final day = allDays[i];
+
+      // Yield to UI every 500 days
+      if (i % 500 == 0) {
+        setState(() => _scanProgress = i);
+        await Future.delayed(Duration.zero);
+      }
+
+      // ── Filter: Chandra Masa ──
+      if (_selectedChandraMasa != null) {
+        // Strip 'ಅಧಿಕ ' prefix for matching
+        String rawMasa = day.chandraMasa.replaceAll('ಅಧಿಕ ', '');
+        // Also strip 'ನಿಜ ' prefix
+        rawMasa = rawMasa.replaceAll('ನಿಜ ', '');
+        if (rawMasa != _chandraMasaNames[_selectedChandraMasa!]) continue;
+      }
+
+      // ── Filter: Soura Masa ──
+      if (_selectedSouraMasa != null) {
+        if (day.souraMasa != _souraMasaNames[_selectedSouraMasa!]) continue;
+      }
+
+      // ── Filter: Tithi ──
+      if (_absoluteTithiIndex != null) {
+        if (day.tithiIndex != _absoluteTithiIndex) continue;
+      }
+
+      found.add(_SearchResult(
+        date: day.date,
+        vara: day.varaName,
+        tithi: day.tithiName,
+        tithiEndTime: day.tithiEndTime,
+        tithiEndsNextDay: _isNextDay(day.tithiEndTime, day.sunset),
+        nakshatra: day.nakshatraName,
+        nakEndTime: day.nakEndTime,
+        nakEndsNextDay: _isNextDay(day.nakEndTime, day.sunset),
+        karana: day.karanaName,
+        karanaEndTime: '',
+        karanaEndsNextDay: false,
+        yoga: day.yogaName,
+        yogaEndTime: '',
+        yogaEndsNextDay: false,
+        chandraMasa: day.chandraMasa,
+        souraMasa: day.souraMasa,
+        sunrise: day.sunrise,
+        sunset: day.sunset,
+        tithiNotAvailable: false,
+      ));
+    }
+
+    if (mounted) {
+      setState(() {
+        _results = found;
+        _isSearching = false;
+        _scanProgress = _scanTotal;
+      });
+    }
+  }
+
+  /// Check if an end time is "next day" (i.e. time < sunrise next day but after midnight)
+  bool _isNextDay(String endTime, String sunset) {
+    if (endTime.isEmpty) return false;
+    // Simple heuristic: if end time hour < 6, it's next day
+    final parts = endTime.split(':');
+    if (parts.length < 2) return false;
+    final h = int.tryParse(parts[0]) ?? 12;
+    return h < 6;
+  }
+
+  /// Legacy search using AstroCalculator (when no cache is loaded)
+  Future<void> _searchLegacy() async {
     setState(() {
       _isSearching = true;
       _results = [];
@@ -87,21 +193,18 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
     final fromH24 = _fromTime.hour + _fromTime.minute / 60.0;
     final toH24 = _toTime.hour + _toTime.minute / 60.0;
     final midH24 = (fromH24 + toH24) / 2.0;
-    bool enteredMasa = false; // track if we've entered the selected masa
+    bool enteredMasa = false;
 
     for (int i = 0; i < totalDays; i++) {
       if (!mounted) break;
-
       final date = now.add(Duration(days: i));
 
-      // Yield to UI every 10 days to keep it responsive
       if (i % 10 == 0) {
         setState(() => _scanProgress = i);
         await Future.delayed(Duration.zero);
       }
 
       try {
-        // Step 1: Calculate at NOON to find if tithi/masa matches this day
         final noonResult = await AstroCalculator.calculate(
           year: date.year, month: date.month, day: date.day,
           hourUtcOffset: tz, hour24: 12.0,
@@ -109,36 +212,25 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
           ayanamsaMode: 'lahiri', trueNode: true,
         );
         if (noonResult == null) continue;
-
         final noonP = noonResult.panchang;
 
-        // Hard filter: Chandra Masa
         bool masaMatch = true;
         if (_selectedChandraMasa != null) {
-          if (noonP.chandraMasaRaw != _chandraMasaNames[_selectedChandraMasa!]) {
-            masaMatch = false;
-          }
+          if (noonP.chandraMasaRaw != _chandraMasaNames[_selectedChandraMasa!]) masaMatch = false;
         }
         if (_selectedSouraMasa != null) {
-          if (noonP.souraMasa != _souraMasaNames[_selectedSouraMasa!]) {
-            masaMatch = false;
-          }
+          if (noonP.souraMasa != _souraMasaNames[_selectedSouraMasa!]) masaMatch = false;
         }
-
-        // Smart early exit: if we already found results inside the masa
-        // and now we've left it, stop scanning
         if (!masaMatch) {
           if (enteredMasa && found.isNotEmpty) break;
           continue;
         }
         enteredMasa = true;
 
-        // Hard filter: Tithi must match at noon
         if (_absoluteTithiIndex != null) {
           if (noonP.tithiIndex != _absoluteTithiIndex) continue;
         }
 
-        // Step 2: Only re-calc at user time if it differs from noon
         PanchangData p = noonP;
         bool tithiNotAvailable = false;
         if ((midH24 - 12.0).abs() > 0.5) {
@@ -290,7 +382,7 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
                     Expanded(child: _buildTimeButton(AppLocale.l('toDate'), _toTime, () => _pickTime(false))),
                   ]),
                   const SizedBox(height: 6),
-                  Text('Scanning 1 year from today', style: TextStyle(fontSize: 11, color: kMuted)),
+                  Text(_scanRangeLabel, style: TextStyle(fontSize: 11, color: kMuted)),
                   const SizedBox(height: 16),
 
                   // Search Button
