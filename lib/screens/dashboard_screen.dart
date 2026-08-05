@@ -4011,7 +4011,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(phala, style: TextStyle(fontSize: 12, color: kText, height: 1.4)),
+                  Text(desc, style: TextStyle(fontSize: 12, color: kText, height: 1.4)),
                 ],
               ),
             );
