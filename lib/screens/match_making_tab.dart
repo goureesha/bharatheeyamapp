@@ -332,9 +332,18 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       }
 
       // Extract bhava house (1-12) for each planet based on bhava cusps
-      Map<String, int> extractBhavaHouses(KundaliResult r) {
+      // refPlanet: if set, shifts madhyas so that planet becomes 1st house (like kundali chart)
+      Map<String, int> extractBhavaHouses(KundaliResult r, {String? refPlanet}) {
         final m = <String, int>{};
-        final madhyas = r.bhavas; // 12 Sripathi Bhava Madhyas (midpoints)
+        final lagnaLong = r.planets['ಲಗ್ನ']?.longitude ?? 0;
+        List<double> madhyas;
+        if (refPlanet != null && r.planets.containsKey(refPlanet)) {
+          final refLon = r.planets[refPlanet]!.longitude;
+          final offset = (refLon - lagnaLong + 360.0) % 360.0;
+          madhyas = List.generate(12, (i) => (r.bhavas[i] + offset) % 360.0);
+        } else {
+          madhyas = r.bhavas;
+        }
         // Compute bhava sandhis (boundaries) = midpoint between consecutive madhyas
         final sandhis = List<double>.filled(12, 0.0);
         for (int i = 0; i < 12; i++) {
@@ -363,8 +372,13 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
 
       final bRashis = extractRashis(brideR);
       final gRashis = extractRashis(groomR);
-      final bBhavaHouses = extractBhavaHouses(brideR);
-      final gBhavaHouses = extractBhavaHouses(groomR);
+      // Bhava houses from 3 references (Lagna, Chandra, Shukra)
+      final bBhavaLagna = extractBhavaHouses(brideR);
+      final gBhavaLagna = extractBhavaHouses(groomR);
+      final bBhavaChandra = extractBhavaHouses(brideR, refPlanet: 'ಚಂದ್ರ');
+      final gBhavaChandra = extractBhavaHouses(groomR, refPlanet: 'ಚಂದ್ರ');
+      final bBhavaShukra = extractBhavaHouses(brideR, refPlanet: 'ಶುಕ್ರ');
+      final gBhavaShukra = extractBhavaHouses(groomR, refPlanet: 'ಶುಕ್ರ');
       final bLagnaRashi = brideR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
       final gLagnaRashi = groomR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
       final bMoonRashi = brideR.planets['ಚಂದ್ರ']?.rashiIndex ?? 0;
@@ -383,7 +397,9 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         brideNavLagnaRashi: bNavLagna, brideNavMoonRashi: bNavMoon,
         groomNakIdx: gNakIdx, groomMoonRashi: gMoonRashi, groomLagnaRashi: gLagnaRashi, groomPlanetRashis: gRashis,
         groomNavLagnaRashi: gNavLagna, groomNavMoonRashi: gNavMoon,
-        brideBhavaHouses: bBhavaHouses, groomBhavaHouses: gBhavaHouses,
+        brideBhavaHouses: bBhavaLagna, groomBhavaHouses: gBhavaLagna,
+        brideBhavaFromChandra: bBhavaChandra, groomBhavaFromChandra: gBhavaChandra,
+        brideBhavaFromShukra: bBhavaShukra, groomBhavaFromShukra: gBhavaShukra,
       );
 
       setState(() {
@@ -486,10 +502,17 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       return m;
     }
 
-    Map<String, int> extractBhavaHouses(KundaliResult r) {
+    Map<String, int> extractBhavaHouses(KundaliResult r, {String? refPlanet}) {
       final m = <String, int>{};
-      final madhyas = r.bhavas; // 12 Sripathi Bhava Madhyas (midpoints)
-      // Compute bhava sandhis (boundaries) = midpoint between consecutive madhyas
+      final lagnaLong = r.planets['ಲಗ್ನ']?.longitude ?? 0;
+      List<double> madhyas;
+      if (refPlanet != null && r.planets.containsKey(refPlanet)) {
+        final refLon = r.planets[refPlanet]!.longitude;
+        final offset = (refLon - lagnaLong + 360.0) % 360.0;
+        madhyas = List.generate(12, (i) => (r.bhavas[i] + offset) % 360.0);
+      } else {
+        madhyas = r.bhavas;
+      }
       final sandhis = List<double>.filled(12, 0.0);
       for (int i = 0; i < 12; i++) {
         final m1 = madhyas[i];
@@ -502,8 +525,8 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         final pLon = e.value.longitude;
         int house = 1;
         for (int i = 0; i < 12; i++) {
-          final start = sandhis[(i + 11) % 12]; // sandhi before this house
-          final end = sandhis[i];               // sandhi after this house
+          final start = sandhis[(i + 11) % 12];
+          final end = sandhis[i];
           if (start < end) {
             if (pLon >= start && pLon < end) { house = i + 1; break; }
           } else {
@@ -517,8 +540,12 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
 
     final bRashis = extractRashis(brideR);
     final gRashis = extractRashis(groomR);
-    final bBhavaHouses = extractBhavaHouses(brideR);
-    final gBhavaHouses = extractBhavaHouses(groomR);
+    final bBhavaLagna = extractBhavaHouses(brideR);
+    final gBhavaLagna = extractBhavaHouses(groomR);
+    final bBhavaChandra = extractBhavaHouses(brideR, refPlanet: 'ಚಂದ್ರ');
+    final gBhavaChandra = extractBhavaHouses(groomR, refPlanet: 'ಚಂದ್ರ');
+    final bBhavaShukra = extractBhavaHouses(brideR, refPlanet: 'ಶುಕ್ರ');
+    final gBhavaShukra = extractBhavaHouses(groomR, refPlanet: 'ಶುಕ್ರ');
     final bLagnaRashi = brideR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
     final gLagnaRashi = groomR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
     final bMoonRashi = brideR.planets['ಚಂದ್ರ']?.rashiIndex ?? 0;
@@ -536,7 +563,9 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       brideNavLagnaRashi: bNavLagna, brideNavMoonRashi: bNavMoon,
       groomNakIdx: gNakIdx, groomMoonRashi: gMoonRashi, groomLagnaRashi: gLagnaRashi, groomPlanetRashis: gRashis,
       groomNavLagnaRashi: gNavLagna, groomNavMoonRashi: gNavMoon,
-      brideBhavaHouses: bBhavaHouses, groomBhavaHouses: gBhavaHouses,
+      brideBhavaHouses: bBhavaLagna, groomBhavaHouses: gBhavaLagna,
+      brideBhavaFromChandra: bBhavaChandra, groomBhavaFromChandra: gBhavaChandra,
+      brideBhavaFromShukra: bBhavaShukra, groomBhavaFromShukra: gBhavaShukra,
     );
 
     setState(() {
