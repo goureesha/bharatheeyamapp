@@ -4644,7 +4644,10 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
     } else {
       // ── LANDSCAPE: horizontal scroll, 2 charts visible at a time ──
       final screenHeight = MediaQuery.of(context).size.height;
-      final chartSize = screenHeight - 100;
+      final screenWidth = MediaQuery.of(context).size.width;
+      final topPad = MediaQuery.of(context).padding.top;
+      final chartSize = (screenHeight - topPad - 160).clamp(200.0, screenHeight * 0.70);
+      final chartWidth = (screenWidth * 0.48).clamp(250.0, chartSize);
       return SizedBox(
         height: chartSize + 40,
         child: ScrollConfiguration(
@@ -4661,7 +4664,7 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
             itemBuilder: (context, i) {
               final label = widget.charts[i]['label'] as String;
               return SizedBox(
-                width: chartSize,
+                width: chartWidth,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Column(
