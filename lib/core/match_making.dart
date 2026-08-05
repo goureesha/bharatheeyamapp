@@ -288,48 +288,26 @@ class MatchMakingLogic {
   }
 
   /// Check Kuja Dosha from a reference point (bhava-based)
-  /// bhavaHouse is the bhava house number (1-12) of Kuja from that reference
   static int _kujaHouseCheck(int bhavaHouse) {
     return const [1, 2, 4, 7, 8, 12].contains(bhavaHouse) ? bhavaHouse : 0;
   }
 
-  /// Calculate Kuja Dosha for a person
-  /// planetBhavaHouses: bhava house (1-12) from Lagna — used for fromLagna
-  /// planetRashis: rashi index (0-11) — used for fromChandra and fromShukra
+  /// Calculate Kuja Dosha for a person using bhava house positions
+  /// planetBhavaHouses: map of planet name -> bhava house number (1-12) from lagna
   /// Returns: {fromLagna: int (house or 0), fromChandra: int, fromShukra: int, hasDosha: bool}
-  static Map<String, dynamic> calculateKujaDosha(
-    Map<String, int> planetBhavaHouses, {
-    Map<String, int>? planetRashis,
-  }) {
-    // ── From Lagna (bhava-based) ──
+  static Map<String, dynamic> calculateKujaDosha(Map<String, int> planetBhavaHouses) {
     final kujaHouse = planetBhavaHouses['ಕುಜ'] ?? 0;
+    final chandraHouse = planetBhavaHouses['ಚಂದ್ರ'] ?? 0;
+    final shukraHouse = planetBhavaHouses['ಶುಕ್ರ'] ?? 0;
+
+    // Kuja's house from Lagna = kujaHouse directly (bhava)
     final fromLagna = _kujaHouseCheck(kujaHouse);
-
-    // ── From Chandra (rashi-based: Chandra Kundali) ──
-    int fromChandra = 0;
-    if (planetRashis != null) {
-      final kujaRashi = planetRashis['ಕುಜ'] ?? 0;
-      final chandraRashi = planetRashis['ಚಂದ್ರ'] ?? 0;
-      final kujaFromChandra = ((kujaRashi - chandraRashi + 12) % 12) + 1;
-      fromChandra = _kujaHouseCheck(kujaFromChandra);
-    } else {
-      final chandraHouse = planetBhavaHouses['ಚಂದ್ರ'] ?? 0;
-      final kujaFromChandra = ((kujaHouse - chandraHouse + 12) % 12) + 1;
-      fromChandra = _kujaHouseCheck(kujaFromChandra);
-    }
-
-    // ── From Shukra (rashi-based: Shukra Kundali) ──
-    int fromShukra = 0;
-    if (planetRashis != null) {
-      final kujaRashi = planetRashis['ಕುಜ'] ?? 0;
-      final shukraRashi = planetRashis['ಶುಕ್ರ'] ?? 0;
-      final kujaFromShukra = ((kujaRashi - shukraRashi + 12) % 12) + 1;
-      fromShukra = _kujaHouseCheck(kujaFromShukra);
-    } else {
-      final shukraHouse = planetBhavaHouses['ಶುಕ್ರ'] ?? 0;
-      final kujaFromShukra = ((kujaHouse - shukraHouse + 12) % 12) + 1;
-      fromShukra = _kujaHouseCheck(kujaFromShukra);
-    }
+    // Kuja's house from Chandra bhava = relative bhava offset
+    final kujaFromChandra = ((kujaHouse - chandraHouse + 12) % 12) + 1;
+    final fromChandra = _kujaHouseCheck(kujaFromChandra);
+    // Kuja's house from Shukra bhava = relative bhava offset
+    final kujaFromShukra = ((kujaHouse - shukraHouse + 12) % 12) + 1;
+    final fromShukra = _kujaHouseCheck(kujaFromShukra);
 
     return {
       'fromLagna': fromLagna,
@@ -341,7 +319,8 @@ class MatchMakingLogic {
 
   static const List<String> _papaGrahas = ['ರವಿ', 'ಕುಜ', 'ಶನಿ', 'ರಾಹು', 'ಕೇತು'];
 
-  /// Count papa grahas in dosha houses using bhava positions (for Lagna-based)
+  /// Count papa grahas in dosha houses using bhava positions
+  /// Each papa graha is counted individually — 2 papas in same house = count 2
   static int _countPapaInDoshaHousesBhava(Map<String, int> planetBhavaHouses, int refHouse) {
     int count = 0;
     for (final graha in _papaGrahas) {
@@ -353,44 +332,15 @@ class MatchMakingLogic {
     return count;
   }
 
-  /// Count papa grahas in dosha houses using rashi positions (for Chandra/Shukra)
-  static int _countPapaInDoshaHousesRashi(Map<String, int> planetRashis, int refRashi) {
-    int count = 0;
-    for (final graha in _papaGrahas) {
-      final gRashi = planetRashis[graha];
-      if (gRashi == null) continue;
-      final house = ((gRashi - refRashi + 12) % 12) + 1;
-      if (const [1, 2, 4, 7, 8, 12].contains(house)) count++;
-    }
-    return count;
-  }
-
-  /// Calculate Papa Dosha for a person
-  /// planetBhavaHouses: bhava (1-12) from Lagna — used for fromLagna
-  /// planetRashis: rashi (0-11) — used for fromChandra and fromShukra
-  static Map<String, dynamic> calculatePapaDosha(
-    Map<String, int> planetBhavaHouses, {
-    Map<String, int>? planetRashis,
-  }) {
-    // From Lagna (bhava-based)
-    final lagnaHouse = 1;
+  /// Calculate Papa Dosha for a person using bhava house positions
+  /// All three references (Lagna, Chandra, Shukra) use bhava offsets
+  static Map<String, dynamic> calculatePapaDosha(Map<String, int> planetBhavaHouses) {
+    final lagnaHouse = 1; // Lagna is always house 1 in bhava
+    final chandraHouse = planetBhavaHouses['ಚಂದ್ರ'] ?? 1;
+    final shukraHouse = planetBhavaHouses['ಶುಕ್ರ'] ?? 1;
     final fromLagna = _countPapaInDoshaHousesBhava(planetBhavaHouses, lagnaHouse);
-
-    // From Chandra and Shukra (rashi-based)
-    int fromChandra;
-    int fromShukra;
-    if (planetRashis != null) {
-      final chandraRashi = planetRashis['ಚಂದ್ರ'] ?? 0;
-      final shukraRashi = planetRashis['ಶುಕ್ರ'] ?? 0;
-      fromChandra = _countPapaInDoshaHousesRashi(planetRashis, chandraRashi);
-      fromShukra = _countPapaInDoshaHousesRashi(planetRashis, shukraRashi);
-    } else {
-      final chandraHouse = planetBhavaHouses['ಚಂದ್ರ'] ?? 1;
-      final shukraHouse = planetBhavaHouses['ಶುಕ್ರ'] ?? 1;
-      fromChandra = _countPapaInDoshaHousesBhava(planetBhavaHouses, chandraHouse);
-      fromShukra = _countPapaInDoshaHousesBhava(planetBhavaHouses, shukraHouse);
-    }
-
+    final fromChandra = _countPapaInDoshaHousesBhava(planetBhavaHouses, chandraHouse);
+    final fromShukra = _countPapaInDoshaHousesBhava(planetBhavaHouses, shukraHouse);
     return {
       'fromLagna': fromLagna,
       'fromChandra': fromChandra,
@@ -551,13 +501,13 @@ class MatchMakingLogic {
     return {
       'ashtaKoota': calculateCompatibility(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
       'dvadashaKoota': calculateDvadashaKoota(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
-      'brideKujaDosha': calculateKujaDosha(bBhava, planetRashis: bridePlanetRashis),
-      'groomKujaDosha': calculateKujaDosha(gBhava, planetRashis: groomPlanetRashis),
-      'bridePapaDosha': calculatePapaDosha(bBhava, planetRashis: bridePlanetRashis),
-      'groomPapaDosha': calculatePapaDosha(gBhava, planetRashis: groomPlanetRashis),
+      'brideKujaDosha': calculateKujaDosha(bBhava),
+      'groomKujaDosha': calculateKujaDosha(gBhava),
+      'bridePapaDosha': calculatePapaDosha(bBhava),
+      'groomPapaDosha': calculatePapaDosha(gBhava),
       'papaSamya': checkPapaSamya(
-        calculatePapaDosha(bBhava, planetRashis: bridePlanetRashis),
-        calculatePapaDosha(gBhava, planetRashis: groomPlanetRashis),
+        calculatePapaDosha(bBhava),
+        calculatePapaDosha(gBhava),
       ),
       'grahaMaitri': calculateGrahaMaitriComparison(
         brideLagnaRashi: brideLagnaRashi, brideMoonRashi: brideMoonRashi,
