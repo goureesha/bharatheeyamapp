@@ -20,7 +20,7 @@ class AppAccessService {
   // ── Constants ──
   static const int _trialMinutes = 30;
   static const int _maxOfflineHours = 24;       // Must connect every 24h
-  static const int _offlineGraceDays = 10;      // Max offline grace: 10 days
+  static int _offlineGraceDays = 10;      // Max offline grace: 10 days
 
   // ── State ──
   static bool isActivated = false;
@@ -232,6 +232,27 @@ class AppAccessService {
       }
     } catch (e) {
       debugPrint('Trial Firestore sync error: $e');
+    }
+  }
+
+  /// Load max_offline_days from Firestore app_config/settings.
+  /// Falls back to default 10 if not set or on error.
+  static Future<void> loadOfflineGraceDays() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('app_config')
+          .doc('settings')
+          .get()
+          .timeout(const Duration(seconds: 5));
+      if (doc.exists && doc.data() != null) {
+        final days = doc.data()!['max_offline_days'];
+        if (days != null && days is int && days > 0) {
+          _offlineGraceDays = days;
+          debugPrint('AppConfig: max_offline_days = $_offlineGraceDays');
+        }
+      }
+    } catch (e) {
+      debugPrint('AppConfig: Failed to load offline grace days: $e');
     }
   }
 

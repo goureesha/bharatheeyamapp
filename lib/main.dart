@@ -151,6 +151,7 @@ Future<void> _deferredInit() async {
 
   // Check minimum version requirement from admin dashboard
   await _checkMinimumVersion();
+  await AppAccessService.loadOfflineGraceDays();
 }
 
 /// Compare two version strings like "2.2.0" → returns true if current < minimum
