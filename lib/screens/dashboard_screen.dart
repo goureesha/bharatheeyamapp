@@ -4646,7 +4646,8 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
       final screenHeight = MediaQuery.of(context).size.height;
       final screenWidth = MediaQuery.of(context).size.width;
       final topPad = MediaQuery.of(context).padding.top;
-      final chartSize = (screenHeight - topPad - 160).clamp(200.0, screenHeight * 0.70);
+      // status bar + app bar(56) + tab bar(48) + person header + padding
+      final chartSize = (screenHeight - topPad - 220).clamp(180.0, screenHeight * 0.55);
       final chartWidth = (screenWidth * 0.48).clamp(250.0, chartSize);
       return SizedBox(
         height: chartSize + 40,
