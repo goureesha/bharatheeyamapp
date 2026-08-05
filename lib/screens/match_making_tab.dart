@@ -1626,12 +1626,23 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     final pan = r.panchang;
     final dateStr = '${dob.day.toString().padLeft(2, "0")}-${dob.month.toString().padLeft(2, "0")}-${dob.year}';
     final timeStr = '${hour.toString().padLeft(2, "0")}:${minute.toString().padLeft(2, "0")} $ampm';
+    // Age calculation
+    final now = DateTime.now();
+    int ageYears = now.year - dob.year;
+    int ageMonths = now.month - dob.month;
+    if (ageMonths < 0 || (ageMonths == 0 && now.day < dob.day)) {
+      ageYears--;
+      ageMonths += 12;
+    }
+    if (now.day < dob.day) ageMonths = (ageMonths - 1 + 12) % 12;
+    final ageStr = '$ageYears${AppLocale.l('yearShort')} $ageMonths${AppLocale.l('monthShort')}';
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _kv(AppLocale.l('nameLabel'), name),
         _kv(AppLocale.l('placeLabel'), place),
         _kv(AppLocale.l('dateLabel'), dateStr),
         _kv(AppLocale.l('timeLabel'), timeStr),
+        _kv(AppLocale.l('ageLabel'), ageStr),
         _kv(AppLocale.l('chandraNakshatra'), '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} ${r.planets['ಚಂದ್ರ']?.pada ?? 1}'),
         _kv(AppLocale.l('chandraRashiLabel'), trAll(pan.chandraRashi)),
         _kv(AppLocale.l('dashaLord'), '${trAll(pan.dashaLord)} ${AppLocale.l('dashaBalance')}: ${pan.dashaBalance}'),
