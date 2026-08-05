@@ -270,7 +270,7 @@ class AppLocale {
       'ayanamsa': 'ಅಯನಾಂಶ', 'nodeType': 'ರಾಹು ವಿಧ',
       'selectAllDetails': 'ದಯವಿಟ್ಟು ಎಲ್ಲಾ ವಿವರಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ', 'selectHint': 'ಆಯ್ಕೆಮಾಡಿ',
       'matchPoor': 'ಹೊಂದಾಣಿಕೆ ಉತ್ತಮವಾಗಿಲ್ಲ', 'matchMedium': 'ಹೊಂದಾಣಿಕೆ ಮಧ್ಯಮವಾಗಿದೆ', 'matchGood': 'ಹೊಂದಾಣಿಕೆ ತುಂಬಾ ಉತ್ತಮವಾಗಿದೆ',
-      'kujaDosha': 'ಕುಜ ದೋಷ', 'papaDosha': 'ಪಾಪ ದೋಷ', 'grahaMaitriAmsha': 'ಗ್ರಹ ಮೈತ್ರಿ (ಬೃಹತ್ ಜಾತಕ)', 'shathaAshtaka': 'ಷಟ-ಅಷ್ಟಕ', 'dvirdvadasha': 'ದ್ವಿರ್ದ್ವಾದಶ',
+      'kujaDosha': 'ಕುಜ ದೋಷ', 'papaDosha': 'ಪಾಪ ದೋಷ', 'grahaMaitriAmsha': 'ಗ್ರಹ ಮೈತ್ರಿ (ಬೃಹತ್ ಜಾತಕ)', 'shathaAshtaka': 'ಷಟ್-ಅಷ್ಟಕ', 'dvirdvadasha': 'ದ್ವಿರ್ದ್ವಾದಶ',
       'chart': 'ಕುಂಡಲಿ', 'rashiKundali': 'ರಾಶಿ ಕುಂಡಲಿ', 'navamshaKundali': 'ನವಾಂಶ ಕುಂಡಲಿ', 'bhavaKundali': 'ಭಾವ ಕುಂಡಲಿ',
       'planetShukra': 'ಶುಕ್ರ', 'chandraNakshatra': 'ಚಂದ್ರ ನಕ್ಷತ್ರ', 'chandraRashiLabel': 'ಚಂದ್ರ ರಾಶಿ', 'nameLabel': 'ಹೆಸರು', 'dateLabel': 'ದಿನಾಂಕ', 'padaLabel': 'ಪಾದ',
       'matchResult': 'ಅಷ್ಟಕೂಟ ಗುಣ ಮಿಲನ ಫಲಿತಾಂಶ', 'totalGuna': 'ಒಟ್ಟು ಗುಣ', 'result': 'ಫಲಿತಾಂಶ',
