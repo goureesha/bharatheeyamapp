@@ -2664,6 +2664,8 @@ class _ChartSliderState extends State<_ChartSlider> {
       AppLocale.l('rashiKundali'),
       AppLocale.l('navamshaKundali'),
       AppLocale.l('bhavaKundali'),
+      '${AppLocale.l('bhavaKundali')} (${trAll('ಚಂದ್ರ')})',
+      '${AppLocale.l('bhavaKundali')} (${trAll('ಶುಕ್ರ')})',
     ];
     return Column(children: [
       Expanded(
@@ -2682,6 +2684,14 @@ class _ChartSliderState extends State<_ChartSlider> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: KundaliChart(result: widget.result, varga: 1, isBhava: true, showSphutas: false),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: KundaliChart(result: widget.result, varga: 1, isBhava: true, showSphutas: false, bhavaFromPlanet: 'ಚಂದ್ರ'),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: KundaliChart(result: widget.result, varga: 1, isBhava: true, showSphutas: false, bhavaFromPlanet: 'ಶುಕ್ರ'),
+            ),
           ],
         ),
       ),
@@ -2689,7 +2699,7 @@ class _ChartSliderState extends State<_ChartSlider> {
       // Label + dots
       Text(labels[_page], style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kPurple2)),
       const SizedBox(height: 4),
-      Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(3, (i) => Container(
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(5, (i) => Container(
         margin: const EdgeInsets.symmetric(horizontal: 3),
         width: _page == i ? 18 : 8,
         height: 8,
