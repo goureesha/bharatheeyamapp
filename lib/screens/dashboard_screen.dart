@@ -3968,6 +3968,10 @@ class _DashboardScreenState extends State<DashboardScreen>
 
           Widget yogaCard(YogaResult y) {
             final isPos = y.isPositive;
+            // Extract short phala: text after first ". " (condition. phala)
+            final desc = AppLocale.current == 'kn' ? y.descKn : y.descEn;
+            final dotIdx = desc.indexOf('. ');
+            final phala = dotIdx >= 0 ? desc.substring(dotIdx + 2) : desc;
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
@@ -4006,13 +4010,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 2),
-                  if (AppLocale.current == 'kn') Text(y.nameEn, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kMuted)),
-                  if (AppLocale.current != 'kn') Text(y.nameKn, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kMuted)),
-                  const SizedBox(height: 2),
-                  Text(_catLabel(y.category), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _catColor(y.category).withOpacity(0.7))),
-                  const SizedBox(height: 6),
-                  Text(AppLocale.current == 'kn' ? y.descKn : y.descEn, style: TextStyle(fontSize: 12, color: kText, height: 1.4)),
+                  const SizedBox(height: 4),
+                  Text(phala, style: TextStyle(fontSize: 12, color: kText, height: 1.4)),
                 ],
               ),
             );
