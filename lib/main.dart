@@ -53,6 +53,7 @@ Future<void> main() async {
     GoogleAuthService.signInSilently(),
     AppThemes.loadTheme(),
     ChartStyle.loadStyle(),
+    VargaLagnaStyle.load(),
     SamshakaMode.load(),
     SingleLetterMode.load(),
     AppLocale.loadLang(),

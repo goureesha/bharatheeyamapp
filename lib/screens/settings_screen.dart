@@ -276,7 +276,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Divider(color: kBorder),
                     const SizedBox(height: 24),
 
-                    // Dasha/Bhukti highlight toggle
+                    // Varga Lagna Style (only relevant for North Indian)
+                    SectionTitle('${AppLocale.l('vargaLagnaTitle')} / Varga Lagna Style'),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 4),
+                      child: Text(AppLocale.l('vargaLagnaDesc'), style: TextStyle(fontSize: 11, color: kMuted)),
+                    ),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: VargaLagnaStyle.notifier,
+                      builder: (context, isModern, _) {
+                        return Column(
+                          children: [
+                            RadioListTile<bool>(
+                              value: true,
+                              groupValue: isModern,
+                              title: Text(AppLocale.l('vargaLagnaModern'), style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
+                              subtitle: Text(AppLocale.l('vargaLagnaModernDesc'), style: TextStyle(fontSize: 11, color: kMuted)),
+                              activeColor: kPurple2,
+                              onChanged: (val) { if (val != null) VargaLagnaStyle.toggle(val); },
+                            ),
+                            RadioListTile<bool>(
+                              value: false,
+                              groupValue: isModern,
+                              title: Text(AppLocale.l('vargaLagnaShastra'), style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
+                              subtitle: Text(AppLocale.l('vargaLagnaShastraDesc'), style: TextStyle(fontSize: 11, color: kMuted)),
+                              activeColor: kPurple2,
+                              onChanged: (val) { if (val != null) VargaLagnaStyle.toggle(val); },
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+                    Divider(color: kBorder),
+                    const SizedBox(height: 24),
                     FutureBuilder<SharedPreferences>(
                       future: SharedPreferences.getInstance(),
                       builder: (context, snap) {

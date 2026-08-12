@@ -125,6 +125,27 @@ class ChartStyle {
 }
 
 // ─────────────────────────────────────────────
+// Varga Lagna Style: shastra (rashi lagna) vs modern (divisional lagna)
+// Controls whether D9/D3 etc. use rashi lagna or divisional lagna as house 1
+// ─────────────────────────────────────────────
+class VargaLagnaStyle {
+  static final ValueNotifier<bool> notifier = ValueNotifier(true); // true = modern (default)
+
+  /// true = Modern style (Navamsha Lagna as house 1)
+  /// false = Shastra style (Rashi Lagna as house 1)
+  static bool get useVargaLagna => notifier.value;
+
+  static void toggle(bool v) {
+    notifier.value = v;
+    SharedPreferences.getInstance().then((prefs) => prefs.setBool('varga_lagna_modern', v));
+  }
+
+  static Future<void> load() async {
+    final prefs = await SharedPreferences.getInstance();
+    notifier.value = prefs.getBool('varga_lagna_modern') ?? true;
+  }
+}
+// ─────────────────────────────────────────────
 // Samshaka mode: show navamsha number instead of degree
 // ─────────────────────────────────────────────
 class SamshakaMode {
@@ -284,6 +305,9 @@ class AppLocale {
       'chartStyle': 'ಕುಂಡಲಿ ಶೈಲಿ', 'southIndian': 'ದಕ್ಷಿಣ ಭಾರತ', 'northIndian': 'ಉತ್ತರ ಭಾರತ',
       'southDesc': '4×4 ಗ್ರಿಡ್ - ರಾಶಿ ಸ್ಥಿರ, ಗ್ರಹಗಳು ಚಲಿಸುವವು', 'northDesc': 'ವಜ್ರ (Diamond) - ಭಾವ ಸ್ಥಿರ, ರಾಶಿಗಳು ಚಲಿಸುವವು',
       'samshakaTitle': 'ಸಂಶಕ ಕುಂಡಲಿ', 'samshakaLabel': 'ನವಾಂಶ ಸಂಖ್ಯೆ ತೋರಿಸಿ', 'samshakaDesc': 'ಡಿಗ್ರಿ ಬದಲು ನವಾಂಶ ರಾಶಿ ಸಂಖ್ಯೆ (1-12) ತೋರಿಸುತ್ತದೆ. ಉದಾ: ರವಿ 5 (ಸಿಂಹ)',
+      'vargaLagnaTitle': 'ವರ್ಗ ಲಗ್ನ ಶೈಲಿ', 'vargaLagnaDesc': 'ನವಾಂಶ ಇತ್ಯಾದಿ ವರ್ಗ ಕುಂಡಲಿಗಳಲ್ಲಿ ಮೊದಲ ಭಾವ ಯಾವ ಲಗ್ನ ಆಗಿರಬೇಕು',
+      'vargaLagnaModern': 'ಆಧುನಿಕ (ವರ್ಗ ಲಗ್ನ)', 'vargaLagnaModernDesc': 'ನವಾಂಶ ಲಗ್ನವನ್ನು ಮೊದಲ ಭಾವವಾಗಿ ತೋರಿಸುತ್ತದೆ',
+      'vargaLagnaShastra': 'ಶಾಸ್ತ್ರ (ರಾಶಿ ಲಗ್ನ)', 'vargaLagnaShastraDesc': 'ರಾಶಿ ಲಗ್ನವನ್ನೇ ಮೊದಲ ಭಾವವಾಗಿ ಬಳಸುತ್ತದೆ',
       'dashaHighlightLabel': 'ದಶಾ/ಭುಕ್ತಿ ಗ್ರಹ ಬಣ್ಣ', 'dashaHighlightDesc': 'ಪ್ರಸ್ತುತ ಮಹಾದಶಾ ಮತ್ತು ಭುಕ್ತಿ ಗ್ರಹಗಳಿಗೆ ಕುಂಡಲಿಯಲ್ಲಿ ಹಿನ್ನೆಲೆ ಬಣ್ಣ ತೋರಿಸುತ್ತದೆ',
       'singleLetterMode': 'ಏಕಾಕ್ಷರ ಕುಂಡಲಿ',
       'searchLocation': 'ಸ್ಥಳ ಹುಡುಕಿ', 'onlineSearch': 'ಆನ್‌ಲೈನ್ ಹುಡುಕಿ', 'defaultLocationSet': 'ಡೀಫಾಲ್ಟ್ ಸ್ಥಳ',
@@ -969,6 +993,9 @@ class AppLocale {
       'chartStyle': 'कुंडली शैली', 'southIndian': 'दक्षिण भारत', 'northIndian': 'उत्तर भारत',
       'southDesc': '4×4 ग्रिड - राशि स्थिर, ग्रह चलते हैं', 'northDesc': 'हीरा (Diamond) - भाव स्थिर, राशियाँ चलती हैं',
       'samshakaTitle': 'संशक कुंडली', 'samshakaLabel': 'नवांश संख्या दिखाएं', 'samshakaDesc': 'डिग्री के बदले नवांश राशि संख्या (1-12) दिखाता है. उदा: रवि 5 (सिंह)',
+      'vargaLagnaTitle': 'वर्ग लग्न शैली', 'vargaLagnaDesc': 'नवांश आदि वर्ग कुंडलियों में पहला भाव कौन सा लग्न होगा',
+      'vargaLagnaModern': 'आधुनिक (वर्ग लग्न)', 'vargaLagnaModernDesc': 'नवांश लग्न को पहले भाव में दिखाता है',
+      'vargaLagnaShastra': 'शास्त्र (राशि लग्न)', 'vargaLagnaShastraDesc': 'राशि लग्न को ही पहले भाव में रखता है',
       'dashaHighlightLabel': 'दशा/भुक्ति ग्रह रंग', 'dashaHighlightDesc': 'वर्तमान महादशा और भुक्ति ग्रहों को कुंडली में हाइलाइट रंग दिखाता है',
       'singleLetterMode': 'एकाक्षर कुंडली',
       'searchLocation': 'स्थान खोजें', 'onlineSearch': 'ऑनलाइन खोजें', 'defaultLocationSet': 'डिफॉल्ट स्थान',
@@ -1682,6 +1709,9 @@ class AppLocale {
       'chartStyle': 'ஜாதக பாணி', 'southIndian': 'தென் இந்திய', 'northIndian': 'வட இந்திய',
       'southDesc': '4×4 கட்டம் - ராசி நிலையான, கிரகங்கள் நகரும்', 'northDesc': 'வைரம் - பாவம் நிலையான, ராசிகள் நகரும்',
       'samshakaTitle': 'சம்சக ஜாதகம்', 'samshakaLabel': 'நவாம்ச எண் காட்டு', 'samshakaDesc': 'டிகிரிக்கு பதிலாக நவாம்ச ராசி எண் (1-12) காட்டும். உதா: ரவி 5 (சிம்மம்)',
+      'vargaLagnaTitle': 'வர்க லக்னா பாணி', 'vargaLagnaDesc': 'நவாம்சம் போன்ற வர்க ஜாதகங்களில் முதல் பாவம் எந்த லக்னா',
+      'vargaLagnaModern': 'நவீன (வர்க லக்னா)', 'vargaLagnaModernDesc': 'நவாம்ச லக்னாவை முதல் பாவமாக காட்டும்',
+      'vargaLagnaShastra': 'சாஸ்திர (ராசி லக்னா)', 'vargaLagnaShastraDesc': 'ராசி லக்னாவையே முதல் பாவமாக பயன்படுத்தும்',
       'dashaHighlightLabel': 'தசா/புக்தி கிரக நிறம்', 'dashaHighlightDesc': 'தற்போதைய மகாதசா மற்றும் புக்தி கிரகங்களுக்கு ஜாதகத்தில் பின்னணி நிறம் காட்டும்',
       'singleLetterMode': 'ஒற்றை எழுத்து குண்டலி',
       'searchLocation': 'இடம் தேடு', 'onlineSearch': 'ஆன்லைன் தேடல்', 'defaultLocationSet': 'இயல்பு இடம்',
@@ -2391,6 +2421,9 @@ class AppLocale {
       'chartStyle': 'కుండలి శైలి', 'southIndian': 'దక్షిణ భారతం', 'northIndian': 'ఉత్తర భారతం',
       'southDesc': '4×4 గ్రిడ్ - రాశి స్థిరం, గ్రహాలు కదులుతాయి', 'northDesc': 'వజ్రం (Diamond) - భావం స్థిరం, రాశులు కదులుతాయి',
       'samshakaTitle': 'సంశక కుండలి', 'samshakaLabel': 'నవాంశ సంఖ్య చూపండి', 'samshakaDesc': 'డిగ్రీ బదులు నవాంశ రాశి సంఖ్య (1-12) చూపిస్తుంది. ఉదా: రవి 5 (సింహం)',
+      'vargaLagnaTitle': 'వర్గ లగ్న శైలి', 'vargaLagnaDesc': 'నవాంశ మొదలైన వర్గ కుండలులలో మొదటి భావం ఏ లగ్నం',
+      'vargaLagnaModern': 'ఆధునిక (వర్గ లగ్నం)', 'vargaLagnaModernDesc': 'నవాంశ లగ్నాన్ని మొదటి భావంగా చూపిస్తుంది',
+      'vargaLagnaShastra': 'శాస్త్ర (రాశి లగ్నం)', 'vargaLagnaShastraDesc': 'రాశి లగ్నాన్నే మొదటి భావంగా ఉంచుతుంది',
       'dashaHighlightLabel': 'దశా/భుక్తి గ్రహ రంగు', 'dashaHighlightDesc': 'ప్రస్తుత మహాదశా మరియు భుక్తి గ్రహాలకు కుండలిలో హైలైట్ రంగు చూపిస్తుంది',
       'singleLetterMode': 'ఏకాక్షర కుండలి',
       'searchLocation': 'ప్రదేశం వెతకండి', 'onlineSearch': 'ఆన్‌లైన్ వెతకండి', 'defaultLocationSet': 'డీఫాల్ట్ ప్రదేశం',
@@ -3100,6 +3133,9 @@ class AppLocale {
       'chartStyle': 'ജാതക ശൈലി', 'southIndian': 'ദക്ഷിണ ഭാരതം', 'northIndian': 'ഉത്തര ഭാരതം',
       'southDesc': '4×4 ഗ്രിഡ് - രാശി സ്ഥിരം, ഗ്രഹങ്ങൾ ചലിക്കുന്നു', 'northDesc': 'വജ്രം (Diamond) - ഭാവം സ്ഥിരം, രാശികൾ ചലിക്കുന്നു',
       'samshakaTitle': 'സംശക ജാതകം', 'samshakaLabel': 'നവാംശ നമ്പർ കാണിക്കുക', 'samshakaDesc': 'ഡിഗ്രിക്കു പകരം നവാംശ രാശി നമ്പർ (1-12) കാണിക്കും. ഉദാ: രവി 5 (ചിംഹം)',
+      'vargaLagnaTitle': 'വർഗ ലഗ്ന ശൈലി', 'vargaLagnaDesc': 'നവാംശ മുതലായ വർഗ ജാതകങ്ങളിൽ ആദ്യ ഭാവം ഏത് ലഗ്നം',
+      'vargaLagnaModern': 'ആധുനിക (വർഗ ലഗ്നം)', 'vargaLagnaModernDesc': 'നവാംശ ലഗ്നത്തെ ആദ്യ ഭാവമായി കാണിക്കും',
+      'vargaLagnaShastra': 'ശാസ്ത്ര (രാശി ലഗ്നം)', 'vargaLagnaShastraDesc': 'രാശി ലഗ്നത്തെ തന്നെ ആദ്യ ഭാവമായി ഉപയോഗിക്കും',
       'dashaHighlightLabel': 'ദശാ/ഭുക്തി ഗ്രഹ നിറം', 'dashaHighlightDesc': 'നിലവിലെ മഹാദശ, ഭുക്തി ഗ്രഹങ്ങൾക്ക് ജാതകത്തിൽ ഹൈലൈറ്റ് നിറം കാണിക്കും',
       'singleLetterMode': 'ഏകാക്ഷര കുണ്ഡലി',
       'searchLocation': 'സ്ഥലം തിരയുക', 'onlineSearch': 'ഓൺലൈൻ തിരയൽ', 'defaultLocationSet': 'ഇയൽപ്പു സ്ഥലം',

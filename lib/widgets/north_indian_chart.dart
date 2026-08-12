@@ -128,14 +128,15 @@ class NorthIndianChart extends StatelessWidget {
     }
 
     // Determine which rashi goes in house 1
-    // For divisional charts (D9, D3 etc.), house 1 = divisional lagna, not rashi lagna
+    // For divisional charts (D9, D3 etc.): depends on VargaLagnaStyle setting
     final int firstHouseRashiIdx;
     if (bhavaFromPlanet != null && result.planets.containsKey(bhavaFromPlanet)) {
       firstHouseRashiIdx = (refLongitude / 30).floor() % 12;
-    } else if (varga != 1 && !isBhava) {
-      // Use the divisional lagna (e.g. Navamsha Lagna for D9)
+    } else if (varga != 1 && !isBhava && VargaLagnaStyle.useVargaLagna) {
+      // Modern style: use the divisional lagna (e.g. Navamsha Lagna for D9)
       firstHouseRashiIdx = _rashinFor(lagnaLong);
     } else {
+      // Shastra style or D1: use rashi lagna
       firstHouseRashiIdx = lagnaIdx;
     }
 
