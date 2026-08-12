@@ -249,6 +249,75 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                     ),
 
+                    // Varga Lagna Style — nested under chart style, only for North Indian
+                    ValueListenableBuilder<String>(
+                      valueListenable: ChartStyle.styleNotifier,
+                      builder: (context, style, _) {
+                        if (style != 'north') return const SizedBox.shrink();
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 12),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber.withOpacity(0.10),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.amber.shade700.withOpacity(0.3)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.info_outline, size: 16, color: Colors.amber.shade800),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        AppLocale.l('vargaLagnaNote'),
+                                        style: TextStyle(fontSize: 11, color: Colors.amber.shade900, fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 16),
+                              child: Text(AppLocale.l('vargaLagnaTitle'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: kText)),
+                            ),
+                            ValueListenableBuilder<bool>(
+                              valueListenable: VargaLagnaStyle.notifier,
+                              builder: (context, isModern, _) {
+                                return Column(
+                                  children: [
+                                    RadioListTile<bool>(
+                                      value: true,
+                                      groupValue: isModern,
+                                      title: Text(AppLocale.l('vargaLagnaModern'), style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
+                                      subtitle: Text(AppLocale.l('vargaLagnaModernDesc'), style: TextStyle(fontSize: 11, color: kMuted)),
+                                      activeColor: kPurple2,
+                                      dense: true,
+                                      onChanged: (val) { if (val != null) VargaLagnaStyle.toggle(val); },
+                                    ),
+                                    RadioListTile<bool>(
+                                      value: false,
+                                      groupValue: isModern,
+                                      title: Text(AppLocale.l('vargaLagnaShastra'), style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
+                                      subtitle: Text(AppLocale.l('vargaLagnaShastraDesc'), style: TextStyle(fontSize: 11, color: kMuted)),
+                                      activeColor: kPurple2,
+                                      dense: true,
+                                      onChanged: (val) { if (val != null) VargaLagnaStyle.toggle(val); },
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+
                     const SizedBox(height: 24),
                     Divider(color: kBorder),
                     const SizedBox(height: 24),
@@ -268,42 +337,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             AppLocale.l('samshakaDesc'),
                             style: TextStyle(fontSize: 11, color: kMuted),
                           ),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 24),
-                    Divider(color: kBorder),
-                    const SizedBox(height: 24),
-
-                    // Varga Lagna Style (only relevant for North Indian)
-                    SectionTitle('${AppLocale.l('vargaLagnaTitle')} / Varga Lagna Style'),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 4),
-                      child: Text(AppLocale.l('vargaLagnaDesc'), style: TextStyle(fontSize: 11, color: kMuted)),
-                    ),
-                    ValueListenableBuilder<bool>(
-                      valueListenable: VargaLagnaStyle.notifier,
-                      builder: (context, isModern, _) {
-                        return Column(
-                          children: [
-                            RadioListTile<bool>(
-                              value: true,
-                              groupValue: isModern,
-                              title: Text(AppLocale.l('vargaLagnaModern'), style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
-                              subtitle: Text(AppLocale.l('vargaLagnaModernDesc'), style: TextStyle(fontSize: 11, color: kMuted)),
-                              activeColor: kPurple2,
-                              onChanged: (val) { if (val != null) VargaLagnaStyle.toggle(val); },
-                            ),
-                            RadioListTile<bool>(
-                              value: false,
-                              groupValue: isModern,
-                              title: Text(AppLocale.l('vargaLagnaShastra'), style: TextStyle(fontWeight: FontWeight.w800, color: kText)),
-                              subtitle: Text(AppLocale.l('vargaLagnaShastraDesc'), style: TextStyle(fontSize: 11, color: kMuted)),
-                              activeColor: kPurple2,
-                              onChanged: (val) { if (val != null) VargaLagnaStyle.toggle(val); },
-                            ),
-                          ],
                         );
                       },
                     ),
