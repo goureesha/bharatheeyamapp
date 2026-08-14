@@ -3211,12 +3211,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
         // ── Bhava Shuddhi Fallback (2-minute fine scan) ──
         // When toggle ON + any required shuddhi fails in Rashi chart,
-        // scan in 2-min increments to find exact sub-windows where Bhava shuddhi is clear.
-        bool bhavaFallbackUsed = false;
-        bool lagnaBhavaOk = true, saptamaBhavaOk = true, ashtamaBhavaOk = true, dashamaBhavaOk = true;
-        List<String> lagnaBhavaGrahasList = [], saptamaBhavaGrahasList = [], ashtamaBhavaGrahasList = [], dashamaBhavaGrahasList = [];
-        String? bhavaStartTime;
-        String? bhavaEndTime;
+        // scan in 2-min increments to find ALL exact sub-windows where Bhava shuddhi is clear.
         final reqShuddhis = rules?.requiredShuddhis ?? const {ShuddhiType.lagna};
 
         final bool needsBhava = useBhavaShuddhi && (
@@ -3227,7 +3222,6 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         );
 
         if (needsBhava) {
-          bhavaFallbackUsed = true;
           // 2-minute scan within [windowStartJd, windowEndJd]
           final double fineStep = 2.0 / (24.0 * 60.0); // 2 min in JD
           double scanJd = windowStartJd;
@@ -3239,6 +3233,9 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           final bool checkS = saptamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.saptama);
           final bool checkA = ashtamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.ashtama);
           final bool checkD = dashamaM.isNotEmpty && reqShuddhis.contains(ShuddhiType.dashama);
+
+          // Collect ALL clean sub-windows
+          final List<List<double>> cleanSubWindows = []; // each: [startMins, endMins]
 
           while (scanJd <= windowEndJd + fineStep * 0.5) {
             final bh = Ephemeris.placidusHousesFull(scanJd, LocationService.lat, LocationService.lon);
@@ -3287,84 +3284,140 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             } else {
               if (cleanStart != null) {
                 // Found a clean sub-window: cleanStartMins to localMins
-                bhavaStartTime = _minutesToTimeStr(cleanStartMins);
-                bhavaEndTime = _minutesToTimeStr(localMins);
-                lagnaBhavaOk = !checkL;
-                saptamaBhavaOk = !checkS;
-                ashtamaBhavaOk = !checkA;
-                dashamaBhavaOk = !checkD;
-                // Mark all as OK since the sub-window is clean
-                if (checkL) lagnaBhavaOk = true;
-                if (checkS) saptamaBhavaOk = true;
-                if (checkA) ashtamaBhavaOk = true;
-                if (checkD) dashamaBhavaOk = true;
-                break; // Use first clean window
+                cleanSubWindows.add([cleanStartMins, localMins]);
+                cleanStart = null;
               }
             }
             scanJd += fineStep;
           }
 
           // Handle clean window that extends to end of lagna window
-          if (cleanStart != null && bhavaStartTime == null) {
-            bhavaStartTime = _minutesToTimeStr(cleanStartMins);
-            bhavaEndTime = _minutesToTimeStr(endMins);
-            if (checkL) lagnaBhavaOk = true;
-            if (checkS) saptamaBhavaOk = true;
-            if (checkA) ashtamaBhavaOk = true;
-            if (checkD) dashamaBhavaOk = true;
+          if (cleanStart != null) {
+            cleanSubWindows.add([cleanStartMins, endMins]);
           }
 
-          // If no clean sub-window found, mark as failed
-          if (bhavaStartTime == null) {
-            lagnaBhavaOk = !checkL;
-            saptamaBhavaOk = !checkS;
-            ashtamaBhavaOk = !checkA;
-            dashamaBhavaOk = !checkD;
+          // Shared properties for all sub-windows from this rashi window
+          final chandraRashi = windowPlanetRashis['ಚಂದ್ರ'] ?? -1;
+          final chandraSaptamaRashi = chandraRashi >= 0 ? (chandraRashi + 6) % 12 : -1;
+          final List<String> chandraSaptamaM = [];
+          if (chandraSaptamaRashi >= 0) {
+            if (windowPlanetRashis['ರವಿ'] == chandraSaptamaRashi) chandraSaptamaM.add('ರವಿ');
+            if (windowPlanetRashis['ಕುಜ'] == chandraSaptamaRashi) chandraSaptamaM.add('ಕುಜ');
+            if (windowPlanetRashis['ಶನಿ'] == chandraSaptamaRashi) chandraSaptamaM.add('ಶನಿ');
           }
+          final guruOk = windowGuruRashiIdx >= 0 ? isGuruAnukoolaForLagna(currentRashi, windowGuruRashiIdx) : false;
+          final guruHouse = windowGuruRashiIdx >= 0 ? ((windowGuruRashiIdx - currentRashi + 12) % 12) + 1 : 0;
+          final bool isLagnaAllowed = allowedLagnas == null || allowedLagnas.contains(currentRashi);
+
+          if (cleanSubWindows.isNotEmpty) {
+            // Emit each clean sub-window as a separate LagnaWindow
+            for (final sw in cleanSubWindows) {
+              windows.add(LagnaWindow(
+                rashiIndex: currentRashi,
+                rashiName: appRashi[currentRashi],
+                startTime: _minutesToTimeStr(sw[0]),
+                endTime: _minutesToTimeStr(sw[1]),
+                isAllowed: isLagnaAllowed,
+                lagnaShuddhi: lagnaM.isEmpty,
+                saptamaShuddhi: saptamaM.isEmpty,
+                ashtamaShuddhi: ashtamaM.isEmpty,
+                dashamaShuddhi: dashamaM.isEmpty,
+                chandraSaptamaShuddhi: chandraSaptamaM.isEmpty,
+                guruAnukoola: guruOk,
+                lagnaGrahas: lagnaM,
+                saptamaGrahas: saptamaM,
+                ashtamaGrahas: ashtamaM,
+                dashamaGrahas: dashamaM,
+                chandraSaptamaGrahas: chandraSaptamaM,
+                guruFromLagna: guruHouse,
+                requiredShuddhis: reqShuddhis,
+                usedBhavaFallback: true,
+                lagnaBhavaShuddhi: true,
+                saptamaBhavaShuddhi: true,
+                ashtamaBhavaShuddhi: true,
+                dashamaBhavaShuddhi: true,
+                lagnaBhavaGrahas: const [],
+                saptamaBhavaGrahas: const [],
+                ashtamaBhavaGrahas: const [],
+                dashamaBhavaGrahas: const [],
+              ));
+            }
+          } else {
+            // No clean sub-window — emit the rashi window with bhava shuddhi failed
+            windows.add(LagnaWindow(
+              rashiIndex: currentRashi,
+              rashiName: appRashi[currentRashi],
+              startTime: _minutesToTimeStr(startMins),
+              endTime: _minutesToTimeStr(endMins),
+              isAllowed: isLagnaAllowed,
+              lagnaShuddhi: lagnaM.isEmpty,
+              saptamaShuddhi: saptamaM.isEmpty,
+              ashtamaShuddhi: ashtamaM.isEmpty,
+              dashamaShuddhi: dashamaM.isEmpty,
+              chandraSaptamaShuddhi: chandraSaptamaM.isEmpty,
+              guruAnukoola: guruOk,
+              lagnaGrahas: lagnaM,
+              saptamaGrahas: saptamaM,
+              ashtamaGrahas: ashtamaM,
+              dashamaGrahas: dashamaM,
+              chandraSaptamaGrahas: chandraSaptamaM,
+              guruFromLagna: guruHouse,
+              requiredShuddhis: reqShuddhis,
+              usedBhavaFallback: true,
+              lagnaBhavaShuddhi: !checkL,
+              saptamaBhavaShuddhi: !checkS,
+              ashtamaBhavaShuddhi: !checkA,
+              dashamaBhavaShuddhi: !checkD,
+              lagnaBhavaGrahas: const [],
+              saptamaBhavaGrahas: const [],
+              ashtamaBhavaGrahas: const [],
+              dashamaBhavaGrahas: const [],
+            ));
+          }
+        } else {
+          // ── No bhava fallback needed: standard rashi-based window ──
+          final chandraRashi = windowPlanetRashis['ಚಂದ್ರ'] ?? -1;
+          final chandraSaptamaRashi = chandraRashi >= 0 ? (chandraRashi + 6) % 12 : -1;
+          final List<String> chandraSaptamaM = [];
+          if (chandraSaptamaRashi >= 0) {
+            if (windowPlanetRashis['ರವಿ'] == chandraSaptamaRashi) chandraSaptamaM.add('ರವಿ');
+            if (windowPlanetRashis['ಕುಜ'] == chandraSaptamaRashi) chandraSaptamaM.add('ಕುಜ');
+            if (windowPlanetRashis['ಶನಿ'] == chandraSaptamaRashi) chandraSaptamaM.add('ಶನಿ');
+          }
+          final guruOk = windowGuruRashiIdx >= 0 ? isGuruAnukoolaForLagna(currentRashi, windowGuruRashiIdx) : false;
+          final guruHouse = windowGuruRashiIdx >= 0 ? ((windowGuruRashiIdx - currentRashi + 12) % 12) + 1 : 0;
+          final bool isLagnaAllowed = allowedLagnas == null || allowedLagnas.contains(currentRashi);
+
+          windows.add(LagnaWindow(
+            rashiIndex: currentRashi,
+            rashiName: appRashi[currentRashi],
+            startTime: _minutesToTimeStr(startMins),
+            endTime: _minutesToTimeStr(endMins),
+            isAllowed: isLagnaAllowed,
+            lagnaShuddhi: lagnaM.isEmpty,
+            saptamaShuddhi: saptamaM.isEmpty,
+            ashtamaShuddhi: ashtamaM.isEmpty,
+            dashamaShuddhi: dashamaM.isEmpty,
+            chandraSaptamaShuddhi: chandraSaptamaM.isEmpty,
+            guruAnukoola: guruOk,
+            lagnaGrahas: lagnaM,
+            saptamaGrahas: saptamaM,
+            ashtamaGrahas: ashtamaM,
+            dashamaGrahas: dashamaM,
+            chandraSaptamaGrahas: chandraSaptamaM,
+            guruFromLagna: guruHouse,
+            requiredShuddhis: reqShuddhis,
+            usedBhavaFallback: false,
+            lagnaBhavaShuddhi: true,
+            saptamaBhavaShuddhi: true,
+            ashtamaBhavaShuddhi: true,
+            dashamaBhavaShuddhi: true,
+            lagnaBhavaGrahas: const [],
+            saptamaBhavaGrahas: const [],
+            ashtamaBhavaGrahas: const [],
+            dashamaBhavaGrahas: const [],
+          ));
         }
-
-        final chandraRashi = windowPlanetRashis['ಚಂದ್ರ'] ?? -1;
-        final chandraSaptamaRashi = chandraRashi >= 0 ? (chandraRashi + 6) % 12 : -1;
-        final List<String> chandraSaptamaM = [];
-        if (chandraSaptamaRashi >= 0) {
-          if (windowPlanetRashis['ರವಿ'] == chandraSaptamaRashi) chandraSaptamaM.add('ರವಿ');
-          if (windowPlanetRashis['ಕುಜ'] == chandraSaptamaRashi) chandraSaptamaM.add('ಕುಜ');
-          if (windowPlanetRashis['ಶನಿ'] == chandraSaptamaRashi) chandraSaptamaM.add('ಶನಿ');
-        }
-
-        final guruOk = windowGuruRashiIdx >= 0 ? isGuruAnukoolaForLagna(currentRashi, windowGuruRashiIdx) : false;
-        final guruHouse = windowGuruRashiIdx >= 0 ? ((windowGuruRashiIdx - currentRashi + 12) % 12) + 1 : 0;
-        final bool isLagnaAllowed = allowedLagnas == null || allowedLagnas.contains(currentRashi);
-
-        windows.add(LagnaWindow(
-          rashiIndex: currentRashi,
-          rashiName: appRashi[currentRashi],
-          startTime: bhavaStartTime ?? _minutesToTimeStr(startMins),
-          endTime: bhavaEndTime ?? _minutesToTimeStr(endMins),
-          isAllowed: isLagnaAllowed,
-          lagnaShuddhi: lagnaM.isEmpty,
-          saptamaShuddhi: saptamaM.isEmpty,
-          ashtamaShuddhi: ashtamaM.isEmpty,
-          dashamaShuddhi: dashamaM.isEmpty,
-          chandraSaptamaShuddhi: chandraSaptamaM.isEmpty,
-          guruAnukoola: guruOk,
-          lagnaGrahas: lagnaM,
-          saptamaGrahas: saptamaM,
-          ashtamaGrahas: ashtamaM,
-          dashamaGrahas: dashamaM,
-          chandraSaptamaGrahas: chandraSaptamaM,
-          guruFromLagna: guruHouse,
-          requiredShuddhis: reqShuddhis,
-          usedBhavaFallback: bhavaFallbackUsed,
-          lagnaBhavaShuddhi: lagnaBhavaOk,
-          saptamaBhavaShuddhi: saptamaBhavaOk,
-          ashtamaBhavaShuddhi: ashtamaBhavaOk,
-          dashamaBhavaShuddhi: dashamaBhavaOk,
-          lagnaBhavaGrahas: lagnaBhavaGrahasList,
-          saptamaBhavaGrahas: saptamaBhavaGrahasList,
-          ashtamaBhavaGrahas: ashtamaBhavaGrahasList,
-          dashamaBhavaGrahas: dashamaBhavaGrahasList,
-        ));
 
         currentRashi = samples[i].rashiIdx;
         startMins = samples[i].localMins;
