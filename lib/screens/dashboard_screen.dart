@@ -1433,8 +1433,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ],
               ),
             ),
-            // Person selector (multi-person only)
-            if (_extraPersons.isNotEmpty)
+            // Person selector (multi-person only) — portrait only
+            // In landscape, the bottom person selector is used instead.
+            if (_extraPersons.isNotEmpty && MediaQuery.of(context).orientation != Orientation.landscape)
               Container(
                 color: kCard,
                 padding: const EdgeInsets.symmetric(vertical: 4),
@@ -4781,15 +4782,15 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
         ),
       );
     } else {
-      // ── LANDSCAPE: horizontal scroll, 2 charts visible at a time ──
+      // ── LANDSCAPE: exactly 2 charts visible, no title labels ──
       final screenHeight = MediaQuery.of(context).size.height;
       final screenWidth = MediaQuery.of(context).size.width;
       final topPad = MediaQuery.of(context).padding.top;
-      // status bar + app bar(56) + tab bar(48) + person header + padding
-      final chartSize = (screenHeight - topPad - 220).clamp(180.0, screenHeight * 0.55);
-      final chartWidth = (screenWidth * 0.48).clamp(250.0, chartSize);
+      // Fit exactly 2 charts: each takes half the screen width minus padding
+      final chartSize = (screenHeight - topPad - 160).clamp(180.0, screenHeight * 0.65);
+      final chartWidth = (screenWidth / 2.0) - 16; // exactly 2 per screen
       return SizedBox(
-        height: chartSize + 40,
+        height: chartSize + 16,
         child: ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(
             dragDevices: {
@@ -4802,18 +4803,11 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             itemCount: widget.charts.length,
             itemBuilder: (context, i) {
-              final label = widget.charts[i]['label'] as String;
               return SizedBox(
                 width: chartWidth,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Column(
-                    children: [
-                      Text(label, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: kPurple2)),
-                      const SizedBox(height: 4),
-                      Expanded(child: _buildChart(i)),
-                    ],
-                  ),
+                  child: _buildChart(i),
                 ),
               );
             },
