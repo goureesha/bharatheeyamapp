@@ -15,6 +15,7 @@ import '../widgets/muhurta_rules_editor.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../services/app_access_service.dart';
 import 'support_screen.dart';
+import 'dashboard_screen.dart';
 
 class TaranukoolaScreen extends StatefulWidget {
   const TaranukoolaScreen({super.key});
@@ -2938,6 +2939,75 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $ampm';
   }
 
+  /// Open kundali for a muhurta lagna window time.
+  /// Parses start+end time, computes midpoint, calculates kundali, navigates.
+  void _openMuhurtaKundali(String startTime, String endTime, {DateTime? date}) async {
+    final dt = date ?? _selectedDay;
+    if (dt == null) return;
+
+    // Parse "HH:MM AM/PM" to 24h
+    int _parse24(String t) {
+      final parts = t.trim().split(' ');
+      final hm = parts[0].split(':');
+      int h = int.parse(hm[0]);
+      final m = int.parse(hm[1]);
+      final isPm = parts.length > 1 && parts[1].toUpperCase() == 'PM';
+      if (isPm && h != 12) h += 12;
+      if (!isPm && h == 12) h = 0;
+      return h * 60 + m;
+    }
+
+    final startMins = _parse24(startTime);
+    final endMins = _parse24(endTime);
+    final midMins = ((startMins + endMins) / 2).round();
+    final hour24 = midMins ~/ 60;
+    final minute = midMins % 60;
+
+    // Convert to 12h for DashboardScreen
+    final ampm = hour24 >= 12 ? 'PM' : 'AM';
+    int hour12 = hour24 > 12 ? hour24 - 12 : hour24;
+    if (hour12 == 0) hour12 = 12;
+
+    // For night windows past midnight, use next day
+    DateTime useDate = dt;
+    if (startMins < 360 && endMins < 360) {
+      // Before 6 AM — likely night window, could be next day
+      // Keep same date for now; user can adjust
+    }
+
+    final lat = LocationService.lat;
+    final lon = LocationService.lon;
+    final tz = LocationService.tzOffset;
+    final place = LocationService.placeName;
+
+    final result = await AstroCalculator.calculate(
+      year: useDate.year, month: useDate.month, day: useDate.day,
+      hourUtcOffset: tz,
+      hour24: hour24 + (minute / 60.0),
+      lat: lat, lon: lon,
+      ayanamsaMode: 'lahiri',
+      trueNode: true,
+    );
+
+    if (result != null && mounted) {
+      Navigator.push(context, MaterialPageRoute(
+        builder: (_) => DashboardScreen(
+          result: result,
+          name: '${AppLocale.l('muhurtaShodhane')} $startTime',
+          place: place,
+          dob: useDate,
+          hour: hour12,
+          minute: minute,
+          ampm: ampm,
+          lat: lat,
+          lon: lon,
+          tz: tz,
+          extraInfo: {'ayanamsa': 'lahiri', 'nodeMode': 'true'},
+        ),
+      ));
+    }
+  }
+
   Widget _buildMuhurtaTimings(PanchangData pan, bool isDay) {
     final sr = _parseTimeToMinutes(pan.sunrise);
     final ss = _parseTimeToMinutes(pan.sunset);
@@ -3483,9 +3553,24 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                   fontWeight: FontWeight.w800,
                   color: Colors.amber.shade900, fontSize: 13,
                 ))),
-                Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(
-                  fontSize: 12, color: Colors.amber.shade800, fontWeight: FontWeight.w700,
-                )),
+                GestureDetector(
+                  onTap: () => _openMuhurtaKundali(lw.startTime, lw.endTime),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.amber.shade600, width: 0.5),
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(Icons.open_in_new, size: 12, color: Colors.amber.shade800),
+                      const SizedBox(width: 4),
+                      Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(
+                        fontSize: 12, color: Colors.amber.shade800, fontWeight: FontWeight.w700,
+                      )),
+                    ]),
+                  ),
+                ),
               ]),
             );
           }
@@ -3526,9 +3611,24 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                   fontWeight: lw.isShubha ? FontWeight.w800 : FontWeight.w500,
                   color: lw.isShubha ? kText : kMuted, fontSize: 13,
                 ))),
-                Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(
-                  fontSize: 12, color: lw.isShubha ? Colors.green.shade700 : kMuted, fontWeight: FontWeight.w600,
-                )),
+                GestureDetector(
+                  onTap: () => _openMuhurtaKundali(lw.startTime, lw.endTime),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: (lw.isShubha ? Colors.green : Colors.grey).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: lw.isShubha ? Colors.green.shade400 : Colors.grey.shade400, width: 0.5),
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(Icons.open_in_new, size: 12, color: lw.isShubha ? Colors.green.shade700 : kMuted),
+                      const SizedBox(width: 4),
+                      Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(
+                        fontSize: 12, color: lw.isShubha ? Colors.green.shade700 : kMuted, fontWeight: FontWeight.w600,
+                      )),
+                    ]),
+                  ),
+                ),
               ]),
               const SizedBox(height: 4),
               Wrap(spacing: 6, runSpacing: 4, children: [
