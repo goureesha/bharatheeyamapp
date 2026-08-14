@@ -57,6 +57,7 @@ class DashboardScreen extends StatefulWidget {
   final int? initialJanmaNakshatraIdx;
   final Map<String, String> extraInfo;
   final List<String> initialGroupMembers;
+  final List<PersonEntry> initialExtraPersons;
   final void Function(String notes, Map<String, int> aroodhas, int? janmaNakshatraIdx, {bool isNew}) onSave;
 
   const DashboardScreen({
@@ -76,6 +77,7 @@ class DashboardScreen extends StatefulWidget {
     this.initialJanmaNakshatraIdx,
     this.extraInfo = const {},
     this.initialGroupMembers = const [],
+    this.initialExtraPersons = const [],
     required this.onSave,
   });
 
@@ -83,7 +85,7 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _PersonEntry {
+class PersonEntry {
   final String name;
   final KundaliResult result;
   final DateTime dob;
@@ -96,7 +98,7 @@ class _PersonEntry {
   final String place;
   String notes;
 
-  _PersonEntry({
+  PersonEntry({
     required this.name,
     required this.result,
     required this.dob,
@@ -140,7 +142,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
 
   // Multi-person support
-  final List<_PersonEntry> _extraPersons = [];
+  final List<PersonEntry> _extraPersons = [];
   Set<int> _selectedPersonIndices = {}; // empty = show all, otherwise show selected indices
   int _selectedChartIdx = 0;  // which chart type is selected (0 = Rashi, 1 = Navamsha, ...)
 
@@ -222,6 +224,11 @@ class _DashboardScreenState extends State<DashboardScreen>
     // Auto-load group members if saved previously
     if (widget.initialGroupMembers.isNotEmpty) {
       _loadGroupMembers();
+    }
+
+    // Load pre-computed extra persons (e.g., muhurta start/end time view)
+    if (widget.initialExtraPersons.isNotEmpty) {
+      _extraPersons.addAll(widget.initialExtraPersons);
     }
 
     _loadJyotishiDetails();
@@ -451,7 +458,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       }
       if (mounted) {
         setState(() {
-          _extraPersons.add(_PersonEntry(name: p.name, result: result, dob: dob, hour: p.hour, minute: p.minute, ampm: p.ampm, lat: p.lat, lon: p.lon, tz: p.tzOffset, place: p.place, notes: p.notes));
+          _extraPersons.add(PersonEntry(name: p.name, result: result, dob: dob, hour: p.hour, minute: p.minute, ampm: p.ampm, lat: p.lat, lon: p.lon, tz: p.tzOffset, place: p.place, notes: p.notes));
         });
       }
     } catch (e) {
@@ -693,7 +700,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   
                   if (mounted) {
                     setState(() {
-                      _extraPersons.add(_PersonEntry(name: name, result: result, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, tz: tz, place: placeCtrl.text));
+                      _extraPersons.add(PersonEntry(name: name, result: result, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, tz: tz, place: placeCtrl.text));
                     });
                     HistoryService.add(HistoryEntry(
                       name: name,
@@ -921,7 +928,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                   if (mounted) {
                     setState(() {
-                      _extraPersons[idx] = _PersonEntry(name: name, result: result, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, tz: tz, place: placeCtrl.text, notes: existing.notes);
+                      _extraPersons[idx] = PersonEntry(name: name, result: result, dob: dob, hour: hour, minute: minute, ampm: ampm, lat: lat, lon: lon, tz: tz, place: placeCtrl.text, notes: existing.notes);
                     });
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ $name ${AppLocale.l('calcSuccess')}'), backgroundColor: Colors.green));
                   }
@@ -1174,7 +1181,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   /// Load all group members from saved profiles and calculate their kundalis
   Future<void> _loadGroupMembers() async {
     final profiles = await StorageService.loadAll();
-    final newEntries = <_PersonEntry>[];
+    final newEntries = <PersonEntry>[];
 
     for (final memberName in widget.initialGroupMembers) {
       // Skip if already loaded or if it's the primary person
@@ -1197,7 +1204,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           lat: p.lat, lon: p.lon, ayanamsaMode: 'lahiri', trueNode: true,
         );
         if (result != null) {
-          newEntries.add(_PersonEntry(
+          newEntries.add(PersonEntry(
             name: p.name, result: result, dob: dob,
             hour: p.hour, minute: p.minute, ampm: p.ampm,
             lat: p.lat, lon: p.lon, tz: p.tzOffset, place: p.place, notes: p.notes,
@@ -3129,7 +3136,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     return _noteControllers[name]!;
   }
   
-  void _saveIndividualNote(String name, bool isPrimary, _PersonEntry? entry, String newNotes) {
+  void _saveIndividualNote(String name, bool isPrimary, PersonEntry? entry, String newNotes) {
     final cId = widget.extraInfo['clientId'] ?? '';
     
     if (isPrimary) {
@@ -3154,7 +3161,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   /// Show dialog to configure and generate Tippani PDF
-  void _showTippaniPdfDialog(String name, bool isPrimary, _PersonEntry? entry, List<Map<String, String>> noteEntries) {
+  void _showTippaniPdfDialog(String name, bool isPrimary, PersonEntry? entry, List<Map<String, String>> noteEntries) {
     final dobDate = isPrimary ? widget.dob : entry!.dob;
     final dobStr = '${dobDate.day.toString().padLeft(2, '0')}-${dobDate.month.toString().padLeft(2, '0')}-${dobDate.year}';
     final birthHour = isPrimary ? widget.hour : entry!.hour;
@@ -3397,7 +3404,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildIndividualNoteSection({required String name, required bool isPrimary, required _PersonEntry? entry}) {
+  Widget _buildIndividualNoteSection({required String name, required bool isPrimary, required PersonEntry? entry}) {
     final currentNotes = isPrimary ? _notes : (entry?.notes ?? '');
     final entries = _parseNoteEntries(currentNotes);
     final ctrl = _getNoteController(name);
@@ -3858,7 +3865,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         return _buildIndividualNoteSection(
            name: pData['name'] as String,
            isPrimary: pData['isPrimary'] as bool,
-           entry: pData['entry'] as _PersonEntry?,
+           entry: pData['entry'] as PersonEntry?,
         );
       },
     );

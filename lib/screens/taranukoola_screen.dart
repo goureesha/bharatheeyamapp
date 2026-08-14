@@ -2971,14 +2971,14 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $ampm';
   }
 
-  /// Open kundali for a muhurta lagna window time.
-  /// Parses start+end time, computes midpoint, calculates kundali, navigates.
+  /// Open kundali for a muhurta lagna window — shows BOTH start and end time
+  /// as a 2-person view so the user can compare charts at window boundaries.
   /// For cached results, pass useCachedLocation: true to use PanchangaCache lat/lon.
   void _openMuhurtaKundali(String startTime, String endTime, {DateTime? date, bool useCachedLocation = false}) async {
     final dt = date ?? _selectedDay;
     if (dt == null) return;
 
-    // Parse "HH:MM AM/PM" to 24h
+    // Parse "HH:MM AM/PM" to 24h minutes
     int _parse24(String t) {
       final parts = t.trim().split(' ');
       final hm = parts[0].split(':');
@@ -2990,23 +2990,23 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       return h * 60 + m;
     }
 
+    // Convert 24h minutes to 12h components
+    Map<String, dynamic> _to12h(int mins) {
+      final hour24 = mins ~/ 60;
+      final minute = mins % 60;
+      final ampm = hour24 >= 12 ? 'PM' : 'AM';
+      int hour12 = hour24 > 12 ? hour24 - 12 : hour24;
+      if (hour12 == 0) hour12 = 12;
+      return {'hour24': hour24, 'minute': minute, 'hour12': hour12, 'ampm': ampm};
+    }
+
     final startMins = _parse24(startTime);
     final endMins = _parse24(endTime);
-    final midMins = ((startMins + endMins) / 2).round();
-    final hour24 = midMins ~/ 60;
-    final minute = midMins % 60;
 
-    // Convert to 12h for DashboardScreen
-    final ampm = hour24 >= 12 ? 'PM' : 'AM';
-    int hour12 = hour24 > 12 ? hour24 - 12 : hour24;
-    if (hour12 == 0) hour12 = 12;
+    final startParts = _to12h(startMins);
+    final endParts = _to12h(endMins);
 
-    // For night windows past midnight, use next day
     DateTime useDate = dt;
-    if (startMins < 360 && endMins < 360) {
-      // Before 6 AM — likely night window, could be next day
-      // Keep same date for now; user can adjust
-    }
 
     // Use cached location if available and requested, else default LocationService
     final cache = PanchangaCache.instance;
@@ -3026,29 +3026,58 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       place = LocationService.place;
     }
 
-    final result = await AstroCalculator.calculate(
+    // Compute kundali for START time
+    final startResult = await AstroCalculator.calculate(
       year: useDate.year, month: useDate.month, day: useDate.day,
       hourUtcOffset: tz,
-      hour24: hour24 + (minute / 60.0),
+      hour24: startParts['hour24'] + (startParts['minute'] / 60.0),
       lat: lat, lon: lon,
       ayanamsaMode: 'lahiri',
       trueNode: true,
     );
 
-    if (result != null && mounted) {
+    // Compute kundali for END time
+    final endResult = await AstroCalculator.calculate(
+      year: useDate.year, month: useDate.month, day: useDate.day,
+      hourUtcOffset: tz,
+      hour24: endParts['hour24'] + (endParts['minute'] / 60.0),
+      lat: lat, lon: lon,
+      ayanamsaMode: 'lahiri',
+      trueNode: true,
+    );
+
+    if (startResult != null && mounted) {
+      // Build end-time extra person (if end kundali computed)
+      final extraPersons = <PersonEntry>[];
+      if (endResult != null) {
+        extraPersons.add(PersonEntry(
+          name: '${AppLocale.l('muhurtaShodhane')} $endTime',
+          result: endResult,
+          dob: useDate,
+          hour: endParts['hour12'] as int,
+          minute: endParts['minute'] as int,
+          ampm: endParts['ampm'] as String,
+          lat: lat,
+          lon: lon,
+          tz: tz,
+          place: place,
+        ));
+      }
+
       Navigator.push(context, MaterialPageRoute(
         builder: (_) => DashboardScreen(
-          result: result,
+          result: startResult,
           name: '${AppLocale.l('muhurtaShodhane')} $startTime',
           place: place,
           dob: useDate,
-          hour: hour12,
-          minute: minute,
-          ampm: ampm,
+          hour: startParts['hour12'] as int,
+          minute: startParts['minute'] as int,
+          ampm: startParts['ampm'] as String,
           lat: lat,
           lon: lon,
           tz: tz,
           extraInfo: {'ayanamsa': 'lahiri', 'nodeMode': 'true'},
+          initialExtraPersons: extraPersons,
           onSave: (notes, aroodhas, janmaIdx, {bool isNew = true}) {},
         ),
       ));
