@@ -2517,7 +2517,22 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                             Icon(Icons.auto_awesome, color: Colors.amber.shade700, size: 14),
                             const SizedBox(width: 6),
                             Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(fontWeight: FontWeight.w800, color: Colors.amber.shade900, fontSize: 12))),
-                            Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(fontSize: 11, color: Colors.amber.shade800, fontWeight: FontWeight.w700)),
+                            GestureDetector(
+                              onTap: () => _openMuhurtaKundali(lw.startTime, lw.endTime, date: date),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(color: Colors.amber.shade600, width: 0.5),
+                                ),
+                                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                  Icon(Icons.open_in_new, size: 10, color: Colors.amber.shade800),
+                                  const SizedBox(width: 3),
+                                  Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(fontSize: 11, color: Colors.amber.shade800, fontWeight: FontWeight.w700)),
+                                ]),
+                              ),
+                            ),
                           ]),
                         );
                       }
@@ -2539,7 +2554,22 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                             Icon(rowIcon, color: iconColor, size: 14),
                             const SizedBox(width: 6),
                             Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(fontWeight: FontWeight.w800, color: kText, fontSize: 12))),
-                            Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(fontSize: 11, color: iconColor, fontWeight: FontWeight.w600)),
+                            GestureDetector(
+                              onTap: () => _openMuhurtaKundali(lw.startTime, lw.endTime, date: date),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: iconColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(color: iconColor.withOpacity(0.4), width: 0.5),
+                                ),
+                                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                  Icon(Icons.open_in_new, size: 10, color: iconColor),
+                                  const SizedBox(width: 3),
+                                  Text('${lw.startTime} - ${lw.endTime}', style: TextStyle(fontSize: 11, color: iconColor, fontWeight: FontWeight.w600)),
+                                ]),
+                              ),
+                            ),
                           ]),
                           const SizedBox(height: 3),
                           Wrap(spacing: 4, runSpacing: 3, children: [
