@@ -187,6 +187,7 @@ class PanchangaCache {
       }
       _cachedLat = (json['lat'] as num?)?.toDouble();
       _cachedLon = (json['lon'] as num?)?.toDouble();
+      _zoneName = json['zone'] as String?;
 
       final List<dynamic> daysJson = json['days'] as List<dynamic>;
       _days = daysJson.map((d) => CachedPanchangaDay.fromCompact(d as List<dynamic>)).toList();

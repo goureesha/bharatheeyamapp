@@ -1096,6 +1096,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           lat: LocationService.lat,
           lon: LocationService.lon,
           tzOffset: LocationService.tzOffset,
+          zoneName: LocationService.place,
         );
       } catch (e) {
         // If cache generation fails, fall back to non-cached
