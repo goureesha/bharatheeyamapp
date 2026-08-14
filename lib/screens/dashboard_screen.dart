@@ -1543,38 +1543,54 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ],
                     );
                   } else {
-                    // ── LANDSCAPE: Collapsible bars for tablet users ──
+                    // ── LANDSCAPE: Bars at BOTTOM, collapsible for tablet users ──
                     return Column(
                       children: [
-                        // Collapsible TabBar at top
-                        AnimatedCrossFade(
-                          firstChild: Container(
-                            color: kCard,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: TabBar(
-                                    controller: _tabCtrl,
-                                    isScrollable: true,
-                                    tabs: _tabs.map((t) => Tab(text: t)).toList(),
+                        // Main content (top — takes all available space)
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              TabBarView(
+                                controller: _tabCtrl,
+                                children: [
+                                  _buildPanchangTab(),
+                                  _buildKundaliTab(),
+                                  _buildSphutas(),
+                                  _buildAroodhaTab(),
+                                  _buildDashaTab(),
+                                  _buildBhavaTab(),
+                                  _buildGrahaShadvargaTab(),
+                                  _buildShadbalaTab(),
+                                  _buildAshtakaTab(),
+                                  _buildYogaTab(),
+                                  _buildGocharTab(),
+                                  _buildNotesTab(),
+                                  _buildJanmaPatrikeTab(),
+                                ],
+                              ),
+                              // Floating expand button when bars are hidden
+                              if (!_landscapeBarsVisible)
+                                Positioned(
+                                  bottom: 4,
+                                  right: 4,
+                                  child: Material(
+                                    color: kCard.withOpacity(0.9),
+                                    borderRadius: BorderRadius.circular(20),
+                                    elevation: 3,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(20),
+                                      onTap: () => setState(() => _landscapeBarsVisible = true),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(6),
+                                        child: Icon(Icons.keyboard_arrow_up, size: 22, color: kPurple2),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                // Collapse button
-                                InkWell(
-                                  onTap: () => setState(() => _landscapeBarsVisible = false),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                                    child: Icon(Icons.keyboard_arrow_up, size: 20, color: kMuted),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            ],
                           ),
-                          secondChild: const SizedBox.shrink(),
-                          crossFadeState: _landscapeBarsVisible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-                          duration: const Duration(milliseconds: 200),
                         ),
-                        // Collapsible Person selector
+                        // Collapsible Person selector (bottom)
                         if (_extraPersons.isNotEmpty)
                           AnimatedCrossFade(
                             firstChild: Container(
@@ -1644,49 +1660,33 @@ class _DashboardScreenState extends State<DashboardScreen>
                             crossFadeState: _landscapeBarsVisible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
                             duration: const Duration(milliseconds: 200),
                           ),
-                        // Main content
-                        Expanded(
-                          child: Stack(
-                            children: [
-                              TabBarView(
-                                controller: _tabCtrl,
-                                children: [
-                                  _buildPanchangTab(),
-                                  _buildKundaliTab(),
-                                  _buildSphutas(),
-                                  _buildAroodhaTab(),
-                                  _buildDashaTab(),
-                                  _buildBhavaTab(),
-                                  _buildGrahaShadvargaTab(),
-                                  _buildShadbalaTab(),
-                                  _buildAshtakaTab(),
-                                  _buildYogaTab(),
-                                  _buildGocharTab(),
-                                  _buildNotesTab(),
-                                  _buildJanmaPatrikeTab(),
-                                ],
-                              ),
-                              // Floating expand button when bars are hidden
-                              if (!_landscapeBarsVisible)
-                                Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: Material(
-                                    color: kCard.withOpacity(0.9),
-                                    borderRadius: BorderRadius.circular(20),
-                                    elevation: 3,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(20),
-                                      onTap: () => setState(() => _landscapeBarsVisible = true),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(6),
-                                        child: Icon(Icons.keyboard_arrow_down, size: 22, color: kPurple2),
-                                      ),
-                                    ),
+                        // Collapsible TabBar at bottom
+                        AnimatedCrossFade(
+                          firstChild: Container(
+                            color: kCard,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TabBar(
+                                    controller: _tabCtrl,
+                                    isScrollable: true,
+                                    tabs: _tabs.map((t) => Tab(text: t)).toList(),
                                   ),
                                 ),
-                            ],
+                                // Collapse button
+                                InkWell(
+                                  onTap: () => setState(() => _landscapeBarsVisible = false),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                                    child: Icon(Icons.keyboard_arrow_down, size: 20, color: kMuted),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                          secondChild: const SizedBox.shrink(),
+                          crossFadeState: _landscapeBarsVisible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                          duration: const Duration(milliseconds: 200),
                         ),
                       ],
                     );
