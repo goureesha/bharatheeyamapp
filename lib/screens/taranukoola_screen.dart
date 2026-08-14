@@ -2978,7 +2978,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     final lat = LocationService.lat;
     final lon = LocationService.lon;
     final tz = LocationService.tzOffset;
-    final place = LocationService.placeName;
+    final place = LocationService.place;
 
     final result = await AstroCalculator.calculate(
       year: useDate.year, month: useDate.month, day: useDate.day,
@@ -3003,6 +3003,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           lon: lon,
           tz: tz,
           extraInfo: {'ayanamsa': 'lahiri', 'nodeMode': 'true'},
+          onSave: (notes, aroodhas, janmaIdx, {bool isNew = true}) {},
         ),
       ));
     }
