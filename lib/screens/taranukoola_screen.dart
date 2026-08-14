@@ -53,6 +53,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   List<Map<String, dynamic>> _mfResults = [];
   Map<String, dynamic>? _mfStats;
   int _mfDisplayCount = 20;
+  bool _mfUsedCache = false; // whether results came from cached scan
   final Set<String> _expandedResults = {};
 
   // Cache state
@@ -1102,7 +1103,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       }
     }
 
-    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; _mfDisplayCount = 20; _expandedResults.clear(); });
+    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; _mfDisplayCount = 20; _expandedResults.clear(); _mfUsedCache = true; });
     await Future.delayed(const Duration(milliseconds: 20));
 
     final userRules = UserRulesManager.instance.getRules(_mfEvent);
@@ -1345,7 +1346,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   Future<void> _searchMuhurtas() async {
     // Keep screen on during long calculation
     WakelockPlus.enable();
-    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; _mfDisplayCount = 20; });
+    setState(() { _mfSearching = true; _mfResults = []; _mfStats = null; _mfDisplayCount = 20; _mfUsedCache = false; });
     await Future.delayed(const Duration(milliseconds: 50));
 
     final results = <Map<String, dynamic>>[];
@@ -2518,7 +2519,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                             const SizedBox(width: 6),
                             Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(fontWeight: FontWeight.w800, color: Colors.amber.shade900, fontSize: 12))),
                             GestureDetector(
-                              onTap: () => _openMuhurtaKundali(lw.startTime, lw.endTime, date: date),
+                              onTap: () => _openMuhurtaKundali(lw.startTime, lw.endTime, date: date, useCachedLocation: _mfUsedCache),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
@@ -2555,7 +2556,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                             const SizedBox(width: 6),
                             Expanded(child: Text(trAll(lw.rashiName), style: TextStyle(fontWeight: FontWeight.w800, color: kText, fontSize: 12))),
                             GestureDetector(
-                              onTap: () => _openMuhurtaKundali(lw.startTime, lw.endTime, date: date),
+                              onTap: () => _openMuhurtaKundali(lw.startTime, lw.endTime, date: date, useCachedLocation: _mfUsedCache),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
@@ -2971,7 +2972,8 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
   /// Open kundali for a muhurta lagna window time.
   /// Parses start+end time, computes midpoint, calculates kundali, navigates.
-  void _openMuhurtaKundali(String startTime, String endTime, {DateTime? date}) async {
+  /// For cached results, pass useCachedLocation: true to use PanchangaCache lat/lon.
+  void _openMuhurtaKundali(String startTime, String endTime, {DateTime? date, bool useCachedLocation = false}) async {
     final dt = date ?? _selectedDay;
     if (dt == null) return;
 
@@ -3005,10 +3007,23 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       // Keep same date for now; user can adjust
     }
 
-    final lat = LocationService.lat;
-    final lon = LocationService.lon;
-    final tz = LocationService.tzOffset;
-    final place = LocationService.place;
+    // Use cached location if available and requested, else default LocationService
+    final cache = PanchangaCache.instance;
+    final double lat;
+    final double lon;
+    final double tz;
+    final String place;
+    if (useCachedLocation && cache.cachedLat != null && cache.cachedLon != null) {
+      lat = cache.cachedLat!;
+      lon = cache.cachedLon!;
+      tz = LocationService.tzOffset;
+      place = cache.zoneName ?? LocationService.place;
+    } else {
+      lat = LocationService.lat;
+      lon = LocationService.lon;
+      tz = LocationService.tzOffset;
+      place = LocationService.place;
+    }
 
     final result = await AstroCalculator.calculate(
       year: useDate.year, month: useDate.month, day: useDate.day,
