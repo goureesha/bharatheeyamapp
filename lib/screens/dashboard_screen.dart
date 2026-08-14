@@ -159,6 +159,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   bool _syncing = false;
   int _gocharYear = DateTime.now().year;
   bool _dashaHighlightEnabled = true;
+  bool _landscapeBarsVisible = true; // Landscape: show/hide tab bar + person selector
 
   /// Translate dasha balance suffixes (ವ=years, ತಿ=months, ದಿ=days)
   String _trDashaBalance(String bal) {
@@ -1542,34 +1543,148 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ],
                     );
                   } else {
-                    // ── LANDSCAPE: Full width tabs (no panchanga side panel) ──
+                    // ── LANDSCAPE: Collapsible bars for tablet users ──
                     return Column(
                       children: [
-                        Container(
-                          color: kCard,
-                          child: TabBar(
-                            controller: _tabCtrl,
-                            isScrollable: true,
-                            tabs: _tabs.map((t) => Tab(text: t)).toList(),
+                        // Collapsible TabBar at top
+                        AnimatedCrossFade(
+                          firstChild: Container(
+                            color: kCard,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TabBar(
+                                    controller: _tabCtrl,
+                                    isScrollable: true,
+                                    tabs: _tabs.map((t) => Tab(text: t)).toList(),
+                                  ),
+                                ),
+                                // Collapse button
+                                InkWell(
+                                  onTap: () => setState(() => _landscapeBarsVisible = false),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                                    child: Icon(Icons.keyboard_arrow_up, size: 20, color: kMuted),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                          secondChild: const SizedBox.shrink(),
+                          crossFadeState: _landscapeBarsVisible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                          duration: const Duration(milliseconds: 200),
                         ),
+                        // Collapsible Person selector
+                        if (_extraPersons.isNotEmpty)
+                          AnimatedCrossFade(
+                            firstChild: Container(
+                              color: kCard,
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: SizedBox(
+                                height: 36,
+                                child: ListView(
+                                  scrollDirection: Axis.horizontal,
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 6),
+                                      child: FilterChip(
+                                        label: Text('ಎಲ್ಲ / All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIndices.isEmpty ? Colors.white : kText)),
+                                        selected: _selectedPersonIndices.isEmpty,
+                                        selectedColor: kPurple2,
+                                        backgroundColor: kCard,
+                                        side: BorderSide(color: _selectedPersonIndices.isEmpty ? kPurple2 : kBorder),
+                                        onSelected: (_) => setState(() => _selectedPersonIndices = {}),
+                                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        visualDensity: VisualDensity.compact,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 6),
+                                      child: FilterChip(
+                                        label: Text(_primaryName, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIndices.contains(0) ? Colors.white : kText)),
+                                        selected: _selectedPersonIndices.contains(0),
+                                        selectedColor: kPurple2,
+                                        backgroundColor: kCard,
+                                        side: BorderSide(color: _selectedPersonIndices.contains(0) ? kPurple2 : kBorder),
+                                        onSelected: (selected) => setState(() {
+                                          final s = Set<int>.from(_selectedPersonIndices);
+                                          if (selected) { s.add(0); } else { s.remove(0); }
+                                          _selectedPersonIndices = s;
+                                        }),
+                                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        visualDensity: VisualDensity.compact,
+                                      ),
+                                    ),
+                                    ...List.generate(_extraPersons.length, (i) {
+                                      final idx = i + 1;
+                                      return Padding(
+                                        padding: const EdgeInsets.only(right: 6),
+                                        child: FilterChip(
+                                          label: Text(_extraPersons[i].name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _selectedPersonIndices.contains(idx) ? Colors.white : kText)),
+                                          selected: _selectedPersonIndices.contains(idx),
+                                          selectedColor: kTeal,
+                                          backgroundColor: kCard,
+                                          side: BorderSide(color: _selectedPersonIndices.contains(idx) ? kTeal : kBorder),
+                                          onSelected: (selected) => setState(() {
+                                            final s = Set<int>.from(_selectedPersonIndices);
+                                            if (selected) { s.add(idx); } else { s.remove(idx); }
+                                            _selectedPersonIndices = s;
+                                          }),
+                                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          visualDensity: VisualDensity.compact,
+                                        ),
+                                      );
+                                    }),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            secondChild: const SizedBox.shrink(),
+                            crossFadeState: _landscapeBarsVisible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                            duration: const Duration(milliseconds: 200),
+                          ),
+                        // Main content
                         Expanded(
-                          child: TabBarView(
-                            controller: _tabCtrl,
+                          child: Stack(
                             children: [
-                              _buildPanchangTab(),
-                              _buildKundaliTab(),
-                              _buildSphutas(),
-                              _buildAroodhaTab(),
-                              _buildDashaTab(),
-                              _buildBhavaTab(),
-                              _buildGrahaShadvargaTab(),
-                              _buildShadbalaTab(),
-                              _buildAshtakaTab(),
-                              _buildYogaTab(),
-                              _buildGocharTab(),
-                              _buildNotesTab(),
-                              _buildJanmaPatrikeTab(),
+                              TabBarView(
+                                controller: _tabCtrl,
+                                children: [
+                                  _buildPanchangTab(),
+                                  _buildKundaliTab(),
+                                  _buildSphutas(),
+                                  _buildAroodhaTab(),
+                                  _buildDashaTab(),
+                                  _buildBhavaTab(),
+                                  _buildGrahaShadvargaTab(),
+                                  _buildShadbalaTab(),
+                                  _buildAshtakaTab(),
+                                  _buildYogaTab(),
+                                  _buildGocharTab(),
+                                  _buildNotesTab(),
+                                  _buildJanmaPatrikeTab(),
+                                ],
+                              ),
+                              // Floating expand button when bars are hidden
+                              if (!_landscapeBarsVisible)
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: Material(
+                                    color: kCard.withOpacity(0.9),
+                                    borderRadius: BorderRadius.circular(20),
+                                    elevation: 3,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(20),
+                                      onTap: () => setState(() => _landscapeBarsVisible = true),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(6),
+                                        child: Icon(Icons.keyboard_arrow_down, size: 22, color: kPurple2),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
