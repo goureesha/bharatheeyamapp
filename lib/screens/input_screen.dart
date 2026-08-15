@@ -539,13 +539,20 @@ class _InputScreenState extends State<InputScreen> {
                  e.value.date.contains(searchQuery);
         }).toList();
 
-        // Sort descending by Client ID so newest entries appear first
+        // Sort by savedAt timestamp (newest first) so new records always appear on top
+        // Records without savedAt (old/restored data) fall below, sorted by clientId
         filteredEntries.sort((a, b) {
+          final aTime = a.value.savedAt;
+          final bTime = b.value.savedAt;
+          // Both have savedAt → newest first
+          if (aTime != null && bTime != null) return bTime.compareTo(aTime);
+          // Only one has savedAt → it goes first
+          if (aTime != null && bTime == null) return -1;
+          if (aTime == null && bTime != null) return 1;
+          // Neither has savedAt → fall back to clientId descending
           final aId = a.value.clientId ?? '';
           final bId = b.value.clientId ?? '';
-          if (aId.isEmpty && bId.isNotEmpty) return 1;
-          if (aId.isNotEmpty && bId.isEmpty) return -1;
-          return bId.compareTo(aId); // Descending — newest first
+          return bId.compareTo(aId);
         });
 
         return SafeArea(
