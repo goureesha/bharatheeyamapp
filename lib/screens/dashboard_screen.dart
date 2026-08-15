@@ -918,7 +918,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                   final result = await AstroCalculator.calculate(
                     year: dob.year, month: dob.month, day: dob.day,
                     hourUtcOffset: tz, hour24: localHour,
-                    lat: lat, lon: lon, ayanamsaMode: 'lahiri', trueNode: false,
+                    lat: lat, lon: lon, ayanamsaMode: 'lahiri',
+                    trueNode: widget.extraInfo['nodeMode'] == 'true',
                   );
 
                   if (result == null) {
@@ -1134,7 +1135,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                   final result = await AstroCalculator.calculate(
                     year: dob.year, month: dob.month, day: dob.day,
                     hourUtcOffset: tz, hour24: localHour,
-                    lat: lat, lon: lon, ayanamsaMode: 'lahiri', trueNode: false,
+                    lat: lat, lon: lon, ayanamsaMode: 'lahiri',
+                    trueNode: widget.extraInfo['nodeMode'] == 'true',
                   );
 
                   if (result == null) {
@@ -1152,6 +1154,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       _primaryAmpm = ampm;
                       _primaryLat = lat;
                       _primaryLon = lon;
+                      _primaryTz = tz;
                       _primaryPlace = placeCtrl.text;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ $name ${AppLocale.l('calcSuccess')}'), backgroundColor: Colors.green));
@@ -1811,9 +1814,9 @@ class _DashboardScreenState extends State<DashboardScreen>
 
 
   void _showPlanetDetail(String pName) {
-    final info = widget.result.planets[pName];
+    final info = _primaryResult.planets[pName];
     if (info == null) return;
-    final sun = widget.result.planets['ರವಿ'];
+    final sun = _primaryResult.planets['ರವಿ'];
     final detail = AstroCalculator.getPlanetDetail(
       pName, info.longitude, info.speed, sun?.longitude ?? 0);
     showModalBottomSheet(
@@ -1962,7 +1965,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     String _selAro = AppLocale.l('aroodha');
     int _selRashiIdx = 0;
     return StatefulBuilder(builder: (ctx, setS) {
-      final activeResult = _prastutaResult ?? widget.result;
+      final activeResult = _prastutaResult ?? _primaryResult;
 
       // Varga charts for horizontal scrolling
       final charts = [
@@ -3068,7 +3071,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     allPersons = _filterPersons(allPersons);
 
     if (allPersons.length == 1) {
-      return AshtakaVargaWidget(result: widget.result);
+      return AshtakaVargaWidget(result: _primaryResult);
     }
 
     return SingleChildScrollView(
@@ -3099,7 +3102,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     allPersons = _filterPersons(allPersons);
 
     if (allPersons.length == 1) {
-      return ShadbalaWidget(key: UniqueKey(), shadbala: widget.result.shadbala);
+      return ShadbalaWidget(key: UniqueKey(), shadbala: _primaryResult.shadbala);
     }
 
     return SingleChildScrollView(
