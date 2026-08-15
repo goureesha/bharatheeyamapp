@@ -871,7 +871,7 @@ class AstroCalculator {
         if (!hasSankranti) {
           chandraMasa = '${AppLocale.l('adhikaPrefix')} $masaName';
         } else {
-          chandraMasa = '${AppLocale.l('nijaPrefix')} $masaName';
+          chandraMasa = masaName; // No 'ನಿಜ' prefix for regular months
         }
       } catch (_) {
         chandraMasa = knChandraMasa[sunRashiIdx];
