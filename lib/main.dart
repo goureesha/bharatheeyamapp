@@ -11,6 +11,7 @@ import 'widgets/common.dart';
 import 'services/app_access_service.dart';
 import 'services/trusted_time_service.dart';
 import 'services/google_auth_service.dart';
+import 'services/drive_backup_service.dart';
 import 'core/transit_cache.dart';
 import 'constants/places.dart';
 
@@ -131,6 +132,8 @@ Future<void> _initAuthAndBinding() async {
       await AppAccessService.syncTrialWithFirestore();
       // Restore offline day count from server (prevents reset on reinstall)
       await OfflineAccessService.restoreFromServer();
+      // Auto-backup to Google Drive if due (every 12h, fire-and-forget)
+      DriveBackupService.autoBackupIfDue();
     }
   } catch (e) {
     debugPrint('Auth/Binding init error: $e');

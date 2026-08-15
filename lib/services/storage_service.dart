@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'drive_backup_service.dart';
 
 class StorageService {
   static const String _key = 'bharatheeyam_profiles_v1';
@@ -71,6 +72,9 @@ class StorageService {
       exportMap[entry.key] = entry.value.toJson();
     }
     await prefs.setString(_key, jsonEncode(exportMap));
+
+    // Silent auto-backup to Google Drive (fire-and-forget)
+    DriveBackupService.triggerAutoBackup();
   }
 
   static Future<void> delete(String name) async {

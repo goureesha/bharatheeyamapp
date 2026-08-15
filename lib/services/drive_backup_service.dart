@@ -316,4 +316,71 @@ class DriveBackupService {
     }
     return null;
   }
+
+  // ── Auto-backup ──────────────────────────────────────────────
+
+  static const String _lastAutoBackupKey = 'bharatheeyam_last_auto_backup';
+  static bool _autoBackupInProgress = false;
+
+  /// Silently trigger Google Drive backup in background.
+  /// Does nothing if not signed in or if already in progress.
+  /// Safe to call from anywhere — never blocks UI, never shows errors.
+  static Future<void> triggerAutoBackup() async {
+    if (_autoBackupInProgress) return;
+    if (!GoogleAuthService.isSignedIn) return;
+
+    _autoBackupInProgress = true;
+    try {
+      debugPrint('AutoBackup: starting silent backup...');
+      final result = await uploadBackup();
+      if (result == 'success') {
+        // Record the timestamp of successful backup
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_lastAutoBackupKey, DateTime.now().toIso8601String());
+        debugPrint('AutoBackup: success');
+      } else {
+        debugPrint('AutoBackup: failed — $result');
+      }
+    } catch (e) {
+      debugPrint('AutoBackup: error — $e');
+    } finally {
+      _autoBackupInProgress = false;
+    }
+  }
+
+  /// Check if daily auto-backup is due. If yes, trigger silently.
+  /// Call this on app startup (e.g., in main.dart).
+  static Future<void> autoBackupIfDue() async {
+    if (!GoogleAuthService.isSignedIn) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lastBackupStr = prefs.getString(_lastAutoBackupKey);
+
+      if (lastBackupStr == null) {
+        // Never auto-backed up — do it now
+        triggerAutoBackup(); // fire-and-forget
+        return;
+      }
+
+      final lastBackup = DateTime.tryParse(lastBackupStr);
+      if (lastBackup == null) {
+        triggerAutoBackup();
+        return;
+      }
+
+      final now = DateTime.now();
+      final hoursSinceLastBackup = now.difference(lastBackup).inHours;
+
+      // Auto-backup if more than 12 hours since last backup
+      if (hoursSinceLastBackup >= 12) {
+        debugPrint('AutoBackup: $hoursSinceLastBackup hours since last backup, triggering...');
+        triggerAutoBackup(); // fire-and-forget
+      } else {
+        debugPrint('AutoBackup: last backup ${hoursSinceLastBackup}h ago, skipping');
+      }
+    } catch (e) {
+      debugPrint('AutoBackup check error: $e');
+    }
+  }
 }
