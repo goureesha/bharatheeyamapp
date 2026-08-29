@@ -1754,6 +1754,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     Color maitriColor(String m) {
       if (m == 'ಮಿತ್ರ') return Colors.green;
       if (m == 'ಶತ್ರು') return Colors.red;
+      if (m == 'ಏಕಾಧಿಪತ್ಯ') return Colors.blue;
       return Colors.orange;
     }
 

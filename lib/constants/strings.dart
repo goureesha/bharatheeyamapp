@@ -475,7 +475,7 @@ void _buildTranslateMapIfNeeded() {
     if (knVal != 'bt$i' && locVal != 'bt$i') map[knVal] = locVal;
   }
   // Paksha, Maitri values, Maitri labels
-  for (final key in ['shPaksha', 'krPaksha', 'mitra', 'shatru', 'sama', 'lagnadhipati', 'chRashyadhipati', 'navLagnadhipati', 'navChdhipati']) {
+  for (final key in ['shPaksha', 'krPaksha', 'mitra', 'shatru', 'sama', 'ekadhipatya', 'lagnadhipati', 'chRashyadhipati', 'navLagnadhipati', 'navChdhipati']) {
     final knVal = AppLocale.l_kn(key);
     final locVal = AppLocale.l(key);
     if (knVal != key && locVal != key) map[knVal] = locVal;

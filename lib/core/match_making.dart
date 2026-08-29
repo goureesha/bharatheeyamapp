@@ -390,6 +390,7 @@ class MatchMakingLogic {
 
   /// Get Naisargika Maitri relationship string
   static String getNaisargikaMaitriLabel(int planet1Lord, int planet2Lord) {
+    if (planet1Lord == planet2Lord) return 'ಏಕಾಧಿಪತ್ಯ';
     final val = _naisargikaMaitri[planet1Lord][planet2Lord];
     if (val == 1) return 'ಮಿತ್ರ';
     if (val == -1) return 'ಶತ್ರು';
@@ -410,11 +411,17 @@ class MatchMakingLogic {
     Map<String, dynamic> _check(String label, int bRashi, int gRashi) {
       final bLord = getRashiLord(bRashi);
       final gLord = getRashiLord(gRashi);
-      final relation = _naisargikaMaitri[bLord][gLord];
       String maitri;
-      if (relation == 1) maitri = 'ಮಿತ್ರ';
-      else if (relation == -1) maitri = 'ಶತ್ರು';
-      else maitri = 'ಸಮ';
+      int relation;
+      if (bLord == gLord) {
+        maitri = 'ಏಕಾಧಿಪತ್ಯ';
+        relation = 2; // Ekadhipatya
+      } else {
+        relation = _naisargikaMaitri[bLord][gLord];
+        if (relation == 1) maitri = 'ಮಿತ್ರ';
+        else if (relation == -1) maitri = 'ಶತ್ರು';
+        else maitri = 'ಸಮ';
+      }
       return {
         'label': label,
         'brideLord': bLord,
