@@ -408,6 +408,7 @@ class AppLocale {
       'ghatiLabel': 'ಘಟಿ', 'vighatiLabel': 'ವಿಘಟಿ', 'applyLabel': 'ಅನ್ವಯಿಸಿ',
       'sunriseLabel': 'ಸೂರ್ಯೋದಯ', 'enterGhatiErr': 'ದಯವಿಟ್ಟು ಘಟಿ/ವಿಘಟಿ ನಮೂದಿಸಿ', 'timeAdjusted': 'ಸಮಯ ಹೊಂದಿಸಲಾಗಿದೆ',
       'copiedToClipboard': 'ಕ್ಲಿಪ್‌ಬೋರ್ಡ್‌ಗೆ ನಕಲಿಸಲಾಗಿದೆ', 'googleAccount': 'Google ಖಾತೆ',
+      'serverConnection': 'ಸರ್ವರ್ ಸಂಪರ್ಕ', 'lastConnection': 'ಕೊನೆಯ ಸಂಪರ್ಕ', 'neverConnected': 'ಎಂದೂ ಸಂಪರ್ಕಿಸಿಲ್ಲ', 'connectionOk': 'ಸಂಪರ್ಕ ಸರಿಯಿದೆ', 'connectSoon': 'ಶೀಘ್ರದಲ್ಲೇ ಸಂಪರ್ಕಿಸಿ', 'connectNow': 'ಈಗ ಸಂಪರ್ಕಿಸಿ', 'connectNowDesc': 'ಈಗ ಇಂಟರ್ನೆಟ್‌ಗೆ ಸಂಪರ್ಕಿಸಿ', 'overdue': 'ವಿಳಂಬವಾಗಿದೆ — ಈಗಲೇ ಸಂಪರ್ಕಿಸಿ!', 'nextIn': 'ಮುಂದಿನ', 'hours': 'ಗಂಟೆಗಳಲ್ಲಿ', 'connection24hNote': 'ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಪರಿಶೀಲಿಸಲು ಪ್ರತಿ 24 ಗಂಟೆಗಳಿಗೊಮ್ಮೆ ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಅಗತ್ಯ.',
       'groupMemberNotes': 'ಗುಂಪಿನ ಸದಸ್ಯರ ಟಿಪ್ಪಣಿ', 'primaryPersonNotes': 'ಮುಖ್ಯ ವ್ಯಕ್ತಿಯ ಟಿಪ್ಪಣಿ',
       'latitude': 'ಅಕ್ಷಾಂಶ', 'longitude': 'ರೇಖಾಂಶ',
       'aroType0': 'ಆರೂಢ', 'aroType1': 'ಉದಯ', 'aroType2': 'ಲಗ್ನಾಂಶ', 'aroType3': 'ಛತ್ರ',
@@ -1173,6 +1174,7 @@ class AppLocale {
       'ghatiLabel': 'घटी', 'vighatiLabel': 'विघटी', 'applyLabel': 'लागू करें',
       'sunriseLabel': 'सूर्योदय', 'enterGhatiErr': 'कृपया घटी/विघटी दर्ज करें', 'timeAdjusted': 'समय समायोजित',
       'copiedToClipboard': 'क्लिपबोर्ड में कॉपी किया', 'googleAccount': 'Google खाता',
+      'serverConnection': 'सर्वर कनेक्शन', 'lastConnection': 'अंतिम कनेक्शन', 'neverConnected': 'कभी कनेक्ट नहीं हुआ', 'connectionOk': 'कनेक्शन ठीक है', 'connectSoon': 'जल्द कनेक्ट करें', 'connectNow': 'अभी कनेक्ट करें', 'connectNowDesc': 'अभी इंटरनेट से कनेक्ट करें', 'overdue': 'विलंब हो गया — अभी कनेक्ट करें!', 'nextIn': 'अगला', 'hours': 'घंटों में', 'connection24hNote': 'आपके खाते को सत्यापित करने के लिए हर 24 घंटे में इंटरनेट कनेक्शन आवश्यक है।',
       'groupMemberNotes': 'समूह सदस्य टिप्पणी', 'primaryPersonNotes': 'मुख्य व्यक्ति टिप्पणी',
       'latitude': 'अक्षांश', 'longitude': 'देशांतर',
     
@@ -1885,6 +1887,7 @@ class AppLocale {
       'ghatiLabel': 'கடி', 'vighatiLabel': 'விகடி', 'applyLabel': 'பயன்படுத்து',
       'sunriseLabel': 'சூரியுதயம்', 'enterGhatiErr': 'தயவுசெய்து கடி/விகடி உள்ளிடுங்கள்', 'timeAdjusted': 'நேரம் சரிசெய்யப்பட்டது',
       'copiedToClipboard': 'க்ளிப்போர்டில் நகலெடுக்கப்பட்டது', 'googleAccount': 'Google கணக்கு',
+      'serverConnection': 'சர்வர் இணைப்பு', 'lastConnection': 'கடைசி இணைப்பு', 'neverConnected': 'ஒருபோதும் இணைக்கப்படவில்லை', 'connectionOk': 'இணைப்பு சரி', 'connectSoon': 'விரைவில் இணைக்கவும்', 'connectNow': 'இப்போது இணைக்கவும்', 'connectNowDesc': 'இப்போது இணையத்துடன் இணைக்கவும்', 'overdue': 'தாமதமாகிவிட்டது — இப்போதே இணைக்கவும்!', 'nextIn': 'அடுத்த', 'hours': 'மணி நேரத்தில்', 'connection24hNote': 'உங்கள் கணக்கை சரிபார்க்க ஒவ்வொரு 24 மணி நேரத்திற்கும் இணைய இணைப்பு தேவை.',
       'groupMemberNotes': 'குழு உறுப்பினர் குறிப்பு', 'primaryPersonNotes': 'முதல் நபர் குறிப்பு',
       'latitude': 'அட்சரேகை', 'longitude': 'நெட்டரேகை',
     
@@ -2597,6 +2600,7 @@ class AppLocale {
       'ghatiLabel': 'ఘటి', 'vighatiLabel': 'విఘటి', 'applyLabel': 'అమలు చేయండి',
       'sunriseLabel': 'సూర్యోదయం', 'enterGhatiErr': 'దయచేసి ఘటి/విఘటి నమోదు చేయండి', 'timeAdjusted': 'సమయం సరిచేయబడింది',
       'copiedToClipboard': 'క్లిప్‌బోర్డ్‌కి కాపీ చేయబడింది', 'googleAccount': 'Google ఖాతా',
+      'serverConnection': 'సర్వర్ కనెక్షన్', 'lastConnection': 'చివరి కనెక్షన్', 'neverConnected': 'ఎప్పుడూ కనెక్ట్ కాలేదు', 'connectionOk': 'కనెక్షన్ బాగుంది', 'connectSoon': 'త్వరలో కనెక్ట్ చేయండి', 'connectNow': 'ఇప్పుడు కనెక్ట్ చేయండి', 'connectNowDesc': 'ఇప్పుడు ఇంటర్నెట్‌కు కనెక్ట్ చేయండి', 'overdue': 'ఆలస్యమైంది — ఇప్పుడే కనెక్ట్ చేయండి!', 'nextIn': 'తదుపరి', 'hours': 'గంటల్లో', 'connection24hNote': 'మీ ఖాతాను ధృవీకరించడానికి ప్రతి 24 గంటలకు ఇంటర్నెట్ కనెక్షన్ అవసరం.',
       'groupMemberNotes': 'గ్రూప్ సభ్యుల నోట్స్', 'primaryPersonNotes': 'ప్రధాన వ్యక్తి నోట్స్',
       'latitude': 'అక్షాంశం', 'longitude': 'రేఖాంశం',
     
@@ -3309,6 +3313,7 @@ class AppLocale {
       'ghatiLabel': 'ഘടി', 'vighatiLabel': 'വിഘടി', 'applyLabel': 'പ്രയോഗിക്കുക',
       'sunriseLabel': 'സൂര്യോദയം', 'enterGhatiErr': 'ദയവായി ഘടി/വിഘടി നല്‍കുക', 'timeAdjusted': 'സമയം സമായോജിച്ചു',
       'copiedToClipboard': 'ക്ലിപ്പ്ബോർഡിലേക്ക് നകലെടുത്തു', 'googleAccount': 'Google അക്കൗണ്ട്',
+      'serverConnection': 'സെർവർ കണക്ഷൻ', 'lastConnection': 'അവസാന കണക്ഷൻ', 'neverConnected': 'ഒരിക്കലും കണക്ട് ചെയ്തിട്ടില്ല', 'connectionOk': 'കണക്ഷൻ ശരിയാണ്', 'connectSoon': 'ഉടൻ കണക്ട് ചെയ്യുക', 'connectNow': 'ഇപ്പോൾ കണക്ട് ചെയ്യുക', 'connectNowDesc': 'ഇപ്പോൾ ഇന്റർനെറ്റിലേക്ക് കണക്ട് ചെയ്യുക', 'overdue': 'താമസിച്ചു — ഇപ്പോൾ കണക്ട് ചെയ്യുക!', 'nextIn': 'അടുത്ത', 'hours': 'മണിക്കൂറിൽ', 'connection24hNote': 'നിങ്ങളുടെ അക്കൗണ്ട് പരിശോധിക്കാൻ ഓരോ 24 മണിക്കൂറിലും ഇന്റർനെറ്റ് കണക്ഷൻ ആവശ്യമാണ്.',
       'groupMemberNotes': 'ഗ്രൂപ്പ് അംഗം കുറിപ്പുകൾ', 'primaryPersonNotes': 'പ്രധാന വ്യക്തി കുറിപ്പുകൾ',
       'latitude': 'അക്ഷാംശം', 'longitude': 'രേഖാംശം',
     

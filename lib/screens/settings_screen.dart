@@ -793,6 +793,133 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Divider(color: kBorder),
                     const SizedBox(height: 24),
 
+                    // Server Connection Status
+                    SectionTitle('${AppLocale.l('serverConnection')} / Server Connection'),
+                    const SizedBox(height: 12),
+                    Builder(builder: (_) {
+                      final lastCheck = AppAccessService.lastOnlineCheck;
+                      final now = TrustedTimeService.now();
+                      final hoursSince = lastCheck != null
+                          ? now.difference(lastCheck).inHours
+                          : -1;
+                      final minutesSince = lastCheck != null
+                          ? now.difference(lastCheck).inMinutes
+                          : -1;
+
+                      // Color: green (<12h), orange (12-20h), red (>20h), grey (never)
+                      final Color statusColor;
+                      final String statusLabel;
+                      final IconData statusIcon;
+                      if (lastCheck == null) {
+                        statusColor = Colors.grey;
+                        statusLabel = '${AppLocale.l('neverConnected')} / Never Connected';
+                        statusIcon = Icons.cloud_off;
+                      } else if (hoursSince < 12) {
+                        statusColor = Colors.green;
+                        statusLabel = '${AppLocale.l('connectionOk')} / Connected ✅';
+                        statusIcon = Icons.cloud_done;
+                      } else if (hoursSince < 20) {
+                        statusColor = Colors.orange;
+                        statusLabel = '${AppLocale.l('connectSoon')} / Connect Soon ⚠️';
+                        statusIcon = Icons.cloud_sync;
+                      } else {
+                        statusColor = Colors.red;
+                        statusLabel = '${AppLocale.l('connectNow')} / Connect Now ❗';
+                        statusIcon = Icons.cloud_off;
+                      }
+
+                      // Format last connection time
+                      String lastCheckStr;
+                      if (lastCheck == null) {
+                        lastCheckStr = '—';
+                      } else {
+                        final d = lastCheck;
+                        final h = d.hour > 12 ? d.hour - 12 : (d.hour == 0 ? 12 : d.hour);
+                        final ampm = d.hour >= 12 ? 'PM' : 'AM';
+                        lastCheckStr = '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year} '
+                            '${h.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')} $ampm';
+                      }
+
+                      // Time ago string
+                      String timeAgo;
+                      if (lastCheck == null) {
+                        timeAgo = '';
+                      } else if (minutesSince < 60) {
+                        timeAgo = '$minutesSince min ago';
+                      } else {
+                        timeAgo = '$hoursSince hr${hoursSince == 1 ? '' : 's'} ago';
+                      }
+
+                      // Next required connection
+                      String nextRequired;
+                      if (lastCheck == null) {
+                        nextRequired = '${AppLocale.l('connectNowDesc')} / Connect to internet now';
+                      } else {
+                        final hoursLeft = 24 - hoursSince;
+                        if (hoursLeft <= 0) {
+                          nextRequired = '${AppLocale.l('overdue')} / Overdue — connect now!';
+                        } else {
+                          nextRequired = '${AppLocale.l('nextIn')} $hoursLeft ${AppLocale.l('hours')} / Required in $hoursLeft hr${hoursLeft == 1 ? '' : 's'}';
+                        }
+                      }
+
+                      return Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: statusColor.withOpacity(0.3)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              Icon(statusIcon, size: 22, color: statusColor),
+                              const SizedBox(width: 10),
+                              Expanded(child: Text(statusLabel,
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: statusColor))),
+                            ]),
+                            const SizedBox(height: 14),
+                            _bindingInfoRow(Icons.access_time, '${AppLocale.l('lastConnection')} / Last', lastCheckStr),
+                            if (timeAgo.isNotEmpty) ...[
+                              const SizedBox(height: 6),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 24),
+                                child: Text('($timeAgo)', style: TextStyle(fontSize: 11, color: kMuted, fontStyle: FontStyle.italic)),
+                              ),
+                            ],
+                            const SizedBox(height: 10),
+                            Row(children: [
+                              Icon(Icons.schedule, size: 16, color: statusColor),
+                              const SizedBox(width: 8),
+                              Expanded(child: Text(nextRequired,
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: statusColor))),
+                            ]),
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: kBorder.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(children: [
+                                Icon(Icons.info_outline, size: 14, color: kMuted),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text(
+                                  '${AppLocale.l('connection24hNote')} / App requires internet connection once every 24 hours to verify your account.',
+                                  style: TextStyle(fontSize: 11, color: kMuted),
+                                )),
+                              ]),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+
+                    const SizedBox(height: 24),
+                    Divider(color: kBorder),
+                    const SizedBox(height: 24),
+
 
 
                     // Backup & Restore

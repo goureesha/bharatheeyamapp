@@ -310,14 +310,15 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
       }
     }
 
-    // Force UI rebuild if access was revoked or user was blocked.
-    // This kicks the user out of HomeScreen to SupportScreen/BlockedScreen.
+    // Force UI rebuild if access was revoked, user was blocked, or 24h internet lock triggered.
+    // This kicks the user out of HomeScreen to the appropriate gate screen.
     if (!AppAccessService.hasAccess ||
         AppAccessService.isBlocked ||
-        DeviceBindingService.isDeviceBlocked) {
+        DeviceBindingService.isDeviceBlocked ||
+        AppAccessService.needsInternetVerification) {
       // Increment rebuild key to force MaterialApp recreation with blocked/support screen
       if (mounted) setState(() => _rebuildKey++);
-      debugPrint('🔒 Access revoked on resume — forcing UI rebuild');
+      debugPrint('🔒 Access revoked or internet lock on resume — forcing UI rebuild');
     }
 
   }
@@ -463,9 +464,11 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   ? (AppAccessService.lastOnlineCheck == null
                     ? const _FirstTimeSignInScreen()
                     : const _OfflineVerifyScreen())
-                  : !isBound
-                    ? const _DeviceMismatchScreen()
-                    : AppAccessService.hasAccess ? const HomeScreen() : const SupportScreen(),
+                    : !isBound
+                      ? const _DeviceMismatchScreen()
+                      : AppAccessService.needsInternetVerification
+                      ? const _InternetRequiredScreen()
+                      : AppAccessService.hasAccess ? const HomeScreen() : const SupportScreen(),
             );
           },
         );
