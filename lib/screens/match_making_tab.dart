@@ -2431,7 +2431,16 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+    // Clamp text scale to prevent layout overflow with large system fonts
+    // which causes keyboard to open and close instantly
+    final mediaQuery = MediaQuery.of(context);
+    final clampedTextScaler = mediaQuery.textScaler.clamp(
+      minScaleFactor: 1.0,
+      maxScaleFactor: 1.2,
+    );
+    return MediaQuery(
+      data: mediaQuery.copyWith(textScaler: clampedTextScaler),
+      child: DefaultTabController(
       length: 3,
       child: Column(
         children: [
@@ -2654,6 +2663,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
           ),
         ],
       ),
+    ),
     );
   }
 }
