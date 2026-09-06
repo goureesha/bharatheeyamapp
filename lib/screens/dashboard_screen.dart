@@ -203,11 +203,13 @@ class _DashboardScreenState extends State<DashboardScreen>
     _notes = widget.initialNotes;
     _aroodhas = Map.from(widget.initialAroodhas);
     _janmaNakshatraIdx = widget.initialJanmaNakshatraIdx;
-    // Restore prastuta time if saved
+    // Restore prastuta time if saved — use post-frame callback so setState works
     if (widget.initialPrastutaTime != null) {
       _prastutaTime = DateTime.tryParse(widget.initialPrastutaTime!);
       if (_prastutaTime != null) {
-        _restorePrastutaChart();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _restorePrastutaChart();
+        });
       }
     }
 
