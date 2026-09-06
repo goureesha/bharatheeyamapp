@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
@@ -257,11 +258,19 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Periodic save of trial progress every 30s (guards against force-kill)
+    _trialSaveTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      AppAccessService.saveTrialProgress();
+    });
   }
+
+  Timer? _trialSaveTimer;
 
   @override
   void dispose() {
+    _trialSaveTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
+    AppAccessService.pauseTrialSession();
     AppAccessService.dispose();
     super.dispose();
   }
@@ -269,6 +278,8 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      // Resume trial usage tracking
+      AppAccessService.startTrialSession();
       // Re-sync NTP clock on resume (updates offset if internet is now available)
       TrustedTimeService.syncWithNtp();
       // Sync offline usage when coming back online
@@ -278,6 +289,11 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
       // If access has been revoked (offline too long, access expired, etc.)
       // redirect to the root gate screen.
       _verifyAccessOnResume();
+    } else if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      // Pause trial usage tracking and save progress
+      AppAccessService.pauseTrialSession();
+      // Sync trial usage to Firestore when going to background
+      AppAccessService.syncTrialWithFirestore();
     }
   }
 

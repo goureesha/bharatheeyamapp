@@ -93,9 +93,7 @@ class DeviceBindingService {
     // Trial details
     data['isTrialActive'] = AppAccessService.isTrialActive;
     data['trialMinutesRemaining'] = AppAccessService.trialMinutesRemaining;
-    if (AppAccessService.trialStartDate != null) {
-      data['trialStartedAt'] = Timestamp.fromDate(AppAccessService.trialStartDate!);
-    }
+    data['trialUsedSeconds'] = AppAccessService.trialUsedSeconds;
 
     // NOTE: Do NOT write accessActive or accessDaysRemaining from the app.
     // Only adminAccess (admin-set) controls access.

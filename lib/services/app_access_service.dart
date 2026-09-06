@@ -10,7 +10,7 @@ import '../widgets/common.dart';
 class AppAccessService {
   // ── Pref keys ──
   static const String _accessStatusKey = 'has_active_access';
-  static const String _trialStartKey = 'trial_start_timestamp';
+  static const String _trialUsedSecondsKey = 'trial_used_seconds';
   static const String _lastOnlineCheckKey = 'last_online_check_timestamp';
   static const String _blockedKey = 'user_blocked';
   static const String _blockedReasonKey = 'user_blocked_reason';
@@ -18,7 +18,7 @@ class AppAccessService {
   static const String _isStudentKey = 'is_student';
 
   // ── Constants ──
-  static const int _trialMinutes = 30;
+  static const int _trialTotalSeconds = 3600; // 1 hour usage-based trial
   static const int _maxOfflineHours = 24;       // Must connect every 24h
   static int _offlineGraceDays = 10;      // Max offline grace: 10 days
 
@@ -26,7 +26,8 @@ class AppAccessService {
   static bool isActivated = false;
   static bool adminAccess = false;
   static DateTime? adminAccessExpiry;
-  static DateTime? trialStartDate;
+  static int trialUsedSeconds = 0;        // Accumulated foreground usage
+  static DateTime? _trialSessionStart;    // When current foreground session began
   static DateTime? lastOnlineCheck;
   static bool isBlocked = false;
   static String blockedReason = '';
@@ -97,21 +98,55 @@ class AppAccessService {
     debugPrint('🌐 Online check recorded: $lastOnlineCheck');
   }
 
-  /// True if the free trial is still active (30 minutes)
+  /// True if the free trial is still active (usage-based: 1 hour of foreground time)
   static bool get isTrialActive {
-    if (trialStartDate == null) return false;
-    final now = TrustedTimeService.now();
-    final elapsed = now.difference(trialStartDate!);
-    return elapsed.inMinutes < _trialMinutes;
+    return _currentTrialUsedSeconds < _trialTotalSeconds;
+  }
+
+  /// Current total used seconds including the live session
+  static int get _currentTrialUsedSeconds {
+    var total = trialUsedSeconds;
+    if (_trialSessionStart != null) {
+      total += TrustedTimeService.now().difference(_trialSessionStart!).inSeconds;
+    }
+    return total;
   }
 
   /// Minutes remaining in trial (0 if expired)
   static int get trialMinutesRemaining {
-    if (trialStartDate == null) return 0;
-    final now = TrustedTimeService.now();
-    final elapsed = now.difference(trialStartDate!);
-    final remaining = _trialMinutes - elapsed.inMinutes;
-    return remaining > 0 ? remaining : 0;
+    final remaining = _trialTotalSeconds - _currentTrialUsedSeconds;
+    final mins = (remaining / 60).ceil();
+    return mins > 0 ? mins : 0;
+  }
+
+  /// Start tracking foreground usage for trial
+  static void startTrialSession() {
+    if (_trialSessionStart != null) return; // Already tracking
+    if (trialUsedSeconds >= _trialTotalSeconds) return; // Trial expired
+    _trialSessionStart = TrustedTimeService.now();
+    debugPrint('⏱️ Trial session started. Used so far: ${trialUsedSeconds}s');
+  }
+
+  /// Pause tracking and accumulate usage. Call on app pause/background.
+  static Future<void> pauseTrialSession() async {
+    if (_trialSessionStart == null) return;
+    final sessionDuration = TrustedTimeService.now().difference(_trialSessionStart!).inSeconds;
+    trialUsedSeconds += sessionDuration;
+    _trialSessionStart = null;
+    // Cap at max
+    if (trialUsedSeconds > _trialTotalSeconds) trialUsedSeconds = _trialTotalSeconds;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_trialUsedSecondsKey, trialUsedSeconds);
+    debugPrint('⏱️ Trial session paused. Session: ${sessionDuration}s, Total: ${trialUsedSeconds}s, Remaining: ${_trialTotalSeconds - trialUsedSeconds}s');
+  }
+
+  /// Periodic save — call from a timer to prevent data loss on force-kill
+  static Future<void> saveTrialProgress() async {
+    if (_trialSessionStart == null) return;
+    final sessionDuration = TrustedTimeService.now().difference(_trialSessionStart!).inSeconds;
+    final total = trialUsedSeconds + sessionDuration;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_trialUsedSecondsKey, total > _trialTotalSeconds ? _trialTotalSeconds : total);
   }
 
   /// App status text for UI display
@@ -137,15 +172,10 @@ class AppAccessService {
   static Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Load trial start (for trial-only logic)
-    final trialTs = prefs.getInt(_trialStartKey);
-    if (trialTs != null) {
-      trialStartDate = DateTime.fromMillisecondsSinceEpoch(trialTs);
-    } else {
-      // First install — start trial
-      trialStartDate = TrustedTimeService.now();
-      await prefs.setInt(_trialStartKey, trialStartDate!.millisecondsSinceEpoch);
-    }
+    // Load accumulated trial usage (usage-based: counts foreground seconds)
+    trialUsedSeconds = prefs.getInt(_trialUsedSecondsKey) ?? 0;
+    // Start tracking this session immediately
+    startTrialSession();
 
     // Load last online check timestamp
     final lastCheckTs = prefs.getInt(_lastOnlineCheckKey);
@@ -191,8 +221,9 @@ class AppAccessService {
   // FIRESTORE TRIAL SYNC (prevents trial reset on reinstall)
   // ════════════════════════════════════════════════
 
-  /// Call AFTER sign-in + device binding. Syncs trial start with Firestore
+  /// Call AFTER sign-in + device binding. Syncs trial usage with Firestore
   /// so uninstall/reinstall with same Gmail does NOT reset the trial.
+  /// Whichever is higher (local or server) wins — prevents gaming.
   static Future<void> syncTrialWithFirestore() async {
     if (kIsWeb) return;
     final email = GoogleAuthService.userEmail;
@@ -207,28 +238,23 @@ class AppAccessService {
       if (!doc.exists || doc.data() == null) return;
 
       final data = doc.data()!;
-      final firestoreTrialTs = data['trialStartedAt'];
+      final firestoreUsed = data['trialUsedSeconds'] as int? ?? 0;
+      final localUsed = _currentTrialUsedSeconds;
 
-      if (firestoreTrialTs != null && firestoreTrialTs is Timestamp) {
-        // Firestore has a trial start → restore it (prevents trial reset)
-        final firestoreTrialDate = firestoreTrialTs.toDate();
+      if (firestoreUsed > localUsed) {
+        // Server has more usage (e.g. used on another device) → restore it
+        trialUsedSeconds = firestoreUsed;
+        _trialSessionStart = null; // Reset session, will restart
         final prefs = await SharedPreferences.getInstance();
-        final localTs = prefs.getInt(_trialStartKey);
-
-        if (localTs == null || firestoreTrialDate.isBefore(DateTime.fromMillisecondsSinceEpoch(localTs))) {
-          // Firestore date is earlier (original) → use it
-          trialStartDate = firestoreTrialDate;
-          await prefs.setInt(_trialStartKey, firestoreTrialDate.millisecondsSinceEpoch);
-          debugPrint('🔄 Trial restored from Firestore: $firestoreTrialDate (no free trial on reinstall)');
-        }
-      } else {
-        // No trial in Firestore yet → write current trial start
-        if (trialStartDate != null) {
-          await docRef.update({
-            'trialStartedAt': Timestamp.fromDate(trialStartDate!),
-          }).catchError((_) {});
-          debugPrint('📝 Trial start written to Firestore: $trialStartDate');
-        }
+        await prefs.setInt(_trialUsedSecondsKey, firestoreUsed);
+        startTrialSession();
+        debugPrint('🔄 Trial usage restored from Firestore: ${firestoreUsed}s (prevents trial reset)');
+      } else if (localUsed > firestoreUsed) {
+        // Local has more usage → update server
+        await docRef.update({
+          'trialUsedSeconds': localUsed,
+        }).catchError((_) {});
+        debugPrint('📝 Trial usage synced to Firestore: ${localUsed}s');
       }
     } catch (e) {
       debugPrint('Trial Firestore sync error: $e');
