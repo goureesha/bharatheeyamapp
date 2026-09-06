@@ -18,7 +18,7 @@ class AppAccessService {
   static const String _isStudentKey = 'is_student';
 
   // ── Constants ──
-  static const int _trialTotalSeconds = 3600; // 1 hour usage-based trial
+  static const int _trialTotalSeconds = 1800; // 30 min usage-based trial
   static const int _maxOfflineHours = 24;       // Must connect every 24h
   static int _offlineGraceDays = 10;      // Max offline grace: 10 days
 
