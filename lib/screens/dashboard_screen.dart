@@ -55,6 +55,7 @@ class DashboardScreen extends StatefulWidget {
   final String initialNotes;
   final Map<String, int> initialAroodhas;
   final int? initialJanmaNakshatraIdx;
+  final String? initialPrastutaTime; // ISO8601 — restored from saved profile
   final Map<String, String> extraInfo;
   final List<String> initialGroupMembers;
   final List<PersonEntry> initialExtraPersons;
@@ -75,6 +76,7 @@ class DashboardScreen extends StatefulWidget {
     this.initialNotes = '',
     this.initialAroodhas = const {},
     this.initialJanmaNakshatraIdx,
+    this.initialPrastutaTime,
     this.extraInfo = const {},
     this.initialGroupMembers = const [],
     this.initialExtraPersons = const [],
@@ -201,6 +203,13 @@ class _DashboardScreenState extends State<DashboardScreen>
     _notes = widget.initialNotes;
     _aroodhas = Map.from(widget.initialAroodhas);
     _janmaNakshatraIdx = widget.initialJanmaNakshatraIdx;
+    // Restore prastuta time if saved
+    if (widget.initialPrastutaTime != null) {
+      _prastutaTime = DateTime.tryParse(widget.initialPrastutaTime!);
+      if (_prastutaTime != null) {
+        _restorePrastutaChart();
+      }
+    }
 
     // Initialize mutable primary person from widget
     _primaryName = widget.name;
@@ -1375,6 +1384,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                               janmaNakshatraIdx: _janmaNakshatraIdx,
                               clientId: resolvedCId,
                               groupMembers: groupNames,
+                              prastutaTime: _prastutaTime?.toIso8601String(),
                             ));
 
                             // 3. Update primary person in ClientService
@@ -1959,7 +1969,34 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
-
+  /// Restore prastuta chart from saved prastutaTime (called from initState)
+  Future<void> _restorePrastutaChart() async {
+    if (_prastutaTime == null) return;
+    final pt = _prastutaTime!;
+    final useLat = LocationService.lat;
+    final useLon = LocationService.lon;
+    final useTz = LocationService.tzOffset;
+    try {
+      final localHour = pt.hour + pt.minute / 60.0;
+      final ayanamsa = widget.extraInfo['ayanamsa'] ?? 'lahiri';
+      final trueNode = (widget.extraInfo['nodeMode'] ?? 'mean') == 'true';
+      final result = await AstroCalculator.calculate(
+        year: pt.year, month: pt.month, day: pt.day,
+        hourUtcOffset: useTz,
+        hour24: localHour,
+        lat: useLat, lon: useLon,
+        ayanamsaMode: ayanamsa,
+        trueNode: trueNode,
+      );
+      if (result != null && mounted) {
+        setState(() {
+          _prastutaResult = result;
+        });
+      }
+    } catch (e) {
+      debugPrint('Prastuta restore error: $e');
+    }
+  }
 
   Widget _buildAroodhaTab() {
     String _selAro = AppLocale.l('aroodha');
@@ -3147,6 +3184,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         name: widget.name, date: '${widget.dob.year}-${widget.dob.month.toString().padLeft(2, '0')}-${widget.dob.day.toString().padLeft(2, '0')}',
         hour: widget.hour, minute: widget.minute, ampm: widget.ampm, lat: widget.lat, lon: widget.lon, place: widget.place,
         tzOffset: _primaryTz, notes: newNotes, aroodhas: _aroodhas, janmaNakshatraIdx: _janmaNakshatraIdx, clientId: (cId is String && cId.isNotEmpty) ? cId : null,
+        prastutaTime: _prastutaTime?.toIso8601String(),
       ));
       if (cId is String && cId.isNotEmpty) {
         ClientService.updateFamilyMember(FamilyMember(clientId: cId, memberName: widget.name, relation: 'Self', dob: '${widget.dob.year}-${widget.dob.month.toString().padLeft(2, '0')}-${widget.dob.day.toString().padLeft(2, '0')}', birthTime: '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}', birthPlace: widget.place, lat: widget.lat, lon: widget.lon, notes: newNotes));

@@ -51,6 +51,7 @@ class _InputScreenState extends State<InputScreen> {
   String? _loadedClientId;
   Map<String, int> _loadedAroodhas = {};
   int? _loadedJanmaNakshatraIdx;
+  String? _loadedPrastutaTime;
   List<String> _loadedGroupMembers = [];
 
   // Udayadi Ghati input
@@ -210,6 +211,7 @@ class _InputScreenState extends State<InputScreen> {
       _loadedClientId = p.clientId;
       _loadedAroodhas = Map.from(p.aroodhas);
       _loadedJanmaNakshatraIdx = p.janmaNakshatraIdx;
+      _loadedPrastutaTime = p.prastutaTime;
       _loadedGroupMembers = List.from(p.groupMembers);
       try {
         final parts = p.date.split('-');
@@ -395,6 +397,7 @@ class _InputScreenState extends State<InputScreen> {
             initialNotes: uiNotes,
             initialAroodhas: _loadedAroodhas,
             initialJanmaNakshatraIdx: _loadedJanmaNakshatraIdx,
+            initialPrastutaTime: _loadedPrastutaTime,
             initialGroupMembers: _loadedGroupMembers,
             onSave: (notes, aroodhas, janmaIdx, {bool isNew = true}) =>
                 _saveProfile(activeClientId, notes: notes, aroodhas: aroodhas, janmaNakshatraIdx: janmaIdx, isNew: !_loadedFromSaved),
@@ -879,6 +882,7 @@ class _InputScreenState extends State<InputScreen> {
                             _loadedClientId = null;
                             _loadedAroodhas = {};
                             _loadedJanmaNakshatraIdx = null;
+                            _loadedPrastutaTime = null;
                             _loadedGroupMembers = [];
                             try {
                               final parts = entry.date.split('-');
@@ -1339,6 +1343,7 @@ class _InputScreenState extends State<InputScreen> {
                     _loadedClientId = null;
                     _loadedAroodhas = {};
                     _loadedJanmaNakshatraIdx = null;
+                    _loadedPrastutaTime = null;
                     _loadedGroupMembers = [];
                   });
                 },

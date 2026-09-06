@@ -106,6 +106,7 @@ class Profile {
   final String? clientId;
   final List<String> groupMembers;
   final String? savedAt; // ISO8601 timestamp for sort order
+  final String? prastutaTime; // ISO8601 — Prastuta time used for aroodha calculation
 
   Profile({
     required this.name,
@@ -123,6 +124,7 @@ class Profile {
     this.clientId,
     this.groupMembers = const [],
     this.savedAt,
+    this.prastutaTime,
   });
 
   Map<String, dynamic> toJson() => {
@@ -140,6 +142,7 @@ class Profile {
     'clientId': clientId,
     'groupMembers': groupMembers,
     'savedAt': savedAt,
+    'prastutaTime': prastutaTime,
   };
 
   factory Profile.fromJson(String name, Map<String, dynamic> j) => Profile(
@@ -162,5 +165,6 @@ class Profile {
         ? List<String>.from(j['groupMembers'] as List)
         : [],
     savedAt: j['savedAt'] as String?,
+    prastutaTime: j['prastutaTime'] as String?,
   );
 }
