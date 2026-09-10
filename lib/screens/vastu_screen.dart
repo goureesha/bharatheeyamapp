@@ -995,9 +995,13 @@ class _VastuScreenState extends State<VastuScreen> {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text('${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)}',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText),
-                  overflow: TextOverflow.ellipsis),
+                child: _inputMode == 0
+                  ? Text('${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)}',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText),
+                      overflow: TextOverflow.ellipsis)
+                  : Text('${_v('area')}: ${((r.minLenCm / 30.48) * (r.minBreCm / 30.48)).round()} - ${((r.maxLenCm / 30.48) * (r.maxBreCm / 30.48)).round()} ${_v('sqAdi')}',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText),
+                      overflow: TextOverflow.ellipsis),
               ),
               if (isExcellent)
                 Container(
@@ -1016,8 +1020,10 @@ class _VastuScreenState extends State<VastuScreen> {
           ),
           const SizedBox(height: 6),
 
-          // Kolu info
-          Text('$_effectiveKoluName  |  ${_fmtCm(r.perimeterCm)}',
+          // Kolu info + secondary measurement
+          Text(_inputMode == 0
+            ? '$_effectiveKoluName  |  ${_fmtCm(r.perimeterCm)}'
+            : '$_effectiveKoluName  |  ${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)}',
             style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
 
