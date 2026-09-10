@@ -40,6 +40,14 @@ Future<void> main() async {
     DeviceOrientation.landscapeRight,
   ]);
 
+  // Ensure status bar is visible
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+  ));
+
   // NTP must init BEFORE AppAccessService so trusted time is available
   await TrustedTimeService.init();
 
