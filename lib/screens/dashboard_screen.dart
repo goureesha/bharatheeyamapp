@@ -1973,8 +1973,12 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   /// Restore prastuta chart from saved prastutaTime (called from initState)
   Future<void> _restorePrastutaChart() async {
-    if (_prastutaTime == null) return;
+    if (_prastutaTime == null) {
+      debugPrint('⏱️ Prastuta restore: _prastutaTime is null, skipping');
+      return;
+    }
     final pt = _prastutaTime!;
+    debugPrint('⏱️ Prastuta restore: attempting for $pt');
     final useLat = LocationService.lat;
     final useLon = LocationService.lon;
     final useTz = LocationService.tzOffset;
@@ -1982,6 +1986,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       final localHour = pt.hour + pt.minute / 60.0;
       final ayanamsa = widget.extraInfo['ayanamsa'] ?? 'lahiri';
       final trueNode = (widget.extraInfo['nodeMode'] ?? 'mean') == 'true';
+      debugPrint('⏱️ Prastuta restore: calculating lat=$useLat lon=$useLon tz=$useTz hour=$localHour');
       final result = await AstroCalculator.calculate(
         year: pt.year, month: pt.month, day: pt.day,
         hourUtcOffset: useTz,
@@ -1990,13 +1995,15 @@ class _DashboardScreenState extends State<DashboardScreen>
         ayanamsaMode: ayanamsa,
         trueNode: trueNode,
       );
+      debugPrint('⏱️ Prastuta restore: result=${result != null ? 'OK' : 'NULL'} mounted=$mounted');
       if (result != null && mounted) {
         setState(() {
           _prastutaResult = result;
         });
+        debugPrint('⏱️ Prastuta restore: SUCCESS - _prastutaResult set');
       }
     } catch (e) {
-      debugPrint('Prastuta restore error: $e');
+      debugPrint('⏱️ Prastuta restore ERROR: $e');
     }
   }
 
