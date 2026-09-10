@@ -2007,9 +2007,18 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
+  bool _prastutaRestoreAttempted = false;
+
   Widget _buildAroodhaTab() {
     String _selAro = AppLocale.l('aroodha');
     int _selRashiIdx = 0;
+
+    // Auto-restore: if prastutaTime is saved but chart not yet calculated, trigger it
+    if (_prastutaTime != null && _prastutaResult == null && !_prastutaRestoreAttempted) {
+      _prastutaRestoreAttempted = true;
+      _restorePrastutaChart();
+    }
+
     return StatefulBuilder(builder: (ctx, setS) {
       final activeResult = _prastutaResult ?? _primaryResult;
 
