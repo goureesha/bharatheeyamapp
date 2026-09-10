@@ -43,6 +43,8 @@ class _InputScreenState extends State<InputScreen> {
 
   Map<String, Profile> _savedProfiles = {};
   String? _selName;
+  final _profileSearchCtrl = TextEditingController();
+  String _profileSearchQuery = '';
 
   bool _isInitStatus = false;
   bool _loadedFromSaved = false; // true when user opened an existing profile
@@ -81,6 +83,7 @@ class _InputScreenState extends State<InputScreen> {
     _tzCtrl.dispose();
     _ghatiCtrl.dispose();
     _vighatiCtrl.dispose();
+    _profileSearchCtrl.dispose();
     super.dispose();
   }
 
@@ -501,7 +504,9 @@ class _InputScreenState extends State<InputScreen> {
   }
 
   Widget _buildProfileListSheet() {
-    String searchQuery = '';
+    // Reset search each time sheet opens
+    _profileSearchCtrl.clear();
+    _profileSearchQuery = '';
     return StatefulBuilder(
       builder: (ctx, setSheetState) {
         // Core Unification: Merge all current local storage profiles with active Appointment/Client family members dynamically
@@ -534,17 +539,28 @@ class _InputScreenState extends State<InputScreen> {
 
         // Apply Search Filter and Sort Sequentially (In Serial)
         final filteredEntries = unifiedProfiles.entries.where((e) {
-          if (searchQuery.isEmpty) return true;
-          final sq = searchQuery.toLowerCase();
+          if (_profileSearchQuery.isEmpty) return true;
+          final sq = _profileSearchQuery.toLowerCase();
           return e.key.toLowerCase().contains(sq) ||
                  e.value.place.toLowerCase().contains(sq) ||
                  (e.value.clientId != null && e.value.clientId!.toLowerCase().contains(sq)) ||
-                 e.value.date.contains(searchQuery);
+                 e.value.date.contains(_profileSearchQuery);
         }).toList();
 
-        // Sort by savedAt timestamp (newest first) so new records always appear on top
-        // Records without savedAt (old/restored data) fall below, sorted by clientId
+        // Sort: when searching, put name matches first; otherwise sort by savedAt
         filteredEntries.sort((a, b) {
+          if (_profileSearchQuery.isNotEmpty) {
+            final sq = _profileSearchQuery.toLowerCase();
+            final aNameMatch = a.key.toLowerCase().contains(sq);
+            final bNameMatch = b.key.toLowerCase().contains(sq);
+            if (aNameMatch && !bNameMatch) return -1;
+            if (!aNameMatch && bNameMatch) return 1;
+            // Both match or neither match by name → sort by startsWith
+            final aStarts = a.key.toLowerCase().startsWith(sq);
+            final bStarts = b.key.toLowerCase().startsWith(sq);
+            if (aStarts && !bStarts) return -1;
+            if (!aStarts && bStarts) return 1;
+          }
           final aTime = a.value.savedAt;
           final bTime = b.value.savedAt;
           // Both have savedAt → newest first
@@ -570,7 +586,8 @@ class _InputScreenState extends State<InputScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: TextField(
-                  onChanged: (v) => setSheetState(() => searchQuery = v),
+                  controller: _profileSearchCtrl,
+                  onChanged: (v) => setSheetState(() => _profileSearchQuery = v),
                   decoration: InputDecoration(
                     hintText: AppLocale.l('searchHint'),
                     prefixIcon: Icon(Icons.search, color: kMuted),
@@ -586,7 +603,7 @@ class _InputScreenState extends State<InputScreen> {
               ),
               const SizedBox(height: 8),
               if (filteredEntries.isEmpty)
-                Padding(padding: EdgeInsets.all(32), child: Text(searchQuery.isEmpty ? AppLocale.l('noSavedKundali') : AppLocale.l('noResults'), style: TextStyle(color: kMuted)))
+                Padding(padding: EdgeInsets.all(32), child: Text(_profileSearchQuery.isEmpty ? AppLocale.l('noSavedKundali') : AppLocale.l('noResults'), style: TextStyle(color: kMuted)))
               else
                 Flexible(
                   child: ListView.separated(
