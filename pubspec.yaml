@@ -1,7 +1,7 @@
 name: bharatheeyam
 description: "ಭಾರತೀಯಮ್ - Vedic Astrology App"
 publish_to: 'none'
-version: 2.5.0+78
+version: 2.5.1+79
 
 environment:
   sdk: '>=3.2.0 <4.0.0'

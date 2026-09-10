@@ -77,3 +77,8 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // Google Play requires Billing Library 8.0.0+ from Nov 2026
+    implementation "com.android.billingclient:billing:8.0.0"
+}
