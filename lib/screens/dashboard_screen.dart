@@ -203,14 +203,31 @@ class _DashboardScreenState extends State<DashboardScreen>
     _notes = widget.initialNotes;
     _aroodhas = Map.from(widget.initialAroodhas);
     _janmaNakshatraIdx = widget.initialJanmaNakshatraIdx;
-    // Restore prastuta time if saved — use delay so widget is fully ready on Android
+    // Restore prastuta time if saved
     if (widget.initialPrastutaTime != null) {
       _prastutaTime = DateTime.tryParse(widget.initialPrastutaTime!);
       if (_prastutaTime != null) {
-        Future.delayed(const Duration(milliseconds: 500), () {
+        // DEBUG: Show visible indicator on Android
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('DEBUG: prastutaTime loaded = ${widget.initialPrastutaTime}'), duration: const Duration(seconds: 3)),
+            );
+          }
+        });
+        Future.delayed(const Duration(milliseconds: 800), () {
           if (mounted) _openPrastutaChart(savedTime: _prastutaTime, silent: true);
         });
       }
+    } else {
+      // DEBUG: Show when prastutaTime is NOT loaded
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('DEBUG: prastutaTime is NULL'), backgroundColor: Colors.red, duration: const Duration(seconds: 3)),
+          );
+        }
+      });
     }
 
     // Initialize mutable primary person from widget
