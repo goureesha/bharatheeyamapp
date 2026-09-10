@@ -1279,8 +1279,15 @@ class _InputScreenState extends State<InputScreen> {
                   showModalBottomSheet(
                     context: context,
                     backgroundColor: kCard,
+                    isScrollControlled: true,
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-                    builder: (_) => _buildProfileListSheet(),
+                    builder: (_) => DraggableScrollableSheet(
+                      initialChildSize: 0.6,
+                      minChildSize: 0.3,
+                      maxChildSize: 0.9,
+                      expand: false,
+                      builder: (_, __) => _buildProfileListSheet(),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
