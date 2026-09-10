@@ -62,6 +62,7 @@ class StorageService {
       janmaNakshatraIdx: profile.janmaNakshatraIdx,
       clientId: profile.clientId,
       groupMembers: profile.groupMembers,
+      prastutaTime: profile.prastutaTime,
       savedAt: DateTime.now().toIso8601String(),
     );
     profiles[stamped.name] = stamped;
