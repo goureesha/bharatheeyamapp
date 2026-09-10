@@ -148,6 +148,8 @@ class _InputScreenState extends State<InputScreen> {
           janmaNakshatraIdx: profile.janmaNakshatraIdx,
           clientId: canonicalId,
           groupMembers: profile.groupMembers,
+          prastutaTime: profile.prastutaTime,
+          savedAt: profile.savedAt,
         );
         await StorageService.save(p[entry.key]!);
       }
