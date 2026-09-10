@@ -533,6 +533,8 @@ class _InputScreenState extends State<InputScreen> {
                   aroodhas: op.aroodhas, janmaNakshatraIdx: op.janmaNakshatraIdx,
                   clientId: m.clientId, // Force use the linked Client ID dynamically
                   groupMembers: op.groupMembers, // Preserve multi-person group!
+                  prastutaTime: op.prastutaTime,
+                  savedAt: op.savedAt,
                 );
               }
             }
