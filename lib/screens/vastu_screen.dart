@@ -644,8 +644,7 @@ class _VastuScreenState extends State<VastuScreen> {
                     )),
                     onChanged: (v) => setState(() { _ownerNakIndex = v!; _searched = false; _results = []; }),
                   ),
-                  if (_inputMode == 0) ...[
-                    const SizedBox(height: 10),
+                  const SizedBox(height: 10),
                     Text(_v('koluType'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<int>(
@@ -701,7 +700,6 @@ class _VastuScreenState extends State<VastuScreen> {
                         onChanged: (_) => setState(() { _searched = false; _results = []; }),
                       ),
                     ],
-                  ],
                 ],
               ),
             );
@@ -999,7 +997,7 @@ class _VastuScreenState extends State<VastuScreen> {
                   ? Text('${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)}',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText),
                       overflow: TextOverflow.ellipsis)
-                  : Text('${_v('area')}: ${((r.minLenCm / 30.48) * (r.minBreCm / 30.48)).round()} - ${((r.maxLenCm / 30.48) * (r.maxBreCm / 30.48)).round()} ${_v('sqAdi')}',
+                  : Text('${_v('area')}: ${((r.minLenCm / 30.48) * (r.minBreCm / 30.48)).round()} - ${((r.maxLenCm / 30.48) * (r.maxBreCm / 30.48)).round()}',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText),
                       overflow: TextOverflow.ellipsis),
               ),
