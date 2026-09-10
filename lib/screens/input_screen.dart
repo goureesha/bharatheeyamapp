@@ -541,10 +541,17 @@ class _InputScreenState extends State<InputScreen> {
         final filteredEntries = unifiedProfiles.entries.where((e) {
           if (_profileSearchQuery.isEmpty) return true;
           final sq = _profileSearchQuery.toLowerCase();
-          return e.key.toLowerCase().contains(sq) ||
-                 e.value.place.toLowerCase().contains(sq) ||
-                 (e.value.clientId != null && e.value.clientId!.toLowerCase().contains(sq)) ||
-                 e.value.date.contains(_profileSearchQuery);
+          // Match name
+          if (e.key.toLowerCase().contains(sq)) return true;
+          // Match place
+          if (e.value.place.toLowerCase().contains(sq)) return true;
+          // Match client ID
+          if (e.value.clientId != null && e.value.clientId!.toLowerCase().contains(sq)) return true;
+          // Match date
+          if (e.value.date.contains(_profileSearchQuery)) return true;
+          // Match group member names
+          if (e.value.groupMembers.any((m) => m.toLowerCase().contains(sq))) return true;
+          return false;
         }).toList();
 
         // Sort: when searching, put name matches first; otherwise sort by savedAt
