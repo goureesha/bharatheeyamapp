@@ -34,6 +34,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
   int? _janmaNakshatraIdx1;
   int? _janmaNakshatraIdx2;
   
+  int _nakTimeMode = 0; // 0=sunrise, 1=midday, 2=sunset
   DateTime _focusedDay = DateTime.utc(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   DateTime? _selectedDay;
   Map<DateTime, int> _dailyNakshatraCache = {};
@@ -146,6 +147,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         _isTwoPersonMode = prefs.getBool('dashboard_tara_two_person') ?? false;
         _excludeNakshatras = prefs.getBool('tara_exclude_nakshatras') ?? false;
         _includeAgniVasa = prefs.getBool('tara_include_agnivasa') ?? false;
+        _nakTimeMode = prefs.getInt('tara_nak_time_mode') ?? 0;
         _janmaNakshatraIdx1 = prefs.getInt('dashboard_janma_nakshatra');
         _janmaNakshatraIdx2 = prefs.getInt('dashboard_janma_nakshatra2');
       });
@@ -157,19 +159,30 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
     await prefs.setBool('dashboard_tara_two_person', _isTwoPersonMode);
     await prefs.setBool('tara_exclude_nakshatras', _excludeNakshatras);
     await prefs.setBool('tara_include_agnivasa', _includeAgniVasa);
+    await prefs.setInt('tara_nak_time_mode', _nakTimeMode);
     if (_janmaNakshatraIdx1 != null) await prefs.setInt('dashboard_janma_nakshatra', _janmaNakshatraIdx1!);
     if (_janmaNakshatraIdx2 != null) await prefs.setInt('dashboard_janma_nakshatra2', _janmaNakshatraIdx2!);
   }
   
   int _calculateNakshatraForDate(DateTime date) {
-    // Calculate Moon's SIDEREAL position at sunrise for accurate Vedic nakshatra
+    // Calculate Moon's SIDEREAL position at sunrise/midday/sunset for accurate Vedic nakshatra
     final srSs = Ephemeris.findSunriseSetForDate(
       date.year, date.month, date.day,
       LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset,
     );
-    final srJd = srSs[0];
-    // Use sunrise + 1 min to be safely past sunrise (matching panchanga)
-    final jd = srJd + (1.0 / 1440.0);
+    final srJd = srSs[0]; // sunrise JD
+    final ssJd = srSs[1]; // sunset JD
+    double jd;
+    if (_nakTimeMode == 1) {
+      // Mid-day: average of sunrise and sunset
+      jd = (srJd + ssJd) / 2.0;
+    } else if (_nakTimeMode == 2) {
+      // Sunset - 1 min
+      jd = ssJd - (1.0 / 1440.0);
+    } else {
+      // Sunrise + 1 min (default)
+      jd = srJd + (1.0 / 1440.0);
+    }
     
     // Sidereal Moon using Lahiri ayanamsa
     Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
@@ -532,6 +545,51 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
                                 _saveSettings();
                               });
                             },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Nakshatra time mode toggle
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: kPurple2.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: kPurple2.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(AppLocale.l('nakTimeLabel'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2)),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ToggleButtons(
+                                  isSelected: [_nakTimeMode == 0, _nakTimeMode == 1, _nakTimeMode == 2],
+                                  onPressed: (index) {
+                                    setState(() {
+                                      _nakTimeMode = index;
+                                      _dailyNakshatraCache.clear();
+                                      _saveSettings();
+                                    });
+                                  },
+                                  borderRadius: BorderRadius.circular(8),
+                                  selectedColor: Colors.white,
+                                  fillColor: kPurple2,
+                                  color: kText,
+                                  constraints: const BoxConstraints(minHeight: 36, minWidth: 80),
+                                  children: [
+                                    Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: Text(AppLocale.l('sunrise'), style: TextStyle(fontSize: 12))),
+                                    Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: Text(AppLocale.l('midday'), style: TextStyle(fontSize: 12))),
+                                    Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: Text(AppLocale.l('sunset'), style: TextStyle(fontSize: 12))),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
