@@ -208,7 +208,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       _prastutaTime = DateTime.tryParse(widget.initialPrastutaTime!);
       if (_prastutaTime != null) {
         Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) _restorePrastutaChart();
+          if (mounted) _openPrastutaChart(savedTime: _prastutaTime, silent: true);
         });
       }
     }
@@ -1938,13 +1938,15 @@ class _DashboardScreenState extends State<DashboardScreen>
   // ─────────────────────────────────────────────
   // TAB 4: AROODHA
   // ─────────────────────────────────────────────
-  Future<void> _openPrastutaChart() async {
-    final now = DateTime.now();
+  Future<void> _openPrastutaChart({DateTime? savedTime, bool silent = false}) async {
+    final now = savedTime ?? DateTime.now();
     // Always use default location for aroodha/prastuta
     final useLat = LocationService.lat;
     final useLon = LocationService.lon;
     final useTz = LocationService.tzOffset;
-    showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
+    if (!silent && mounted) {
+      showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
+    }
     try {
       final localHour = now.hour + now.minute / 60.0;
       final ayanamsa = widget.extraInfo['ayanamsa'] ?? 'lahiri';
@@ -1957,53 +1959,20 @@ class _DashboardScreenState extends State<DashboardScreen>
         ayanamsaMode: ayanamsa,
         trueNode: trueNode,
       );
-      if (mounted) Navigator.pop(context);
+      if (!silent && mounted) Navigator.pop(context);
       if (result != null && mounted) {
         setState(() {
           _prastutaResult = result;
           _prastutaTime = now;
         });
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocale.l('loadingPrastuta'))));
+        if (!silent && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocale.l('loadingPrastuta'))));
+        }
       }
     } catch (e) {
-      if (mounted) Navigator.pop(context);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${AppLocale.l('errorLabel')}: $e')));
-    }
-  }
-
-  /// Restore prastuta chart from saved prastutaTime (called from initState)
-  Future<void> _restorePrastutaChart() async {
-    if (_prastutaTime == null) {
-      debugPrint('⏱️ Prastuta restore: _prastutaTime is null, skipping');
-      return;
-    }
-    final pt = _prastutaTime!;
-    debugPrint('⏱️ Prastuta restore: attempting for $pt');
-    final useLat = LocationService.lat;
-    final useLon = LocationService.lon;
-    final useTz = LocationService.tzOffset;
-    try {
-      final localHour = pt.hour + pt.minute / 60.0;
-      final ayanamsa = widget.extraInfo['ayanamsa'] ?? 'lahiri';
-      final trueNode = (widget.extraInfo['nodeMode'] ?? 'mean') == 'true';
-      debugPrint('⏱️ Prastuta restore: calculating lat=$useLat lon=$useLon tz=$useTz hour=$localHour');
-      final result = await AstroCalculator.calculate(
-        year: pt.year, month: pt.month, day: pt.day,
-        hourUtcOffset: useTz,
-        hour24: localHour,
-        lat: useLat, lon: useLon,
-        ayanamsaMode: ayanamsa,
-        trueNode: trueNode,
-      );
-      debugPrint('⏱️ Prastuta restore: result=${result != null ? 'OK' : 'NULL'} mounted=$mounted');
-      if (result != null && mounted) {
-        setState(() {
-          _prastutaResult = result;
-        });
-        debugPrint('⏱️ Prastuta restore: SUCCESS - _prastutaResult set');
-      }
-    } catch (e) {
-      debugPrint('⏱️ Prastuta restore ERROR: $e');
+      if (!silent && mounted) Navigator.pop(context);
+      if (!silent && mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${AppLocale.l('errorLabel')}: $e')));
+      debugPrint('⏱️ Prastuta chart error: $e');
     }
   }
 
@@ -2016,7 +1985,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     // Auto-restore: if prastutaTime is saved but chart not yet calculated, trigger it
     if (_prastutaTime != null && _prastutaResult == null && !_prastutaRestoreAttempted) {
       _prastutaRestoreAttempted = true;
-      _restorePrastutaChart();
+      _openPrastutaChart(savedTime: _prastutaTime, silent: true);
     }
 
     return StatefulBuilder(builder: (ctx, setS) {
