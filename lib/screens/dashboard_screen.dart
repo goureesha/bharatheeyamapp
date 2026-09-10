@@ -1740,15 +1740,27 @@ class _DashboardScreenState extends State<DashboardScreen>
   // TAB 1: KUNDALI (All vargas stacked vertically)
   // ─────────────────────────────────────────────
   Widget _buildKundaliTab() {
-    final charts = [
-      {'label': AppLocale.l('rashiKundali'), 'varga': 1, 'isBhava': false},
-      {'label': AppLocale.l('navamshaKundali'), 'varga': 9, 'isBhava': false},
-      {'label': AppLocale.l('bhavaKundali'), 'varga': 1, 'isBhava': true},
-      {'label': AppLocale.l('horaKundali'), 'varga': 2, 'isBhava': false},
-      {'label': AppLocale.l('drekkanaKundali'), 'varga': 3, 'isBhava': false},
-      {'label': AppLocale.l('dvadashamsha'), 'varga': 12, 'isBhava': false},
-      {'label': AppLocale.l('trimshamsha'), 'varga': 30, 'isBhava': false},
-    ];
+    final charts = SamshakaMode.isActive
+      ? [
+          // Samshaka mode order: Rashi → Bhava → Navamsha → Other Varga
+          {'label': AppLocale.l('rashiKundali'), 'varga': 1, 'isBhava': false},
+          {'label': AppLocale.l('bhavaKundali'), 'varga': 1, 'isBhava': true},
+          {'label': AppLocale.l('navamshaKundali'), 'varga': 9, 'isBhava': false},
+          {'label': AppLocale.l('horaKundali'), 'varga': 2, 'isBhava': false},
+          {'label': AppLocale.l('drekkanaKundali'), 'varga': 3, 'isBhava': false},
+          {'label': AppLocale.l('dvadashamsha'), 'varga': 12, 'isBhava': false},
+          {'label': AppLocale.l('trimshamsha'), 'varga': 30, 'isBhava': false},
+        ]
+      : [
+          // Default order: Rashi → Navamsha → Bhava → Other Varga
+          {'label': AppLocale.l('rashiKundali'), 'varga': 1, 'isBhava': false},
+          {'label': AppLocale.l('navamshaKundali'), 'varga': 9, 'isBhava': false},
+          {'label': AppLocale.l('bhavaKundali'), 'varga': 1, 'isBhava': true},
+          {'label': AppLocale.l('horaKundali'), 'varga': 2, 'isBhava': false},
+          {'label': AppLocale.l('drekkanaKundali'), 'varga': 3, 'isBhava': false},
+          {'label': AppLocale.l('dvadashamsha'), 'varga': 12, 'isBhava': false},
+          {'label': AppLocale.l('trimshamsha'), 'varga': 30, 'isBhava': false},
+        ];
 
     // All persons: primary + extras
     var allPersons = <Map<String, dynamic>>[
