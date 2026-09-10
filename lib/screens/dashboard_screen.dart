@@ -207,27 +207,10 @@ class _DashboardScreenState extends State<DashboardScreen>
     if (widget.initialPrastutaTime != null) {
       _prastutaTime = DateTime.tryParse(widget.initialPrastutaTime!);
       if (_prastutaTime != null) {
-        // DEBUG: Show visible indicator on Android
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('DEBUG: prastutaTime loaded = ${widget.initialPrastutaTime}'), duration: const Duration(seconds: 3)),
-            );
-          }
-        });
         Future.delayed(const Duration(milliseconds: 800), () {
           if (mounted) _openPrastutaChart(savedTime: _prastutaTime, silent: true);
         });
       }
-    } else {
-      // DEBUG: Show when prastutaTime is NOT loaded
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('DEBUG: prastutaTime is NULL'), backgroundColor: Colors.red, duration: const Duration(seconds: 3)),
-          );
-        }
-      });
     }
 
     // Initialize mutable primary person from widget
