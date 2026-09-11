@@ -288,6 +288,8 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
     if (state == AppLifecycleState.resumed) {
       // Resume trial usage tracking
       AppAccessService.startTrialSession();
+      // Count resume as an app open for trial users
+      AppAccessService.incrementOpenCount();
       // Re-sync NTP clock on resume (updates offset if internet is now available)
       TrustedTimeService.syncWithNtp();
       // Sync offline usage when coming back online

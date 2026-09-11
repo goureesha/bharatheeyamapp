@@ -130,6 +130,16 @@ class AppAccessService {
     debugPrint('⏱️ Trial session started. Used so far: ${trialUsedSeconds}s');
   }
 
+  /// Increment app open/resume count for trial users
+  static Future<void> incrementOpenCount() async {
+    if (isActivated || adminAccess) return; // Only for trial users
+    if (trialOpenCount > _trialMaxOpens) return; // Already expired
+    trialOpenCount++;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_trialOpenCountKey, trialOpenCount);
+    debugPrint('📱 Trial open/resume #$trialOpenCount / $_trialMaxOpens');
+  }
+
   /// Pause tracking and accumulate usage. Call on app pause/background.
   static Future<void> pauseTrialSession() async {
     if (_trialSessionStart == null) return;
