@@ -486,9 +486,52 @@ class _VastuScreenState extends State<VastuScreen> {
     final minHasta = (minPerimCm / koluCm).ceil();
     final maxHasta = (maxPerimCm / koluCm).floor();
 
+    final minAreaCm2 = minSq * 30.48 * 30.48; // convert sqft to sqcm
+    final maxAreaCm2 = maxSq * 30.48 * 30.48;
+
     final results = <_VastuResult>[];
     for (int h = minHasta; h <= maxHasta; h++) {
-      results.add(_calcFromHasta(h, koluCm, _ownerNakIndex!, 0, 0, 0, 0));
+      final sumCm = (h * koluCm) / 2.0; // L + B in cm
+      // For L + B = sumCm, area = L * (sumCm - L)
+      // Max area (square): (sumCm/2)^2
+      // We need L,B such that area is in [minAreaCm2, maxAreaCm2]
+      // Using quadratic: L^2 - sumCm*L + area = 0 → L = (sumCm ± sqrt(sumCm^2 - 4*area)) / 2
+      final maxPossibleArea = (sumCm / 2) * (sumCm / 2);
+      if (maxPossibleArea < minAreaCm2) continue; // skip, too small even at best
+
+      // Clamp area range to what this perimeter can produce
+      final effMinArea = minAreaCm2.clamp(0.0, maxPossibleArea);
+      final effMaxArea = maxAreaCm2.clamp(0.0, maxPossibleArea);
+
+      // For effMaxArea: find L,B pair
+      final disc1 = sumCm * sumCm - 4 * effMinArea;
+      final disc2 = sumCm * sumCm - 4 * effMaxArea;
+      // L range for max area (most square-like)
+      final lForMaxArea = sumCm / 2; // square
+      final bForMaxArea = sumCm / 2;
+      // L range for min area (most rectangular)
+      double lForMinArea, bForMinArea;
+      if (disc1 > 0) {
+        lForMinArea = (sumCm + sqrt(disc1)) / 2;
+        bForMinArea = sumCm - lForMinArea;
+      } else {
+        lForMinArea = sumCm / 2;
+        bForMinArea = sumCm / 2;
+      }
+
+      // Set practical L/B constraints (longer side as L)
+      double minL, maxL, minB, maxB;
+      if (disc2 > 0) {
+        maxL = (sumCm + sqrt(disc2)) / 2;
+        minL = (sumCm - sqrt(disc2)) / 2;
+      } else {
+        maxL = sumCm / 2;
+        minL = sumCm / 2;
+      }
+      maxB = sumCm - minL;
+      minB = sumCm - maxL;
+
+      results.add(_calcFromHasta(h, koluCm, _ownerNakIndex!, minL, maxL, minB, maxB));
     }
     _sortAndSet(results);
   }
