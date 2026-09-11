@@ -88,7 +88,73 @@ class _SupportScreenState extends State<SupportScreen> {
 
                 // Access info
                 _buildLockInfo(widget.lockType),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
+
+                // ── App Demo Video ──
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.red.withOpacity(0.08), kOrange.withOpacity(0.08)],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.red.withOpacity(0.3)),
+                  ),
+                  child: Column(children: [
+                    Icon(Icons.play_circle_fill, color: Colors.red, size: 44),
+                    const SizedBox(height: 8),
+                    Text('ಆ್ಯಪ್ ಡೆಮೋ ವೀಡಿಯೋ', style: TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w800, color: kText)),
+                    const SizedBox(height: 4),
+                    Text('ಭಾರತೀಯಮ್ ಆ್ಯಪ್‌ನ ಸಂಪೂರ್ಣ ವೈಶಿಷ್ಟ್ಯಗಳನ್ನು ನೋಡಿ',
+                      style: TextStyle(fontSize: 12, color: kMuted),
+                      textAlign: TextAlign.center),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          final url = Uri.parse('https://youtu.be/j4-4O-t7VYw');
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        icon: const Icon(Icons.ondemand_video, size: 20),
+                        label: Text('Watch Demo Video',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                  ]),
+                ),
+                const SizedBox(height: 16),
+
+                // ── App Features ──
+                AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('ವೈಶಿಷ್ಟ್ಯಗಳು / Features', style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w800, color: kPurple2)),
+                      const SizedBox(height: 12),
+                      _featureRow(Icons.auto_awesome, 'ಕುಂಡಲಿ — ರಾಶಿ, ನವಾಂಶ, ಭಾವ, ದಶಾ, ಯೋಗ, ಗೋಚಾರ'),
+                      _featureRow(Icons.calendar_month, 'ಪಂಚಾಂಗ — ತಿಥಿ, ನಕ್ಷತ್ರ, ರಾಹುಕಾಲ'),
+                      _featureRow(Icons.stars_rounded, 'ತಾರಾನುಕೂಲ — ಶುಭ ದಿನ ಆಯ್ಕೆ, ಮುಹೂರ್ತ'),
+                      _featureRow(Icons.favorite, 'ಗುಣ ಮಿಲನ — ಅಷ್ಟಕೂಟ ಹೊಂದಾಣಿಕೆ'),
+                      _featureRow(Icons.home_work_rounded, 'ವಾಸ್ತು — ಪರಿಧಿ ಮತ್ತು ಚದರ ಅಡಿ'),
+                      _featureRow(Icons.blur_circular, 'ಗ್ರಹ ಸ್ಥಿತಿ — ನವಗ್ರಹ ಸ್ಥಾನ'),
+                      _featureRow(Icons.watch_later_rounded, 'ವೈದಿಕ ಗಡಿಯಾರ — ಘಟಿ, ಪಲ'),
+                      _featureRow(Icons.language, '5 ಭಾಷೆ — ಕನ್ನಡ, ಹಿಂದಿ, ತಮಿಳು, ತೆಲುಗು, ಮಲಯಾಳಂ'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
 
                 // ── Gmail Sign-In (if not signed in) ──
                 if (!isSignedIn) ...[
@@ -348,5 +414,17 @@ class _SupportScreenState extends State<SupportScreen> {
         constraints: const BoxConstraints(),
       ),
     ]);
+  }
+
+  static Widget _featureRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(children: [
+        Icon(icon, color: kOrange, size: 18),
+        const SizedBox(width: 10),
+        Expanded(child: Text(text,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kText))),
+      ]),
+    );
   }
 }
