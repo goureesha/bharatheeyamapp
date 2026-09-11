@@ -2458,8 +2458,12 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
           Expanded(
             child: TabBarView(
               children: [
-                OrientationBuilder(
-                  builder: (context, orientation) {
+                Builder(
+                  builder: (context) {
+                    // Use device orientation, NOT available-space orientation.
+                    // OrientationBuilder uses constraints which change when keyboard
+                    // opens, flipping layout and destroying TextFields → keyboard closes.
+                    final orientation = MediaQuery.of(context).orientation;
                     final groomInput = _buildPersonInput(
                       title: AppLocale.l('groomDetails'), color: kTeal,
                       nameCtrl: _gNameCtrl, placeCtrl: _gPlaceCtrl, latCtrl: _gLatCtrl, lonCtrl: _gLonCtrl, tzCtrl: _gTzCtrl,
