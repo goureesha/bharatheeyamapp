@@ -11,6 +11,7 @@ class AppAccessService {
   // ── Pref keys ──
   static const String _accessStatusKey = 'has_active_access';
   static const String _trialUsedSecondsKey = 'trial_used_seconds';
+  static const String _trialOpenCountKey = 'trial_open_count';
   static const String _lastOnlineCheckKey = 'last_online_check_timestamp';
   static const String _blockedKey = 'user_blocked';
   static const String _blockedReasonKey = 'user_blocked_reason';
@@ -19,6 +20,7 @@ class AppAccessService {
 
   // ── Constants ──
   static const int _trialTotalSeconds = 1800; // 30 min usage-based trial
+  static const int _trialMaxOpens = 10;        // Max app opens during trial
   static const int _maxOfflineHours = 24;       // Must connect every 24h
   static int _offlineGraceDays = 10;      // Max offline grace: 10 days
 
@@ -27,6 +29,7 @@ class AppAccessService {
   static bool adminAccess = false;
   static DateTime? adminAccessExpiry;
   static int trialUsedSeconds = 0;        // Accumulated foreground usage
+  static int trialOpenCount = 0;          // Number of app opens during trial
   static DateTime? _trialSessionStart;    // When current foreground session began
   static DateTime? lastOnlineCheck;
   static bool isBlocked = false;
@@ -98,9 +101,9 @@ class AppAccessService {
     debugPrint('🌐 Online check recorded: $lastOnlineCheck');
   }
 
-  /// True if the free trial is still active (usage-based: 1 hour of foreground time)
+  /// True if the free trial is still active (usage-based: 30 min foreground + max 10 app opens)
   static bool get isTrialActive {
-    return _currentTrialUsedSeconds < _trialTotalSeconds;
+    return _currentTrialUsedSeconds < _trialTotalSeconds && trialOpenCount <= _trialMaxOpens;
   }
 
   /// Current total used seconds including the live session
@@ -160,7 +163,8 @@ class AppAccessService {
     }
     if (isTrialActive) {
       final m = trialMinutesRemaining;
-      return '${AppLocale.l('trialActive').replaceAll('{h}', '$m')} ($m min left)';
+      final opensLeft = _trialMaxOpens - trialOpenCount + 1;
+      return '${AppLocale.l('trialActive').replaceAll('{h}', '$m')} ($m min | $opensLeft opens left)';
     }
     return '${AppLocale.l('trialExpired')}';
   }
@@ -174,6 +178,13 @@ class AppAccessService {
 
     // Load accumulated trial usage (usage-based: counts foreground seconds)
     trialUsedSeconds = prefs.getInt(_trialUsedSecondsKey) ?? 0;
+    // Load and increment trial open count
+    trialOpenCount = prefs.getInt(_trialOpenCountKey) ?? 0;
+    if (!isActivated && !adminAccess && trialOpenCount <= _trialMaxOpens) {
+      trialOpenCount++;
+      await prefs.setInt(_trialOpenCountKey, trialOpenCount);
+      debugPrint('📱 Trial app open #$trialOpenCount / $_trialMaxOpens');
+    }
     // Start tracking this session immediately
     startTrialSession();
 
