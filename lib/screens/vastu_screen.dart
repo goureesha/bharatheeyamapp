@@ -1040,20 +1040,9 @@ class _VastuScreenState extends State<VastuScreen> {
                   ? Text('${_v('peridhi')}: ${_cmToFtIn(r.perimeterCm)}',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText),
                       overflow: TextOverflow.ellipsis)
-                  : Builder(builder: (_) {
-                      // With L+B=sum fixed, valid pairs: (minL,maxB) and (maxL,minB)
-                      final f = 30.48;
-                      final a1 = (r.minLenCm / f) * (r.maxBreCm / f); // area at minL
-                      final a2 = (r.maxLenCm / f) * (r.minBreCm / f); // area at maxL
-                      final halfSum = r.sumCm / 2;
-                      final sqArea = (halfSum / f) * (halfSum / f);    // area at square
-                      final inRange = halfSum >= r.minLenCm && halfSum <= r.maxLenCm;
-                      final lo = min(a1, a2).round();
-                      final hi = (inRange ? sqArea : max(a1, a2)).round();
-                      return Text('${_v('area')}: ${lo == hi ? '$lo' : '$lo - $hi'}',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText),
-                        overflow: TextOverflow.ellipsis);
-                    }),
+                  : Text('${_v('area')}: ${((r.perimeterCm / 30.48 / 4) * (r.perimeterCm / 30.48 / 4)).round()} ${_v('sqAdi')}',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText),
+                      overflow: TextOverflow.ellipsis),
               ),
               if (isExcellent)
                 Container(
