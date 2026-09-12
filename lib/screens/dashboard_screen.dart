@@ -11,6 +11,7 @@ import 'package:printing/printing.dart';
 import '../services/export_service.dart';
 import '../core/calculator.dart';
 import '../core/yoga_engine.dart';
+import '../core/prediction_engine.dart';
 import '../constants/strings.dart';
 import '../widgets/common.dart';
 import '../widgets/kundali_chart.dart';
@@ -187,11 +188,11 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   static List<String> get _tabs {
     switch (AppLocale.current) {
-      case 'hi': return ['पंचांग', 'कुंडली', 'स्फुट', 'आरूढ', 'दशा', 'भाव', 'ग्रह षड्वर्ग', 'षड्बल', 'अष्टक', 'योग', 'गोचर', 'टिप्पणी', 'पत्रिका'];
-      case 'ta': return ['பஞ்சாங்கம்', 'ஜாதகம்', 'ஸ்புடம்', 'ஆரூடம்', 'தசை', 'பாவம்', 'ஷட்வர்கம்', 'ஷட்பலம்', 'அஷ்டகம்', 'யோகம்', 'கோசாரம்', 'குறிப்பு', 'பத்ரிகை'];
-      case 'te': return ['పంచాంగం', 'కుండలి', 'స్ఫుటం', 'ఆరూఢం', 'దశ', 'భావం', 'షడ్వర్గం', 'షడ్బలం', 'అష్టకం', 'యోగం', 'గోచారం', 'గమనికలు', 'పత్రిక'];
-      case 'ml': return ['പഞ്ചാംഗം', 'ജാതകം', 'സ്ഫുടം', 'ആരൂഢം', 'ദശ', 'ഭാവം', 'ഷഡ്വർഗം', 'ഷഡ്ബലം', 'അഷ്ടകം', 'യോഗം', 'ഗോചരം', 'കുറിപ്പുകൾ', 'പത്രിക'];
-      default: return ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಆರೂಢ', 'ದಶ', 'ಭಾವ', 'ಗ್ರಹ ಷಡ್ವರ್ಗ', 'ಷಡ್ಬಲ', 'ಅಷ್ಟಕ', 'ಯೋಗ', 'ಗೋಚಾರ', 'ಟಿಪ್ಪಣಿ', 'ಪತ್ರಿಕೆ'];
+      case 'hi': return ['पंचांग', 'कुंडली', 'स्फुट', 'आरूढ', 'दशा', 'भाव', 'ग्रह षड्वर्ग', 'षड्बल', 'अष्टक', 'योग', 'फल', 'गोचर', 'टिप्पणी', 'पत्रिका'];
+      case 'ta': return ['பஞ்சாங்கம்', 'ஜாதகம்', 'ஸ்புடம்', 'ஆரூடம்', 'தசை', 'பாவம்', 'ஷட்வர்கம்', 'ஷட்பலம்', 'அஷ்டகம்', 'யோகம்', 'பலன்', 'கோசாரம்', 'குறிப்பு', 'பத்ரிகை'];
+      case 'te': return ['పంచాంగం', 'కుండలి', 'స్ఫుటం', 'ఆరూఢం', 'దశ', 'భావం', 'షడ్వర్గం', 'షడ్బలం', 'అష్టకం', 'యోగం', 'ఫలం', 'గోచారం', 'గమనికలు', 'పత్రిక'];
+      case 'ml': return ['പഞ്ചാംഗം', 'ജാതകം', 'സ്ഫുടം', 'ആരൂഢം', 'ദശ', 'ഭാവം', 'ഷഡ്വർഗം', 'ഷഡ്ബലം', 'അഷ്ടകം', 'യോഗം', 'ഫലം', 'ഗോചരം', 'കുറിപ്പുകൾ', 'പത്രിക'];
+      default: return ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಆರೂಢ', 'ದಶ', 'ಭಾವ', 'ಗ್ರಹ ಷಡ್ವರ್ಗ', 'ಷಡ್ಬಲ', 'ಅಷ್ಟಕ', 'ಯೋಗ', 'ಫಲ', 'ಗೋಚಾರ', 'ಟಿಪ್ಪಣಿ', 'ಪತ್ರಿಕೆ'];
     }
   }
 
@@ -1557,6 +1558,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                               _buildShadbalaTab(),
                               _buildAshtakaTab(),
                               _buildYogaTab(),
+                              _buildPredictionTab(),
                               _buildGocharTab(),
                               _buildNotesTab(),
                               _buildJanmaPatrikeTab(),
@@ -1586,6 +1588,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   _buildShadbalaTab(),
                                   _buildAshtakaTab(),
                                   _buildYogaTab(),
+                                  _buildPredictionTab(),
                                   _buildGocharTab(),
                                   _buildNotesTab(),
                                   _buildJanmaPatrikeTab(),
@@ -3703,6 +3706,356 @@ class _DashboardScreenState extends State<DashboardScreen>
       });
     }
   }
+
+  // ═══════════════════════════════════════════
+  // PREDICTION TAB — Bhava & Dasha Phala
+  // ═══════════════════════════════════════════
+
+  Widget _buildPredictionTab() {
+    final allPersons = _filterPersons();
+    if (allPersons.isEmpty) return const SizedBox.shrink();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: allPersons.map((person) {
+          final r = person['result'] as KundaliResult;
+          final name = person['name'] as String? ?? '';
+          final prediction = PredictionEngine.analyze(r);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (allPersons.length > 1)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kOrange)),
+                ),
+
+              // ── Key Highlights ──
+              if (prediction.highlights.isNotEmpty)
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [kPurple2.withOpacity(0.08), kOrange.withOpacity(0.08)]),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: kPurple2.withOpacity(0.3)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        Icon(Icons.auto_awesome, color: kOrange, size: 18),
+                        const SizedBox(width: 6),
+                        Text('ಮುಖ್ಯ ಅಂಶಗಳು', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kOrange)),
+                      ]),
+                      const SizedBox(height: 8),
+                      ...prediction.highlights.map((h) => Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text('• ', style: TextStyle(color: kText, fontWeight: FontWeight.bold)),
+                          Expanded(child: Text(h, style: TextStyle(fontSize: 12, color: kText))),
+                        ]),
+                      )),
+                    ],
+                  ),
+                ),
+
+              // ── Current Dasha-Bhukti ──
+              if (prediction.currentDasha != null) _buildCurrentDashaCard(prediction.currentDasha!),
+
+              const SizedBox(height: 12),
+
+              // ── Section: Bhava Phala ──
+              Row(children: [
+                Icon(Icons.home_work, color: kPurple2, size: 18),
+                const SizedBox(width: 6),
+                Text('ಭಾವ ಫಲ', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple2)),
+              ]),
+              const SizedBox(height: 8),
+
+              // ── 12 Bhava Cards ──
+              ...prediction.bhavas.map((b) => _buildBhavaCard(b)),
+
+              const SizedBox(height: 16),
+
+              // ── Section: All Dasha Phala ──
+              Row(children: [
+                Icon(Icons.timeline, color: kPurple2, size: 18),
+                const SizedBox(width: 6),
+                Text('ದಶಾ ಫಲ', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple2)),
+              ]),
+              const SizedBox(height: 8),
+
+              // ── All Mahadasha periods ──
+              ...prediction.allDashas.map((md) => _buildMahaDashaCard(md, prediction.currentDasha)),
+
+              if (allPersons.length > 1) const Divider(height: 32),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  /// Current running dasha-bhukti card (highlighted at top)
+  Widget _buildCurrentDashaCard(DashaPeriodPrediction d) {
+    final qualityColor = _phalaColor(d.quality);
+    final qualityIcon = _phalaIcon(d.quality);
+    final now = DateTime.now();
+    final adTotal = d.adEnd.difference(d.adStart).inDays;
+    final adElapsed = now.difference(d.adStart).inDays;
+    final adProgress = adTotal > 0 ? (adElapsed / adTotal).clamp(0.0, 1.0) : 0.0;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: qualityColor.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: qualityColor.withOpacity(0.4)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(Icons.star, color: qualityColor, size: 20),
+          const SizedBox(width: 6),
+          Text('ಪ್ರಸ್ತುತ ದಶಾ-ಭುಕ್ತಿ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: qualityColor)),
+          const Spacer(),
+          Icon(qualityIcon, color: qualityColor, size: 18),
+        ]),
+        const SizedBox(height: 8),
+        Row(children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(color: kPurple2.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+            child: Text('${trAll(d.mdLord)} ಮಹಾದಶಾ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kPurple2)),
+          ),
+          const SizedBox(width: 6),
+          Icon(Icons.arrow_forward, size: 14, color: kMuted),
+          const SizedBox(width: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(color: kOrange.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+            child: Text('${trAll(d.adLord)} ಅಂತರ್ದಶಾ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kOrange)),
+          ),
+        ]),
+        const SizedBox(height: 8),
+        // Progress bar for current antardasha
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: adProgress,
+            backgroundColor: kBorder.withOpacity(0.3),
+            color: qualityColor,
+            minHeight: 4,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Row(children: [
+          Text('${_fmtDate(d.adStart)} → ${_fmtDate(d.adEnd)}',
+            style: TextStyle(fontSize: 10, color: kMuted)),
+          const Spacer(),
+          Text('${d.relationship}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: qualityColor)),
+        ]),
+        if (d.mdPhala.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Text(d.mdPhala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+        ],
+        if (d.adPhala.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(d.adPhala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+        ],
+      ]),
+    );
+  }
+
+  /// Expandable bhava prediction card
+  Widget _buildBhavaCard(BhavaPrediction b) {
+    final qualityColor = _phalaColor(b.quality);
+    final qualityIcon = _phalaIcon(b.quality);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      decoration: BoxDecoration(
+        color: kCard,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: kBorder.withOpacity(0.5)),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+          childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          leading: Container(
+            width: 32, height: 32,
+            decoration: BoxDecoration(color: qualityColor.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+            child: Center(child: Text('${b.bhavaNum}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: qualityColor))),
+          ),
+          title: Row(children: [
+            Expanded(child: Text(b.bhavaName, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kText))),
+            Icon(qualityIcon, color: qualityColor, size: 16),
+          ]),
+          subtitle: Text(b.significations, style: TextStyle(fontSize: 10, color: kMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+          children: [
+            // Lord info
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Text('ಅಧಿಪತಿ: ', style: TextStyle(fontSize: 11, color: kMuted)),
+                  Text(trAll(b.lordName), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kText)),
+                  Text(' (${b.bhavaNum} → ${b.lordInHouse})', style: TextStyle(fontSize: 10, color: kMuted)),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(color: qualityColor.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                    child: Text(b.lordDignity, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: qualityColor)),
+                  ),
+                ]),
+                if (b.planetsInHouse.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text('ಭಾವ ಗ್ರಹಗಳು: ${b.planetsInHouse.map((p) => trAll(p)).join(', ')}',
+                    style: TextStyle(fontSize: 10, color: kText)),
+                ],
+                if (b.aspectingPlanets.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text('ದೃಷ್ಟಿ: ${b.aspectingPlanets.map((p) => trAll(p)).join(', ')}',
+                    style: TextStyle(fontSize: 10, color: kText)),
+                ],
+              ]),
+            ),
+            // Phala text
+            if (b.phala.isNotEmpty)
+              Text(b.phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+            // Remedy
+            if (b.remedy.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                ),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Icon(Icons.healing, color: Colors.amber.shade700, size: 16),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text(b.remedy, style: TextStyle(fontSize: 11, color: kText, height: 1.4))),
+                ]),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Mahadasha card with expandable bhukti list
+  Widget _buildMahaDashaCard(MahaDashaPrediction md, DashaPeriodPrediction? current) {
+    final isCurrent = current != null && current.mdLord == md.lord &&
+        DateTime.now().isAfter(md.start) && DateTime.now().isBefore(md.end);
+    final qualityColor = _phalaColor(md.quality);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      decoration: BoxDecoration(
+        color: kCard,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: isCurrent ? kOrange.withOpacity(0.6) : kBorder.withOpacity(0.5), width: isCurrent ? 1.5 : 1),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+          childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          initiallyExpanded: isCurrent,
+          leading: Icon(isCurrent ? Icons.play_circle_fill : Icons.circle_outlined,
+            color: isCurrent ? kOrange : qualityColor, size: 22),
+          title: Row(children: [
+            Text('${trAll(md.lord)} ಮಹಾದಶಾ', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: isCurrent ? kOrange : kText)),
+            if (isCurrent) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(color: kOrange.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                child: Text('ಪ್ರಸ್ತುತ', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: kOrange)),
+              ),
+            ],
+          ]),
+          subtitle: Text('${_fmtDate(md.start)} → ${_fmtDate(md.end)}',
+            style: TextStyle(fontSize: 10, color: kMuted)),
+          children: [
+            if (md.phala.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Text(md.phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+              ),
+            // Bhukti list
+            ...md.bhuktis.map((bk) {
+              final isCurrentBk = isCurrent && current!.adLord == bk.lord &&
+                  DateTime.now().isAfter(bk.start) && DateTime.now().isBefore(bk.end);
+              final bkColor = _phalaColor(bk.quality);
+              return Container(
+                margin: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: isCurrentBk ? kOrange.withOpacity(0.06) : kBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: isCurrentBk ? Border.all(color: kOrange.withOpacity(0.4)) : null,
+                ),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    if (isCurrentBk)
+                      Icon(Icons.play_arrow, color: kOrange, size: 14)
+                    else
+                      Icon(_phalaIcon(bk.quality), color: bkColor, size: 12),
+                    const SizedBox(width: 4),
+                    Text('${trAll(bk.lord)} ಅಂತರ್ದಶಾ', style: TextStyle(
+                      fontSize: 11, fontWeight: FontWeight.w700, color: isCurrentBk ? kOrange : kText)),
+                    const Spacer(),
+                    Text('${_fmtDate(bk.start)} → ${_fmtDate(bk.end)}',
+                      style: TextStyle(fontSize: 9, color: kMuted)),
+                  ]),
+                  if (bk.phala.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(bk.phala, style: TextStyle(fontSize: 11, color: kText, height: 1.4)),
+                  ],
+                ]),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Quality color helper
+  Color _phalaColor(PhalaQuality q) {
+    switch (q) {
+      case PhalaQuality.shubha: return Colors.green;
+      case PhalaQuality.mishra: return Colors.orange;
+      case PhalaQuality.ashubha: return Colors.red;
+    }
+  }
+
+  /// Quality icon helper
+  IconData _phalaIcon(PhalaQuality q) {
+    switch (q) {
+      case PhalaQuality.shubha: return Icons.check_circle;
+      case PhalaQuality.mishra: return Icons.warning_amber;
+      case PhalaQuality.ashubha: return Icons.error;
+    }
+  }
+
+  /// Format date as dd/MM/yyyy
+  String _fmtDate(DateTime d) => '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 
   Widget _buildGocharTab() {
     // Trigger load if year changed
