@@ -3712,7 +3712,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   // ═══════════════════════════════════════════
 
   Widget _buildPredictionTab() {
-    final allPersons = _filterPersons();
+    var allPersons = <Map<String, dynamic>>[
+      {'name': _primaryName, 'result': _primaryResult, 'isPrimary': true},
+      ..._extraPersons.map((p) => {'name': p.name, 'result': p.result, 'isPrimary': false}),
+    ];
+    allPersons = _filterPersons(allPersons);
     if (allPersons.isEmpty) return const SizedBox.shrink();
 
     return SingleChildScrollView(
