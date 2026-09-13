@@ -3717,6 +3717,20 @@ class _DashboardScreenState extends State<DashboardScreen>
   // ═══════════════════════════════════════════
 
   Widget _buildPredictionTab() {
+    const _phalaStrings = <String, Map<String, String>>{
+      'keyHighlights': {'kn': 'ಮುಖ್ಯ ಅಂಶಗಳು', 'hi': 'मुख्य बिंदु', 'ta': 'முக்கிய அம்சங்கள்', 'te': 'ముఖ్య అంశాలు', 'ml': 'പ്രധാന കാര്യങ്ങൾ', 'en': 'Key Highlights'},
+      'currentDashaBhukti': {'kn': 'ಪ್ರಸ್ತುತ ದಶಾ-ಭುಕ್ತಿ', 'hi': 'वर्तमान दशा-भुक्ति', 'ta': 'நடப்பு தசா-புக்தி', 'te': 'ప్రస్తుత దశా-భుక్తి', 'ml': 'നിലവിലെ ദശാ-ഭുക്തി', 'en': 'Current Dasha-Bhukti'},
+      'mahadasha': {'kn': 'ಮಹಾದಶಾ', 'hi': 'महादशा', 'ta': 'மகாதசா', 'te': 'మహాదశా', 'ml': 'മഹാദశా', 'en': 'Mahadasha'},
+      'antardasha': {'kn': 'ಅಂತರ್ದಶಾ', 'hi': 'अंतर्दशा', 'ta': 'அந்தர்தசா', 'te': 'అంతర్దశా', 'ml': 'അന്തർദശാ', 'en': 'Antardasha'},
+      'bhavaPhala': {'kn': 'ಭಾವ ಫಲ', 'hi': 'भाव फल', 'ta': 'பாவ பலன்', 'te': 'భావ ఫలం', 'ml': 'ഭാവ ഫലം', 'en': 'House Predictions'},
+      'dashaPhala': {'kn': 'ದಶಾ ಫಲ', 'hi': 'दशा फल', 'ta': 'தசா பலன்', 'te': 'దశా ఫలం', 'ml': 'ദശാ ഫലം', 'en': 'Dasha Predictions'},
+      'prasthuta': {'kn': 'ಪ್ರಸ್ತುತ', 'hi': 'वर्तमान', 'ta': 'நடப்பு', 'te': 'ప్రస్తుతం', 'ml': 'നിലവിലെ', 'en': 'Current'},
+      'adhipati': {'kn': 'ಅಧಿಪತಿ: ', 'hi': 'अधिपति: ', 'ta': 'அதிபதி: ', 'te': 'అధిపతి: ', 'ml': 'അധിപതി: ', 'en': 'Lord: '},
+      'bhavaGrahagalu': {'kn': 'ಭಾವ ಗ್ರಹಗಳು: ', 'hi': 'भाव ग्रह: ', 'ta': 'பாவ கிரகங்கள்: ', 'te': 'భావ గ్రహాలు: ', 'ml': 'ഭാവ ഗ്രഹങ്ങൾ: ', 'en': 'Planets in House: '},
+      'drushti': {'kn': 'ದೃಷ್ಟಿ: ', 'hi': 'दृष्टि: ', 'ta': 'திருஷ்டி: ', 'te': 'దృష్టి: ', 'ml': 'ദൃഷ്ടി: ', 'en': 'Aspects: '},
+    };
+    String _pl(String key) => _phalaStrings[key]?[AppLocale.current] ?? _phalaStrings[key]?['kn'] ?? key;
+
     var allPersons = <Map<String, dynamic>>[
       {'name': _primaryName, 'result': _primaryResult, 'isPrimary': true},
       ..._extraPersons.map((p) => {'name': p.name, 'result': p.result, 'isPrimary': false}),
@@ -3758,7 +3772,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       Row(children: [
                         Icon(Icons.auto_awesome, color: kOrange, size: 18),
                         const SizedBox(width: 6),
-                        Text('ಮುಖ್ಯ ಅಂಶಗಳು', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kOrange)),
+                        Text(_pl('keyHighlights'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kOrange)),
                       ]),
                       const SizedBox(height: 8),
                       ...prediction.highlights.map((h) => Padding(
@@ -3773,7 +3787,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
 
               // ── Current Dasha-Bhukti ──
-              if (prediction.currentDasha != null) _buildCurrentDashaCard(prediction.currentDasha!),
+              if (prediction.currentDasha != null) _buildCurrentDashaCard(prediction.currentDasha!, _pl),
 
               const SizedBox(height: 12),
 
@@ -3781,12 +3795,12 @@ class _DashboardScreenState extends State<DashboardScreen>
               Row(children: [
                 Icon(Icons.home_work, color: kPurple2, size: 18),
                 const SizedBox(width: 6),
-                Text('ಭಾವ ಫಲ', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple2)),
+                Text(_pl('bhavaPhala'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple2)),
               ]),
               const SizedBox(height: 8),
 
               // ── 12 Bhava Cards ──
-              ...prediction.bhavas.map((b) => _buildBhavaCard(b)),
+              ...prediction.bhavas.map((b) => _buildBhavaCard(b, _pl)),
 
               const SizedBox(height: 16),
 
@@ -3794,12 +3808,12 @@ class _DashboardScreenState extends State<DashboardScreen>
               Row(children: [
                 Icon(Icons.timeline, color: kPurple2, size: 18),
                 const SizedBox(width: 6),
-                Text('ದಶಾ ಫಲ', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple2)),
+                Text(_pl('dashaPhala'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple2)),
               ]),
               const SizedBox(height: 8),
 
               // ── All Mahadasha periods ──
-              ...prediction.allDashas.map((md) => _buildMahaDashaCard(md, prediction.currentDasha)),
+              ...prediction.allDashas.map((md) => _buildMahaDashaCard(md, prediction.currentDasha, _pl)),
 
               if (allPersons.length > 1) const Divider(height: 32),
             ],
@@ -3810,7 +3824,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   /// Current running dasha-bhukti card (highlighted at top)
-  Widget _buildCurrentDashaCard(DashaPeriodPrediction d) {
+  Widget _buildCurrentDashaCard(DashaPeriodPrediction d, String Function(String) _pl) {
     final qualityColor = _phalaColor(d.quality);
     final qualityIcon = _phalaIcon(d.quality);
     final now = DateTime.now();
@@ -3831,7 +3845,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         Row(children: [
           Icon(Icons.star, color: qualityColor, size: 20),
           const SizedBox(width: 6),
-          Text('ಪ್ರಸ್ತುತ ದಶಾ-ಭುಕ್ತಿ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: qualityColor)),
+          Text(_pl('currentDashaBhukti'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: qualityColor)),
           const Spacer(),
           Icon(qualityIcon, color: qualityColor, size: 18),
         ]),
@@ -3840,7 +3854,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(color: kPurple2.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-            child: Text('${trAll(d.mdLord)} ಮಹಾದಶಾ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kPurple2)),
+            child: Text('${trAll(d.mdLord)} ${_pl('mahadasha')}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kPurple2)),
           ),
           const SizedBox(width: 6),
           Icon(Icons.arrow_forward, size: 14, color: kMuted),
@@ -3848,7 +3862,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(color: kOrange.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-            child: Text('${trAll(d.adLord)} ಅಂತರ್ದಶಾ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kOrange)),
+            child: Text('${trAll(d.adLord)} ${_pl('antardasha')}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kOrange)),
           ),
         ]),
         const SizedBox(height: 8),
@@ -3882,7 +3896,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   /// Expandable bhava prediction card
-  Widget _buildBhavaCard(BhavaPrediction b) {
+  Widget _buildBhavaCard(BhavaPrediction b, String Function(String) _pl) {
     final qualityColor = _phalaColor(b.quality);
     final qualityIcon = _phalaIcon(b.quality);
 
@@ -3917,7 +3931,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Text('ಅಧಿಪತಿ: ', style: TextStyle(fontSize: 11, color: kMuted)),
+                  Text(_pl('adhipati'), style: TextStyle(fontSize: 11, color: kMuted)),
                   Text(trAll(b.lordName), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: kText)),
                   Text(' (${b.bhavaNum} → ${b.lordInHouse})', style: TextStyle(fontSize: 10, color: kMuted)),
                   const Spacer(),
@@ -3929,12 +3943,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ]),
                 if (b.planetsInHouse.isNotEmpty) ...[
                   const SizedBox(height: 4),
-                  Text('ಭಾವ ಗ್ರಹಗಳು: ${b.planetsInHouse.map((p) => trAll(p)).join(', ')}',
+                  Text('${_pl('bhavaGrahagalu')}${b.planetsInHouse.map((p) => trAll(p)).join(', ')}',
                     style: TextStyle(fontSize: 10, color: kText)),
                 ],
                 if (b.aspectingPlanets.isNotEmpty) ...[
                   const SizedBox(height: 2),
-                  Text('ದೃಷ್ಟಿ: ${b.aspectingPlanets.map((p) => trAll(p)).join(', ')}',
+                  Text('${_pl('drushti')}${b.aspectingPlanets.map((p) => trAll(p)).join(', ')}',
                     style: TextStyle(fontSize: 10, color: kText)),
                 ],
               ]),
@@ -3967,7 +3981,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   /// Mahadasha card with expandable bhukti list
-  Widget _buildMahaDashaCard(MahaDashaPrediction md, DashaPeriodPrediction? current) {
+  Widget _buildMahaDashaCard(MahaDashaPrediction md, DashaPeriodPrediction? current, String Function(String) _pl) {
     final isCurrent = current != null && current.mdLord == md.lord &&
         DateTime.now().isAfter(md.start) && DateTime.now().isBefore(md.end);
     final qualityColor = _phalaColor(md.quality);
@@ -3988,13 +4002,13 @@ class _DashboardScreenState extends State<DashboardScreen>
           leading: Icon(isCurrent ? Icons.play_circle_fill : Icons.circle_outlined,
             color: isCurrent ? kOrange : qualityColor, size: 22),
           title: Row(children: [
-            Text('${trAll(md.lord)} ಮಹಾದಶಾ', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: isCurrent ? kOrange : kText)),
+            Text('${trAll(md.lord)} ${_pl('mahadasha')}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: isCurrent ? kOrange : kText)),
             if (isCurrent) ...[
               const SizedBox(width: 6),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(color: kOrange.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
-                child: Text('ಪ್ರಸ್ತುತ', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: kOrange)),
+                child: Text(_pl('prasthuta'), style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: kOrange)),
               ),
             ],
           ]),
@@ -4026,7 +4040,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     else
                       Icon(_phalaIcon(bk.quality), color: bkColor, size: 12),
                     const SizedBox(width: 4),
-                    Text('${trAll(bk.lord)} ಅಂತರ್ದಶಾ', style: TextStyle(
+                    Text('${trAll(bk.lord)} ${_pl('antardasha')}', style: TextStyle(
                       fontSize: 11, fontWeight: FontWeight.w700, color: isCurrentBk ? kOrange : kText)),
                     const Spacer(),
                     Text('${_fmtDate(bk.start)} → ${_fmtDate(bk.end)}',

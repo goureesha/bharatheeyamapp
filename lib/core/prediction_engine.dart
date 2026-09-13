@@ -1,5 +1,7 @@
 import 'calculator.dart';
 import 'prediction_texts.dart';
+import 'prediction_texts_en.dart';
+import '../widgets/common.dart';
 
 // ═══════════════════════════════════════════
 // PREDICTION ENGINE — Bhava & Dasha Phala Analysis
@@ -178,6 +180,17 @@ class PredictionEngine {
       return const PredictionResult(bhavas: [], allDashas: [], highlights: []);
     }
 
+    final isEn = AppLocale.current == 'en';
+
+    // Locale-aware text sources
+    final _bhavaInfo = isEn ? bhavaInfoListEn : bhavaInfoList;
+    final _planetInHouse = isEn ? planetInHousePhalaEn : planetInHousePhala;
+    final _lordInHouse = isEn ? lordInHousePhalaEn : lordInHousePhala;
+    final _mahadashaP = isEn ? mahadashaPhalasEn : mahadashaPhalas;
+    final _dashaBhuktiP = isEn ? dashaBhuktiPhalasEn : dashaBhuktiPhalas;
+    final _dignityMod = isEn ? dignityModifiersEn : dignityModifiers;
+    final _remedies = isEn ? planetRemediesEn : planetRemedies;
+
     final lagnaRashi = planets[_lagna]!.rashiIndex;
 
     // ── Helper functions ──
@@ -292,13 +305,13 @@ class PredictionEngine {
       final phalaBuffer = StringBuffer();
 
       // 1. Lord placement phala
-      if (lordInHousePhala.length > h - 1 && lordInHousePhala[h - 1].length > lordH - 1) {
-        phalaBuffer.write(lordInHousePhala[h - 1][lordH - 1]);
+      if (_lordInHouse.length > h - 1 && _lordInHouse[h - 1].length > lordH - 1) {
+        phalaBuffer.write(_lordInHouse[h - 1][lordH - 1]);
       }
 
       // 2. Planet-in-house phalas
       for (final p in inHouse) {
-        final phalas = planetInHousePhala[p];
+        final phalas = _planetInHouse[p];
         if (phalas != null && phalas.length > h - 1) {
           phalaBuffer.write(' ${phalas[h - 1]}');
         }
@@ -307,16 +320,20 @@ class PredictionEngine {
 
       // 3. Dignity modifiers (asta, vakri, etc. — can be multiple)
       for (final state in dignityList(lord)) {
-        if (dignityModifiers.containsKey(state)) {
-          phalaBuffer.write(' ${dignityModifiers[state]}');
+        if (_dignityMod.containsKey(state)) {
+          phalaBuffer.write(' ${_dignityMod[state]}');
         }
       }
       // Also check dignity of planets IN the house
       for (final p in inHouse) {
         final pStates = dignityList(p);
         for (final s in pStates) {
-          if (s == 'ವಕ್ರ') phalaBuffer.write(' $p ವಕ್ರಗತಿಯಲ್ಲಿದ್ದು ಫಲಗಳಲ್ಲಿ ವಿಳಂಬ ಅಥವಾ ತೀವ್ರತೆ ಸಾಧ್ಯ.');
-          if (s == 'ಅಸ್ತ') phalaBuffer.write(' $p ಅಸ್ತಂಗತವಾಗಿದ್ದು ತನ್ನ ಪೂರ್ಣ ಫಲ ನೀಡಲು ಅಸಮರ್ಥ.');
+          if (s == 'ವಕ್ರ') phalaBuffer.write(isEn
+            ? ' $p is retrograde, causing delays or intensity in results.'
+            : ' $p ವಕ್ರಗತಿಯಲ್ಲಿದ್ದು ಫಲಗಳಲ್ಲಿ ವಿಳಂಬ ಅಥವಾ ತೀವ್ರತೆ ಸಾಧ್ಯ.');
+          if (s == 'ಅಸ್ತ') phalaBuffer.write(isEn
+            ? ' $p is combust and unable to deliver its full results.'
+            : ' $p ಅಸ್ತಂಗತವಾಗಿದ್ದು ತನ್ನ ಪೂರ್ಣ ಫಲ ನೀಡಲು ಅಸಮರ್ಥ.');
         }
       }
 
@@ -325,41 +342,53 @@ class PredictionEngine {
         final beneficAspecters = aspecters.where((p) => _benefics.contains(p)).toList();
         final maleficAspecters = aspecters.where((p) => _malefics.contains(p)).toList();
         if (beneficAspecters.isNotEmpty) {
-          phalaBuffer.write(' ${beneficAspecters.join(', ')} ದೃಷ್ಟಿಯಿಂದ ಶುಭ ಫಲ ವೃದ್ಧಿ.');
+          phalaBuffer.write(isEn
+            ? ' ${beneficAspecters.join(', ')} aspect enhances positive results.'
+            : ' ${beneficAspecters.join(', ')} ದೃಷ್ಟಿಯಿಂದ ಶುಭ ಫಲ ವೃದ್ಧಿ.');
         }
         if (maleficAspecters.isNotEmpty) {
-          phalaBuffer.write(' ${maleficAspecters.join(', ')} ದೃಷ್ಟಿಯಿಂದ ಕೆಲವು ಸವಾಲುಗಳು ಸಾಧ್ಯ.');
+          phalaBuffer.write(isEn
+            ? ' ${maleficAspecters.join(', ')} aspect may bring some challenges.'
+            : ' ${maleficAspecters.join(', ')} ದೃಷ್ಟಿಯಿಂದ ಕೆಲವು ಸವಾಲುಗಳು ಸಾಧ್ಯ.');
         }
       }
 
       // 5. Remedy for challenging houses
       String remedy = '';
       if (quality == PhalaQuality.ashubha) {
-        final rem = planetRemedies[lord];
+        final rem = _remedies[lord];
         if (rem != null) {
-          remedy = 'ಪರಿಹಾರ: ${rem.mantra} ಜಪಿಸಿ. ${rem.gemstone} ಧರಿಸಿ. ${rem.day} ${rem.charity}. ${rem.deity} ಪೂಜೆ ಮಾಡಿ.';
+          remedy = isEn
+            ? 'Remedy: Chant ${rem.mantra}. Wear ${rem.gemstone}. On ${rem.day}, ${rem.charity}. Worship ${rem.deity}.'
+            : 'ಪರಿಹಾರ: ${rem.mantra} ಜಪಿಸಿ. ${rem.gemstone} ಧರಿಸಿ. ${rem.day} ${rem.charity}. ${rem.deity} ಪೂಜೆ ಮಾಡಿ.';
         }
       } else if (quality == PhalaQuality.mishra) {
-        final rem = planetRemedies[lord];
+        final rem = _remedies[lord];
         if (rem != null) {
-          remedy = 'ಸಲಹೆ: ${rem.deity} ಪ್ರಾರ್ಥನೆ ಮಾಡಿ. ${rem.day} ${rem.color} ಬಣ್ಣದ ಬಟ್ಟೆ ಧರಿಸಿ.';
+          remedy = isEn
+            ? 'Advice: Pray to ${rem.deity}. On ${rem.day}, wear ${rem.color} colored clothes.'
+            : 'ಸಲಹೆ: ${rem.deity} ಪ್ರಾರ್ಥನೆ ಮಾಡಿ. ${rem.day} ${rem.color} ಬಣ್ಣದ ಬಟ್ಟೆ ಧರಿಸಿ.';
         }
       }
 
       // Generate highlights for exceptional placements
       if (quality == PhalaQuality.shubha && (h == 1 || h == 5 || h == 9 || h == 10)) {
-        final info = bhavaInfoList[h - 1];
-        highlights.add('${info.nameKn} ಭಾವ ಬಲಿಷ್ಠ — ${info.significations} ವಿಷಯದಲ್ಲಿ ಶುಭ ಫಲ');
+        final info = _bhavaInfo[h - 1];
+        highlights.add(isEn
+          ? '${info.nameKn} house is strong — positive results in ${info.significations}'
+          : '${info.nameKn} ಭಾವ ಬಲಿಷ್ಠ — ${info.significations} ವಿಷಯದಲ್ಲಿ ಶುಭ ಫಲ');
       }
       if (quality == PhalaQuality.ashubha && (h == 1 || h == 7 || h == 8)) {
-        final info = bhavaInfoList[h - 1];
-        highlights.add('${info.nameKn} ಭಾವಕ್ಕೆ ಗಮನ ಬೇಕು — ಪರಿಹಾರ ಅನುಸರಿಸಿ');
+        final info = _bhavaInfo[h - 1];
+        highlights.add(isEn
+          ? '${info.nameKn} house needs attention — follow remedies'
+          : '${info.nameKn} ಭಾವಕ್ಕೆ ಗಮನ ಬೇಕು — ಪರಿಹಾರ ಅನುಸರಿಸಿ');
       }
 
       bhavas.add(BhavaPrediction(
         bhavaNum: h,
-        bhavaName: bhavaInfoList[h - 1].nameKn,
-        significations: bhavaInfoList[h - 1].significations,
+        bhavaName: _bhavaInfo[h - 1].nameKn,
+        significations: _bhavaInfo[h - 1].significations,
         lordName: lord,
         lordInHouse: lordH,
         lordDignity: lordDig,
@@ -382,10 +411,10 @@ class PredictionEngine {
       final mdDig = dignity(mdLord);
 
       // Mahadasha phala from texts
-      final mdPhalaText = mahadashaPhalas[mdLord] ?? '';
+      final mdPhalaText = _mahadashaP[mdLord] ?? '';
       String mdPhala = mdPhalaText;
-      if (mdDig != 'ಸಾಮಾನ್ಯ' && dignityModifiers.containsKey(mdDig)) {
-        mdPhala += ' ${dignityModifiers[mdDig]}';
+      if (mdDig != 'ಸಾಮಾನ್ಯ' && _dignityMod.containsKey(mdDig)) {
+        mdPhala += ' ${_dignityMod[mdDig]}';
       }
 
       // Evaluate MD quality
@@ -412,29 +441,29 @@ class PredictionEngine {
         final adHouse = houseOf(adLord);
 
         // Dasha-bhukti combination phala from texts
-        final dbPhala = dashaBhuktiPhalas[mdLord]?[adLord] ?? '';
+        final dbPhala = _dashaBhuktiP[mdLord]?[adLord] ?? '';
 
         // Evaluate MD-AD relationship
         final diff = (adHouse - mdHouse + 12) % 12;
         String relationship;
         PhalaQuality adQuality;
         if (diff == 0) {
-          relationship = 'ಸಮ ಸ್ಥಾನ';
+          relationship = isEn ? 'Same Sign' : 'ಸಮ ಸ್ಥಾನ';
           adQuality = PhalaQuality.shubha;
         } else if ({3, 6, 9}.contains(diff)) {
-          relationship = 'ಕೇಂದ್ರ';
+          relationship = isEn ? 'Kendra' : 'ಕೇಂದ್ರ';
           adQuality = PhalaQuality.shubha;
         } else if ({4, 8}.contains(diff)) {
-          relationship = 'ತ್ರಿಕೋಣ';
+          relationship = isEn ? 'Trikona' : 'ತ್ರಿಕೋಣ';
           adQuality = PhalaQuality.shubha;
         } else if ({5, 7}.contains(diff)) {
-          relationship = 'ಷಡಷ್ಟಕ (6-8)';
+          relationship = isEn ? 'Shadashtaka (6-8)' : 'ಷಡಷ್ಟಕ (6-8)';
           adQuality = PhalaQuality.ashubha;
         } else if ({1, 11}.contains(diff)) {
-          relationship = 'ದ್ವಿರ್ದ್ವಾದಶ (2-12)';
+          relationship = isEn ? 'Dwirdwadasha (2-12)' : 'ದ್ವಿರ್ದ್ವಾದಶ (2-12)';
           adQuality = PhalaQuality.mishra;
         } else {
-          relationship = 'ಸಾಮಾನ್ಯ';
+          relationship = isEn ? 'Neutral' : 'ಸಾಮಾನ್ಯ';
           adQuality = PhalaQuality.mishra;
         }
 
