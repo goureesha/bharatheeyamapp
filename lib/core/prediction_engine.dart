@@ -315,8 +315,8 @@ class PredictionEngine {
       for (final p in inHouse) {
         final pStates = dignityList(p);
         for (final s in pStates) {
-          if (s == 'ವಕ್ರ') phalaBuffer.write(' ${trAll(p)} ವಕ್ರಗತಿಯಲ್ಲಿದ್ದು ಫಲಗಳಲ್ಲಿ ವಿಳಂಬ ಅಥವಾ ತೀವ್ರತೆ ಸಾಧ್ಯ.');
-          if (s == 'ಅಸ್ತ') phalaBuffer.write(' ${trAll(p)} ಅಸ್ತಂಗತವಾಗಿದ್ದು ತನ್ನ ಪೂರ್ಣ ಫಲ ನೀಡಲು ಅಸಮರ್ಥ.');
+          if (s == 'ವಕ್ರ') phalaBuffer.write(' $p ವಕ್ರಗತಿಯಲ್ಲಿದ್ದು ಫಲಗಳಲ್ಲಿ ವಿಳಂಬ ಅಥವಾ ತೀವ್ರತೆ ಸಾಧ್ಯ.');
+          if (s == 'ಅಸ್ತ') phalaBuffer.write(' $p ಅಸ್ತಂಗತವಾಗಿದ್ದು ತನ್ನ ಪೂರ್ಣ ಫಲ ನೀಡಲು ಅಸಮರ್ಥ.');
         }
       }
 
