@@ -206,9 +206,11 @@ class PredictionEngine {
       if (fromHouse == 0) return false;
       final diff = (targetHouse - fromHouse + 12) % 12;
       if (diff == 6) return true; // all planets aspect 7th
-      if (planet == _mars && (diff == 3 || diff == 7)) return true;
-      if (planet == _jup && (diff == 4 || diff == 8)) return true;
-      if (planet == _sat && (diff == 2 || diff == 9)) return true;
+      if (planet == _mars && (diff == 3 || diff == 7)) return true;  // 4th, 8th
+      if (planet == _jup && (diff == 4 || diff == 8)) return true;   // 5th, 9th
+      if (planet == _sat && (diff == 2 || diff == 9)) return true;   // 3rd, 10th
+      if (planet == _rahu && (diff == 4 || diff == 8)) return true;  // 5th, 9th
+      if (planet == _ketu && (diff == 4 || diff == 8)) return true;  // 5th, 9th
       return false;
     }
 
