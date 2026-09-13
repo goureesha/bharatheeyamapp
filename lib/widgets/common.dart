@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/strings.dart';
+import '../core/en_translations.dart';
 // ─────────────────────────────────────────────
 // Shared app-wide decorators / constants
 // ─────────────────────────────────────────────
@@ -3801,6 +3802,7 @@ class AppLocale {
 
       'poojaLists': 'പൂജാ പട്ടിക', 'vastuLabel': 'വാസ്തു',
 },
+    'en': enStrings,
   };
 
   /// Translate Kannada text → current language using reverse lookup

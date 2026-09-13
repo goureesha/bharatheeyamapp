@@ -150,7 +150,7 @@ class _SupportScreenState extends State<SupportScreen> {
                       _featureRow(Icons.home_work_rounded, 'ವಾಸ್ತು — ಪರಿಧಿ ಮತ್ತು ಚದರ ಅಡಿ'),
                       _featureRow(Icons.blur_circular, 'ಗ್ರಹ ಸ್ಥಿತಿ — ನವಗ್ರಹ ಸ್ಥಾನ'),
                       _featureRow(Icons.watch_later_rounded, 'ವೈದಿಕ ಗಡಿಯಾರ — ಘಟಿ, ಪಲ'),
-                      _featureRow(Icons.language, '5 ಭಾಷೆ — ಕನ್ನಡ, ಹಿಂದಿ, ತಮಿಳು, ತೆಲುಗು, ಮಲಯಾಳಂ'),
+                      _featureRow(Icons.language, '6 ಭಾಷೆ — ಕನ್ನಡ, ಹಿಂದಿ, ತಮಿಳು, ತೆಲುಗು, ಮಲಯಾಳಂ, English'),
                     ],
                   ),
                 ),

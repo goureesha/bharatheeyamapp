@@ -374,6 +374,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           {'code': 'ta', 'label': 'தமிழ்', 'sub': 'Tamil'},
                           {'code': 'te', 'label': 'తెలుగు', 'sub': 'Telugu'},
                           {'code': 'ml', 'label': 'മലയാളം', 'sub': 'Malayalam'},
+                          {'code': 'en', 'label': 'English', 'sub': 'English'},
                         ];
                         return Column(
                           children: langs.map((l) => RadioListTile<String>(

@@ -52,6 +52,7 @@ class JanmaPatrikeService {
       case 'ta': return 'NotoSansTamil';
       case 'te': return 'NotoSansTelugu';
       case 'ml': return 'NotoSansMalayalam';
+      case 'en': return 'NotoSansKannada';
       default:   return 'NotoSansKannada';
     }
   }
