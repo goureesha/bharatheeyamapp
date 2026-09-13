@@ -223,16 +223,23 @@ class PredictionEngine {
       }).toList();
     }
 
-    /// Get dignity of a planet
-    String dignity(String planet) {
+    /// Get ALL dignity states of a planet (can be multiple)
+    List<String> dignityList(String planet) {
       final p = planets[planet];
-      if (p == null) return 'ಸಾಮಾನ್ಯ';
-      if (_exaltRashi[planet] == p.rashiIndex) return 'ಉಚ್ಚ';
-      if (_debilRashi[planet] == p.rashiIndex) return 'ನೀಚ';
-      if (_ownSigns[planet]?.contains(p.rashiIndex) ?? false) return 'ಸ್ವಕ್ಷೇತ್ರ';
-      if (p.speed < 0) return 'ವಕ್ರ';
-      if (p.isCombust) return 'ಅಸ್ತ';
-      return 'ಸಾಮಾನ್ಯ';
+      if (p == null) return [];
+      final states = <String>[];
+      if (_exaltRashi[planet] == p.rashiIndex) states.add('ಉಚ್ಚ');
+      if (_debilRashi[planet] == p.rashiIndex) states.add('ನೀಚ');
+      if (_ownSigns[planet]?.contains(p.rashiIndex) ?? false) states.add('ಸ್ವಕ್ಷೇತ್ರ');
+      if (p.speed < 0) states.add('ವಕ್ರ');
+      if (p.isCombust) states.add('ಅಸ್ತ');
+      return states;
+    }
+
+    /// Single dignity label for display
+    String dignity(String planet) {
+      final states = dignityList(planet);
+      return states.isEmpty ? 'ಸಾಮಾನ್ಯ' : states.join(', ');
     }
 
     /// Evaluate quality of a bhava based on its factors
@@ -297,9 +304,20 @@ class PredictionEngine {
         }
       }
 
-      // 3. Dignity modifier
-      if (lordDig != 'ಸಾಮಾನ್ಯ' && dignityModifiers.containsKey(lordDig)) {
-        phalaBuffer.write(' ${dignityModifiers[lordDig]}');
+
+      // 3. Dignity modifiers (asta, vakri, etc. — can be multiple)
+      for (final state in dignityList(lord)) {
+        if (dignityModifiers.containsKey(state)) {
+          phalaBuffer.write(' ${dignityModifiers[state]}');
+        }
+      }
+      // Also check dignity of planets IN the house
+      for (final p in inHouse) {
+        final pStates = dignityList(p);
+        for (final s in pStates) {
+          if (s == 'ವಕ್ರ') phalaBuffer.write(' ${trAll(p)} ವಕ್ರಗತಿಯಲ್ಲಿದ್ದು ಫಲಗಳಲ್ಲಿ ವಿಳಂಬ ಅಥವಾ ತೀವ್ರತೆ ಸಾಧ್ಯ.');
+          if (s == 'ಅಸ್ತ') phalaBuffer.write(' ${trAll(p)} ಅಸ್ತಂಗತವಾಗಿದ್ದು ತನ್ನ ಪೂರ್ಣ ಫಲ ನೀಡಲು ಅಸಮರ್ಥ.');
+        }
       }
 
       // 4. Aspect effects
