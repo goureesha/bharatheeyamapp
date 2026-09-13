@@ -202,7 +202,7 @@ class AppLocale {
   static bool get isHindi => current == 'hi';
 
   static void setLang(String lang) {
-    if (!['kn', 'hi', 'ta', 'te', 'ml'].contains(lang)) return;
+    if (!['kn', 'hi', 'ta', 'te', 'ml', 'en'].contains(lang)) return;
     langNotifier.value = lang;
     SharedPreferences.getInstance().then((prefs) => prefs.setString('app_lang', lang));
   }

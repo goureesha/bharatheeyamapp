@@ -174,6 +174,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       'ta': {'ವ': 'வ', 'ತಿ': 'மா', 'ದಿ': 'நா'},
       'te': {'ವ': 'సం', 'ತಿ': 'నె', 'ದಿ': 'రో'},
       'ml': {'ವ': 'വ', 'ತಿ': 'മാ', 'ದಿ': 'ദി'},
+      'en': {'ವ': 'y', 'ತಿ': 'm', 'ದಿ': 'd'},
     };
     final map = suffixes[AppLocale.current];
     if (map == null) return bal;
@@ -2034,6 +2035,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           'ta': ['செ','சு','பு','சந்','சூ','பு','சு','செ','கு','ச','ச','கு'],
           'te': ['కు','శు','బు','చం','ర','బు','శు','కు','గు','శ','శ','గు'],
           'ml': ['കു','ശു','ബു','ചം','ര','ബു','ശു','കു','ഗു','ശ','ശ','ഗു'],
+          'en': ['Ma','Ve','Me','Mo','Su','Me','Ve','Ma','Ju','Sa','Sa','Ju'],
         };
         return (lordAbbr[AppLocale.current] ?? lordAbbr['kn']!)[idx];
       }
@@ -2380,15 +2382,15 @@ class _DashboardScreenState extends State<DashboardScreen>
             // key=dasha lord (Kannada), value={lang: [planet1, planet2]}
             'ಕುಜ': {
               'kn': ['ಕುಜ', 'ರಾಹು'], 'hi': ['कुज', 'राहु'], 'ta': ['குஜ', 'ராகு'],
-              'te': ['కుజ', 'రాహు'], 'ml': ['കുജ', 'രാഹു'],
+              'te': ['కుజ', 'రాహు'], 'ml': ['കുജ', 'രാഹു'], 'en': ['Mars', 'Rahu'],
             },
             'ಶುಕ್ರ': {
               'kn': ['ಶುಕ್ರ', 'ಆದಿತ್ಯ'], 'hi': ['शुक्र', 'आदित्य'], 'ta': ['சுக்ர', 'ஆதித்ய'],
-              'te': ['శుక్ర', 'ఆదిత్య'], 'ml': ['ശുക്ര', 'ആദിത്യ'],
+              'te': ['శుక్ర', 'ఆదిత్య'], 'ml': ['ശുക്ര', 'ആദിത്യ'], 'en': ['Venus', 'Sun'],
             },
             'ರಾಹು': {
               'kn': ['ರಾಹು', 'ಬೃಹಸ್ಪತಿ'], 'hi': ['राहु', 'बृहस्पति'], 'ta': ['ராகு', 'பிருஹஸ்பதி'],
-              'te': ['రాహు', 'బృహస్పతి'], 'ml': ['രാഹു', 'ബൃഹസ്പതി'],
+              'te': ['రాహు', 'బృహస్పతి'], 'ml': ['രാഹു', 'ബൃഹസ്പതി'], 'en': ['Rahu', 'Jupiter'],
             },
           };
 
@@ -2397,11 +2399,11 @@ class _DashboardScreenState extends State<DashboardScreen>
           // {0}=p1, {1}=p2
           String _sandhiTitle(String p1, String p2) => {
             'kn': '$p1 $p2 ಸಂಧಿ ಕಾಲ', 'hi': '$p1 $p2 संधि काल', 'ta': '$p1 $p2 சந்தி காலம்',
-            'te': '$p1 $p2 సంధి కాలం', 'ml': '$p1 $p2 സന്ധി കാലം',
+            'te': '$p1 $p2 సంధి కాలం', 'ml': '$p1 $p2 സന്ധി കാലം', 'en': '$p1 $p2 Sandhi Period',
           }[_loc] ?? '$p1 $p2 ಸಂಧಿ ಕಾಲ';
           String _dashaEnd(String p1, String dt) => {
             'kn': '$p1 ದಶಾ ಅಂತ್ಯ $dt', 'hi': '$p1 दशा अंत $dt', 'ta': '$p1 தசா முடிவு $dt',
-            'te': '$p1 దశా అంతం $dt', 'ml': '$p1 ദശാ അവസാനം $dt',
+            'te': '$p1 దశా అంతం $dt', 'ml': '$p1 ദശാ അവസാനം $dt', 'en': '$p1 Dasha ends $dt',
           }[_loc] ?? '$p1 ದಶಾ ಅಂತ್ಯ $dt';
           String _sandhiDesc(String p1, String p2) => {
             'kn': 'ಈ ಸಮಯವು $p1 $p2 ದಶ ಸಂಧಿ ಆಗಿರುವುದರಿಂದ ಮೇಲೆ ತಿಳಿಸಿದ ಸಮಯಕ್ಕಿಂತ 6 ತಿಂಗಳ ಪೂರ್ವದಲ್ಲಿ\n$p1 $p2 ಶಾಂತಿ ಅಥವಾ ತತ್ಸಮಾನ ಕರ್ಮಗಳನ್ನು ಆಚರಿಸುವುದು ಉತ್ತಮ.',
@@ -2409,6 +2411,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             'ta': 'இது $p1 $p2 தசா சந்தி காலமாக இருப்பதால் மேற்கூறிய நேரத்திற்கு 6 மாதங்களுக்கு முன்\n$p1 $p2 சாந்தி அல்லது அதற்கு இணையான கர்மங்களை செய்வது நல்லது.',
             'te': 'ఈ సమయం $p1 $p2 దశా సంధి అయినందున పై సమయానికి 6 నెలల ముందు\n$p1 $p2 శాంతి లేదా తత్సమాన కర్మలు చేయడం మంచిది.',
             'ml': 'ഈ സമയം $p1 $p2 ദശാ സന്ധി ആയതിനാൽ മേൽ പറഞ്ഞ സമയത്തിന് 6 മാസം മുമ്പ്\n$p1 $p2 ശാന്തി അല്ലെങ്കിൽ തത്തുല്യ കർമ്മങ്ങൾ ആചരിക്കുന്നത് ഉത്തമം.',
+            'en': 'This is $p1 $p2 Dasha Sandhi period. It is recommended to perform $p1 $p2 Shanti or equivalent rituals 6 months before the above date.',
           }[_loc] ?? 'ಈ ಸಮಯವು $p1 $p2 ದಶ ಸಂಧಿ ಆಗಿರುವುದರಿಂದ ಮೇಲೆ ತಿಳಿಸಿದ ಸಮಯಕ್ಕಿಂತ 6 ತಿಂಗಳ ಪೂರ್ವದಲ್ಲಿ\n$p1 $p2 ಶಾಂತಿ ಅಥವಾ ತತ್ಸಮಾನ ಕರ್ಮಗಳನ್ನು ಆಚರಿಸುವುದು ಉತ್ತಮ.';
 
           // ── Collect sandhi notices ──
@@ -2971,6 +2974,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         'ta': ['செ','சு','பு','சந்','சூ','பு','சு','செ','கு','ச','ச','கு'],
         'te': ['కు','శు','బు','చం','ర','బు','శు','కు','గు','శ','శ','గు'],
         'ml': ['കു','ശു','ബു','ചം','ര','ബു','ശു','കു','ഗു','ശ','ശ','ഗു'],
+        'en': ['Ma','Ve','Me','Mo','Su','Me','Ve','Ma','Ju','Sa','Sa','Ju'],
       };
       return (lordAbbr[AppLocale.current] ?? lordAbbr['kn']!)[idx];
     }

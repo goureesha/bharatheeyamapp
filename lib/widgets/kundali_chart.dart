@@ -520,8 +520,15 @@ class KundaliChart extends StatelessWidget {
     'ಮಾಂದಿ': 'മാ',
   };
 
+  static const _shortNamesEn = <String, String>{
+    'ರವಿ': 'Su', 'ಚಂದ್ರ': 'Mo', 'ಕುಜ': 'Ma', 'ಬುಧ': 'Me',
+    'ಗುರು': 'Ju', 'ಶುಕ್ರ': 'Ve', 'ಶನಿ': 'Sa', 'ರಾಹು': 'Ra',
+    'ಕೇತು': 'Ke', 'ಲಗ್ನ': 'Asc', 'ಮಾಂದಿ': 'Md',
+  };
+
   static Map<String, String> get _shortNames {
     switch (AppLocale.current) {
+      case 'en': return _shortNamesEn;
       case 'hi': return _shortNamesHi;
       case 'ta': return _shortNamesTa;
       case 'te': return _shortNamesTe;

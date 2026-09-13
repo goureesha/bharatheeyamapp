@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "android/app/build.gradle": {
-    "mtime": 1784697327.5232975,
-    "ast_hash": "60a393bdc1fd9f173d02a63ff90b877a",
+    "mtime": 1789048214.3769116,
+    "ast_hash": "1f312db1acdc190983603e189f835f6b",
     "semantic_hash": ""
   },
   "android/app/google-services.json": {
@@ -60,8 +60,8 @@
     "semantic_hash": ""
   },
   "lib/constants/strings.dart": {
-    "mtime": 1783748710.4324298,
-    "ast_hash": "42c3654f5cf43dc818091f01ea996d74",
+    "mtime": 1789276790.995983,
+    "ast_hash": "7e8bf166f74a172b3f4d2cd3915e9a12",
     "semantic_hash": ""
   },
   "lib/core/ashtakavarga.dart": {
@@ -70,8 +70,8 @@
     "semantic_hash": ""
   },
   "lib/core/calculator.dart": {
-    "mtime": 1785742242.8994231,
-    "ast_hash": "4fa98bbc5d4a2609c41642068129f353",
+    "mtime": 1786799201.4559271,
+    "ast_hash": "e5cb9f0b9588460dde5704113e03abc3",
     "semantic_hash": ""
   },
   "lib/core/ephemeris.dart": {
@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "lib/core/match_making.dart": {
-    "mtime": 1784786342.5082583,
-    "ast_hash": "048f20a4d35c852915403c0e7a7b5443",
+    "mtime": 1787982580.4298248,
+    "ast_hash": "88302876a8460b3d306477f3b56db7bf",
     "semantic_hash": ""
   },
   "lib/core/muhurta_rules.dart": {
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "lib/main.dart": {
-    "mtime": 1785676677.7000487,
-    "ast_hash": "eb68c77118f7edfc4ad50ecf74793819",
+    "mtime": 1789115024.0020337,
+    "ast_hash": "a1026ab5040e5134dc407a1359c57bef",
     "semantic_hash": ""
   },
   "lib/models/library_models.dart": {
@@ -135,8 +135,8 @@
     "semantic_hash": ""
   },
   "lib/screens/dashboard_screen.dart": {
-    "mtime": 1785743359.7360682,
-    "ast_hash": "00b9d6770429aced3ae6e22917b57747",
+    "mtime": 1789276013.9878018,
+    "ast_hash": "58520740cb13345cc52c68b5bf86ccac",
     "semantic_hash": ""
   },
   "lib/screens/home_screen.dart": {
@@ -145,13 +145,13 @@
     "semantic_hash": ""
   },
   "lib/screens/input_screen.dart": {
-    "mtime": 1785728888.0754435,
-    "ast_hash": "dbe30f9d4fe9038e04791f55d62afe50",
+    "mtime": 1789022783.038509,
+    "ast_hash": "fec4102dd866793e904ffe5516a0cbb5",
     "semantic_hash": ""
   },
   "lib/screens/match_making_tab.dart": {
-    "mtime": 1785733236.155547,
-    "ast_hash": "795acab627f4ded90a44ee8b85a48963",
+    "mtime": 1789118814.9149218,
+    "ast_hash": "7ebf8630801ccf26cce4ae216edcfcaf",
     "semantic_hash": ""
   },
   "lib/screens/panchanga_screen.dart": {
@@ -160,8 +160,8 @@
     "semantic_hash": ""
   },
   "lib/screens/panchanga_search_screen.dart": {
-    "mtime": 1781413389.4209497,
-    "ast_hash": "c65fdce4ddada84a4e20c729e41da756",
+    "mtime": 1785821364.8479898,
+    "ast_hash": "94bdd8f02b38d2da2af27b9b56544fad",
     "semantic_hash": ""
   },
   "lib/screens/planets_screen.dart": {
@@ -170,8 +170,8 @@
     "semantic_hash": ""
   },
   "lib/screens/pooja_lists_screen.dart": {
-    "mtime": 1785562314.6286106,
-    "ast_hash": "4bb8ae6edcba3b1a15640c7063142ddb",
+    "mtime": 1789276818.9154565,
+    "ast_hash": "cdf1e22212d23b34647aacfebcaea142",
     "semantic_hash": ""
   },
   "lib/screens/privacy_policy_screen.dart": {
@@ -180,23 +180,23 @@
     "semantic_hash": ""
   },
   "lib/screens/settings_screen.dart": {
-    "mtime": 1785569311.2569666,
-    "ast_hash": "eafc339a0f665616ade84ef6624c001c",
+    "mtime": 1789274540.4288237,
+    "ast_hash": "47f97ebc1db0bf35aa697735e4ba2b8a",
     "semantic_hash": ""
   },
   "lib/screens/support_screen.dart": {
-    "mtime": 1785072055.87066,
-    "ast_hash": "41abfc90bcd9e11f410108e4dbb6682c",
+    "mtime": 1789276054.8064277,
+    "ast_hash": "eadd958cdabd4519e95710f42fa2c5d8",
     "semantic_hash": ""
   },
   "lib/screens/taranukoola_screen.dart": {
-    "mtime": 1785735713.0261285,
-    "ast_hash": "9716f6fde54547b50654ef27ffb6aac7",
+    "mtime": 1789050311.063331,
+    "ast_hash": "17b6c4f61028bdb34c6191c06cafde67",
     "semantic_hash": ""
   },
   "lib/screens/vastu_screen.dart": {
-    "mtime": 1785072162.2779968,
-    "ast_hash": "881ed851828123433c038f7b7f611af1",
+    "mtime": 1789094064.5470102,
+    "ast_hash": "0b78917e24b7807e09363fc1069b13d2",
     "semantic_hash": ""
   },
   "lib/screens/vedic_clock_screen.dart": {
@@ -240,8 +240,8 @@
     "semantic_hash": ""
   },
   "lib/services/device_binding_service.dart": {
-    "mtime": 1784955614.3765125,
-    "ast_hash": "17c41deb031dd380006757ab0a45b815",
+    "mtime": 1788671077.4764476,
+    "ast_hash": "1e86ffb7c07504e24d85f35ddb019232",
     "semantic_hash": ""
   },
   "lib/services/docs_service.dart": {
@@ -250,8 +250,8 @@
     "semantic_hash": ""
   },
   "lib/services/drive_backup_service.dart": {
-    "mtime": 1785303609.3633375,
-    "ast_hash": "2ce363ec6377c033df49bb423bd3f16a",
+    "mtime": 1786761038.5497918,
+    "ast_hash": "ca5bf42cf70299511e3048b25e2210d4",
     "semantic_hash": ""
   },
   "lib/services/export_service.dart": {
@@ -295,8 +295,8 @@
     "semantic_hash": ""
   },
   "lib/services/janma_patrike_service.dart": {
-    "mtime": 1785742569.163319,
-    "ast_hash": "f41a4d2e64ce0bd4a56c2152f3b85c62",
+    "mtime": 1789276030.5986755,
+    "ast_hash": "62bc382f6922020b428a43927231d9e5",
     "semantic_hash": ""
   },
   "lib/services/local_export_mobile.dart": {
@@ -350,8 +350,8 @@
     "semantic_hash": ""
   },
   "lib/services/storage_service.dart": {
-    "mtime": 1775217289.8573904,
-    "ast_hash": "869be9c901fd3bd7c8f151c277c55a77",
+    "mtime": 1789012810.8676002,
+    "ast_hash": "f323610a85a3763dbaf971f064c04a80",
     "semantic_hash": ""
   },
   "lib/services/tester_service.dart": {
@@ -370,8 +370,8 @@
     "semantic_hash": ""
   },
   "lib/widgets/common.dart": {
-    "mtime": 1785742616.2753487,
-    "ast_hash": "a3a1b9462a41b9c3c64796c8c890d7d4",
+    "mtime": 1789276676.4299748,
+    "ast_hash": "81dead113ee12cc241c0d11fd2f6c1b5",
     "semantic_hash": ""
   },
   "lib/widgets/dasha_widget.dart": {
@@ -380,13 +380,13 @@
     "semantic_hash": ""
   },
   "lib/widgets/kundali_chart.dart": {
-    "mtime": 1785213918.656634,
-    "ast_hash": "f18f1435c9d07fb8355374b5cf6d2e2b",
+    "mtime": 1789276784.1802478,
+    "ast_hash": "a9cd3671c802ff2d1f815f5ef41437c3",
     "semantic_hash": ""
   },
   "lib/widgets/north_indian_chart.dart": {
-    "mtime": 1785213936.8105276,
-    "ast_hash": "a3e88bdf6b0598f38302b2fda158538b",
+    "mtime": 1789276790.1140797,
+    "ast_hash": "6721b0b4aba9c727ccf0611a9448bb95",
     "semantic_hash": ""
   },
   "lib/widgets/planet_detail_sheet.dart": {
@@ -480,8 +480,8 @@
     "semantic_hash": ""
   },
   "pubspec.yaml": {
-    "mtime": 1785676199.3858228,
-    "ast_hash": "a755715366b62e61b3b691021dacf2b4",
+    "mtime": 1789005838.9075062,
+    "ast_hash": "aa19e3c88aef29c95ac987e6f7082fcf",
     "semantic_hash": ""
   },
   "script/brihad_jataka.txt": {
@@ -655,13 +655,13 @@
     "semantic_hash": ""
   },
   "lib/core/yoga_engine.dart": {
-    "mtime": 1784782463.861892,
-    "ast_hash": "791662d46dd5376809a149a00f46b1a7",
+    "mtime": 1785938463.5876243,
+    "ast_hash": "18654b36dfc665f96332b1f9404f4926",
     "semantic_hash": ""
   },
   "lib/services/app_access_service.dart": {
-    "mtime": 1785062500.3577566,
-    "ast_hash": "6e1456bf4fa40ec5723f436547b8c655",
+    "mtime": 1789115016.5355463,
+    "ast_hash": "797fae0d16d3147981414c98d19d81bf",
     "semantic_hash": ""
   },
   ".gemini-backup/conversations/d205e32f-9cf3-4027-b64f-e30df4bc14b1/implementation_plan.md": {
@@ -790,8 +790,8 @@
     "semantic_hash": ""
   },
   "lib/services/panchanga_cache.dart": {
-    "mtime": 1785735932.6732237,
-    "ast_hash": "f9fbda659a22c7ea7275f982d0aaa98d",
+    "mtime": 1786724713.998731,
+    "ast_hash": "da526a108edee860f2a2c77e1b5f0c9a",
     "semantic_hash": ""
   },
   "lib/widgets/muhurta_rules_editor.dart": {
@@ -805,8 +805,8 @@
     "semantic_hash": ""
   },
   "lib/services/match_pdf_service.dart": {
-    "mtime": 1785560901.6282794,
-    "ast_hash": "94a1a3ac4b6fab37e8533bae7d9980d2",
+    "mtime": 1789276045.3603034,
+    "ast_hash": "f7f8857ff71857c3c4bc16e1d03991de",
     "semantic_hash": ""
   },
   "lib/services/timezone_service.dart": {
@@ -830,8 +830,8 @@
     "semantic_hash": ""
   },
   "tools/generate_bdat.py": {
-    "mtime": 1785737038.1149392,
-    "ast_hash": "54624c8af345300fbd92c31083cbf350",
+    "mtime": 1785762926.2670698,
+    "ast_hash": "59ad84d0211294893c7225abedef5f9e",
     "semantic_hash": ""
   },
   "tools/generate_cities.py": {
@@ -847,6 +847,26 @@
   ".github/workflows/deploy-admin.yml": {
     "mtime": 1785066479.0318139,
     "ast_hash": "fb43ca481b495aea545f82cb763e54b4",
+    "semantic_hash": ""
+  },
+  "lib/core/en_translations.dart": {
+    "mtime": 1789276745.6905813,
+    "ast_hash": "1b69461d0ce042b20ca43a6d6cf6ba34",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_engine.dart": {
+    "mtime": 1789271892.4079213,
+    "ast_hash": "61f7f3aed1fa7dbac3b1f0a4e66155b9",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_texts.dart": {
+    "mtime": 1789270414.0119708,
+    "ast_hash": "91754f8b930c9002713719f5777ee18e",
+    "semantic_hash": ""
+  },
+  "tools/output/PANCHANGA_DATA_FILES_INFO.txt": {
+    "mtime": 1785762999.3657355,
+    "ast_hash": "c86c959f29a98d159ce11d02feb5d8a7",
     "semantic_hash": ""
   }
 }

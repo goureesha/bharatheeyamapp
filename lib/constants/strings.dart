@@ -297,10 +297,21 @@ const Map<String, String> mlPlanetNames = {
   'Mandi': 'മാന്ദി', 'Lagna': 'ലഗ്നം',
 };
 
+// ─── ENGLISH TERMS ───
+const enRashi = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+const enVara = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const enTithi = ['Pratipada', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami', 'Shashthi', 'Saptami', 'Ashtami', 'Navami', 'Dashami', 'Ekadashi', 'Dwadashi', 'Trayodashi', 'Chaturdashi', 'Purnima', 'Amavasya'];
+const enNak = ['Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra', 'Punarvasu', 'Pushya', 'Ashlesha', 'Magha', 'Purva Phalguni', 'Uttara Phalguni', 'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha', 'Jyeshtha', 'Moola', 'Purvashadha', 'Uttarashadha', 'Shravana', 'Dhanishtha', 'Shatabhisha', 'Purvabhadra', 'Uttarabhadra', 'Revati'];
+const enYoga = ['Vishkambha', 'Priti', 'Ayushman', 'Saubhagya', 'Shobhana', 'Atiganda', 'Sukarma', 'Dhriti', 'Shoola', 'Ganda', 'Vriddhi', 'Dhruva', 'Vyaghata', 'Harshana', 'Vajra', 'Siddhi', 'Vyatipata', 'Variyan', 'Parigha', 'Shiva', 'Siddha', 'Sadhya', 'Shubha', 'Shukla', 'Brahma', 'Indra', 'Vaidhriti'];
+const enDashaLords = ['Ketu', 'Venus', 'Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Saturn', 'Mercury'];
+const enPlanetNames = <String, String>{'ರವಿ': 'Sun', 'ಚಂದ್ರ': 'Moon', 'ಕುಜ': 'Mars', 'ಬುಧ': 'Mercury', 'ಗುರು': 'Jupiter', 'ಶುಕ್ರ': 'Venus', 'ಶನಿ': 'Saturn', 'ರಾಹು': 'Rahu', 'ಕೇತು': 'Ketu', 'ಲಗ್ನ': 'Ascendant', 'ಮಾಂದಿ': 'Mandi'};
+const enSphutas16Order = ['Dhuma', 'Vyatipata', 'Parivesha', 'Indrachapa', 'Upaketu', 'Bhrigu B.', 'Bija', 'Kshetra', 'Yogi', 'Trisphuta', 'Chatuhsphuta', 'Panchasphuta', 'Prana', 'Deha', 'Mrityu', 'Sukshma Tri.'];
+
 // ─── DYNAMIC LOCALE GETTERS ───
 
 List<String> get appRashi {
   switch (AppLocale.current) {
+    case 'en': return enRashi;
     case 'hi': return hiRashi;
     case 'ta': return taRashi;
     case 'te': return teRashi;
@@ -311,6 +322,7 @@ List<String> get appRashi {
 
 List<String> get appVara {
   switch (AppLocale.current) {
+    case 'en': return enVara;
     case 'hi': return hiVara;
     case 'ta': return taVara;
     case 'te': return teVara;
@@ -321,6 +333,7 @@ List<String> get appVara {
 
 List<String> get appTithi {
   switch (AppLocale.current) {
+    case 'en': return enTithi;
     case 'hi': return hiTithi;
     case 'ta': return taTithi;
     case 'te': return teTithi;
@@ -331,6 +344,7 @@ List<String> get appTithi {
 
 List<String> get appNak {
   switch (AppLocale.current) {
+    case 'en': return enNak;
     case 'hi': return hiNak;
     case 'ta': return taNak;
     case 'te': return teNak;
@@ -341,6 +355,7 @@ List<String> get appNak {
 
 List<String> get appYoga {
   switch (AppLocale.current) {
+    case 'en': return enYoga;
     case 'hi': return hiYoga;
     case 'ta': return taYoga;
     case 'te': return teYoga;
@@ -351,6 +366,7 @@ List<String> get appYoga {
 
 List<String> get appDashaLords {
   switch (AppLocale.current) {
+    case 'en': return enDashaLords;
     case 'hi': return hiDashaLords;
     case 'ta': return taDashaLords;
     case 'te': return teDashaLords;
@@ -361,6 +377,7 @@ List<String> get appDashaLords {
 
 Map<String, String> get appPlanetNames {
   switch (AppLocale.current) {
+    case 'en': return enPlanetNames;
     case 'hi': return hiPlanetNames;
     case 'ta': return taPlanetNames;
     case 'te': return tePlanetNames;
@@ -372,6 +389,7 @@ Map<String, String> get appPlanetNames {
 List<String> get appSphutas16Order {
   // Sphutas stay in Kannada/Sanskrit for now (technical terms)
   switch (AppLocale.current) {
+    case 'en': return enSphutas16Order;
     case 'hi': return hiSphutas16Order;
     default: return sphutas16Order;
   }
@@ -379,6 +397,7 @@ List<String> get appSphutas16Order {
 
 List<String> get appPlanetOrder {
   switch (AppLocale.current) {
+    case 'en': return ['Ascendant', 'Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu', 'Mandi'];
     case 'hi': return ['लग्न', 'सूर्य', 'चन्द्र', 'मंगल', 'बुध', 'गुरु', 'शुक्र', 'शनि', 'राहु', 'केतु', 'मांदि'];
     case 'ta': return ['லக்னம்', 'சூரியன்', 'சந்திரன்', 'செவ்வாய்', 'புதன்', 'குரு', 'சுக்கிரன்', 'சனி', 'ராகு', 'கேது', 'மாந்தி'];
     case 'te': return ['లగ్నం', 'సూర్యుడు', 'చంద్రుడు', 'కుజ', 'బుధ', 'గురు', 'శుక్ర', 'శని', 'రాహు', 'కేతు', 'మాంది'];
