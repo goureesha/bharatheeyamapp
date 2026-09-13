@@ -59,19 +59,44 @@ class JanmaPatrikeService {
 
   /// Locale-aware short names for chart cells
   static Map<String, String> get _shortNames {
-    return <String, String>{
-      'ಲಗ್ನ': AppLocale.l('abbrLagna'),
-      'ರವಿ': AppLocale.l('abbrRavi'),
-      'ಚಂದ್ರ': AppLocale.l('abbrChandra'),
-      'ಕುಜ': AppLocale.l('abbrKuja'),
-      'ಬುಧ': AppLocale.l('abbrBudha'),
-      'ಗುರು': AppLocale.l('abbrGuru'),
-      'ಶುಕ್ರ': AppLocale.l('abbrShukra'),
-      'ಶನಿ': AppLocale.l('abbrShani'),
-      'ರಾಹು': AppLocale.l('abbrRahu'),
-      'ಕೇತು': AppLocale.l('abbrKetu'),
-      'ಮಾಂದಿ': AppLocale.l('abbrMandi'),
+    const _shortNamesKn = <String, String>{
+      'ಲಗ್ನ': 'ಲ', 'ರವಿ': 'ರ', 'ಚಂದ್ರ': 'ಚಂ', 'ಕುಜ': 'ಕು',
+      'ಬುಧ': 'ಬು', 'ಗುರು': 'ಗು', 'ಶುಕ್ರ': 'ಶು', 'ಶನಿ': 'ಶ',
+      'ರಾಹು': 'ರಾ', 'ಕೇತು': 'ಕೇ', 'ಮಾಂದಿ': 'ಮಾ',
     };
+    const _shortNamesHi = <String, String>{
+      'ಲಗ್ನ': 'ल', 'ರವಿ': 'सू', 'ಚಂದ್ರ': 'चं', 'ಕುಜ': 'मं',
+      'ಬುಧ': 'बु', 'ಗುರು': 'गु', 'ಶುಕ್ರ': 'शु', 'ಶನಿ': 'श',
+      'ರಾಹು': 'रा', 'ಕೇತು': 'के', 'ಮಾಂದಿ': 'मा',
+    };
+    const _shortNamesTa = <String, String>{
+      'ಲಗ್ನ': 'ல', 'ರವಿ': 'சூ', 'ಚಂದ್ರ': 'சந்', 'ಕುಜ': 'செ',
+      'ಬುಧ': 'பு', 'ಗುರು': 'கு', 'ಶುಕ್ರ': 'சு', 'ಶನಿ': 'ச',
+      'ರಾಹು': 'ரா', 'ಕೇತು': 'கே', 'ಮಾಂದಿ': 'மா',
+    };
+    const _shortNamesTe = <String, String>{
+      'ಲಗ್ನ': 'ల', 'ರವಿ': 'ర', 'ಚಂದ್ರ': 'చం', 'ಕುಜ': 'కు',
+      'ಬುಧ': 'బు', 'ಗುರು': 'గు', 'ಶುಕ್ರ': 'శు', 'ಶನಿ': 'శ',
+      'ರಾಹು': 'రా', 'ಕೇತು': 'కే', 'ಮಾಂದಿ': 'మా',
+    };
+    const _shortNamesMl = <String, String>{
+      'ಲಗ್ನ': 'ല', 'ರವಿ': 'ര', 'ಚಂದ್ರ': 'ചം', 'ಕುಜ': 'കു',
+      'ಬುಧ': 'ബു', 'ಗುರು': 'ഗു', 'ಶುಕ್ರ': 'ശു', 'ಶನಿ': 'ശ',
+      'ರಾಹು': 'രാ', 'ಕೇತು': 'കേ', 'ಮಾಂದಿ': 'മാ',
+    };
+    const _shortNamesEn = <String, String>{
+      'ಲಗ್ನ': 'Asc', 'ರವಿ': 'Su', 'ಚಂದ್ರ': 'Mo', 'ಕುಜ': 'Ma',
+      'ಬುಧ': 'Me', 'ಗುರು': 'Ju', 'ಶುಕ್ರ': 'Ve', 'ಶನಿ': 'Sa',
+      'ರಾಹು': 'Ra', 'ಕೇತು': 'Ke', 'ಮಾಂದಿ': 'Md',
+    };
+    switch (AppLocale.current) {
+      case 'hi': return _shortNamesHi;
+      case 'ta': return _shortNamesTa;
+      case 'te': return _shortNamesTe;
+      case 'ml': return _shortNamesMl;
+      case 'en': return _shortNamesEn;
+      default: return _shortNamesKn;
+    }
   }
 
   static List<List<String>> _computeChart(KundaliResult result, int Function(double deg) rashiResolver) {
