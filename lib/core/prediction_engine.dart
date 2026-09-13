@@ -200,8 +200,10 @@ class PredictionEngine {
       return _ninePlanets.where((p) => houseOf(p) == house).toList();
     }
 
-    /// Check if planet aspects a house (Parashari drishti)
+    /// Check if planet aspects a house (Parashari drishti — only 7 graha)
     bool aspects(String planet, int targetHouse) {
+      // Rahu & Ketu have NO drishti (shadow planets)
+      if (planet == _rahu || planet == _ketu) return false;
       final fromHouse = houseOf(planet);
       if (fromHouse == 0) return false;
       final diff = (targetHouse - fromHouse + 12) % 12;
@@ -209,14 +211,13 @@ class PredictionEngine {
       if (planet == _mars && (diff == 3 || diff == 7)) return true;  // 4th, 8th
       if (planet == _jup && (diff == 4 || diff == 8)) return true;   // 5th, 9th
       if (planet == _sat && (diff == 2 || diff == 9)) return true;   // 3rd, 10th
-      if (planet == _rahu && (diff == 4 || diff == 8)) return true;  // 5th, 9th
-      if (planet == _ketu && (diff == 4 || diff == 8)) return true;  // 5th, 9th
       return false;
     }
 
-    /// Get planets aspecting a house
+    /// Get planets aspecting a house (only 7 graha, no Rahu/Ketu)
     List<String> aspectingPlanets(int house) {
-      return _ninePlanets.where((p) {
+      const sevenPlanets = [_sun, _moon, _mars, _merc, _jup, _ven, _sat];
+      return sevenPlanets.where((p) {
         final h = houseOf(p);
         return h != house && aspects(p, house);
       }).toList();
