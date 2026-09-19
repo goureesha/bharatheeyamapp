@@ -4840,6 +4840,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
           // ── Form Fields ──
           Container(
+            key: const ValueKey('jp_form_fields'),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: kCard,
@@ -4867,16 +4868,19 @@ class _DashboardScreenState extends State<DashboardScreen>
                 Text(AppLocale.l('familyDetails'), style: TextStyle(fontWeight: FontWeight.w800, color: kTeal)),
                 const SizedBox(height: 8),
                 TextField(
+                  key: const ValueKey('father_name_field'),
                   controller: _fatherNameCtrl,
                   decoration: InputDecoration(labelText: AppLocale.l('fatherName'), prefixIcon: Icon(Icons.person_outline, size: 18), isDense: true),
                 ),
                 const SizedBox(height: 10),
                 TextField(
+                  key: const ValueKey('mother_name_field'),
                   controller: _motherNameCtrl,
                   decoration: InputDecoration(labelText: AppLocale.l('motherName'), prefixIcon: Icon(Icons.person_3_outlined, size: 18), isDense: true),
                 ),
                 const SizedBox(height: 10),
                 TextField(
+                  key: const ValueKey('gotra_field'),
                   controller: _gotraCtrl,
                   decoration: InputDecoration(labelText: AppLocale.l('gotraLabel'), prefixIcon: Icon(Icons.hub_outlined, size: 18), isDense: true),
                 ),
