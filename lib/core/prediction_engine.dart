@@ -1,6 +1,10 @@
 import 'calculator.dart';
 import 'prediction_texts.dart';
 import 'prediction_texts_en.dart';
+import 'prediction_texts_hi.dart';
+import 'prediction_texts_ta.dart';
+import 'prediction_texts_te.dart';
+import 'prediction_texts_ml.dart';
 import '../widgets/common.dart';
 
 // ═══════════════════════════════════════════
@@ -180,16 +184,99 @@ class PredictionEngine {
       return const PredictionResult(bhavas: [], allDashas: [], highlights: []);
     }
 
-    final isEn = AppLocale.current == 'en';
+    final _lang = AppLocale.current;
 
-    // Locale-aware text sources
-    final _bhavaInfo = isEn ? bhavaInfoListEn : bhavaInfoList;
-    final _planetInHouse = isEn ? planetInHousePhalaEn : planetInHousePhala;
-    final _lordInHouse = isEn ? lordInHousePhalaEn : lordInHousePhala;
-    final _mahadashaP = isEn ? mahadashaPhalasEn : mahadashaPhalas;
-    final _dashaBhuktiP = isEn ? dashaBhuktiPhalasEn : dashaBhuktiPhalas;
-    final _dignityMod = isEn ? dignityModifiersEn : dignityModifiers;
-    final _remedies = isEn ? planetRemediesEn : planetRemedies;
+    // Multi-language inline text helper
+    String _t({required String kn, String? hi, String? ta, String? te, String? ml, String? en}) {
+      switch (_lang) {
+        case 'en': return en ?? kn;
+        case 'hi': return hi ?? kn;
+        case 'ta': return ta ?? kn;
+        case 'te': return te ?? kn;
+        case 'ml': return ml ?? kn;
+        default: return kn;
+      }
+    }
+
+    // Locale-aware text sources — select by language
+    List<BhavaInfo> _selectBhavaInfo() {
+      switch (_lang) {
+        case 'en': return bhavaInfoListEn;
+        case 'hi': return bhavaInfoListHi;
+        case 'ta': return bhavaInfoListTa;
+        case 'te': return bhavaInfoListTe;
+        case 'ml': return bhavaInfoListMl;
+        default: return bhavaInfoList;
+      }
+    }
+    Map<String, List<String>> _selectPlanetInHouse() {
+      switch (_lang) {
+        case 'en': return planetInHousePhalaEn;
+        case 'hi': return planetInHousePhalaHi;
+        case 'ta': return planetInHousePhalaTa;
+        case 'te': return planetInHousePhalaTe;
+        case 'ml': return planetInHousePhalaMl;
+        default: return planetInHousePhala;
+      }
+    }
+    List<List<String>> _selectLordInHouse() {
+      switch (_lang) {
+        case 'en': return lordInHousePhalaEn;
+        case 'hi': return lordInHousePhalaHi;
+        case 'ta': return lordInHousePhalaTa;
+        case 'te': return lordInHousePhalaTe;
+        case 'ml': return lordInHousePhalaMl;
+        default: return lordInHousePhala;
+      }
+    }
+    Map<String, String> _selectMahadasha() {
+      switch (_lang) {
+        case 'en': return mahadashaPhalasEn;
+        case 'hi': return mahadashaPhalasHi;
+        case 'ta': return mahadashaPhalasTa;
+        case 'te': return mahadashaPhalasTe;
+        case 'ml': return mahadashaPhalasMl;
+        default: return mahadashaPhalas;
+      }
+    }
+    Map<String, Map<String, String>> _selectDashaBhukti() {
+      switch (_lang) {
+        case 'en': return dashaBhuktiPhalasEn;
+        case 'hi': return dashaBhuktiPhalasHi;
+        case 'ta': return dashaBhuktiPhalasTa;
+        case 'te': return dashaBhuktiPhalasTe;
+        case 'ml': return dashaBhuktiPhalasMl;
+        default: return dashaBhuktiPhalas;
+      }
+    }
+    Map<String, String> _selectDignity() {
+      switch (_lang) {
+        case 'en': return dignityModifiersEn;
+        case 'hi': return dignityModifiersHi;
+        case 'ta': return dignityModifiersTa;
+        case 'te': return dignityModifiersTe;
+        case 'ml': return dignityModifiersMl;
+        default: return dignityModifiers;
+      }
+    }
+    Map<String, PlanetRemedy> _selectRemedies() {
+      switch (_lang) {
+        case 'en': return planetRemediesEn;
+        case 'hi': return planetRemediesHi;
+        case 'ta': return planetRemediesTa;
+        case 'te': return planetRemediesTe;
+        case 'ml': return planetRemediesMl;
+        default: return planetRemedies;
+      }
+    }
+
+    final _bhavaInfo = _selectBhavaInfo();
+    final _planetInHouse = _selectPlanetInHouse();
+    final _lordInHouse = _selectLordInHouse();
+    final _mahadashaP = _selectMahadasha();
+    final _dashaBhuktiP = _selectDashaBhukti();
+    final _dignityMod = _selectDignity();
+    final _remedies = _selectRemedies();
 
     final lagnaRashi = planets[_lagna]!.rashiIndex;
 
@@ -328,12 +415,20 @@ class PredictionEngine {
       for (final p in inHouse) {
         final pStates = dignityList(p);
         for (final s in pStates) {
-          if (s == 'ವಕ್ರ') phalaBuffer.write(isEn
-            ? ' $p is retrograde, causing delays or intensity in results.'
-            : ' $p ವಕ್ರಗತಿಯಲ್ಲಿದ್ದು ಫಲಗಳಲ್ಲಿ ವಿಳಂಬ ಅಥವಾ ತೀವ್ರತೆ ಸಾಧ್ಯ.');
-          if (s == 'ಅಸ್ತ') phalaBuffer.write(isEn
-            ? ' $p is combust and unable to deliver its full results.'
-            : ' $p ಅಸ್ತಂಗತವಾಗಿದ್ದು ತನ್ನ ಪೂರ್ಣ ಫಲ ನೀಡಲು ಅಸಮರ್ಥ.');
+          if (s == 'ವಕ್ರ') phalaBuffer.write(_t(
+            kn: ' $p ವಕ್ರಗತಿಯಲ್ಲಿದ್ದು ಫಲಗಳಲ್ಲಿ ವಿಳಂಬ ಅಥವಾ ತೀವ್ರತೆ ಸಾಧ್ಯ.',
+            hi: ' $p वक्रगति में है, फल में विलंब या तीव्रता संभव.',
+            ta: ' $p வக்ரகதியில் உள்ளது, பலன்களில் தாமதம் அல்லது தீவிரம் சாத்தியம்.',
+            te: ' $p వక్రగతిలో ఉంది, ఫలాల్లో ఆలస్యం లేదా తీవ్రత సాధ్యం.',
+            ml: ' $p വക്രഗതിയിലാണ്, ഫലങ്ങളിൽ താമസം അല്ലെങ്കിൽ തീവ്രത സാധ്യം.',
+            en: ' $p is retrograde, causing delays or intensity in results.'));
+          if (s == 'ಅಸ್ತ') phalaBuffer.write(_t(
+            kn: ' $p ಅಸ್ತಂಗತವಾಗಿದ್ದು ತನ್ನ ಪೂರ್ಣ ಫಲ ನೀಡಲು ಅಸಮರ್ಥ.',
+            hi: ' $p अस्त है और अपना पूर्ण फल देने में असमर्थ.',
+            ta: ' $p அஸ்தமானது, முழு பலனை வழங்க இயலாது.',
+            te: ' $p అస్తమై ఉంది, పూర్ణ ఫలం ఇవ్వలేదు.',
+            ml: ' $p അസ്തമായിരിക്കുന്നു, പൂർണ ഫലം നൽകാൻ അസമർഥം.',
+            en: ' $p is combust and unable to deliver its full results.'));
         }
       }
 
@@ -342,14 +437,22 @@ class PredictionEngine {
         final beneficAspecters = aspecters.where((p) => _benefics.contains(p)).toList();
         final maleficAspecters = aspecters.where((p) => _malefics.contains(p)).toList();
         if (beneficAspecters.isNotEmpty) {
-          phalaBuffer.write(isEn
-            ? ' ${beneficAspecters.join(', ')} aspect enhances positive results.'
-            : ' ${beneficAspecters.join(', ')} ದೃಷ್ಟಿಯಿಂದ ಶುಭ ಫಲ ವೃದ್ಧಿ.');
+          phalaBuffer.write(_t(
+            kn: ' ${beneficAspecters.join(', ')} ದೃಷ್ಟಿಯಿಂದ ಶುಭ ಫಲ ವೃದ್ಧಿ.',
+            hi: ' ${beneficAspecters.join(', ')} की दृष्टि से शुभ फल में वृद्धि.',
+            ta: ' ${beneficAspecters.join(', ')} பார்வையால் நல்ல பலன் அதிகரிக்கும்.',
+            te: ' ${beneficAspecters.join(', ')} దృష్టి వల్ల శుభ ఫలాలు పెరుగుతాయి.',
+            ml: ' ${beneficAspecters.join(', ')} ദൃഷ്ടിയാൽ ശുഭ ഫലം വർധിക്കും.',
+            en: ' ${beneficAspecters.join(', ')} aspect enhances positive results.'));
         }
         if (maleficAspecters.isNotEmpty) {
-          phalaBuffer.write(isEn
-            ? ' ${maleficAspecters.join(', ')} aspect may bring some challenges.'
-            : ' ${maleficAspecters.join(', ')} ದೃಷ್ಟಿಯಿಂದ ಕೆಲವು ಸವಾಲುಗಳು ಸಾಧ್ಯ.');
+          phalaBuffer.write(_t(
+            kn: ' ${maleficAspecters.join(', ')} ದೃಷ್ಟಿಯಿಂದ ಕೆಲವು ಸವಾಲುಗಳು ಸಾಧ್ಯ.',
+            hi: ' ${maleficAspecters.join(', ')} की दृष्टि से कुछ चुनौतियाँ संभव.',
+            ta: ' ${maleficAspecters.join(', ')} பார்வையால் சில சவால்கள் சாத்தியம்.',
+            te: ' ${maleficAspecters.join(', ')} దృష్టి వల్ల కొన్ని సవాళ్లు సాధ్యం.',
+            ml: ' ${maleficAspecters.join(', ')} ദൃഷ്ടിയാൽ ചില വെല്ലുവിളികൾ സാധ്യം.',
+            en: ' ${maleficAspecters.join(', ')} aspect may bring some challenges.'));
         }
       }
 
@@ -358,31 +461,39 @@ class PredictionEngine {
       if (quality == PhalaQuality.ashubha) {
         final rem = _remedies[lord];
         if (rem != null) {
-          remedy = isEn
-            ? 'Remedy: Chant ${rem.mantra}. Wear ${rem.gemstone}. On ${rem.day}, ${rem.charity}. Worship ${rem.deity}.'
-            : 'ಪರಿಹಾರ: ${rem.mantra} ಜಪಿಸಿ. ${rem.gemstone} ಧರಿಸಿ. ${rem.day} ${rem.charity}. ${rem.deity} ಪೂಜೆ ಮಾಡಿ.';
+          remedy = _t(
+            kn: 'ಪರಿಹಾರ: ${rem.mantra} ಜಪಿಸಿ. ${rem.gemstone} ಧರಿಸಿ. ${rem.day} ${rem.charity}. ${rem.deity} ಪೂಜೆ ಮಾಡಿ.',
+            hi: 'उपाय: ${rem.mantra} जपें. ${rem.gemstone} धारण करें. ${rem.day} ${rem.charity}. ${rem.deity} पूजा करें.',
+            ta: 'பரிகாரம்: ${rem.mantra} ஜபிக்கவும். ${rem.gemstone} அணியவும். ${rem.day} ${rem.charity}. ${rem.deity} பூஜை செய்யவும்.',
+            te: 'పరిహారం: ${rem.mantra} జపించండి. ${rem.gemstone} ధరించండి. ${rem.day} ${rem.charity}. ${rem.deity} పూజ చేయండి.',
+            ml: 'പരിഹാരം: ${rem.mantra} ജപിക്കുക. ${rem.gemstone} ധരിക്കുക. ${rem.day} ${rem.charity}. ${rem.deity} പൂജ ചെയ്യുക.',
+            en: 'Remedy: Chant ${rem.mantra}. Wear ${rem.gemstone}. On ${rem.day}, ${rem.charity}. Worship ${rem.deity}.');
         }
       } else if (quality == PhalaQuality.mishra) {
         final rem = _remedies[lord];
         if (rem != null) {
-          remedy = isEn
-            ? 'Advice: Pray to ${rem.deity}. On ${rem.day}, wear ${rem.color} colored clothes.'
-            : 'ಸಲಹೆ: ${rem.deity} ಪ್ರಾರ್ಥನೆ ಮಾಡಿ. ${rem.day} ${rem.color} ಬಣ್ಣದ ಬಟ್ಟೆ ಧರಿಸಿ.';
+          remedy = _t(
+            kn: 'ಸಲಹೆ: ${rem.deity} ಪ್ರಾರ್ಥನೆ ಮಾಡಿ. ${rem.day} ${rem.color} ಬಣ್ಣದ ಬಟ್ಟೆ ಧರಿಸಿ.',
+            hi: 'सलाह: ${rem.deity} से प्रार्थना करें. ${rem.day} ${rem.color} रंग के कपड़े पहनें.',
+            ta: 'ஆலோசனை: ${rem.deity} வழிபடவும். ${rem.day} ${rem.color} நிற ஆடை அணியவும்.',
+            te: 'సలహా: ${rem.deity} ప్రార్థన చేయండి. ${rem.day} ${rem.color} రంగు బట్టలు ధరించండి.',
+            ml: 'ഉപദേശം: ${rem.deity} പ്രാർഥിക്കുക. ${rem.day} ${rem.color} നിറത്തിലുള്ള വസ്ത്രം ധരിക്കുക.',
+            en: 'Advice: Pray to ${rem.deity}. On ${rem.day}, wear ${rem.color} colored clothes.');
         }
       }
 
       // Generate highlights for exceptional placements
       if (quality == PhalaQuality.shubha && (h == 1 || h == 5 || h == 9 || h == 10)) {
         final info = _bhavaInfo[h - 1];
-        highlights.add(isEn
-          ? '${info.nameKn} house is strong — positive results in ${info.significations}'
-          : '${info.nameKn} ಭಾವ ಬಲಿಷ್ಠ — ${info.significations} ವಿಷಯದಲ್ಲಿ ಶುಭ ಫಲ');
+        highlights.add(_t(
+          kn: '${info.nameKn} ಭಾವ ಬಲಿಷ್ಠ — ${info.significations} ವಿಷಯದಲ್ಲಿ ಶುಭ ಫಲ',
+          en: '${info.nameKn} house is strong — positive results in ${info.significations}'));
       }
       if (quality == PhalaQuality.ashubha && (h == 1 || h == 7 || h == 8)) {
         final info = _bhavaInfo[h - 1];
-        highlights.add(isEn
-          ? '${info.nameKn} house needs attention — follow remedies'
-          : '${info.nameKn} ಭಾವಕ್ಕೆ ಗಮನ ಬೇಕು — ಪರಿಹಾರ ಅನುಸರಿಸಿ');
+        highlights.add(_t(
+          kn: '${info.nameKn} ಭಾವಕ್ಕೆ ಗಮನ ಬೇಕು — ಪರಿಹಾರ ಅನುಸರಿಸಿ',
+          en: '${info.nameKn} house needs attention — follow remedies'));
       }
 
       bhavas.add(BhavaPrediction(
@@ -448,22 +559,22 @@ class PredictionEngine {
         String relationship;
         PhalaQuality adQuality;
         if (diff == 0) {
-          relationship = isEn ? 'Same Sign' : 'ಸಮ ಸ್ಥಾನ';
+          relationship = _t(kn: 'ಸಮ ಸ್ಥಾನ', hi: 'सम स्थान', ta: 'சம நிலை', te: 'సమ స్థానం', ml: 'സമ സ്ഥാനം', en: 'Same Sign');
           adQuality = PhalaQuality.shubha;
         } else if ({3, 6, 9}.contains(diff)) {
-          relationship = isEn ? 'Kendra' : 'ಕೇಂದ್ರ';
+          relationship = _t(kn: 'ಕೇಂದ್ರ', hi: 'केंद्र', ta: 'கேந்திர', te: 'కేంద్ర', ml: 'കേന്ദ്ര', en: 'Kendra');
           adQuality = PhalaQuality.shubha;
         } else if ({4, 8}.contains(diff)) {
-          relationship = isEn ? 'Trikona' : 'ತ್ರಿಕೋಣ';
+          relationship = _t(kn: 'ತ್ರಿಕೋಣ', hi: 'त्रिकोण', ta: 'திரிகோண', te: 'త్రికోణ', ml: 'ത്രികോണ', en: 'Trikona');
           adQuality = PhalaQuality.shubha;
         } else if ({5, 7}.contains(diff)) {
-          relationship = isEn ? 'Shadashtaka (6-8)' : 'ಷಡಷ್ಟಕ (6-8)';
+          relationship = _t(kn: 'ಷಡಷ್ಟಕ (6-8)', hi: 'षडष्टक (6-8)', ta: 'சடாஷ்டக (6-8)', te: 'షడష్టక (6-8)', ml: 'ഷഡഷ്ടക (6-8)', en: 'Shadashtaka (6-8)');
           adQuality = PhalaQuality.ashubha;
         } else if ({1, 11}.contains(diff)) {
-          relationship = isEn ? 'Dwirdwadasha (2-12)' : 'ದ್ವಿರ್ದ್ವಾದಶ (2-12)';
+          relationship = _t(kn: 'ದ್ವಿರ್ದ್ವಾದಶ (2-12)', hi: 'द्विर्द्वादश (2-12)', ta: 'த்விர்த்வாதச (2-12)', te: 'ద్విర్ద్వాదశ (2-12)', ml: 'ദ്വിർദ്വാദശ (2-12)', en: 'Dwirdwadasha (2-12)');
           adQuality = PhalaQuality.mishra;
         } else {
-          relationship = isEn ? 'Neutral' : 'ಸಾಮಾನ್ಯ';
+          relationship = _t(kn: 'ಸಾಮಾನ್ಯ', hi: 'सामान्य', ta: 'சாமான்ய', te: 'సామాన్య', ml: 'സാമാന്യ', en: 'Neutral');
           adQuality = PhalaQuality.mishra;
         }
 
