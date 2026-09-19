@@ -95,7 +95,8 @@ const List<BhavaInfo> bhavaInfoListEn = [
 ];
 
 
-const Map<String, List<String>> planetInHousePhalaEn = {\n  'ರವಿ': [
+const Map<String, List<String>> planetInHousePhalaEn = {
+  'ರವಿ': [
     '1 house: The native possesses strong leadership qualities and a commanding personality. There is natural authority and a tendency toward government service or positions of power. Health is generally robust, though eyes may need attention. The person earns recognition through self-effort.',
     '2 house: The native possesses strong leadership qualities and a commanding personality. There is natural authority and a tendency toward government service or positions of power. It strongly influences financial stability, family bonds, and speech. Health is generally robust, though eyes or heart may need attention. The person earns recognition through self-effort and ambition. Accumulation of wealth is a major focus.',
     '3 house: The native possesses strong leadership qualities and a commanding personality. There is natural authority and a tendency toward government service or positions of power. It emphasizes courage, communication, and relationships with siblings. Health is generally robust, though eyes or heart may need attention. The person earns recognition through self-effort and ambition. Self-effort and short journeys play a vital role.',
