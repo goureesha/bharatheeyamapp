@@ -1753,8 +1753,18 @@ class _DashboardScreenState extends State<DashboardScreen>
           {'label': AppLocale.l('navamshaKundali'), 'varga': 9, 'isBhava': false},
           {'label': AppLocale.l('horaKundali'), 'varga': 2, 'isBhava': false},
           {'label': AppLocale.l('drekkanaKundali'), 'varga': 3, 'isBhava': false},
+          {'label': 'D4 ಚತುರ್ಥಾಂಶ', 'varga': 4, 'isBhava': false},
+          {'label': 'D7 ಸಪ್ತಾಂಶ', 'varga': 7, 'isBhava': false},
+          {'label': 'D10 ದಶಾಂಶ', 'varga': 10, 'isBhava': false},
           {'label': AppLocale.l('dvadashamsha'), 'varga': 12, 'isBhava': false},
+          {'label': 'D16 ಷೋಡಶಾಂಶ', 'varga': 16, 'isBhava': false},
+          {'label': 'D20 ವಿಂಶಾಂಶ', 'varga': 20, 'isBhava': false},
+          {'label': 'D24 ಚತುರ್ವಿಂಶಾಂಶ', 'varga': 24, 'isBhava': false},
+          {'label': 'D27 ಸಪ್ತವಿಂಶಾಂಶ', 'varga': 27, 'isBhava': false},
           {'label': AppLocale.l('trimshamsha'), 'varga': 30, 'isBhava': false},
+          {'label': 'D40 ಖವೇದಾಂಶ', 'varga': 40, 'isBhava': false},
+          {'label': 'D45 ಅಕ್ಷವೇದಾಂಶ', 'varga': 45, 'isBhava': false},
+          {'label': 'D60 ಷಷ್ಠ್ಯಂಶ', 'varga': 60, 'isBhava': false},
         ]
       : [
           // Default order: Rashi → Navamsha → Bhava → Other Varga
@@ -1763,8 +1773,18 @@ class _DashboardScreenState extends State<DashboardScreen>
           {'label': AppLocale.l('bhavaKundali'), 'varga': 1, 'isBhava': true},
           {'label': AppLocale.l('horaKundali'), 'varga': 2, 'isBhava': false},
           {'label': AppLocale.l('drekkanaKundali'), 'varga': 3, 'isBhava': false},
+          {'label': 'D4 ಚತುರ್ಥಾಂಶ', 'varga': 4, 'isBhava': false},
+          {'label': 'D7 ಸಪ್ತಾಂಶ', 'varga': 7, 'isBhava': false},
+          {'label': 'D10 ದಶಾಂಶ', 'varga': 10, 'isBhava': false},
           {'label': AppLocale.l('dvadashamsha'), 'varga': 12, 'isBhava': false},
+          {'label': 'D16 ಷೋಡಶಾಂಶ', 'varga': 16, 'isBhava': false},
+          {'label': 'D20 ವಿಂಶಾಂಶ', 'varga': 20, 'isBhava': false},
+          {'label': 'D24 ಚತುರ್ವಿಂಶಾಂಶ', 'varga': 24, 'isBhava': false},
+          {'label': 'D27 ಸಪ್ತವಿಂಶಾಂಶ', 'varga': 27, 'isBhava': false},
           {'label': AppLocale.l('trimshamsha'), 'varga': 30, 'isBhava': false},
+          {'label': 'D40 ಖವೇದಾಂಶ', 'varga': 40, 'isBhava': false},
+          {'label': 'D45 ಅಕ್ಷವೇದಾಂಶ', 'varga': 45, 'isBhava': false},
+          {'label': 'D60 ಷಷ್ಠ್ಯಂಶ', 'varga': 60, 'isBhava': false},
         ];
 
     // All persons: primary + extras
