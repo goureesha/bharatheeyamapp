@@ -21,8 +21,13 @@ class MuhurtaScreen extends StatefulWidget {
 
 class _MuhurtaScreenState extends State<MuhurtaScreen> {
   // Default allowed lagnas: Vrishabha(1), Mithuna(2), Kataka(3), Kanya(5), Tula(6), Dhanu(8), Meena(11)
-  static const _allowedLagnas = [1, 2, 3, 5, 6, 8, 11];
+  // Default allowed lagnas (user can change)
+  final Set<int> _allowedLagnas = {1, 2, 3, 5, 6, 8, 11};
   static const _rashiNames = ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ'];
+  static const _rashiEn = ['Mesha','Vrishabha','Mithuna','Kataka','Simha','Kanya','Tula','Vrischika','Dhanu','Makara','Kumbha','Meena'];
+
+  // Minimum score to show
+  int _minScore = 40;
   // Inputs
   MuhurtaEvent _event = MuhurtaEvent.vivaha;
   int _nakIdx = 0;
@@ -112,7 +117,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         );
 
         // Only show days with score >= 40
-        if (mResult.score >= 40) {
+        if (mResult.score >= _minScore) {
           // Compute lagna windows for this day
           final lagnaWindows = _scanLagnas(srSs[0], srSs[1]);
 
@@ -134,7 +139,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             'sunset': pan.sunset,
             'tara': mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null,
             'isPerfect': mResult.score >= 80,
-            'isCandidate': mResult.score >= 40 && mResult.score < 80,
+            'isCandidate': mResult.score >= _minScore && mResult.score < 80,
             'lagnaWindows': lagnaWindows,
           });
         }
@@ -205,6 +210,92 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     return windows;
   }
 
+  // ── Settings dialog ──
+  void _showSettings() {
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDlgState) => AlertDialog(
+          title: Row(children: [
+            Icon(Icons.settings, color: kPurple1, size: 22),
+            const SizedBox(width: 8),
+            Text('ನಿಯಮ ಬದಲಾಯಿಸಿ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+          ]),
+          content: SizedBox(
+            width: 320, height: 480,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Allowed Lagnas ──
+                  Text('🏠 ಶುಭ ಲಗ್ನಗಳು', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kPurple1)),
+                  const SizedBox(height: 4),
+                  Text('ಯಾವ ಲಗ್ನಗಳನ್ನು ತೋರಿಸಬೇಕು?', style: TextStyle(fontSize: 11, color: kMuted)),
+                  const SizedBox(height: 8),
+                  ...List.generate(12, (i) => CheckboxListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    value: _allowedLagnas.contains(i),
+                    activeColor: kTeal,
+                    title: Text('${_rashiNames[i]} (${_rashiEn[i]})',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+                    onChanged: (v) {
+                      setDlgState(() {
+                        if (v == true) _allowedLagnas.add(i);
+                        else _allowedLagnas.remove(i);
+                      });
+                    },
+                  )),
+
+                  const Divider(),
+
+                  // ── Minimum Score ──
+                  Text('📊 ಕನಿಷ್ಠ ಅಂಕ (Min Score)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kPurple1)),
+                  const SizedBox(height: 4),
+                  Text('ಈ ಅಂಕಕ್ಕಿಂತ ಹೆಚ್ಚಿನ ದಿನಗಳನ್ನು ಮಾತ್ರ ತೋರಿಸುತ್ತದೆ', style: TextStyle(fontSize: 11, color: kMuted)),
+                  const SizedBox(height: 8),
+                  Row(children: [
+                    Text('$_minScore', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: kTeal)),
+                    Expanded(
+                      child: Slider(
+                        value: _minScore.toDouble(),
+                        min: 20, max: 80,
+                        divisions: 6,
+                        activeColor: kTeal,
+                        label: '$_minScore',
+                        onChanged: (v) => setDlgState(() => _minScore = v.round()),
+                      ),
+                    ),
+                  ]),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setDlgState(() {
+                  _allowedLagnas.clear();
+                  _allowedLagnas.addAll({1, 2, 3, 5, 6, 8, 11});
+                  _minScore = 40;
+                });
+              },
+              child: Text('ಡೀಫಾಲ್ಟ್', style: TextStyle(color: kMuted)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                setState(() {});
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: kPurple1, foregroundColor: Colors.white),
+              child: const Text('ಉಳಿಸಿ', style: TextStyle(fontWeight: FontWeight.w800)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ── Location picker ──
   Future<void> _pickLocation() async {
     final result = await showDialog<Map<String, dynamic>>(
@@ -269,6 +360,13 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         backgroundColor: kCard,
         elevation: 0,
         iconTheme: IconThemeData(color: kText),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.tune, color: kPurple2),
+            tooltip: 'ನಿಯಮ ಬದಲಾಯಿಸಿ',
+            onPressed: _showSettings,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
