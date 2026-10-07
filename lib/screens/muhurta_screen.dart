@@ -60,10 +60,10 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                 children: [
                   TextField(
                     decoration: InputDecoration(hintText: AppLocale.l('searchPlace'), prefixIcon: const Icon(Icons.search)),
-                    onChanged: (v) async {
+                    onChanged: (v) {
                       query = v;
                       if (v.length < 2) { setDlgState(() => results = []); return; }
-                      final r = await searchWorldCities(v, limit: 20);
+                      final r = searchWorldCities(v, limit: 20);
                       setDlgState(() => results = r);
                     },
                   ),
