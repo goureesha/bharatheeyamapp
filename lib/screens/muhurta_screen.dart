@@ -104,6 +104,10 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         if (kr == null) continue;
 
         final pan = kr.panchang;
+
+        // Shukla Paksha only (indices 0-14)
+        if (pan.tithiIndex >= 15) continue;
+
         final varaIdx = knVara.indexOf(pan.vara).clamp(0, 6);
         final moonRashiIdx = (kr.planets['ಚಂದ್ರ']!.longitude / 30).floor() % 12;
         final jupRashiIdx = (kr.planets['ಗುರು']!.longitude / 30).floor() % 12;
