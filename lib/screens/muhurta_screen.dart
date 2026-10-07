@@ -34,6 +34,28 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
   DateTime _monthFrom = DateTime(DateTime.now().year, DateTime.now().month);
   DateTime _monthTo = DateTime(DateTime.now().year, DateTime.now().month + 1);
 
+  // User-overridable rules (loaded from event defaults)
+  Set<int> _userTithis = {};
+  Set<int> _userNakshatras = {};
+  Set<int> _userVaras = {};
+  bool _requireShukla = false;
+  bool _avoidVishti = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEventDefaults();
+  }
+
+  void _loadEventDefaults() {
+    final rules = muhurtaRules[_event];
+    _userTithis = Set<int>.from(rules?.allowedTithis ?? List.generate(30, (i) => i));
+    _userNakshatras = Set<int>.from(rules?.allowedNakshatras ?? List.generate(27, (i) => i));
+    _userVaras = Set<int>.from(rules?.allowedVaras ?? List.generate(7, (i) => i));
+    _requireShukla = rules?.requireShukla ?? false;
+    _avoidVishti = rules?.avoidVishti ?? true;
+  }
+
   // Location
   double _lat = LocationService.lat;
   double _lon = LocationService.lon;
@@ -114,6 +136,13 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
           janmaNakIdx1: _nakIdx,
           janmaRashiIdx1: _rashiIdx,
           abhijitTimeWindow: abhStr,
+          overrideRules: MuhurtaEventRules(
+            allowedTithis: _userTithis.toList(),
+            allowedNakshatras: _userNakshatras.toList(),
+            allowedVaras: _userVaras.toList(),
+            avoidVishti: _avoidVishti,
+            requireShukla: _requireShukla,
+          ),
         );
 
         // Only show days with score >= 40
@@ -215,83 +244,179 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDlgState) => AlertDialog(
-          title: Row(children: [
-            Icon(Icons.settings, color: kPurple1, size: 22),
-            const SizedBox(width: 8),
-            Text('ನಿಯಮ ಬದಲಾಯಿಸಿ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-          ]),
-          content: SizedBox(
-            width: 320, height: 480,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── Allowed Lagnas ──
-                  Text('🏠 ಶುಭ ಲಗ್ನಗಳು', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kPurple1)),
-                  const SizedBox(height: 4),
-                  Text('ಯಾವ ಲಗ್ನಗಳನ್ನು ತೋರಿಸಬೇಕು?', style: TextStyle(fontSize: 11, color: kMuted)),
-                  const SizedBox(height: 8),
-                  ...List.generate(12, (i) => CheckboxListTile(
-                    dense: true,
-                    contentPadding: EdgeInsets.zero,
-                    value: _allowedLagnas.contains(i),
-                    activeColor: kTeal,
-                    title: Text('${_rashiNames[i]} (${_rashiEn[i]})',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
-                    onChanged: (v) {
-                      setDlgState(() {
-                        if (v == true) _allowedLagnas.add(i);
-                        else _allowedLagnas.remove(i);
-                      });
-                    },
-                  )),
-
-                  const Divider(),
-
-                  // ── Minimum Score ──
-                  Text('📊 ಕನಿಷ್ಠ ಅಂಕ (Min Score)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kPurple1)),
-                  const SizedBox(height: 4),
-                  Text('ಈ ಅಂಕಕ್ಕಿಂತ ಹೆಚ್ಚಿನ ದಿನಗಳನ್ನು ಮಾತ್ರ ತೋರಿಸುತ್ತದೆ', style: TextStyle(fontSize: 11, color: kMuted)),
-                  const SizedBox(height: 8),
-                  Row(children: [
-                    Text('$_minScore', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: kTeal)),
+        builder: (ctx, setDlgState) {
+          final eventInfo = muhurtaEventNames[_event]!;
+          return AlertDialog(
+            title: Row(children: [
+              Icon(Icons.tune, color: kPurple1, size: 22),
+              const SizedBox(width: 8),
+              Expanded(child: Text('ನಿಯಮ ಬದಲಾಯಿಸಿ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16))),
+            ]),
+            content: SizedBox(
+              width: 340, height: 500,
+              child: DefaultTabController(
+                length: 5,
+                child: Column(
+                  children: [
+                    TabBar(
+                      isScrollable: true,
+                      labelColor: kPurple1,
+                      unselectedLabelColor: kMuted,
+                      labelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+                      indicatorColor: kPurple1,
+                      tabs: const [
+                        Tab(text: 'ತಿಥಿ'),
+                        Tab(text: 'ನಕ್ಷತ್ರ'),
+                        Tab(text: 'ವಾರ'),
+                        Tab(text: 'ಲಗ್ನ'),
+                        Tab(text: 'ಇತರ'),
+                      ],
+                    ),
                     Expanded(
-                      child: Slider(
-                        value: _minScore.toDouble(),
-                        min: 20, max: 80,
-                        divisions: 6,
-                        activeColor: kTeal,
-                        label: '$_minScore',
-                        onChanged: (v) => setDlgState(() => _minScore = v.round()),
+                      child: TabBarView(
+                        children: [
+                          // ── TAB 1: TITHI ──
+                          ListView(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Row(children: [
+                                  Text('${_userTithis.length}/30', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
+                                  const Spacer(),
+                                  TextButton(onPressed: () => setDlgState(() => _userTithis = Set.from(List.generate(30, (i) => i))), child: Text('ಎಲ್ಲಾ', style: TextStyle(fontSize: 11))),
+                                  TextButton(onPressed: () => setDlgState(() => _userTithis.clear()), child: Text('ಯಾವುದೂ ಇಲ್ಲ', style: TextStyle(fontSize: 11))),
+                                ]),
+                              ),
+                              ...List.generate(30, (i) => CheckboxListTile(
+                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                value: _userTithis.contains(i),
+                                activeColor: kTeal,
+                                title: Text(knTithi[i], style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kText)),
+                                onChanged: (v) => setDlgState(() { if (v == true) _userTithis.add(i); else _userTithis.remove(i); }),
+                              )),
+                            ],
+                          ),
+
+                          // ── TAB 2: NAKSHATRA ──
+                          ListView(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Row(children: [
+                                  Text('${_userNakshatras.length}/27', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
+                                  const Spacer(),
+                                  TextButton(onPressed: () => setDlgState(() => _userNakshatras = Set.from(List.generate(27, (i) => i))), child: Text('ಎಲ್ಲಾ', style: TextStyle(fontSize: 11))),
+                                  TextButton(onPressed: () => setDlgState(() => _userNakshatras.clear()), child: Text('ಯಾವುದೂ ಇಲ್ಲ', style: TextStyle(fontSize: 11))),
+                                ]),
+                              ),
+                              ...List.generate(27, (i) => CheckboxListTile(
+                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                value: _userNakshatras.contains(i),
+                                activeColor: kTeal,
+                                title: Text('${i + 1}. ${knNak[i]}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kText)),
+                                onChanged: (v) => setDlgState(() { if (v == true) _userNakshatras.add(i); else _userNakshatras.remove(i); }),
+                              )),
+                            ],
+                          ),
+
+                          // ── TAB 3: VARA ──
+                          ListView(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Text('${_userVaras.length}/7 ವಾರ ಆಯ್ಕೆ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
+                              ),
+                              ...List.generate(7, (i) => CheckboxListTile(
+                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                value: _userVaras.contains(i),
+                                activeColor: kTeal,
+                                title: Text(knVara[i], style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+                                onChanged: (v) => setDlgState(() { if (v == true) _userVaras.add(i); else _userVaras.remove(i); }),
+                              )),
+                            ],
+                          ),
+
+                          // ── TAB 4: LAGNA ──
+                          ListView(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Row(children: [
+                                  Text('${_allowedLagnas.length}/12 ಲಗ್ನ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
+                                  const Spacer(),
+                                  TextButton(onPressed: () => setDlgState(() => _allowedLagnas.addAll(List.generate(12, (i) => i))), child: Text('ಎಲ್ಲಾ', style: TextStyle(fontSize: 11))),
+                                  TextButton(onPressed: () => setDlgState(() => _allowedLagnas.clear()), child: Text('ಯಾವುದೂ ಇಲ್ಲ', style: TextStyle(fontSize: 11))),
+                                ]),
+                              ),
+                              ...List.generate(12, (i) => CheckboxListTile(
+                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                value: _allowedLagnas.contains(i),
+                                activeColor: kTeal,
+                                title: Text('${_rashiNames[i]} (${_rashiEn[i]})', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+                                onChanged: (v) => setDlgState(() { if (v == true) _allowedLagnas.add(i); else _allowedLagnas.remove(i); }),
+                              )),
+                            ],
+                          ),
+
+                          // ── TAB 5: OTHER ──
+                          ListView(
+                            children: [
+                              const SizedBox(height: 8),
+                              SwitchListTile(
+                                dense: true,
+                                activeColor: kTeal,
+                                value: _requireShukla,
+                                title: Text('ಶುಕ್ಲ ಪಕ್ಷ ಮಾತ್ರ', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+                                subtitle: Text('Only Shukla Paksha', style: TextStyle(fontSize: 11, color: kMuted)),
+                                onChanged: (v) => setDlgState(() => _requireShukla = v),
+                              ),
+                              SwitchListTile(
+                                dense: true,
+                                activeColor: kTeal,
+                                value: _avoidVishti,
+                                title: Text('ವಿಷ್ಟಿ (ಭದ್ರಾ) ಕರಣ ಟ್ಯಾಜ್ಯ', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+                                subtitle: Text('Avoid Vishti Karana', style: TextStyle(fontSize: 11, color: kMuted)),
+                                onChanged: (v) => setDlgState(() => _avoidVishti = v),
+                              ),
+                              const Divider(),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Text('📊 ಕನಿಷ್ಠ ಅಂಕ (Min Score: $_minScore)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kPurple1)),
+                              ),
+                              Slider(
+                                value: _minScore.toDouble(),
+                                min: 20, max: 80,
+                                divisions: 6,
+                                activeColor: kTeal,
+                                label: '$_minScore',
+                                onChanged: (v) => setDlgState(() => _minScore = v.round()),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ]),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setDlgState(() {
-                  _allowedLagnas.clear();
-                  _allowedLagnas.addAll({1, 2, 3, 5, 6, 8, 11});
-                  _minScore = 40;
-                });
-              },
-              child: Text('ಡೀಫಾಲ್ಟ್', style: TextStyle(color: kMuted)),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                setState(() {});
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: kPurple1, foregroundColor: Colors.white),
-              child: const Text('ಉಳಿಸಿ', style: TextStyle(fontWeight: FontWeight.w800)),
-            ),
-          ],
-        ),
+            actions: [
+              TextButton(
+                onPressed: () => setDlgState(() => _loadEventDefaults()),
+                child: Text('ಡೀಫಾಲ್ಟ್', style: TextStyle(color: kMuted)),
+              ),
+              ElevatedButton(
+                onPressed: () { Navigator.pop(ctx); setState(() {}); },
+                style: ElevatedButton.styleFrom(backgroundColor: kPurple1, foregroundColor: Colors.white),
+                child: const Text('ಉಳಿಸಿ', style: TextStyle(fontWeight: FontWeight.w800)),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -411,7 +536,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                       final info = muhurtaEventNames[e]!;
                       return DropdownMenuItem(value: e, child: Text('${AppLocale.l(info.localeKey)} (${info.englishName})', overflow: TextOverflow.ellipsis));
                     }).toList(),
-                    onChanged: (v) => setState(() => _event = v!),
+                    onChanged: (v) => setState(() { _event = v!; _loadEventDefaults(); }),
                   )),
                 ),
                 const SizedBox(height: 10),
