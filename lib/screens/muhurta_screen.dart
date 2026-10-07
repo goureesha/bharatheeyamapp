@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sweph/sweph.dart' hide kIsWeb;
 import '../widgets/common.dart';
 import '../constants/strings.dart';
 import '../constants/places.dart';
@@ -19,6 +20,9 @@ class MuhurtaScreen extends StatefulWidget {
 }
 
 class _MuhurtaScreenState extends State<MuhurtaScreen> {
+  // Default allowed lagnas: Vrishabha(1), Mithuna(2), Kataka(3), Kanya(5), Tula(6), Dhanu(8), Meena(11)
+  static const _allowedLagnas = [1, 2, 3, 5, 6, 8, 11];
+  static const _rashiNames = ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ'];
   // Inputs
   MuhurtaEvent _event = MuhurtaEvent.vivaha;
   int _nakIdx = 0;
@@ -109,6 +113,9 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
 
         // Only show days with score >= 40
         if (mResult.score >= 40) {
+          // Compute lagna windows for this day
+          final lagnaWindows = _scanLagnas(srSs[0], srSs[1]);
+
           found.add({
             'date': d,
             'score': mResult.score,
@@ -128,6 +135,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             'tara': mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null,
             'isPerfect': mResult.score >= 80,
             'isCandidate': mResult.score >= 40 && mResult.score < 80,
+            'lagnaWindows': lagnaWindows,
           });
         }
       } catch (_) {}
@@ -146,6 +154,55 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     final ap = h >= 12 ? 'PM' : 'AM';
     final h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h);
     return '${h12.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $ap';
+  }
+
+  /// Scan ascendant from sunrise to sunset and return allowed lagna windows
+  List<Map<String, String>> _scanLagnas(double srJd, double ssJd) {
+    Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
+    final ayn = Sweph.swe_get_ayanamsa(srJd);
+    final double step = 10.0 / (24.0 * 60.0); // 10-minute steps
+    final windows = <Map<String, String>>[];
+
+    int? curRashi;
+    double startMins = 0;
+
+    double jd = srJd;
+    while (jd <= ssJd + step) {
+      final houses = Ephemeris.placidusHousesFull(jd, _lat, _lon);
+      if (houses != null && houses.ascmc.length >= 1) {
+        final sidAsc = ((houses.ascmc[0] as double) - ayn) % 360.0;
+        final rashiIdx = (sidAsc / 30.0).floor() % 12;
+        final localFrac = ((jd + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
+        final localMins = localFrac * 24.0 * 60.0;
+
+        if (curRashi == null) {
+          curRashi = rashiIdx;
+          startMins = localMins;
+        } else if (rashiIdx != curRashi) {
+          // Window ended — save if allowed
+          if (_allowedLagnas.contains(curRashi)) {
+            windows.add({
+              'rashi': trAll(_rashiNames[curRashi]),
+              'start': _fmtMins(startMins),
+              'end': _fmtMins(localMins),
+            });
+          }
+          curRashi = rashiIdx;
+          startMins = localMins;
+        }
+      }
+      jd += step;
+    }
+    // Last window
+    if (curRashi != null && _allowedLagnas.contains(curRashi)) {
+      final endFrac = ((ssJd + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
+      windows.add({
+        'rashi': trAll(_rashiNames[curRashi]),
+        'start': _fmtMins(startMins),
+        'end': _fmtMins(endFrac * 24.0 * 60.0),
+      });
+    }
+    return windows;
   }
 
   // ── Location picker ──
@@ -519,6 +576,43 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                       child: Text('• $d', style: TextStyle(fontSize: 11, color: Colors.red.withOpacity(0.8))),
                     )),
                   ],
+                ),
+              ),
+
+            // Lagna Windows
+            if ((r['lagnaWindows'] as List?)?.isNotEmpty == true)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: kBorder),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: kTeal.withOpacity(0.08),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                      ),
+                      child: Text('🏠 ಶುಭ ಲಗ್ನ ಸಮಯ', style: TextStyle(fontWeight: FontWeight.w800, color: kTeal, fontSize: 13)),
+                    ),
+                    ...(r['lagnaWindows'] as List).map((w) {
+                      final wMap = w as Map<String, String>;
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder.withOpacity(0.5)))),
+                        child: Row(children: [
+                          Icon(Icons.schedule, size: 14, color: kTeal),
+                          const SizedBox(width: 8),
+                          Text(wMap['rashi']!, style: TextStyle(fontWeight: FontWeight.w700, color: kText, fontSize: 12)),
+                          const Spacer(),
+                          Text('${wMap['start']} - ${wMap['end']}', style: TextStyle(color: kMuted, fontSize: 12, fontWeight: FontWeight.w600)),
+                        ]),
+                      );
+                    }),
+                  ]),
                 ),
               ),
             const SizedBox(height: 12),
