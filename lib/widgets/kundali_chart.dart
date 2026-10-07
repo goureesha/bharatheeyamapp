@@ -51,10 +51,10 @@ class KundaliChart extends StatelessWidget {
 
   /// Compute which rashi index each planet falls in for the chosen varga
   int _rashinFor(double deg) {
+    final dr = deg % 30;
     switch (varga) {
       case 2: // Hora
         final r = (deg / 30).floor() % 12;
-        final dr = deg % 30;
         final isOdd = r % 2 == 0;
         return isOdd ? (dr < 15 ? 4 : 3) : (dr < 15 ? 3 : 4);
       case 3: // Drekkana
@@ -68,7 +68,6 @@ class KundaliChart extends StatelessWidget {
         return ((deg / 30).floor() + ((deg % 30) / 2.5).floor()) % 12;
       case 30: // Trimshamsa
         final r = (deg / 30).floor() % 12;
-        final dr = deg % 30;
         final isOdd = r % 2 == 0;
         if (isOdd) {
           if (dr < 5) return 0;
