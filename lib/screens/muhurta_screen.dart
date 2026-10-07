@@ -9,8 +9,9 @@ import '../core/muhurta_rules.dart';
 import '../services/location_service.dart';
 
 /// ──────────────────────────────────────────────────────────────
-/// Simplified Muhoorta Screen
-/// Filters: Tithi, Nakshatra, Tara Anukoola, Vara, Shuddhi, Abhijit
+/// Simplified Muhoorta Screen — Easy to use
+/// Just pick birth nakshatra + location → see good days
+/// Filters: Tithi, Nakshatra, Tara, Vara, Shuddhi, Abhijit
 /// ──────────────────────────────────────────────────────────────
 class MuhurtaScreen extends StatefulWidget {
   const MuhurtaScreen({super.key});
@@ -35,9 +36,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
   final Map<DateTime, _SimpleMuhurtaDay> _cache = {};
   bool _isLoading = false;
 
-  // Selected day detail
-  _SimpleMuhurtaDay? _selectedDayDetail;
-
   @override
   void initState() {
     super.initState();
@@ -46,7 +44,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
 
   // ── Location picker ──
   Future<void> _pickLocation() async {
-    String query = '';
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -61,7 +58,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                   TextField(
                     decoration: InputDecoration(hintText: AppLocale.l('searchPlace'), prefixIcon: const Icon(Icons.search)),
                     onChanged: (v) {
-                      query = v;
                       if (v.length < 2) { setDlgState(() => results = []); return; }
                       final r = searchWorldCities(v, limit: 20);
                       setDlgState(() => results = r);
@@ -105,7 +101,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('ಜನ್ಮ ನಕ್ಷತ್ರ ಆಯ್ಕೆ'),
+        title: const Text('ಜನ್ಮ ನಕ್ಷತ್ರ ಆಯ್ಕೆ'),
         content: SizedBox(
           width: 280, height: 400,
           child: ListView.builder(
@@ -150,11 +146,10 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     for (var d = first; !d.isAfter(last); d = d.add(const Duration(days: 1))) {
       if (_cache.containsKey(d)) continue;
       try {
-        // Compute sunrise first to determine correct vara
         final srSs = Ephemeris.findSunriseSetForDate(
           d.year, d.month, d.day, _lat, _lon, tzOffset: _tz);
         final srFrac = ((srSs[0] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
-        final srHour = srFrac * 24.0 + (1.0 / 60.0); // just after sunrise
+        final srHour = srFrac * 24.0 + (1.0 / 60.0);
         final ssFrac = ((srSs[1] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
 
         final kr = await AstroCalculator.calculate(
@@ -169,7 +164,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
           final nIdx = pan.nakshatraIndex;
           final varaIdx = knVara.indexOf(pan.vara).clamp(0, 6);
 
-          // ── Evaluate simplified muhoorta ──
           _cache[d] = _evaluateDay(
             date: d,
             tithiIndex: tIdx,
@@ -178,10 +172,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             nakshatraName: pan.nakshatra,
             varaIndex: varaIdx,
             varaName: pan.vara,
-            yogaIndex: (kr.planets['ಚಂದ್ರ'] != null && kr.planets['ರವಿ'] != null)
-              ? (((kr.planets['ಚಂದ್ರ']!.longitude + kr.planets['ರವಿ']!.longitude) % 360) / 13.333333).floor() % 27
-              : 0,
-            yogaName: pan.yoga,
             karanaName: pan.karana,
             sunrise: pan.sunrise,
             sunset: pan.sunset,
@@ -203,8 +193,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     required String nakshatraName,
     required int varaIndex,
     required String varaName,
-    required int yogaIndex,
-    required String yogaName,
     required String karanaName,
     required String sunrise,
     required String sunset,
@@ -213,30 +201,28 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
   }) {
     int score = 0;
     int maxScore = 0;
-    final checks = <_CheckItem>[];
+    final checks = <MuhurtaCheckItem>[];
 
-    // ── 1. TITHI (20 pts) ──
-    maxScore += 20;
+    // ── 1. TITHI (15 pts) ──
+    maxScore += 15;
     final pakshaRel = tithiIndex % 15;
-    // Rikta tithis: 4, 9, 14 (Chaturthi, Navami, Chaturdashi)
     final rikta = (pakshaRel == 3 || pakshaRel == 8 || pakshaRel == 13);
     final amavasya = tithiIndex == 29;
     final tithiGood = !rikta && !amavasya;
-    if (tithiGood) score += 20;
-    checks.add(_CheckItem(
+    if (tithiGood) score += 15;
+    checks.add(MuhurtaCheckItem(
       label: 'ತಿಥಿ',
       value: tithiName,
       passed: tithiGood,
       note: rikta ? 'ರಿಕ್ತ ತಿಥಿ — ಅಶುಭ' : (amavasya ? 'ಅಮಾವಾಸ್ಯೆ — ಅಶುಭ' : null),
     ));
 
-    // ── 2. NAKSHATRA (20 pts) ──
-    maxScore += 20;
-    // Generally auspicious nakshatras (Dhruva/Sthira, Mridu, Kshipra/Laghu, Chara)
-    const goodNak = {0,2,3,5,6,7,10,12,13,14,16,19,20,21,24,25,26}; // Ashwini,Krittika,Rohini,Mrigashira,Punarvasu,Pushya,Magha,UPhalguni,Hasta,Chitra,Anuradha,PAshadha,UAshadha,Shravana,PBhadra,UBhadra,Revati
+    // ── 2. NAKSHATRA (15 pts) ──
+    maxScore += 15;
+    const goodNak = {0,2,3,5,6,7,10,12,13,14,16,19,20,21,24,25,26};
     final nakGood = goodNak.contains(nakshatraIndex);
-    if (nakGood) score += 20;
-    checks.add(_CheckItem(
+    if (nakGood) score += 15;
+    checks.add(MuhurtaCheckItem(
       label: 'ನಕ್ಷತ್ರ',
       value: nakshatraName,
       passed: nakGood,
@@ -246,107 +232,92 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     // ── 3. TARA ANUKOOLA (20 pts) ──
     maxScore += 20;
     bool taraGood = true;
-    String? taraNote;
     if (_janmaNakIdx >= 0) {
       final tara = calculateTaraBala(_janmaNakIdx, nakshatraIndex);
       taraGood = tara.isGood;
       if (taraGood) score += 20;
-      taraNote = tara.taraName;
-      checks.add(_CheckItem(
-        label: 'ತಾರಾ ಅನುಕೂಲ',
+      checks.add(MuhurtaCheckItem(
+        label: 'ತಾರಾ ಬಲ',
         value: tara.taraName,
         passed: taraGood,
         note: taraGood ? 'ಅನುಕೂಲ' : 'ಪ್ರತಿಕೂಲ',
       ));
     } else {
-      score += 20; // No birth nakshatra set, skip this check
+      score += 20;
     }
 
     // ── 4. VARA (15 pts) ──
     maxScore += 15;
-    // Mon(1)=good, Wed(3)=good, Thu(4)=best, Fri(5)=good, Sun(0)=neutral, Tue(2)=caution, Sat(6)=caution
     final varaGood = (varaIndex == 1 || varaIndex == 3 || varaIndex == 4 || varaIndex == 5);
     final varaNeutral = (varaIndex == 0);
-    if (varaGood) {
-      score += 15;
-    } else if (varaNeutral) {
-      score += 10;
-    }
-    checks.add(_CheckItem(
+    if (varaGood) { score += 15; }
+    else if (varaNeutral) { score += 10; }
+    checks.add(MuhurtaCheckItem(
       label: 'ವಾರ',
       value: varaName,
       passed: varaGood || varaNeutral,
       note: varaGood ? 'ಶುಭ ವಾರ' : (varaNeutral ? 'ಸಾಮಾನ್ಯ' : 'ಮಂಗಳ/ಶನಿ — ಎಚ್ಚರಿಕೆ'),
     ));
 
-    // ── 5. SHUDDHI: Dagdha Yoga check (15 pts) ──
+    // ── 5. DAGDHA YOGA (15 pts) ──
     maxScore += 15;
     final dagdhaList = dagdhaYogaTable[varaIndex];
     final hasDagdha = dagdhaList != null && dagdhaList.contains(nakshatraIndex);
     if (!hasDagdha) score += 15;
-    checks.add(_CheckItem(
+    checks.add(MuhurtaCheckItem(
       label: 'ದಗ್ಧ ಯೋಗ',
       value: hasDagdha ? 'ಇದೆ — ಅಶುಭ' : 'ಇಲ್ಲ — ಶುಭ',
       passed: !hasDagdha,
       note: hasDagdha ? 'ವಾರ-ನಕ್ಷತ್ರ ದಗ್ಧ ಸಂಯೋಗ' : null,
     ));
 
-    // ── 6. SHUDDHI: Siddha Yoga bonus (10 pts) ──
+    // ── 6. SIDDHA YOGA bonus (10 pts) ──
     maxScore += 10;
     final siddhaList = siddhaYogaTable[varaIndex];
     final hasSiddha = siddhaList != null && siddhaList.contains(pakshaRel);
     if (hasSiddha) score += 10;
-    checks.add(_CheckItem(
+    checks.add(MuhurtaCheckItem(
       label: 'ಸಿದ್ಧ ಯೋಗ',
       value: hasSiddha ? 'ಇದೆ — ಶುಭ' : 'ಇಲ್ಲ',
       passed: hasSiddha,
       note: hasSiddha ? 'ವಾರ-ತಿಥಿ ಸಿದ್ಧ ಯೋಗ — ದೋಷ ಭಂಗ' : null,
     ));
 
-    // ── 7. ABHIJIT MUHURTA ──
-    // 8th of 15 daytime muhurtas (midday)
+    // ── 7. VISHTI KARANA (10 pts) ──
+    maxScore += 10;
+    final hasVishti = karanaName.contains('ಭದ್ರಾ') || karanaName.contains('ವಿಷ್ಟಿ');
+    if (!hasVishti) score += 10;
+    checks.add(MuhurtaCheckItem(
+      label: 'ವಿಷ್ಟಿ ಕರಣ',
+      value: hasVishti ? 'ಭದ್ರಾ — ಅಶುಭ' : '$karanaName — ಶುಭ',
+      passed: !hasVishti,
+      note: hasVishti ? 'ವಿಷ್ಟಿ (ಭದ್ರಾ) ಕರಣ ಟ್ಯಾಜ್ಯ' : null,
+    ));
+
+    // ── ABHIJIT MUHURTA time ──
     final srMins = srFrac * 24.0 * 60.0;
     final ssMins = ssFrac * 24.0 * 60.0;
     final dayDur = ((ssMins - srMins) + 1440) % 1440;
     final muhDur = dayDur / 15.0;
     final abhijitStart = srMins + 7 * muhDur;
     final abhijitEnd = abhijitStart + muhDur;
-    final abhijitStr = '${_formatMins(abhijitStart)} - ${_formatMins(abhijitEnd)}';
-    checks.add(_CheckItem(
-      label: 'ಅಭಿಜಿತ್ ಮುಹೂರ್ತ',
-      value: abhijitStr,
-      passed: true,
-      note: 'ಮಧ್ಯಾಹ್ನದ ಶ್ರೇಷ್ಠ ಮುಹೂರ್ತ',
-    ));
+    final abhijitStr = '${_fmtMins(abhijitStart)} - ${_fmtMins(abhijitEnd)}';
 
-    // ── Amrita Siddhi Yoga bonus ──
+    // ── AMRITA SIDDHI YOGA bonus ──
     final amritaList = amritaSiddhiTable[varaIndex];
     final hasAmrita = amritaList != null && amritaList.contains(nakshatraIndex);
-    if (hasAmrita) {
-      score += 5; // bonus
-      checks.add(_CheckItem(
-        label: 'ಅಮೃತ ಸಿದ್ಧಿ ಯೋಗ',
-        value: 'ಇದೆ — ಅತಿಶ್ರೇಷ್ಠ',
-        passed: true,
-        note: 'ವಾರ-ನಕ್ಷತ್ರ ಅಮೃತ ಸಿದ್ಧಿ ಸಂಯೋಗ',
-      ));
-    }
+    if (hasAmrita) score += 5;
 
     // ── Compute verdict ──
     final pct = maxScore > 0 ? (score * 100 / maxScore).round() : 0;
-    String verdict;
-    int quality; // 2=shubha, 1=madhyama, 0=ashubha
+    int quality;
     if (hasDagdha) {
-      verdict = 'ಅಶುಭ';
       quality = 0;
     } else if (pct >= 75) {
-      verdict = 'ಶುಭ';
       quality = 2;
     } else if (pct >= 45) {
-      verdict = 'ಮಧ್ಯಮ';
       quality = 1;
     } else {
-      verdict = 'ಅಶುಭ';
       quality = 0;
     }
 
@@ -357,116 +328,144 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
       varaName: varaName,
       score: pct,
       quality: quality,
-      verdict: verdict,
       checks: checks,
       abhijitTime: abhijitStr,
+      hasAmrita: hasAmrita,
       sunrise: sunrise,
       sunset: sunset,
     );
   }
 
-  String _formatMins(double mins) {
-    final totalMins = mins.round() % 1440;
-    final h = totalMins ~/ 60;
-    final m = totalMins % 60;
-    final amPm = h >= 12 ? 'PM' : 'AM';
+  String _fmtMins(double mins) {
+    final t = mins.round() % 1440;
+    final h = t ~/ 60;
+    final m = t % 60;
+    final ap = h >= 12 ? 'PM' : 'AM';
     final h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h);
-    return '${h12.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $amPm';
+    return '${h12.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $ap';
   }
 
-  void _showDayDetail(_SimpleMuhurtaDay day) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: kCard,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => DraggableScrollableSheet(
-        initialChildSize: 0.6,
-        minChildSize: 0.3,
-        maxChildSize: 0.85,
-        expand: false,
-        builder: (_, scrollCtrl) => ListView(
-          controller: scrollCtrl,
-          padding: const EdgeInsets.all(20),
-          children: [
-            // Handle bar
-            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: kMuted.withOpacity(0.3), borderRadius: BorderRadius.circular(2)))),
-            const SizedBox(height: 12),
-            // Date header
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: _qualityColor(day.quality).withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    day.quality == 2 ? Icons.check_circle : (day.quality == 1 ? Icons.info : Icons.cancel),
-                    color: _qualityColor(day.quality), size: 28,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('${day.date.day}/${day.date.month}/${day.date.year}',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: kText)),
-                      Text('${day.varaName} • ${day.verdict} (${day.score}%)',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _qualityColor(day.quality))),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Sunrise/Sunset row
-            Row(
-              children: [
-                Icon(Icons.wb_sunny, size: 16, color: kOrange),
-                const SizedBox(width: 4),
-                Text('☀ ${day.sunrise}', style: TextStyle(fontSize: 12, color: kMuted)),
-                const SizedBox(width: 16),
-                Icon(Icons.nightlight_round, size: 16, color: kPurple2),
-                const SizedBox(width: 4),
-                Text('🌙 ${day.sunset}', style: TextStyle(fontSize: 12, color: kMuted)),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Checks
-            ...day.checks.map((c) => Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(12),
+  Color _qColor(int q) => q == 2 ? kGreen : (q == 1 ? kOrange : Colors.red);
+  String _qLabel(int q) => q == 2 ? 'ಶುಭ' : (q == 1 ? 'ಮಧ್ಯಮ' : 'ಅಶುಭ');
+  IconData _qIcon(int q) => q == 2 ? Icons.check_circle : (q == 1 ? Icons.warning_amber_rounded : Icons.cancel);
+
+  // ── Build result card (like Taranukoola style) ──
+  final Set<String> _expandedCards = {};
+
+  Widget _buildResultCard(_SimpleMuhurtaDay d) {
+    final dateStr = '${d.date.day.toString().padLeft(2, '0')}/${d.date.month.toString().padLeft(2, '0')}/${d.date.year}';
+    final key = dateStr;
+    final isExpanded = _expandedCards.contains(key);
+    final scoreColor = _qColor(d.quality);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: kCard,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: scoreColor.withOpacity(0.4), width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // ── Tappable header ──
+          GestureDetector(
+            onTap: () => setState(() {
+              if (isExpanded) _expandedCards.remove(key);
+              else _expandedCards.add(key);
+            }),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: c.passed ? kGreen.withOpacity(0.06) : Colors.red.withOpacity(0.06),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: c.passed ? kGreen.withOpacity(0.2) : Colors.red.withOpacity(0.2)),
+                color: scoreColor.withOpacity(0.08),
+                borderRadius: isExpanded
+                  ? const BorderRadius.vertical(top: Radius.circular(11))
+                  : BorderRadius.circular(11),
               ),
-              child: Row(
-                children: [
-                  Icon(c.passed ? Icons.check_circle : Icons.cancel, color: c.passed ? kGreen : Colors.red, size: 20),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(c.label, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: kText)),
-                        Text(c.value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kText.withOpacity(0.8))),
-                        if (c.note != null) Text(c.note!, style: TextStyle(fontSize: 11, color: kMuted, fontStyle: FontStyle.italic)),
-                      ],
+              child: Row(children: [
+                Icon(_qIcon(d.quality), size: 16, color: scoreColor),
+                const SizedBox(width: 8),
+                Expanded(child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('$dateStr  ${d.varaName}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kText)),
+                    Text('${d.tithiName} • ${d.nakshatraName}', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                  ],
+                )),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(color: scoreColor.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                  child: Text('${d.score}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: scoreColor)),
+                ),
+                const SizedBox(width: 6),
+                Icon(isExpanded ? Icons.expand_less : Icons.expand_more, size: 20, color: kMuted),
+              ]),
+            ),
+          ),
+
+          // ── Expandable details ──
+          if (isExpanded) ...[
+            // Sunrise/Sunset & Abhijit
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              color: kBg.withOpacity(0.5),
+              child: Row(children: [
+                Text('☀ ${d.sunrise}', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                const SizedBox(width: 12),
+                Text('🌙 ${d.sunset}', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
+                const Spacer(),
+                Text('⏰ ಅಭಿಜಿತ್: ${d.abhijitTime}', style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w700)),
+              ]),
+            ),
+            if (d.hasAmrita)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                color: kGreen.withOpacity(0.08),
+                child: Row(children: [
+                  Icon(Icons.stars, size: 14, color: kGreen),
+                  const SizedBox(width: 6),
+                  Text('ಅಮೃತ ಸಿದ್ಧಿ ಯೋಗ — ಅತಿಶ್ರೇಷ್ಠ', style: TextStyle(fontSize: 11, color: kGreen, fontWeight: FontWeight.w800)),
+                ]),
+              ),
+            // Panchanga Shuddhi table
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: kBorder),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: kPurple1.withOpacity(0.08),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                     ),
+                    child: Text('ಪಂಚಾಂಗ ಶುದ್ಧಿ', style: TextStyle(fontWeight: FontWeight.w800, color: kPurple1, fontSize: 13)),
                   ),
-                ],
+                  ...d.checks.map((c) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder.withOpacity(0.5)))),
+                    child: Row(children: [
+                      Icon(c.passed ? Icons.check_circle : Icons.cancel,
+                          color: c.passed ? Colors.green : Colors.red, size: 16),
+                      const SizedBox(width: 8),
+                      Text(c.label, style: TextStyle(fontWeight: FontWeight.w700, color: kText, fontSize: 12)),
+                      const Spacer(),
+                      Flexible(child: Text(c.value, style: TextStyle(color: kMuted, fontSize: 12), textAlign: TextAlign.end, overflow: TextOverflow.ellipsis)),
+                    ]),
+                  )),
+                ]),
               ),
-            )),
+            ),
+            const SizedBox(height: 12),
           ],
-        ),
+        ],
       ),
     );
   }
-
-  Color _qualityColor(int q) => q == 2 ? kGreen : (q == 1 ? kOrange : Colors.red);
 
   @override
   Widget build(BuildContext context) {
@@ -484,119 +483,185 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // ── Location & Birth Nakshatra bar ──
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            color: kCard,
-            child: Row(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // ── Settings bar ──
+            AppCard(child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Location chip
-                Expanded(
-                  child: InkWell(
-                    onTap: _pickLocation,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(color: kPurple2.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
-                      child: Row(
-                        children: [
-                          Icon(Icons.location_on, size: 16, color: kPurple2),
-                          const SizedBox(width: 4),
-                          Expanded(child: Text(_placeName, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kPurple2), overflow: TextOverflow.ellipsis)),
-                        ],
-                      ),
+                // Location
+                InkWell(
+                  onTap: _pickLocation,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(color: kPurple2.withOpacity(0.06), borderRadius: BorderRadius.circular(8)),
+                    child: Row(
+                      children: [
+                        Icon(Icons.location_on, size: 18, color: kPurple2),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(_placeName, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kPurple2), overflow: TextOverflow.ellipsis)),
+                        Icon(Icons.edit, size: 14, color: kMuted),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                // Birth nakshatra chip
+                const SizedBox(height: 8),
+                // Birth Nakshatra
                 InkWell(
                   onTap: _pickJanmaNakshatra,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(color: kTeal.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(color: kTeal.withOpacity(0.06), borderRadius: BorderRadius.circular(8)),
                     child: Row(
                       children: [
-                        Icon(Icons.star, size: 16, color: kTeal),
-                        const SizedBox(width: 4),
+                        Icon(Icons.star, size: 18, color: kTeal),
+                        const SizedBox(width: 8),
                         Text(
-                          _janmaNakIdx >= 0 ? knNak[_janmaNakIdx] : 'ಜನ್ಮ ನಕ್ಷತ್ರ',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kTeal),
+                          _janmaNakIdx >= 0 ? 'ಜನ್ಮ ನಕ್ಷತ್ರ: ${knNak[_janmaNakIdx]}' : 'ಜನ್ಮ ನಕ್ಷತ್ರ ಆಯ್ಕೆ ಮಾಡಿ (ತಾರಾ ಬಲಕ್ಕೆ)',
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kTeal),
                         ),
+                        const Spacer(),
+                        Icon(Icons.edit, size: 14, color: kMuted),
                       ],
                     ),
                   ),
                 ),
               ],
+            )),
+
+            // ── Calendar ──
+            TableCalendar(
+              firstDay: DateTime.utc(2020, 1, 1),
+              lastDay: DateTime.utc(2040, 12, 31),
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (d) => _selectedDay != null && isSameDay(d, _selectedDay),
+              onDaySelected: (selected, focused) {
+                setState(() {
+                  _selectedDay = selected;
+                  _focusedDay = focused;
+                });
+              },
+              onPageChanged: (focused) {
+                _focusedDay = focused;
+                _loadMonth(focused);
+              },
+              calendarFormat: CalendarFormat.month,
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false,
+                titleCentered: true,
+                titleTextStyle: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: kText),
+                leftChevronIcon: Icon(Icons.chevron_left, color: kPurple2),
+                rightChevronIcon: Icon(Icons.chevron_right, color: kPurple2),
+              ),
+              daysOfWeekStyle: DaysOfWeekStyle(
+                weekdayStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: kMuted),
+                weekendStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Colors.red.withOpacity(0.6)),
+              ),
+              calendarBuilders: CalendarBuilders(
+                defaultBuilder: (ctx, day, focused) => _buildDayCell(day, false),
+                todayBuilder: (ctx, day, focused) => _buildDayCell(day, true),
+                selectedBuilder: (ctx, day, focused) => _buildDayCell(day, false, selected: true),
+              ),
             ),
-          ),
 
-          // ── Calendar ──
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
+            // ── Legend ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TableCalendar(
-                    firstDay: DateTime.utc(2020, 1, 1),
-                    lastDay: DateTime.utc(2040, 12, 31),
-                    focusedDay: _focusedDay,
-                    selectedDayPredicate: (d) => _selectedDay != null && isSameDay(d, _selectedDay),
-                    onDaySelected: (selected, focused) {
-                      setState(() {
-                        _selectedDay = selected;
-                        _focusedDay = focused;
-                      });
-                      final key = DateTime.utc(selected.year, selected.month, selected.day);
-                      final day = _cache[key];
-                      if (day != null) _showDayDetail(day);
-                    },
-                    onPageChanged: (focused) {
-                      _focusedDay = focused;
-                      _loadMonth(focused);
-                    },
-                    calendarFormat: CalendarFormat.month,
-                    headerStyle: HeaderStyle(
-                      formatButtonVisible: false,
-                      titleCentered: true,
-                      titleTextStyle: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: kText),
-                      leftChevronIcon: Icon(Icons.chevron_left, color: kPurple2),
-                      rightChevronIcon: Icon(Icons.chevron_right, color: kPurple2),
-                    ),
-                    daysOfWeekStyle: DaysOfWeekStyle(
-                      weekdayStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: kMuted),
-                      weekendStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Colors.red.withOpacity(0.6)),
-                    ),
-                    calendarBuilders: CalendarBuilders(
-                      defaultBuilder: (ctx, day, focused) => _buildDayCell(day, false),
-                      todayBuilder: (ctx, day, focused) => _buildDayCell(day, true),
-                      selectedBuilder: (ctx, day, focused) => _buildDayCell(day, false, selected: true),
-                    ),
-                  ),
-
-                  // ── Legend ──
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _legendDot(kGreen, 'ಶುಭ'),
-                        const SizedBox(width: 16),
-                        _legendDot(kOrange, 'ಮಧ್ಯಮ'),
-                        const SizedBox(width: 16),
-                        _legendDot(Colors.red, 'ಅಶುಭ'),
-                      ],
-                    ),
-                  ),
-
-                  // ── Good days summary for the month ──
-                  _buildMonthSummary(),
-                  const SizedBox(height: 24),
+                  _legendDot(kGreen, 'ಶುಭ'),
+                  const SizedBox(width: 16),
+                  _legendDot(kOrange, 'ಮಧ್ಯಮ'),
+                  const SizedBox(width: 16),
+                  _legendDot(Colors.red, 'ಅಶುಭ'),
                 ],
               ),
             ),
-          ),
+
+            // ── Results list (Taranukoola-style expandable cards) ──
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ..._buildResultsList(),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildResultsList() {
+    final monthDays = _cache.entries
+      .where((e) => e.key.month == _focusedDay.month && e.key.year == _focusedDay.year)
+      .toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+
+    if (monthDays.isEmpty) return [];
+
+    final shubhaDays = monthDays.where((e) => e.value.quality == 2).toList();
+    final madhyamaDays = monthDays.where((e) => e.value.quality == 1).toList();
+    final ashubhaDays = monthDays.where((e) => e.value.quality == 0).toList();
+
+    return [
+      // Summary
+      Row(
+        children: [
+          _countBadge(shubhaDays.length, 'ಶುಭ', kGreen),
+          const SizedBox(width: 8),
+          _countBadge(madhyamaDays.length, 'ಮಧ್ಯಮ', kOrange),
+          const SizedBox(width: 8),
+          _countBadge(ashubhaDays.length, 'ಅಶುಭ', Colors.red),
         ],
+      ),
+      const SizedBox(height: 12),
+
+      // Shubha days
+      if (shubhaDays.isNotEmpty) ...[
+        Text('🟢 ಶುಭ ದಿನಗಳು (${shubhaDays.length})', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kGreen)),
+        const SizedBox(height: 8),
+        ...shubhaDays.map((e) => _buildResultCard(e.value)),
+      ],
+
+      // Madhyama days
+      if (madhyamaDays.isNotEmpty) ...[
+        const SizedBox(height: 8),
+        Text('🟡 ಮಧ್ಯಮ ದಿನಗಳು (${madhyamaDays.length})', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kOrange)),
+        const SizedBox(height: 8),
+        ...madhyamaDays.map((e) => _buildResultCard(e.value)),
+      ],
+
+      // Ashubha days
+      if (ashubhaDays.isNotEmpty) ...[
+        const SizedBox(height: 8),
+        Text('🔴 ಅಶುಭ ದಿನಗಳು (${ashubhaDays.length})', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Colors.red)),
+        const SizedBox(height: 8),
+        ...ashubhaDays.map((e) => _buildResultCard(e.value)),
+      ],
+    ];
+  }
+
+  Widget _countBadge(int count, String label, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withOpacity(0.2)),
+        ),
+        child: Column(
+          children: [
+            Text('$count', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: color)),
+            Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+          ],
+        ),
       ),
     );
   }
@@ -614,14 +679,11 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     final data = _cache[key];
 
     Color bgColor = Colors.transparent;
-    Color textColor = kText;
     Color? dotColor;
 
     if (data != null) {
-      dotColor = _qualityColor(data.quality);
-      if (selected) {
-        bgColor = kPurple2.withOpacity(0.15);
-      }
+      dotColor = _qColor(data.quality);
+      if (selected) bgColor = kPurple2.withOpacity(0.15);
     }
 
     return Container(
@@ -634,97 +696,28 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('${day.day}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: textColor)),
+          Text('${day.day}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kText)),
           if (data != null) ...[
             const SizedBox(height: 2),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(width: 6, height: 6, decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle)),
-              ],
-            ),
-            Text(
-              data.nakshatraName.length > 4 ? data.nakshatraName.substring(0, 4) : data.nakshatraName,
-              style: TextStyle(fontSize: 7, color: kMuted, fontWeight: FontWeight.w600),
-              overflow: TextOverflow.ellipsis,
-            ),
+            Container(width: 6, height: 6, decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle)),
           ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMonthSummary() {
-    final monthDays = _cache.entries
-      .where((e) => e.key.month == _focusedDay.month && e.key.year == _focusedDay.year)
-      .toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
-
-    final shubhaDays = monthDays.where((e) => e.value.quality == 2).toList();
-
-    if (shubhaDays.isEmpty) return const SizedBox();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 8),
-          Text('ಶುಭ ದಿನಗಳು — Good Days', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: kGreen)),
-          const SizedBox(height: 8),
-          ...shubhaDays.map((e) {
-            final d = e.value;
-            return InkWell(
-              onTap: () => _showDayDetail(d),
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: kGreen.withOpacity(0.06),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: kGreen.withOpacity(0.15)),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 36, height: 36,
-                      decoration: BoxDecoration(color: kGreen.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-                      child: Center(child: Text('${d.date.day}', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: kGreen))),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('${d.varaName} • ${d.tithiName}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kText)),
-                          Text('${d.nakshatraName} • ಅಭಿಜಿತ್: ${d.abhijitTime}', style: TextStyle(fontSize: 11, color: kMuted)),
-                        ],
-                      ),
-                    ),
-                    Text('${d.score}%', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: kGreen)),
-                  ],
-                ),
-              ),
-            );
-          }),
         ],
       ),
     );
   }
 }
 
-// ── Data Models ──
-
+// ── Data Model ──
 class _SimpleMuhurtaDay {
   final DateTime date;
   final String tithiName;
   final String nakshatraName;
   final String varaName;
-  final int score;       // 0-100
+  final int score;
   final int quality;     // 0=ashubha, 1=madhyama, 2=shubha
-  final String verdict;
-  final List<_CheckItem> checks;
+  final List<MuhurtaCheckItem> checks;
   final String abhijitTime;
+  final bool hasAmrita;
   final String sunrise;
   final String sunset;
 
@@ -735,19 +728,10 @@ class _SimpleMuhurtaDay {
     required this.varaName,
     required this.score,
     required this.quality,
-    required this.verdict,
     required this.checks,
     required this.abhijitTime,
+    required this.hasAmrita,
     required this.sunrise,
     required this.sunset,
   });
-}
-
-class _CheckItem {
-  final String label;
-  final String value;
-  final bool passed;
-  final String? note;
-
-  _CheckItem({required this.label, required this.value, required this.passed, this.note});
 }
