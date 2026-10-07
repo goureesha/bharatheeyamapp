@@ -105,7 +105,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(AppLocale.l('birthNakLabel')),
+        title: Text('ಜನ್ಮ ನಕ್ಷತ್ರ ಆಯ್ಕೆ'),
         content: SizedBox(
           width: 280, height: 400,
           child: ListView.builder(
