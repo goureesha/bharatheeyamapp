@@ -3176,6 +3176,135 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
               ),
               if (allPersons.length > 1) const SizedBox(height: 24),
+
+              const SizedBox(height: 24),
+
+              // ── Dashavarga: Additional 10 divisional charts ──
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [kTeal.withOpacity(0.12), kTeal.withOpacity(0.06)]),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(14), topRight: Radius.circular(14),
+                  ),
+                  border: Border(bottom: BorderSide(color: kTeal.withOpacity(0.3), width: 2)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.dashboard_rounded, size: 18, color: kTeal),
+                    const SizedBox(width: 8),
+                    Text('ಷೋಡಶವರ್ಗ', style: TextStyle(
+                      fontWeight: FontWeight.w900, fontSize: 16, color: kTeal,
+                    )),
+                  ],
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: kCard,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(14), bottomRight: Radius.circular(14),
+                  ),
+                  border: Border.all(color: kBorder),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4)),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(14), bottomRight: Radius.circular(14),
+                  ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Table(
+                      border: TableBorder.symmetric(
+                        inside: BorderSide(color: kBorder.withOpacity(0.6), width: 0.5),
+                      ),
+                      defaultColumnWidth: const FixedColumnWidth(52),
+                      columnWidths: const {0: FixedColumnWidth(80)},
+                      children: [
+                        TableRow(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(colors: [kTeal.withOpacity(0.15), kTeal.withOpacity(0.08)]),
+                          ),
+                          children: [
+                            for (final h in [hGraha, 'D4', 'D7', 'D10', 'D16', 'D20', 'D24', 'D27', 'D40', 'D45', 'D60'])
+                              Padding(padding: const EdgeInsets.symmetric(vertical: 14), child: Text(h, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: kTeal))),
+                          ],
+                        ),
+                        ...planetOrder.map((pNameKey) {
+                          final pInfo = r.planets[pNameKey];
+                          if (pInfo == null) return TableRow(children: List.generate(11, (_) => const SizedBox()));
+                          final details = AstroCalculator.getPlanetDetail(pNameKey, pInfo.longitude, pInfo.speed, r.planets['ರವಿ']?.longitude ?? 0.0);
+                          final displayName = tr(pNameKey);
+                          final keys = ['d4','d7','d10','d16','d20','d24','d27','d40','d45','d60'];
+                          return TableRow(
+                            children: [
+                              Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Text(displayName, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: kTeal))),
+                              ...keys.map((k) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                child: Text(getRashiLord(details[k] as String), textAlign: TextAlign.center, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kText)),
+                              )),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // ── Varga Kundali Chart Boxes ──
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [kPurple1.withOpacity(0.12), kPurple2.withOpacity(0.06)]),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border(bottom: BorderSide(color: kPurple2.withOpacity(0.3), width: 2)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.auto_awesome_mosaic_rounded, size: 18, color: kPurple2),
+                    const SizedBox(width: 8),
+                    Text('ವರ್ಗ ಕುಂಡಲಿಗಳು', style: TextStyle(
+                      fontWeight: FontWeight.w900, fontSize: 16, color: kPurple2,
+                    )),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              ...([
+                [4, 'D4 ಚತುರ್ಥಾಂಶ'],
+                [7, 'D7 ಸಪ್ತಾಂಶ'],
+                [10, 'D10 ದಶಾಂಶ'],
+                [16, 'D16 ಷೋಡಶಾಂಶ'],
+                [20, 'D20 ವಿಂಶಾಂಶ'],
+                [24, 'D24 ಚತುರ್ವಿಂಶಾಂಶ'],
+                [27, 'D27 ಸಪ್ತವಿಂಶಾಂಶ'],
+                [40, 'D40 ಖವೇದಾಂಶ'],
+                [45, 'D45 ಅಕ್ಷವೇದಾಂಶ'],
+                [60, 'D60 ಷಷ್ಠ್ಯಂಶ'],
+              ].map((v) => Column(
+                children: [
+                  Text(v[1] as String, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: kTeal)),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 320,
+                    child: KundaliChart(
+                      result: r,
+                      varga: v[0] as int,
+                      isBhava: false,
+                      showSphutas: false,
+                      centerLabel: v[1] as String,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ))),
             ]
           );
         }).toList(),
