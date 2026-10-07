@@ -38,8 +38,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
   Set<int> _userTithis = {};
   Set<int> _userNakshatras = {};
   Set<int> _userVaras = {};
-  bool _requireShukla = false;
-  bool _avoidVishti = true;
 
   @override
   void initState() {
@@ -52,8 +50,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     _userTithis = Set<int>.from(rules?.allowedTithis ?? List.generate(30, (i) => i));
     _userNakshatras = Set<int>.from(rules?.allowedNakshatras ?? List.generate(27, (i) => i));
     _userVaras = Set<int>.from(rules?.allowedVaras ?? List.generate(7, (i) => i));
-    _requireShukla = rules?.requireShukla ?? false;
-    _avoidVishti = rules?.avoidVishti ?? true;
   }
 
   // Location
@@ -140,8 +136,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             allowedTithis: _userTithis.toList(),
             allowedNakshatras: _userNakshatras.toList(),
             allowedVaras: _userVaras.toList(),
-            avoidVishti: _avoidVishti,
-            requireShukla: _requireShukla,
           ),
         );
 
@@ -190,16 +184,15 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     return '${h12.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $ap';
   }
 
-  /// Scan ascendant from sunrise to sunset and return allowed lagna windows
-  List<Map<String, String>> _scanLagnas(double srJd, double ssJd) {
+  /// Scan ascendant from sunrise to sunset, check lagna shuddhi
+  List<Map<String, dynamic>> _scanLagnas(double srJd, double ssJd) {
     Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
     final ayn = Sweph.swe_get_ayanamsa(srJd);
     final double step = 10.0 / (24.0 * 60.0); // 10-minute steps
-    final windows = <Map<String, String>>[];
+    final windows = <Map<String, dynamic>>[];
 
-    int? curRashi;
-    double startMins = 0;
-
+    // Collect samples
+    final samples = <_AscSample>[];
     double jd = srJd;
     while (jd <= ssJd + step) {
       final houses = Ephemeris.placidusHousesFull(jd, _lat, _lon);
@@ -207,34 +200,72 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         final sidAsc = ((houses.ascmc[0] as double) - ayn) % 360.0;
         final rashiIdx = (sidAsc / 30.0).floor() % 12;
         final localFrac = ((jd + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
-        final localMins = localFrac * 24.0 * 60.0;
-
-        if (curRashi == null) {
-          curRashi = rashiIdx;
-          startMins = localMins;
-        } else if (rashiIdx != curRashi) {
-          // Window ended — save if allowed
-          if (_allowedLagnas.contains(curRashi)) {
-            windows.add({
-              'rashi': trAll(_rashiNames[curRashi]),
-              'start': _fmtMins(startMins),
-              'end': _fmtMins(localMins),
-            });
-          }
-          curRashi = rashiIdx;
-          startMins = localMins;
-        }
+        samples.add(_AscSample(jd: jd, rashiIdx: rashiIdx, localMins: localFrac * 24.0 * 60.0));
       }
       jd += step;
     }
-    // Last window
-    if (curRashi != null && _allowedLagnas.contains(curRashi)) {
-      final endFrac = ((ssJd + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
-      windows.add({
-        'rashi': trAll(_rashiNames[curRashi]),
-        'start': _fmtMins(startMins),
-        'end': _fmtMins(endFrac * 24.0 * 60.0),
-      });
+    if (samples.isEmpty) return [];
+
+    const engToKn = {
+      'Sun': 'ರವಿ', 'Moon': 'ಚಂದ್ರ', 'Mercury': 'ಬುಧ', 'Venus': 'ಶುಕ್ರ',
+      'Mars': 'ಕುಜ', 'Jupiter': 'ಗುರು', 'Saturn': 'ಶನಿ',
+      'Rahu': 'ರಾಹು', 'Ketu': 'ಕೇತು',
+    };
+
+    int curRashi = samples.first.rashiIdx;
+    double startMins = samples.first.localMins;
+    double windowStartJd = samples.first.jd;
+
+    for (int i = 1; i < samples.length; i++) {
+      if (samples[i].rashiIdx != curRashi || i == samples.length - 1) {
+        final endMins = samples[i].localMins;
+        final windowEndJd = samples[i].jd;
+
+        if (_allowedLagnas.contains(curRashi)) {
+          // Get planet positions at window midpoint
+          final midJd = (windowStartJd + windowEndJd) / 2.0;
+          final positions = Ephemeris.calcAll(midJd, 'lahiri', true);
+          final Map<String, int> planetRashis = {};
+          for (final e in positions.entries) {
+            final kn = engToKn[e.key];
+            if (kn != null) planetRashis[kn] = (e.value[0] / 30.0).floor() % 12;
+          }
+
+          final saptamaRashi = (curRashi + 6) % 12;
+          final ashtamaRashi = (curRashi + 7) % 12;
+
+          final lagnaGrahas = findMaleficsInRashi(curRashi, planetRashis);
+          final saptamaGrahas = findMaleficsInRashi(saptamaRashi, planetRashis);
+          final ashtamaGrahas = findAllPlanetsInRashi(ashtamaRashi, planetRashis);
+
+          final lagnaShuddhi = lagnaGrahas.isEmpty;
+          final saptamaShuddhi = saptamaGrahas.isEmpty;
+          final ashtamaShuddhi = ashtamaGrahas.isEmpty;
+          final isShubha = lagnaShuddhi && saptamaShuddhi;
+
+          // Check Guru anukoola
+          final guruRashi = planetRashis['ಗುರು'] ?? -1;
+          final guruAnukoola = guruRashi >= 0 && isGuruAnukoolaForLagna(curRashi, guruRashi);
+
+          windows.add({
+            'rashi': trAll(_rashiNames[curRashi]),
+            'rashiIdx': curRashi,
+            'start': _fmtMins(startMins),
+            'end': _fmtMins(endMins),
+            'lagnaShuddhi': lagnaShuddhi,
+            'saptamaShuddhi': saptamaShuddhi,
+            'ashtamaShuddhi': ashtamaShuddhi,
+            'isShubha': isShubha,
+            'lagnaGrahas': lagnaGrahas,
+            'saptamaGrahas': saptamaGrahas,
+            'ashtamaGrahas': ashtamaGrahas,
+            'guruAnukoola': guruAnukoola,
+          });
+        }
+        curRashi = samples[i].rashiIdx;
+        startMins = samples[i].localMins;
+        windowStartJd = samples[i].jd;
+      }
     }
     return windows;
   }
@@ -255,7 +286,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             content: SizedBox(
               width: 340, height: 500,
               child: DefaultTabController(
-                length: 5,
+                length: 4,
                 child: Column(
                   children: [
                     TabBar(
@@ -269,7 +300,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                         Tab(text: 'ನಕ್ಷತ್ರ'),
                         Tab(text: 'ವಾರ'),
                         Tab(text: 'ಲಗ್ನ'),
-                        Tab(text: 'ಇತರ'),
                       ],
                     ),
                     Expanded(
@@ -359,42 +389,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                                 title: Text('${_rashiNames[i]} (${_rashiEn[i]})', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
                                 onChanged: (v) => setDlgState(() { if (v == true) _allowedLagnas.add(i); else _allowedLagnas.remove(i); }),
                               )),
-                            ],
-                          ),
-
-                          // ── TAB 5: OTHER ──
-                          ListView(
-                            children: [
-                              const SizedBox(height: 8),
-                              SwitchListTile(
-                                dense: true,
-                                activeColor: kTeal,
-                                value: _requireShukla,
-                                title: Text('ಶುಕ್ಲ ಪಕ್ಷ ಮಾತ್ರ', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
-                                subtitle: Text('Only Shukla Paksha', style: TextStyle(fontSize: 11, color: kMuted)),
-                                onChanged: (v) => setDlgState(() => _requireShukla = v),
-                              ),
-                              SwitchListTile(
-                                dense: true,
-                                activeColor: kTeal,
-                                value: _avoidVishti,
-                                title: Text('ವಿಷ್ಟಿ (ಭದ್ರಾ) ಕರಣ ಟ್ಯಾಜ್ಯ', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
-                                subtitle: Text('Avoid Vishti Karana', style: TextStyle(fontSize: 11, color: kMuted)),
-                                onChanged: (v) => setDlgState(() => _avoidVishti = v),
-                              ),
-                              const Divider(),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                child: Text('📊 ಕನಿಷ್ಠ ಅಂಕ (Min Score: $_minScore)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kPurple1)),
-                              ),
-                              Slider(
-                                value: _minScore.toDouble(),
-                                min: 20, max: 80,
-                                divisions: 6,
-                                activeColor: kTeal,
-                                label: '$_minScore',
-                                onChanged: (v) => setDlgState(() => _minScore = v.round()),
-                              ),
                             ],
                           ),
                         ],
@@ -819,20 +813,48 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                         color: kTeal.withOpacity(0.08),
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                       ),
-                      child: Text('🏠 ಶುಭ ಲಗ್ನ ಸಮಯ', style: TextStyle(fontWeight: FontWeight.w800, color: kTeal, fontSize: 13)),
+                      child: Text('🏠 ಲಗ್ನ ಶುದ್ಧಿ', style: TextStyle(fontWeight: FontWeight.w800, color: kTeal, fontSize: 13)),
                     ),
                     ...(r['lagnaWindows'] as List).map((w) {
-                      final wMap = w as Map<String, String>;
+                      final wMap = w as Map<String, dynamic>;
+                      final isShubha = wMap['isShubha'] == true;
+                      final lShuddhi = wMap['lagnaShuddhi'] == true;
+                      final sShuddhi = wMap['saptamaShuddhi'] == true;
+                      final aShuddhi = wMap['ashtamaShuddhi'] == true;
+                      final guruOk = wMap['guruAnukoola'] == true;
+                      final lG = (wMap['lagnaGrahas'] as List?)?.join(', ') ?? '';
+                      final sG = (wMap['saptamaGrahas'] as List?)?.join(', ') ?? '';
+                      final aG = (wMap['ashtamaGrahas'] as List?)?.join(', ') ?? '';
+
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder.withOpacity(0.5)))),
-                        child: Row(children: [
-                          Icon(Icons.schedule, size: 14, color: kTeal),
-                          const SizedBox(width: 8),
-                          Text(wMap['rashi']!, style: TextStyle(fontWeight: FontWeight.w700, color: kText, fontSize: 12)),
-                          const Spacer(),
-                          Text('${wMap['start']} - ${wMap['end']}', style: TextStyle(color: kMuted, fontSize: 12, fontWeight: FontWeight.w600)),
-                        ]),
+                        decoration: BoxDecoration(
+                          color: isShubha ? Colors.green.withOpacity(0.04) : Colors.red.withOpacity(0.04),
+                          border: Border(bottom: BorderSide(color: kBorder.withOpacity(0.5))),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              Icon(isShubha ? Icons.check_circle : Icons.warning_amber_rounded, size: 16, color: isShubha ? Colors.green : Colors.orange),
+                              const SizedBox(width: 6),
+                              Text(wMap['rashi'] as String, style: TextStyle(fontWeight: FontWeight.w800, color: kText, fontSize: 13)),
+                              const Spacer(),
+                              Text('${wMap['start']} - ${wMap['end']}', style: TextStyle(color: kMuted, fontSize: 12, fontWeight: FontWeight.w700)),
+                            ]),
+                            const SizedBox(height: 4),
+                            Wrap(spacing: 10, runSpacing: 2, children: [
+                              _shuddhiChip('ಲಗ್ನ', lShuddhi, lG),
+                              _shuddhiChip('೭ ಮ', sShuddhi, sG),
+                              _shuddhiChip('೮ ಮ', aShuddhi, aG),
+                              if (guruOk) Row(mainAxisSize: MainAxisSize.min, children: [
+                                Icon(Icons.star, size: 12, color: Colors.amber),
+                                const SizedBox(width: 2),
+                                Text('ಗುರು✓', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.amber.shade800)),
+                              ]),
+                            ]),
+                          ],
+                        ),
                       );
                     }),
                   ]),
@@ -844,4 +866,19 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
       ),
     );
   }
+
+  Widget _shuddhiChip(String label, bool ok, String grahas) {
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      Icon(ok ? Icons.check_circle : Icons.cancel, size: 12, color: ok ? Colors.green : Colors.red),
+      const SizedBox(width: 2),
+      Text('$label${ok ? '' : ' ($grahas)'}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: ok ? Colors.green : Colors.red)),
+    ]);
+  }
+}
+
+class _AscSample {
+  final double jd;
+  final int rashiIdx;
+  final double localMins;
+  const _AscSample({required this.jd, required this.rashiIdx, required this.localMins});
 }
