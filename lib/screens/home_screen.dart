@@ -15,6 +15,7 @@ import 'vedic_clock_screen.dart';
 import 'appointment_screen.dart';
 import 'pooja_lists_screen.dart';
 import 'vastu_screen.dart';
+import 'muhurta_screen.dart';
 import '../services/tester_service.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -34,6 +35,9 @@ class HomeScreen extends StatelessWidget {
       }),
       _Section(AppLocale.l('taranukoola'), 'Taranukoola', Icons.stars_rounded, kGreen, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const TaranukoolaScreen()));
+      }),
+      _Section(AppLocale.l('muhurtaLabel'), 'Muhoorta', Icons.event_available_rounded, AppThemes.isTanjore ? const Color(0xFFCDA434) : const Color(0xFF1ABC9C), () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const MuhurtaScreen()));
       }),
       _Section(AppLocale.l('matchMaking'), 'Match Making', Icons.favorite, AppThemes.isTanjore ? const Color(0xFFD4AF37) : const Color(0xFFE53E3E), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const MatchMakingScreen()));
