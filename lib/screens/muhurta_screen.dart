@@ -29,7 +29,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
   double _lat = LocationService.lat;
   double _lon = LocationService.lon;
   double _tz = LocationService.tzOffset;
-  String _placeName = LocationService.placeName;
+  String _placeName = LocationService.place;
 
   // Cached day results for the displayed month
   final Map<DateTime, _SimpleMuhurtaDay> _cache = {};
