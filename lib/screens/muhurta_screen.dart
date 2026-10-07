@@ -39,6 +39,12 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
   Set<int> _userNakshatras = {};
   Set<int> _userVaras = {};
 
+  // Lagna shuddhi filters
+  bool _filterLagnaShuddhi = true;
+  bool _filterSaptamaShuddhi = true;
+  bool _filterAshtamaShuddhi = false;
+  bool _filterGuruAnukoola = false;
+
   @override
   void initState() {
     super.initState();
@@ -142,7 +148,15 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         // Only show days with score >= 40
         if (mResult.score >= _minScore) {
           // Compute lagna windows for this day
-          final lagnaWindows = _scanLagnas(srSs[0], srSs[1]);
+          final allLagnaWindows = _scanLagnas(srSs[0], srSs[1]);
+          // Filter by user shuddhi settings
+          final lagnaWindows = allLagnaWindows.where((w) {
+            if (_filterLagnaShuddhi && w['lagnaShuddhi'] != true) return false;
+            if (_filterSaptamaShuddhi && w['saptamaShuddhi'] != true) return false;
+            if (_filterAshtamaShuddhi && w['ashtamaShuddhi'] != true) return false;
+            if (_filterGuruAnukoola && w['guruAnukoola'] != true) return false;
+            return true;
+          }).toList();
 
           found.add({
             'date': d,
@@ -389,6 +403,44 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                                 title: Text('${_rashiNames[i]} (${_rashiEn[i]})', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
                                 onChanged: (v) => setDlgState(() { if (v == true) _allowedLagnas.add(i); else _allowedLagnas.remove(i); }),
                               )),
+                              const Divider(height: 20),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: Text('🛡 ಲಗ್ನ ಶುದ್ಧಿ ನಿಯಮ', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kPurple1)),
+                              ),
+                              const SizedBox(height: 4),
+                              SwitchListTile(
+                                dense: true, activeColor: kTeal,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                value: _filterLagnaShuddhi,
+                                title: Text('ಲಗ್ನ ಶುದ್ಧಿ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                                subtitle: Text('ಲಗ್ನದಲ್ಲಿ ಪಾಪ ಗ್ರಹ ಇಲ್ಲ', style: TextStyle(fontSize: 10, color: kMuted)),
+                                onChanged: (v) => setDlgState(() => _filterLagnaShuddhi = v),
+                              ),
+                              SwitchListTile(
+                                dense: true, activeColor: kTeal,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                value: _filterSaptamaShuddhi,
+                                title: Text('ಸಪ್ತಮ ಶುದ್ಧಿ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                                subtitle: Text('೭ನೇ ಮನೆಯಲ್ಲಿ ಪಾಪ ಗ್ರಹ ಇಲ್ಲ', style: TextStyle(fontSize: 10, color: kMuted)),
+                                onChanged: (v) => setDlgState(() => _filterSaptamaShuddhi = v),
+                              ),
+                              SwitchListTile(
+                                dense: true, activeColor: kTeal,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                value: _filterAshtamaShuddhi,
+                                title: Text('ಅಷ್ಟಮ ಶುದ್ಧಿ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                                subtitle: Text('೮ನೇ ಮನೆಯಲ್ಲಿ ಗ್ರಹ ಇಲ್ಲ', style: TextStyle(fontSize: 10, color: kMuted)),
+                                onChanged: (v) => setDlgState(() => _filterAshtamaShuddhi = v),
+                              ),
+                              SwitchListTile(
+                                dense: true, activeColor: kTeal,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                value: _filterGuruAnukoola,
+                                title: Text('ಗುರು ಅನುಕೂಲ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                                subtitle: Text('ಗುರು ಕೇಂದ್ರ/ತ್ರಿಕೋಣದಲ್ಲಿ', style: TextStyle(fontSize: 10, color: kMuted)),
+                                onChanged: (v) => setDlgState(() => _filterGuruAnukoola = v),
+                              ),
                             ],
                           ),
                         ],
