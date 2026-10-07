@@ -83,6 +83,44 @@ class KundaliChart extends StatelessWidget {
           if (dr < 25) return 10;
           return 0;
         }
+      case 4: // Chaturthamsha
+        final r4 = (deg / 30).floor() % 12;
+        final part4 = (dr / 7.5).floor();
+        return (r4 + part4 * 3) % 12;
+      case 7: // Saptamsha
+        final r7 = (deg / 30).floor() % 12;
+        final isOdd7 = r7 % 2 == 0;
+        final part7 = (dr / (30 / 7)).floor();
+        return isOdd7 ? (r7 + part7) % 12 : (r7 + 6 + part7) % 12;
+      case 10: // Dashamsha
+        final r10 = (deg / 30).floor() % 12;
+        final isOdd10 = r10 % 2 == 0;
+        final part10 = (dr / 3).floor();
+        return isOdd10 ? (r10 + part10) % 12 : (r10 + 8 + part10) % 12;
+      case 16: // Shodashamsha
+        final nature16 = ((deg / 30).floor() % 12) % 3;
+        final start16 = nature16 == 0 ? 0 : (nature16 == 1 ? 4 : 8);
+        return (start16 + (dr / (30 / 16)).floor()) % 12;
+      case 20: // Vimshamsha
+        final nature20 = ((deg / 30).floor() % 12) % 3;
+        final start20 = nature20 == 0 ? 0 : (nature20 == 1 ? 8 : 4);
+        return (start20 + (dr / 1.5).floor()) % 12;
+      case 24: // Chaturvimshamsha
+        final isOdd24 = (deg / 30).floor() % 2 == 0;
+        return isOdd24 ? (4 + (dr / 1.25).floor()) % 12 : (3 + (dr / 1.25).floor()) % 12;
+      case 27: // Bhamsha
+        final elem27 = ((deg / 30).floor() % 12) % 4;
+        return (elem27 * 3 + (dr / (30 / 27)).floor()) % 12;
+      case 40: // Khavedamsha
+        final isOdd40 = (deg / 30).floor() % 2 == 0;
+        return isOdd40 ? ((dr / 0.75).floor()) % 12 : (6 + (dr / 0.75).floor()) % 12;
+      case 45: // Akshavedamsha
+        final nature45 = ((deg / 30).floor() % 12) % 3;
+        final start45 = nature45 == 0 ? 0 : (nature45 == 1 ? 4 : 8);
+        return (start45 + (dr / (30 / 45)).floor()) % 12;
+      case 60: // Shashtiyamsha
+        final r60 = (deg / 30).floor() % 12;
+        return (r60 + (dr / 0.5).floor()) % 12;
       default: // Rashi (D1)
         if (isBhava) {
           // Bhava chart: place based on house number from lagna
@@ -121,6 +159,26 @@ class KundaliChart extends StatelessWidget {
           if (dr < 25) return (dr - 20) * (30.0 / 5.0);
           return (dr - 25) * (30.0 / 5.0);
         }
+      case 4: // Chaturthamsha — each 7°30' span
+        return (dr % 7.5) * (30.0 / 7.5);
+      case 7: // Saptamsha — each 4°17' span
+        return (dr % (30 / 7)) * (30.0 / (30 / 7));
+      case 10: // Dashamsha — each 3° span
+        return (dr % 3) * (30.0 / 3.0);
+      case 16: // Shodashamsha — each 1°52.5' span
+        return (dr % (30 / 16)) * (30.0 / (30 / 16));
+      case 20: // Vimshamsha — each 1°30' span
+        return (dr % 1.5) * (30.0 / 1.5);
+      case 24: // Chaturvimshamsha — each 1°15' span
+        return (dr % 1.25) * (30.0 / 1.25);
+      case 27: // Bhamsha — each 1°6.67' span
+        return (dr % (30 / 27)) * (30.0 / (30 / 27));
+      case 40: // Khavedamsha — each 0°45' span
+        return (dr % 0.75) * (30.0 / 0.75);
+      case 45: // Akshavedamsha — each 0°40' span
+        return (dr % (30 / 45)) * (30.0 / (30 / 45));
+      case 60: // Shashtiyamsha — each 0°30' span
+        return (dr % 0.5) * (30.0 / 0.5);
       default: // Rashi (D1)
         return dr;
     }

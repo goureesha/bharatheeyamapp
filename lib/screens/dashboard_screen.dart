@@ -2774,6 +2774,88 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ],
                 ),
               ),
+              const SizedBox(height: 24),
+
+              // ── Dashavarga: Remaining 10 divisional charts ──
+              Text('ದಶವರ್ಗ — Additional Divisional Charts', style: TextStyle(
+                fontWeight: FontWeight.w800, fontSize: 15,
+                color: kPurple2)),
+              const SizedBox(height: 4),
+              Text('D4, D7, D10, D16, D20, D24, D27, D40, D45, D60', style: TextStyle(fontSize: 11, color: kMuted)),
+              const SizedBox(height: 12),
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Table(
+                    border: TableBorder(
+                      horizontalInside: BorderSide(color: kBorder),
+                      verticalInside: BorderSide(color: kBorder),
+                    ),
+                    defaultColumnWidth: const FixedColumnWidth(52),
+                    columnWidths: const {0: FixedColumnWidth(36)},
+                    children: [
+                      TableRow(
+                        decoration: BoxDecoration(color: kTeal.withOpacity(0.08), borderRadius: const BorderRadius.vertical(top: Radius.circular(16))),
+                        children: [
+                          for (final h in ['#', 'D4', 'D7', 'D10', 'D16', 'D20', 'D24', 'D27', 'D40', 'D45', 'D60'])
+                            Padding(padding: const EdgeInsets.all(6), child: Text(h, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 10))),
+                        ],
+                      ),
+                      ...List.generate(12, (i) {
+                        final madhya = r.bhavas[i];
+                        final details = AstroCalculator.getPlanetDetail('ಲಗ್ನ', madhya, 0, 0);
+                        final keys = ['d4','d7','d10','d16','d20','d24','d27','d40','d45','d60'];
+
+                        return TableRow(
+                          children: [
+                            Padding(padding: const EdgeInsets.all(6), child: Text('${i+1}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11))),
+                            ...keys.map((k) => Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: Text(details[k] as String, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
+                            )),
+                          ],
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // ── Varga Kundali Chart Boxes ──
+              Text('ವರ್ಗ ಕುಂಡಲಿಗಳು — Varga Kundalis', style: TextStyle(
+                fontWeight: FontWeight.w800, fontSize: 15,
+                color: kPurple2)),
+              const SizedBox(height: 12),
+              ...([
+                [4, 'D4 ಚತುರ್ಥಾಂಶ'],
+                [7, 'D7 ಸಪ್ತಾಂಶ'],
+                [10, 'D10 ದಶಾಂಶ'],
+                [16, 'D16 ಷೋಡಶಾಂಶ'],
+                [20, 'D20 ವಿಂಶಾಂಶ'],
+                [24, 'D24 ಚತುರ್ವಿಂಶಾಂಶ'],
+                [27, 'D27 ಸಪ್ತವಿಂಶಾಂಶ'],
+                [40, 'D40 ಖವೇದಾಂಶ'],
+                [45, 'D45 ಅಕ್ಷವೇದಾಂಶ'],
+                [60, 'D60 ಷಷ್ಠ್ಯಂಶ'],
+              ].map((v) => Column(
+                children: [
+                  Text(v[1] as String, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: kTeal)),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 320,
+                    child: KundaliChart(
+                      result: r,
+                      varga: v[0] as int,
+                      isBhava: false,
+                      showSphutas: false,
+                      centerLabel: v[1] as String,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ))),
               if (allPersons.length > 1) const SizedBox(height: 16),
             ]
           );

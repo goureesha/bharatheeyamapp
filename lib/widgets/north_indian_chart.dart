@@ -75,6 +75,44 @@ class NorthIndianChart extends StatelessWidget {
           if (dr < 25) return 10;
           return 0;
         }
+      case 4:
+        final r4 = (deg / 30).floor() % 12;
+        final part4 = (dr / 7.5).floor();
+        return (r4 + part4 * 3) % 12;
+      case 7:
+        final r7 = (deg / 30).floor() % 12;
+        final isOdd7 = r7 % 2 == 0;
+        final part7 = (dr / (30 / 7)).floor();
+        return isOdd7 ? (r7 + part7) % 12 : (r7 + 6 + part7) % 12;
+      case 10:
+        final r10 = (deg / 30).floor() % 12;
+        final isOdd10 = r10 % 2 == 0;
+        final part10 = (dr / 3).floor();
+        return isOdd10 ? (r10 + part10) % 12 : (r10 + 8 + part10) % 12;
+      case 16:
+        final nature16 = ((deg / 30).floor() % 12) % 3;
+        final start16 = nature16 == 0 ? 0 : (nature16 == 1 ? 4 : 8);
+        return (start16 + (dr / (30 / 16)).floor()) % 12;
+      case 20:
+        final nature20 = ((deg / 30).floor() % 12) % 3;
+        final start20 = nature20 == 0 ? 0 : (nature20 == 1 ? 8 : 4);
+        return (start20 + (dr / 1.5).floor()) % 12;
+      case 24:
+        final isOdd24 = (deg / 30).floor() % 2 == 0;
+        return isOdd24 ? (4 + (dr / 1.25).floor()) % 12 : (3 + (dr / 1.25).floor()) % 12;
+      case 27:
+        final elem27 = ((deg / 30).floor() % 12) % 4;
+        return (elem27 * 3 + (dr / (30 / 27)).floor()) % 12;
+      case 40:
+        final isOdd40 = (deg / 30).floor() % 2 == 0;
+        return isOdd40 ? ((dr / 0.75).floor()) % 12 : (6 + (dr / 0.75).floor()) % 12;
+      case 45:
+        final nature45 = ((deg / 30).floor() % 12) % 3;
+        final start45 = nature45 == 0 ? 0 : (nature45 == 1 ? 4 : 8);
+        return (start45 + (dr / (30 / 45)).floor()) % 12;
+      case 60:
+        final r60 = (deg / 30).floor() % 12;
+        return (r60 + (dr / 0.5).floor()) % 12;
       default:
         if (isBhava) return -1;
         return (deg / 30).floor() % 12;
@@ -105,6 +143,16 @@ class NorthIndianChart extends StatelessWidget {
           if (dr < 25) return (dr - 20) * (30.0 / 5.0);
           return (dr - 25) * (30.0 / 5.0);
         }
+      case 4: return (dr % 7.5) * (30.0 / 7.5);
+      case 7: return (dr % (30 / 7)) * (30.0 / (30 / 7));
+      case 10: return (dr % 3) * (30.0 / 3.0);
+      case 16: return (dr % (30 / 16)) * (30.0 / (30 / 16));
+      case 20: return (dr % 1.5) * (30.0 / 1.5);
+      case 24: return (dr % 1.25) * (30.0 / 1.25);
+      case 27: return (dr % (30 / 27)) * (30.0 / (30 / 27));
+      case 40: return (dr % 0.75) * (30.0 / 0.75);
+      case 45: return (dr % (30 / 45)) * (30.0 / (30 / 45));
+      case 60: return (dr % 0.5) * (30.0 / 0.5);
       default: return dr;
     }
   }
