@@ -1223,5 +1223,331 @@ class JanmaPatrikeService {
       ],
     );
   }
-}
 
+  // ════════════════════════════════════════════════════════
+  // SIMPLE PDF — 2 pages only
+  // ════════════════════════════════════════════════════════
+
+  static Future<Uint8List> _generateSimplePdfBytes(UserDetails user, KundaliResult result, {PdfThemeConfig? theme}) async {
+    theme ??= PdfThemes.traditional;
+    final controller = ScreenshotController();
+
+    const double pageWidth = 793.0;
+    const double pageHeight = 1122.0;
+    final targetSize = const Size(pageWidth, pageHeight);
+
+    // Page 1: Birth paragraph + Charts
+    final page1Widget = _buildPageWrapper(
+      width: pageWidth, height: pageHeight, theme: theme,
+      child: _buildSimplePage1(user, result, theme),
+    );
+    final page1Bytes = await controller.captureFromLongWidget(page1Widget, pixelRatio: 2.0, delay: const Duration(milliseconds: 100), context: null, constraints: BoxConstraints.tight(targetSize));
+
+    // Page 2: Dasha + Sandhi
+    final page2Widget = _buildPageWrapper(
+      width: pageWidth, height: pageHeight, theme: theme,
+      child: _buildSimplePage2(user, result, theme),
+    );
+    final page2Bytes = await controller.captureFromLongWidget(page2Widget, pixelRatio: 2.0, delay: const Duration(milliseconds: 100), context: null, constraints: BoxConstraints.tight(targetSize));
+
+    // Build PDF
+    final doc = pw.Document();
+    for (final imgBytes in [page1Bytes, page2Bytes]) {
+      final image = pw.MemoryImage(imgBytes);
+      doc.addPage(pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: pw.EdgeInsets.zero,
+        build: (ctx) => pw.FullPage(ignoreMargins: true, child: pw.Image(image, fit: pw.BoxFit.contain)),
+      ));
+    }
+    return doc.save();
+  }
+
+  static Future<void> generateSimplePdfAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme}) async {
+    final bytes = await _generateSimplePdfBytes(user, result, theme: theme);
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => bytes,
+      name: '${user.name}_simple_patrike',
+    );
+  }
+
+  static Future<void> generateSimplePdfAndShare(UserDetails user, KundaliResult result, {PdfThemeConfig? theme}) async {
+    final bytes = await _generateSimplePdfBytes(user, result, theme: theme);
+    await Printing.sharePdf(bytes: bytes, filename: '${user.name}_simple_patrike.pdf');
+  }
+
+  // ── Simple Page 1: Birth paragraph + Charts ──
+  static Widget _buildSimplePage1(UserDetails user, KundaliResult result, PdfThemeConfig t) {
+    final p = result.panchang;
+    final lagnaInfo = result.planets['ಲಗ್ನ'];
+    final lagnaRashi = lagnaInfo != null ? trAll(lagnaInfo.rashi) : '-';
+
+    // Build birth details as paragraph
+    final birthPara = '${AppLocale.l('jpNativeName')}: ${user.name}, '
+        '${AppLocale.l('jpDob')}: ${user.dateStr}, '
+        '${AppLocale.l('jpTime')}: ${user.timeStr}, '
+        '${AppLocale.l('jpBirthPlace')}: ${user.place}. '
+        '${AppLocale.l('jpLatLon')}: ${user.lat.toStringAsFixed(4)}°, ${user.lon.toStringAsFixed(4)}°. ';
+
+    final panchangPara = '${AppLocale.l('jpSamvatsara')}: ${trAll(p.samvatsara)}, '
+        '${AppLocale.l('jpChandraMasa')}: ${trAll(p.chandraMasa)}, '
+        '${AppLocale.l('jpSouraMasa')}: ${trAll(p.souraMasa)}, '
+        '${AppLocale.l('jpVara')}: ${trAll(p.vara)}, '
+        '${AppLocale.l('jpTithi')}: ${trAll(p.tithi)}, '
+        '${AppLocale.l('jpNakshatra')}: ${trAll(p.nakshatra)}, '
+        '${AppLocale.l('jpYoga')}: ${trAll(p.yoga)}, '
+        '${AppLocale.l('jpKarana')}: ${trAll(p.karana)}, '
+        '${AppLocale.l('jpChandraRashi')}: ${trAll(p.chandraRashi)}, '
+        '${AppLocale.l('jpLagnaRashi')}: $lagnaRashi. '
+        '${AppLocale.l('jpUdayadiGhati')}: ${p.udayadiGhati}, '
+        '${AppLocale.l('jpGataGhati')}: ${p.gataGhati}, '
+        '${AppLocale.l('jpParamaGhati')}: ${p.paramaGhati}, '
+        '${AppLocale.l('jpSunrise')}: ${p.sunrise}, ${AppLocale.l('jpSunset')}: ${p.sunset}.';
+
+    final familyPara = [
+      if (user.fatherName.isNotEmpty) '${AppLocale.l('jpFather')}: ${user.fatherName}',
+      if (user.motherName.isNotEmpty) '${AppLocale.l('jpMother')}: ${user.motherName}',
+      if (user.gotra.isNotEmpty) '${AppLocale.l('jpGotra')}: ${user.gotra}',
+    ].join(', ');
+
+    final dashaPara = '${AppLocale.l('jpShishtaDasha')}: ${trAll(p.dashaLord)}, '
+        '${AppLocale.l('jpShishtaShesha')}: ${p.dashaBalance}.';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(AppLocale.l('jpTitle'), AppLocale.l('jpSubtitle'), t),
+        const SizedBox(height: 8),
+
+        // Birth details paragraph
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: t.detailBorder),
+            borderRadius: BorderRadius.circular(6),
+            color: t.detailBoxBg,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(birthPara, style: TextStyle(fontSize: 11, height: 1.5, color: Colors.black87)),
+              if (familyPara.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(familyPara, style: TextStyle(fontSize: 11, height: 1.5, color: Colors.black87)),
+              ],
+              const SizedBox(height: 4),
+              Text(panchangPara, style: TextStyle(fontSize: 11, height: 1.5, color: Colors.black87)),
+              const SizedBox(height: 2),
+              Text(dashaPara, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, height: 1.5, color: t.primaryDark)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // Graha table
+        _buildSectionTitle(AppLocale.l('jpGrahaStithi'), t),
+        _buildGrahaTable(result, t),
+        const SizedBox(height: 6),
+
+        // Three charts side by side
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWithRashiNumbers(AppLocale.l('jpRashiKundali'), _rashiChart(result), result, 'rashi', t))),
+              const SizedBox(width: 6),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWithRashiNumbers(AppLocale.l('jpNavamshaKundali'), _navamshaChart(result), result, 'navamsha', t))),
+              const SizedBox(width: 6),
+              Expanded(child: AspectRatio(aspectRatio: 1.0, child: _buildChartWithRashiNumbers(AppLocale.l('jpBhavaKundali'), _bhavaChart(result), result, 'bhava', t))),
+            ],
+          ),
+        ),
+
+        if (user.jyotishiName.isNotEmpty || user.jyotishiPhone.isNotEmpty)
+          _buildAstrologerSection(user, t),
+        _buildFooter(user.jyotishiName, user.jyotishiPhone, t),
+      ],
+    );
+  }
+
+  // ── Simple Page 2: Dasha + Sandhi ──
+  static Widget _buildSimplePage2(UserDetails user, KundaliResult result, PdfThemeConfig t) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(AppLocale.l('jpDashaTitle'), '${user.name} — ${user.dateStr}', t),
+        const SizedBox(height: 8),
+
+        _buildSectionTitle(AppLocale.l('jpNakDasha'), t),
+        _buildDetailBox([
+          [AppLocale.l('jpJanmaNak'), trAll(result.panchang.nakshatra), AppLocale.l('jpChandraRashi'), trAll(result.panchang.chandraRashi)],
+          [AppLocale.l('jpNakParama'), result.panchang.paramaGhati, AppLocale.l('jpGataGhati'), result.panchang.gataGhati],
+          [AppLocale.l('jpShishtaDasha'), trAll(result.panchang.dashaLord), AppLocale.l('jpShishtaShesha'), result.panchang.dashaBalance],
+        ], t),
+        const SizedBox(height: 8),
+
+        _buildSectionTitle(AppLocale.l('jpMahaDasha'), t),
+        _buildDashaTable(result, t),
+        const SizedBox(height: 6),
+
+        Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: t.dashaHighlight,
+            border: Border.all(color: t.dashaHighlightBorder),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text('${AppLocale.l('jpShishtaDashe')} ${trAll(result.panchang.dashaLord)} — ${AppLocale.l('jpShesha')} ${result.panchang.dashaBalance}',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: t.dashaHighlightText)
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        _buildSectionTitle(AppLocale.l('jpDashaSandhi'), t),
+        const SizedBox(height: 3),
+        _buildDashaSandhiTable(result, t),
+
+        const Spacer(),
+        _buildFooter(user.jyotishiName, user.jyotishiPhone, t),
+      ],
+    );
+  }
+
+  /// Chart with rashi number in each cell corner (like the reference image)
+  static Widget _buildChartWithRashiNumbers(String title, List<List<String>> chart, KundaliResult result, String chartType, PdfThemeConfig t) {
+    if (chart.isEmpty) chart = List.generate(12, (_) => []);
+
+    // Get the lagna rashi index to compute rashi numbers for each cell
+    final lagnaLon = result.planets['ಲಗ್ನ']?.longitude ?? 0;
+    final lagnaIdx = (lagnaLon / 30).floor() % 12;
+
+    // For south Indian chart, cell positions map to fixed rashis
+    // Cell 0=top-left=Pisces(11), but in standard south Indian:
+    // The rashi number displayed in each cell position
+    // Standard South Indian: top row L-R: 12,1,2,3 | right col: 4,5 | bottom row R-L: 6,7,8,9 | left col: 10,11
+    // But our chart uses 0-indexed rashi positions directly
+    int rashiNumber(int cellIdx) {
+      if (chartType == 'navamsha') {
+        // For navamsha, the rashi number = cellIdx + 1
+        return cellIdx + 1;
+      }
+      // For rashi chart, cell position = rashi position, so number = cellIdx + 1
+      return cellIdx + 1;
+    }
+
+    Widget box(int idx) {
+      final items = chart[idx];
+      final count = items.length;
+      String text;
+      if (count <= 3) {
+        text = items.join('\n');
+      } else {
+        final rows = <String>[];
+        for (int i = 0; i < count; i += 3) {
+          final end = (i + 3 > count) ? count : i + 3;
+          rows.add(items.sublist(i, end).join(' '));
+        }
+        text = rows.join('\n');
+      }
+      double fontSize = count <= 3 ? 11.0 : (count <= 5 ? 9.0 : 7.5);
+      double lineHeight = count <= 3 ? 1.1 : 1.0;
+
+      return Expanded(
+        child: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            border: Border.all(color: t.chartBorder, width: 0.5),
+            color: Colors.white,
+          ),
+          child: Stack(
+            children: [
+              // Rashi number in top-left corner
+              Positioned(
+                top: 1, left: 2,
+                child: Text(
+                  '${rashiNumber(idx)}',
+                  style: TextStyle(fontSize: 7, fontWeight: FontWeight.w600, color: t.primaryDark.withOpacity(0.5)),
+                ),
+              ),
+              // Planet text centered
+              Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    text,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: fontSize, color: const Color(0xFF1A1A1A), height: lineHeight),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    Widget rowBoxes(List<int> idxs) {
+      return Expanded(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: idxs.map((i) => box(i)).toList(),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        // Title above chart
+        Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Text(title, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 10, color: t.primaryDark)),
+        ),
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(border: Border.all(color: t.primaryDark, width: 1.5)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                rowBoxes([11, 0, 1, 2]),
+                Expanded(
+                  flex: 2,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [box(10), box(9)]),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: t.chartBorder, width: 0.5),
+                            color: t.chartCenterBg,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(title.split(' ')[0], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: t.chartCenterText)),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [box(3), box(4)]),
+                      ),
+                    ],
+                  ),
+                ),
+                rowBoxes([8, 7, 6, 5]),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

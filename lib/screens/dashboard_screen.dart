@@ -4892,6 +4892,63 @@ class _DashboardScreenState extends State<DashboardScreen>
 
 
   // ─────────────────────────────────────────────
+  // SIMPLE PDF GENERATION
+  // ─────────────────────────────────────────────
+  Future<void> _generateSimplePdf({required bool print}) async {
+    final selectedTheme = PdfThemes.getById(_selectedThemeId);
+    final dateStr = '${widget.dob.day.toString().padLeft(2,'0')}-${widget.dob.month.toString().padLeft(2,'0')}-${widget.dob.year}';
+    final timeStr = '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}';
+
+    final ud = UserDetails(
+      name: widget.name,
+      dateStr: dateStr,
+      timeStr: timeStr,
+      place: widget.place,
+      lat: widget.lat,
+      lon: widget.lon,
+      tz: widget.tz,
+      fatherName: _fatherNameCtrl.text.trim(),
+      motherName: _motherNameCtrl.text.trim(),
+      gotra: _gotraCtrl.text.trim(),
+      jyotishiName: _jyotishiNameCtrl.text.trim(),
+      jyotishiPhone: _jyotishiPhoneCtrl.text.trim(),
+      jyotishiAddress: _tippaniAddressCtrl.text.trim(),
+      gender: _selectedGender,
+    );
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Center(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            CircularProgressIndicator(color: kTeal),
+            const SizedBox(height: 16),
+            Text('${AppLocale.l('pdfCreating')}', style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none)),
+          ]),
+        ),
+      ),
+    );
+
+    try {
+      await Future.delayed(const Duration(milliseconds: 50));
+      if (print) {
+        await JanmaPatrikeService.generateSimplePdfAndPrint(ud, widget.result, theme: selectedTheme);
+      } else {
+        await JanmaPatrikeService.generateSimplePdfAndShare(ud, widget.result, theme: selectedTheme);
+      }
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+    } catch (e) {
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('❌ ${AppLocale.l('errorLabel')}: $e'), backgroundColor: Colors.red)
+      );
+    }
+  }
+
+  // ─────────────────────────────────────────────
   // TAB 11: JANMA PATRIKE (PDF GENERATION)
   // ─────────────────────────────────────────────
   Widget _buildJanmaPatrikeTab() {
@@ -5016,6 +5073,63 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                     );
                   }).toList(),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // ── Simple PDF Option ──
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: kCard,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: kTeal.withOpacity(0.4)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.description, color: kTeal),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text('ಸರಳ ಪತ್ರಿಕೆ (Simple PDF - 2 Pages)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kText))),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text('ಜನನ ವಿವರ + ಕುಂಡಲಿ + ದಶಾ ವಿವರ ಮಾತ್ರ', style: TextStyle(fontSize: 11, color: kMuted)),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kTeal,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        icon: const Icon(Icons.print, size: 18),
+                        label: Text(AppLocale.l('pdfPrint'), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                        onPressed: () => _generateSimplePdf(print: true),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: kTeal,
+                          side: BorderSide(color: kTeal, width: 1.5),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        icon: const Icon(Icons.share, size: 18),
+                        label: Text(AppLocale.l('pdfShareDirect'), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                        onPressed: () => _generateSimplePdf(print: false),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
