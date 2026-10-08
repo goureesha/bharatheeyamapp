@@ -418,115 +418,247 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
   ];
 
   void _showShakaSearch() {
-    final ctrl = TextEditingController();
-    String? resultText;
+    final shakaCtrl = TextEditingController();
+    String? shakaResult;
+    int? selectedSamvatsaraIdx;
+    List<Map<String, dynamic>>? samvatsaraResults;
 
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(builder: (ctx, setDlgState) {
-        void doSearch() {
-          final shakaYear = int.tryParse(ctrl.text.trim());
+
+        void doShakaSearch() {
+          final shakaYear = int.tryParse(shakaCtrl.text.trim());
           if (shakaYear == null || shakaYear < 1 || shakaYear > 9999) {
-            setDlgState(() => resultText = '❌ ದಯವಿಟ್ಟು ಸರಿಯಾದ ಶಕ ವರ್ಷ ನಮೂದಿಸಿ');
+            setDlgState(() => shakaResult = '❌ ದಯವಿಟ್ಟು ಸರಿಯಾದ ಶಕ ವರ್ಷ ನಮೂದಿಸಿ');
             return;
           }
           final englishYear = shakaYear + 78;
           final samvatsaraIdx = ((shakaYear + 11) % 60);
           final samvatsaraName = _samvatsaraNames[samvatsaraIdx];
           setDlgState(() {
-            resultText = '📅 ಶಕ $shakaYear = ಕ್ರಿ.ಶ. $englishYear\n'
+            shakaResult = '📅 ಶಕ $shakaYear = ಕ್ರಿ.ಶ. $englishYear\n'
                 '🪐 ಸಂವತ್ಸರ: $samvatsaraName\n'
                 '📆 ಉಗಾದಿ: ~ಮಾರ್ಚ್/ಏಪ್ರಿಲ್ $englishYear';
           });
         }
 
-        return AlertDialog(
-          backgroundColor: kCard,
-          title: Row(children: [
-            Icon(Icons.search, color: kPurple1, size: 20),
-            const SizedBox(width: 8),
-            Text('ಶಕ ವರ್ಷ ಹುಡುಕಿ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: kText)),
-          ]),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: ctrl,
-                keyboardType: TextInputType.number,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: kText),
-                decoration: InputDecoration(
-                  hintText: 'ಉದಾ: 1947',
-                  hintStyle: TextStyle(color: kMuted, fontSize: 14),
-                  labelText: 'ಶಕ ವರ್ಷ ಸಂಖ್ಯೆ',
-                  labelStyle: TextStyle(color: kPurple1, fontSize: 13),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: kPurple1, width: 2),
-                  ),
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.search, color: kPurple1),
-                    onPressed: doSearch,
-                  ),
+        void doSamvatsaraSearch(int idx) {
+          // Find all Shaka years in range 1800-2200 CE for this samvatsara
+          final results = <Map<String, dynamic>>[];
+          for (int ceYear = 1800; ceYear <= 2200; ceYear++) {
+            final shaka = ceYear - 78;
+            if (((shaka + 11) % 60) == idx) {
+              results.add({'shaka': shaka, 'ce': ceYear});
+            }
+          }
+          setDlgState(() {
+            selectedSamvatsaraIdx = idx;
+            samvatsaraResults = results;
+          });
+        }
+
+        return DefaultTabController(
+          length: 2,
+          child: AlertDialog(
+            backgroundColor: kCard,
+            contentPadding: EdgeInsets.zero,
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(children: [
+                  Icon(Icons.search, color: kPurple1, size: 20),
+                  const SizedBox(width: 8),
+                  Text('ಹುಡುಕಿ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: kText)),
+                ]),
+                const SizedBox(height: 8),
+                TabBar(
+                  labelColor: kPurple1,
+                  unselectedLabelColor: kMuted,
+                  indicatorColor: kPurple1,
+                  labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+                  tabs: [
+                    Tab(text: 'ಶಕ ವರ್ಷ'),
+                    Tab(text: 'ಸಂವತ್ಸರ'),
+                  ],
                 ),
-                onSubmitted: (_) => doSearch(),
-              ),
-              if (resultText != null) ...[
-                const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: resultText!.startsWith('❌') ? Colors.red.withOpacity(0.08) : kTeal.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: resultText!.startsWith('❌') ? Colors.red.withOpacity(0.3) : kTeal.withOpacity(0.3),
+              ],
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              height: 380,
+              child: TabBarView(
+                children: [
+                  // ── TAB 1: Shaka Year Search ──
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: shakaCtrl,
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: kText),
+                          decoration: InputDecoration(
+                            hintText: 'ಉದಾ: 1947',
+                            hintStyle: TextStyle(color: kMuted, fontSize: 14),
+                            labelText: 'ಶಕ ವರ್ಷ ಸಂಖ್ಯೆ',
+                            labelStyle: TextStyle(color: kPurple1, fontSize: 13),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: kPurple1, width: 2),
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.search, color: kPurple1),
+                              onPressed: doShakaSearch,
+                            ),
+                          ),
+                          onSubmitted: (_) => doShakaSearch(),
+                        ),
+                        if (shakaResult != null) ...[
+                          const SizedBox(height: 14),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: shakaResult!.startsWith('❌') ? Colors.red.withOpacity(0.08) : kTeal.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: shakaResult!.startsWith('❌') ? Colors.red.withOpacity(0.3) : kTeal.withOpacity(0.3)),
+                            ),
+                            child: Text(shakaResult!, style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w700, height: 1.6,
+                              color: shakaResult!.startsWith('❌') ? Colors.red : kText,
+                            )),
+                          ),
+                          if (!shakaResult!.startsWith('❌')) ...[
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                icon: Icon(Icons.calendar_today, size: 16),
+                                label: Text('ಈ ವರ್ಷದ ಪಂಚಾಂಗ ನೋಡಿ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: kPurple1, foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                                onPressed: () {
+                                  final shakaYear = int.tryParse(shakaCtrl.text.trim());
+                                  if (shakaYear == null) return;
+                                  Navigator.pop(ctx);
+                                  setState(() {
+                                    _selectedDate = DateTime(shakaYear + 78, 4, 1);
+                                    _focusedDay = _selectedDate;
+                                  });
+                                  _calcPanchang();
+                                },
+                              ),
+                            ),
+                          ],
+                        ],
+                      ],
                     ),
                   ),
-                  child: Text(
-                    resultText!,
-                    style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w700, height: 1.6,
-                      color: resultText!.startsWith('❌') ? Colors.red : kText,
-                    ),
-                  ),
-                ),
-                if (!resultText!.startsWith('❌')) ...[
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.calendar_today, size: 16),
-                      label: Text('ಈ ವರ್ಷದ ಪಂಚಾಂಗ ನೋಡಿ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kPurple1, foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      onPressed: () {
-                        final shakaYear = int.tryParse(ctrl.text.trim());
-                        if (shakaYear == null) return;
-                        final englishYear = shakaYear + 78;
-                        // Jump to Ugadi of that year (approx April 1)
-                        Navigator.pop(ctx);
-                        setState(() {
-                          _selectedDate = DateTime(englishYear, 4, 1);
-                          _focusedDay = _selectedDate;
-                        });
-                        _calcPanchang();
-                      },
+
+                  // ── TAB 2: Samvatsara Name Search ──
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: kBorder),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int>(
+                              isExpanded: true,
+                              value: selectedSamvatsaraIdx,
+                              hint: Text('ಸಂವತ್ಸರ ಆಯ್ಕೆ ಮಾಡಿ', style: TextStyle(color: kMuted, fontSize: 13)),
+                              dropdownColor: kCard,
+                              menuMaxHeight: 300,
+                              items: List.generate(60, (i) => DropdownMenuItem(
+                                value: i,
+                                child: Text('${i + 1}. ${_samvatsaraNames[i]}', style: TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight.w700, color: kText,
+                                )),
+                              )),
+                              onChanged: (v) { if (v != null) doSamvatsaraSearch(v); },
+                            ),
+                          ),
+                        ),
+                        if (samvatsaraResults != null) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: kTeal.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: kTeal.withOpacity(0.3)),
+                            ),
+                            child: Text(
+                              '🪐 ${_samvatsaraNames[selectedSamvatsaraIdx!]} ಸಂವತ್ಸರ',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: samvatsaraResults!.length,
+                              itemBuilder: (_, i) {
+                                final r = samvatsaraResults![i];
+                                final isNow = r['ce'] == DateTime.now().year || r['ce'] == DateTime.now().year + 1;
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.pop(ctx);
+                                    setState(() {
+                                      _selectedDate = DateTime(r['ce'], 4, 1);
+                                      _focusedDay = _selectedDate;
+                                    });
+                                    _calcPanchang();
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: isNow ? kPurple1.withOpacity(0.1) : null,
+                                      border: Border(bottom: BorderSide(color: kBorder.withOpacity(0.3))),
+                                    ),
+                                    child: Row(children: [
+                                      Text('ಶಕ ${r['shaka']}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kPurple1)),
+                                      const SizedBox(width: 12),
+                                      Text('= ಕ್ರಿ.ಶ. ${r['ce']}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+                                      const Spacer(),
+                                      if (isNow)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(color: kTeal.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                                          child: Text('ಈಗ', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: kTeal)),
+                                        ),
+                                      Icon(Icons.chevron_right, size: 16, color: kMuted),
+                                    ]),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ],
-              ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('ಮುಚ್ಚಿ', style: TextStyle(color: kMuted)),
+              ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text('ಮುಚ್ಚಿ', style: TextStyle(color: kMuted)),
-            ),
-          ],
         );
       }),
     );
