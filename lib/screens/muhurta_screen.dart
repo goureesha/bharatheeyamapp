@@ -111,6 +111,12 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         if (pan.tithiIndex >= 15) continue;
 
         final varaIdx = knVara.indexOf(pan.vara).clamp(0, 6);
+
+        // Hard filters — day MUST pass all selected rules
+        if (!_userTithis.contains(pan.tithiIndex)) continue;
+        if (!_userNakshatras.contains(pan.nakshatraIndex)) continue;
+        if (!_userVaras.contains(varaIdx)) continue;
+
         final moonRashiIdx = (kr.planets['ಚಂದ್ರ']!.longitude / 30).floor() % 12;
         final jupRashiIdx = (kr.planets['ಗುರು']!.longitude / 30).floor() % 12;
         final sunRashiIdx = (kr.planets['ರವಿ']!.longitude / 30).floor() % 12;
