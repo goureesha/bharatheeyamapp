@@ -5,6 +5,7 @@ import 'prediction_texts_hi.dart';
 import 'prediction_texts_ta.dart';
 import 'prediction_texts_te.dart';
 import 'prediction_texts_ml.dart';
+import 'prediction_shlokas.dart';
 import '../widgets/common.dart';
 
 // ═══════════════════════════════════════════
@@ -91,6 +92,7 @@ class BhavaPrediction {
   final List<String> planetsInHouse; // planets sitting in this house
   final List<String> aspectingPlanets; // planets aspecting this house
   final String phala;              // detailed prediction text
+  final String shloka;             // Sanskrit shloka from classical texts
   final String remedy;             // remedy if challenging
   final PhalaQuality quality;      // overall quality
 
@@ -104,6 +106,7 @@ class BhavaPrediction {
     required this.planetsInHouse,
     required this.aspectingPlanets,
     required this.phala,
+    this.shloka = '',
     required this.remedy,
     required this.quality,
   });
@@ -120,6 +123,7 @@ class DashaPeriodPrediction {
   final String relationship;       // kendra, trikona, 6-8, 2-12, etc.
   final String mdPhala;            // mahadasha lord phala
   final String adPhala;            // dasha-bhukti combination phala
+  final String shloka;             // Sanskrit shloka
   final PhalaQuality quality;
 
   const DashaPeriodPrediction({
@@ -132,6 +136,7 @@ class DashaPeriodPrediction {
     required this.relationship,
     required this.mdPhala,
     required this.adPhala,
+    this.shloka = '',
     required this.quality,
   });
 }
@@ -142,6 +147,7 @@ class MahaDashaPrediction {
   final DateTime start;
   final DateTime end;
   final String phala;
+  final String shloka;             // Sanskrit shloka
   final PhalaQuality quality;
   final List<BhuktiPrediction> bhuktis;
 
@@ -150,6 +156,7 @@ class MahaDashaPrediction {
     required this.start,
     required this.end,
     required this.phala,
+    this.shloka = '',
     required this.quality,
     required this.bhuktis,
   });
@@ -496,6 +503,23 @@ class PredictionEngine {
           en: '${info.nameKn} house needs attention — follow remedies'));
       }
 
+      // Pick shloka — from the most significant planet in the house, or lord placement
+      String bhavaShloka = '';
+      if (inHouse.isNotEmpty) {
+        // Use first planet in the house
+        final shlokaList = planetInHouseShloka[inHouse.first];
+        if (shlokaList != null && h - 1 < shlokaList.length) {
+          bhavaShloka = shlokaList[h - 1];
+        }
+      }
+      if (bhavaShloka.isEmpty) {
+        // Fallback: lord-in-house shloka
+        final lordShlokas = lordInHouseShloka[h];
+        if (lordShlokas != null && lordShlokas.containsKey(lordH)) {
+          bhavaShloka = lordShlokas[lordH]!;
+        }
+      }
+
       bhavas.add(BhavaPrediction(
         bhavaNum: h,
         bhavaName: _bhavaInfo[h - 1].nameKn,
@@ -506,6 +530,7 @@ class PredictionEngine {
         planetsInHouse: inHouse,
         aspectingPlanets: aspecters,
         phala: phalaBuffer.toString(),
+        shloka: bhavaShloka,
         remedy: remedy,
         quality: quality,
       ));
@@ -599,6 +624,7 @@ class PredictionEngine {
             relationship: relationship,
             mdPhala: mdPhala,
             adPhala: dbPhala,
+            shloka: mahadashaShloka[mdLord] ?? '',
             quality: adQuality,
           );
         }
@@ -609,6 +635,7 @@ class PredictionEngine {
         start: md.start,
         end: md.end,
         phala: mdPhala,
+        shloka: mahadashaShloka[mdLord] ?? '',
         quality: mdQuality,
         bhuktis: bhuktis,
       ));

@@ -4122,6 +4122,22 @@ class _DashboardScreenState extends State<DashboardScreen>
           const SizedBox(height: 6),
           Text(d.adPhala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
         ],
+        if (d.shloka.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: kPurple2.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: kPurple2.withOpacity(0.15)),
+            ),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(Icons.menu_book, size: 14, color: kPurple2.withOpacity(0.5)),
+              const SizedBox(width: 6),
+              Expanded(child: Text(d.shloka, style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: kMuted, height: 1.5))),
+            ]),
+          ),
+        ],
       ]),
     );
   }
@@ -4187,6 +4203,24 @@ class _DashboardScreenState extends State<DashboardScreen>
             // Phala text
             if (b.phala.isNotEmpty)
               Text(b.phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+            // Shloka
+            if (b.shloka.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: kPurple2.withOpacity(0.04),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: kPurple2.withOpacity(0.15)),
+                ),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Icon(Icons.menu_book, size: 14, color: kPurple2.withOpacity(0.5)),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text(b.shloka, style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: kMuted, height: 1.5))),
+                ]),
+              ),
+            ],
             // Remedy
             if (b.remedy.isNotEmpty) ...[
               const SizedBox(height: 8),
@@ -4250,6 +4284,22 @@ class _DashboardScreenState extends State<DashboardScreen>
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Text(md.phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+              ),
+            if (md.shloka.isNotEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(8),
+                margin: const EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                  color: kPurple2.withOpacity(0.04),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: kPurple2.withOpacity(0.15)),
+                ),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Icon(Icons.menu_book, size: 14, color: kPurple2.withOpacity(0.5)),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text(md.shloka, style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: kMuted, height: 1.5))),
+                ]),
               ),
             // Bhukti list
             ...md.bhuktis.map((bk) {

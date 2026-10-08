@@ -1297,6 +1297,12 @@ class JanmaPatrikeService {
           const SizedBox(height: 2),
           // Phala text
           Text(b.phala, style: TextStyle(fontSize: 10, height: 1.3, color: Colors.black87)),
+          // Shloka
+          if (b.shloka.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 3),
+              child: Text('📖 ${b.shloka}', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: Colors.black45, height: 1.3)),
+            ),
           // Remedy
           if (b.remedy.isNotEmpty && b.quality == PhalaQuality.challenging)
             Padding(
@@ -1337,6 +1343,10 @@ class JanmaPatrikeService {
           ]),
           const SizedBox(height: 2),
           Text(d.adPhala, style: TextStyle(fontSize: 10, height: 1.3, color: t.dashaHighlightText)),
+          if (d.shloka.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text('📖 ${d.shloka}', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: t.dashaHighlightText.withOpacity(0.6), height: 1.3)),
+          ],
         ],
       ),
     );
@@ -1374,6 +1384,11 @@ class JanmaPatrikeService {
           ]),
           const SizedBox(height: 2),
           Text(md.phala, style: TextStyle(fontSize: 10, height: 1.3, color: Colors.black87)),
+          if (md.shloka.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 3),
+              child: Text('📖 ${md.shloka}', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: Colors.black45, height: 1.3)),
+            ),
         ],
       ),
     );
