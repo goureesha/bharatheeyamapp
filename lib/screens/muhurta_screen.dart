@@ -7,6 +7,7 @@ import '../core/calculator.dart';
 import '../core/ephemeris.dart';
 import '../core/muhurta_rules.dart';
 import '../services/location_service.dart';
+import '../services/panchanga_cache.dart';
 
 /// ──────────────────────────────────────────────────────────────
 /// Simplified Muhoorta Screen
@@ -77,20 +78,132 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
   List<DateTime> get _months => List.generate(12, (i) =>
     DateTime(DateTime.now().year, DateTime.now().month + i));
 
-  // ── Search ──
+  // ── Search (using cached panchanga data) ──
   Future<void> _search() async {
     setState(() { _searching = true; _results = []; _displayCount = 20; _expanded.clear(); });
 
     try { await Ephemeris.initSweph(); } catch (_) {}
 
+    final cache = PanchangaCache.instance;
+    final startDate = DateTime(_monthFrom.year, _monthFrom.month, 1);
+    final endDate = DateTime(_monthTo.year, _monthTo.month + 1, 0);
+
+    // Auto-generate cache if not loaded
+    if (!cache.isLoaded) {
+      try {
+        await cache.generate(
+          startDate: startDate,
+          endDate: endDate,
+          lat: _lat,
+          lon: _lon,
+          tzOffset: _tz,
+          zoneName: _place,
+        );
+      } catch (_) {
+        // Fallback to non-cached
+        return _searchNonCached();
+      }
+    }
+
+    final found = <Map<String, dynamic>>[];
+    final days = cache.getDaysInRange(startDate, endDate);
+
+    for (final day in days) {
+      // Shukla Paksha only
+      if (day.tithiIndex >= 15) continue;
+
+      // Hard filters
+      if (!_userTithis.contains(day.tithiIndex)) continue;
+      if (!_userNakshatras.contains(day.nakshatraIndex)) continue;
+      if (!_userVaras.contains(day.varaIndex)) continue;
+
+      // Abhijit time from sunrise/sunset
+      String abhStr = '';
+      try {
+        final srSs = Ephemeris.findSunriseSetForDate(
+          day.date.year, day.date.month, day.date.day, _lat, _lon, tzOffset: _tz);
+        final srFrac = ((srSs[0] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
+        final ssFrac = ((srSs[1] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
+        final srMins = srFrac * 24.0 * 60.0;
+        final ssMins = ssFrac * 24.0 * 60.0;
+        final dayDur = ((ssMins - srMins) + 1440) % 1440;
+        final muhDur = dayDur / 15.0;
+        final abhStart = srMins + 7 * muhDur;
+        final abhEnd = abhStart + muhDur;
+        abhStr = '${_fmtMins(abhStart)} - ${_fmtMins(abhEnd)}';
+      } catch (_) {}
+
+      final mResult = evaluateMuhurta(
+        event: _event,
+        tithiIndex: day.tithiIndex,
+        tithiName: day.tithiName,
+        nakshatraIndex: day.nakshatraIndex,
+        nakshatraName: day.nakshatraName,
+        varaIndex: day.varaIndex,
+        varaName: day.varaName,
+        yogaIndex: day.yogaIndex,
+        yogaName: day.yogaName,
+        karanaName: day.karanaName,
+        moonRashiIndex: day.moonRashiIndex,
+        jupiterRashiIndex: day.jupiterRashiIndex,
+        sunRashiIndex: day.sunRashiIndex,
+        janmaNakIdx1: _nakIdx,
+        janmaRashiIdx1: _rashiIdx,
+        abhijitTimeWindow: abhStr,
+        overrideRules: MuhurtaEventRules(
+          allowedTithis: _userTithis.toList(),
+          allowedNakshatras: _userNakshatras.toList(),
+          allowedVaras: _userVaras.toList(),
+        ),
+      );
+
+      // Compute lagna windows
+      List<Map<String, dynamic>> lagnaWindows = [];
+      try {
+        final srSs = Ephemeris.findSunriseSetForDate(
+          day.date.year, day.date.month, day.date.day, _lat, _lon, tzOffset: _tz);
+        final allLagnaWindows = _scanLagnas(srSs[0], srSs[1]);
+        lagnaWindows = allLagnaWindows.where((w) {
+          if (_filterLagnaShuddhi && w['lagnaShuddhi'] != true) return false;
+          if (_filterSaptamaShuddhi && w['saptamaShuddhi'] != true) return false;
+          if (_filterAshtamaShuddhi && w['ashtamaShuddhi'] != true) return false;
+          if (_filterGuruAnukoola && w['guruAnukoola'] != true) return false;
+          return true;
+        }).toList();
+      } catch (_) {}
+
+      found.add({
+        'date': day.date,
+        'vara': day.varaName,
+        'tithi': day.tithiName,
+        'nakshatra': day.nakshatraName,
+        'yoga': day.yogaName,
+        'karana': day.karanaName,
+        'checks': mResult.checks,
+        'doshas': mResult.doshas,
+        'doshaBhangas': mResult.doshaBhangas,
+        'hasAbhijit': mResult.hasAbhijit,
+        'abhijitTime': abhStr,
+        'sunrise': day.sunrise,
+        'sunset': day.sunset,
+        'tara': mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null,
+        'lagnaWindows': lagnaWindows,
+      });
+    }
+
+    found.sort((a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime));
+    if (mounted) setState(() { _results = found; _searching = false; });
+  }
+
+  /// Fallback non-cached search
+  Future<void> _searchNonCached() async {
     final startDate = DateTime.utc(_monthFrom.year, _monthFrom.month, 1);
     final endDate = DateTime.utc(_monthTo.year, _monthTo.month + 1, 0);
     final found = <Map<String, dynamic>>[];
 
     for (var d = startDate; !d.isAfter(endDate); d = d.add(const Duration(days: 1))) {
       try {
-        final srSs = Ephemeris.findSunriseSetForDate(
-          d.year, d.month, d.day, _lat, _lon, tzOffset: _tz);
+        final srSs = Ephemeris.findSunriseSetForDate(d.year, d.month, d.day, _lat, _lon, tzOffset: _tz);
         final srFrac = ((srSs[0] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
         final srHour = srFrac * 24.0 + (1.0 / 60.0);
         final ssFrac = ((srSs[1] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
@@ -104,22 +217,12 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         if (kr == null) continue;
 
         final pan = kr.panchang;
-
-        // Shukla Paksha only (indices 0-14)
         if (pan.tithiIndex >= 15) continue;
-
         final varaIdx = knVara.indexOf(pan.vara).clamp(0, 6);
-
-        // Hard filters — day MUST pass all selected rules
         if (!_userTithis.contains(pan.tithiIndex)) continue;
         if (!_userNakshatras.contains(pan.nakshatraIndex)) continue;
         if (!_userVaras.contains(varaIdx)) continue;
 
-        final moonRashiIdx = (kr.planets['ಚಂದ್ರ']!.longitude / 30).floor() % 12;
-        final jupRashiIdx = (kr.planets['ಗುರು']!.longitude / 30).floor() % 12;
-        final sunRashiIdx = (kr.planets['ರವಿ']!.longitude / 30).floor() % 12;
-
-        // Abhijit time
         final srMins = srFrac * 24.0 * 60.0;
         final ssMins = ssFrac * 24.0 * 60.0;
         final dayDur = ((ssMins - srMins) + 1440) % 1440;
@@ -128,25 +231,20 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         final abhEnd = abhStart + muhDur;
         final abhStr = '${_fmtMins(abhStart)} - ${_fmtMins(abhEnd)}';
 
-        // Use the existing engine!
+        final moonRashiIdx = (kr.planets['ಚಂದ್ರ']!.longitude / 30).floor() % 12;
+        final jupRashiIdx = (kr.planets['ಗುರು']!.longitude / 30).floor() % 12;
+        final sunRashiIdx = (kr.planets['ರವಿ']!.longitude / 30).floor() % 12;
+
         final mResult = evaluateMuhurta(
           event: _event,
-          tithiIndex: pan.tithiIndex,
-          tithiName: pan.tithi,
-          nakshatraIndex: pan.nakshatraIndex,
-          nakshatraName: pan.nakshatra,
-          varaIndex: varaIdx,
-          varaName: pan.vara,
+          tithiIndex: pan.tithiIndex, tithiName: pan.tithi,
+          nakshatraIndex: pan.nakshatraIndex, nakshatraName: pan.nakshatra,
+          varaIndex: varaIdx, varaName: pan.vara,
           yogaIndex: (kr.planets['ಚಂದ್ರ'] != null && kr.planets['ರವಿ'] != null)
-            ? (((kr.planets['ಚಂದ್ರ']!.longitude + kr.planets['ರವಿ']!.longitude) % 360) / 13.333333).floor() % 27
-            : 0,
-          yogaName: pan.yoga,
-          karanaName: pan.karana,
-          moonRashiIndex: moonRashiIdx,
-          jupiterRashiIndex: jupRashiIdx,
-          sunRashiIndex: sunRashiIdx,
-          janmaNakIdx1: _nakIdx,
-          janmaRashiIdx1: _rashiIdx,
+            ? (((kr.planets['ಚಂದ್ರ']!.longitude + kr.planets['ರವಿ']!.longitude) % 360) / 13.333333).floor() % 27 : 0,
+          yogaName: pan.yoga, karanaName: pan.karana,
+          moonRashiIndex: moonRashiIdx, jupiterRashiIndex: jupRashiIdx, sunRashiIndex: sunRashiIdx,
+          janmaNakIdx1: _nakIdx, janmaRashiIdx1: _rashiIdx,
           abhijitTimeWindow: abhStr,
           overrideRules: MuhurtaEventRules(
             allowedTithis: _userTithis.toList(),
@@ -155,40 +253,29 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
           ),
         );
 
-          // Compute lagna windows for this day
-          final allLagnaWindows = _scanLagnas(srSs[0], srSs[1]);
-          // Filter by user shuddhi settings
-          final lagnaWindows = allLagnaWindows.where((w) {
-            if (_filterLagnaShuddhi && w['lagnaShuddhi'] != true) return false;
-            if (_filterSaptamaShuddhi && w['saptamaShuddhi'] != true) return false;
-            if (_filterAshtamaShuddhi && w['ashtamaShuddhi'] != true) return false;
-            if (_filterGuruAnukoola && w['guruAnukoola'] != true) return false;
-            return true;
-          }).toList();
+        final allLagnaWindows = _scanLagnas(srSs[0], srSs[1]);
+        final lagnaWindows = allLagnaWindows.where((w) {
+          if (_filterLagnaShuddhi && w['lagnaShuddhi'] != true) return false;
+          if (_filterSaptamaShuddhi && w['saptamaShuddhi'] != true) return false;
+          if (_filterAshtamaShuddhi && w['ashtamaShuddhi'] != true) return false;
+          if (_filterGuruAnukoola && w['guruAnukoola'] != true) return false;
+          return true;
+        }).toList();
 
-          found.add({
-            'date': d,
-            'vara': pan.vara,
-            'tithi': pan.tithi,
-            'nakshatra': pan.nakshatra,
-            'yoga': pan.yoga,
-            'karana': pan.karana,
-            'checks': mResult.checks,
-            'doshas': mResult.doshas,
-            'doshaBhangas': mResult.doshaBhangas,
-            'hasAbhijit': mResult.hasAbhijit,
-            'abhijitTime': abhStr,
-            'sunrise': pan.sunrise,
-            'sunset': pan.sunset,
-            'tara': mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null,
-            'lagnaWindows': lagnaWindows,
-          });
+        found.add({
+          'date': d, 'vara': pan.vara, 'tithi': pan.tithi,
+          'nakshatra': pan.nakshatra, 'yoga': pan.yoga, 'karana': pan.karana,
+          'checks': mResult.checks, 'doshas': mResult.doshas,
+          'doshaBhangas': mResult.doshaBhangas,
+          'hasAbhijit': mResult.hasAbhijit, 'abhijitTime': abhStr,
+          'sunrise': pan.sunrise, 'sunset': pan.sunset,
+          'tara': mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null,
+          'lagnaWindows': lagnaWindows,
+        });
       } catch (_) {}
     }
 
-    // Sort by date
     found.sort((a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime));
-
     if (mounted) setState(() { _results = found; _searching = false; });
   }
 
