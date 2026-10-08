@@ -137,7 +137,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   final _jyotishiPhoneCtrl = TextEditingController();
   String _selectedThemeId = 'traditional';
   String _selectedGender = 'male';
-  List<bool> _pdfPageSelection = [true, true, true, true, true, true]; // 6 pages
+  List<bool> _pdfPageSelection = [true, true, true, true, true, true, true]; // 7 pages
 
   // Tippani PDF fields
   final _tippaniInvocationCtrl = TextEditingController(text: 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ');
@@ -5041,7 +5041,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ],
                 ),
                 const SizedBox(height: 8),
-                ...List.generate(6, (i) {
+                ...List.generate(7, (i) {
                   final pageNames = [
                     'ಜನನ ಪತ್ರಿಕಾ (Birth Details)',
                     'ವಿಂಶೋತ್ತರೀ ದಶಾ (Dasha)',
@@ -5049,6 +5049,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     'ವರ್ಗ ಕುಂಡಲಿ (Varga Charts)',
                     'ಅಷ್ಟಕವರ್ಗ (Ashtakavarga)',
                     'ಷಡ್ಬಲ (Shadbala)',
+                    'ಫಲ (Predictions)',
                   ];
                   return CheckboxListTile(
                     value: _pdfPageSelection[i],

@@ -6,6 +6,7 @@ import 'package:printing/printing.dart';
 import 'package:screenshot/screenshot.dart';
 import '../core/calculator.dart';
 import '../core/ashtakavarga.dart';
+import '../core/prediction_engine.dart';
 import '../constants/strings.dart';
 import 'pdf_theme.dart';
 import '../widgets/common.dart';
@@ -215,7 +216,7 @@ class JanmaPatrikeService {
 
   static Future<Uint8List> _generatePdfBytes(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages}) async {
     theme ??= PdfThemes.traditional;
-    final pages = selectedPages ?? [true, true, true, true, true, true];
+    final pages = selectedPages ?? [true, true, true, true, true, true, true];
     final controller = ScreenshotController();
 
     // A4 Dimensions at 96 DPI
@@ -223,105 +224,53 @@ class JanmaPatrikeService {
     const double pageHeight = 1122.0;
     final targetSize = const Size(pageWidth, pageHeight);
 
-    Uint8List? page1Bytes;
-    if (pages[0]) {
-      final page1Widget = _buildPageWrapper(
-        width: pageWidth,
-        height: pageHeight,
-        theme: theme,
-        child: _buildPage1Content(user, result, theme),
-      );
-      page1Bytes = await controller.captureFromWidget(
-        page1Widget,
-        targetSize: targetSize,
-        pixelRatio: 2.5,
-        delay: const Duration(milliseconds: 10),
-      );
+    final List<Uint8List?> allPageBytes = [];
+
+    // Pages 1-6: existing pages
+    final pageBuilders = [
+      () => _buildPage1Content(user, result, theme!),
+      () => _buildPage2Content(user, result, theme!),
+      () => _buildPage3Content(user, result, theme!),
+      () => _buildPage4Content(user, result, theme!),
+      () => _buildPage5Content(user, result, theme!),
+      () => _buildPage6Content(user, result, theme!),
+    ];
+
+    for (int i = 0; i < 6; i++) {
+      if (i < pages.length && pages[i]) {
+        final widget = _buildPageWrapper(
+          width: pageWidth, height: pageHeight, theme: theme,
+          child: pageBuilders[i](),
+        );
+        allPageBytes.add(await controller.captureFromWidget(
+          widget, targetSize: targetSize, pixelRatio: 2.5,
+          delay: const Duration(milliseconds: 10),
+        ));
+      } else {
+        allPageBytes.add(null);
+      }
     }
 
-    Uint8List? page2Bytes;
-    if (pages[1]) {
-      final page2Widget = _buildPageWrapper(
-        width: pageWidth,
-        height: pageHeight,
-        theme: theme,
-        child: _buildPage2Content(user, result, theme),
-      );
-      page2Bytes = await controller.captureFromWidget(
-        page2Widget,
-        targetSize: targetSize,
-        pixelRatio: 2.5,
-        delay: const Duration(milliseconds: 10),
-      );
-    }
-
-    Uint8List? page3Bytes;
-    if (pages[2]) {
-      final page3Widget = _buildPageWrapper(
-        width: pageWidth,
-        height: pageHeight,
-        theme: theme,
-        child: _buildPage3Content(user, result, theme),
-      );
-      page3Bytes = await controller.captureFromWidget(
-        page3Widget,
-        targetSize: targetSize,
-        pixelRatio: 2.5,
-        delay: const Duration(milliseconds: 10),
-      );
-    }
-
-    Uint8List? page4Bytes;
-    if (pages[3]) {
-      final page4Widget = _buildPageWrapper(
-        width: pageWidth,
-        height: pageHeight,
-        theme: theme,
-        child: _buildPage4Content(user, result, theme),
-      );
-      page4Bytes = await controller.captureFromWidget(
-        page4Widget,
-        targetSize: targetSize,
-        pixelRatio: 2.5,
-        delay: const Duration(milliseconds: 10),
-      );
-    }
-
-    Uint8List? page5Bytes;
-    if (pages[4]) {
-      final page5Widget = _buildPageWrapper(
-        width: pageWidth,
-        height: pageHeight,
-        theme: theme,
-        child: _buildPage5Content(user, result, theme),
-      );
-      page5Bytes = await controller.captureFromWidget(
-        page5Widget,
-        targetSize: targetSize,
-        pixelRatio: 2.5,
-        delay: const Duration(milliseconds: 10),
-      );
-    }
-
-    Uint8List? page6Bytes;
-    if (pages[5]) {
-      final page6Widget = _buildPageWrapper(
-        width: pageWidth,
-        height: pageHeight,
-        theme: theme,
-        child: _buildPage6Content(user, result, theme),
-      );
-      page6Bytes = await controller.captureFromWidget(
-        page6Widget,
-        targetSize: targetSize,
-        pixelRatio: 2.5,
-        delay: const Duration(milliseconds: 10),
-      );
+    // Page 7: Phala (Predictions)
+    if (pages.length > 6 && pages[6]) {
+      final prediction = PredictionEngine.analyze(result);
+      // Phala can span multiple pages — build all phala pages
+      final phalaPages = _buildPhalaPages(user, result, prediction, theme);
+      for (final phalaPage in phalaPages) {
+        final widget = _buildPageWrapper(
+          width: pageWidth, height: pageHeight, theme: theme,
+          child: phalaPage,
+        );
+        allPageBytes.add(await controller.captureFromWidget(
+          widget, targetSize: targetSize, pixelRatio: 2.5,
+          delay: const Duration(milliseconds: 10),
+        ));
+      }
     }
 
     final doc = pw.Document();
 
-    for (final bytes in [page1Bytes, page2Bytes, page3Bytes, page4Bytes, page5Bytes, page6Bytes]) {
+    for (final bytes in allPageBytes) {
       if (bytes != null) {
         doc.addPage(
           pw.Page(
@@ -1221,6 +1170,212 @@ class JanmaPatrikeService {
         const Spacer(),
         _buildFooter(user.jyotishiName, user.jyotishiPhone, t),
       ],
+    );
+  }
+
+  // ════════════════════════════════════════════════════════
+  // PAGE 7: PHALA (PREDICTIONS) — multi-page
+  // ════════════════════════════════════════════════════════
+
+  static List<Widget> _buildPhalaPages(UserDetails user, KundaliResult result, PredictionResult prediction, PdfThemeConfig t) {
+    final pages = <Widget>[];
+
+    // ── Phala Page 1: Bhava Phala (houses 1-6) ──
+    pages.add(_buildPhalaPage(
+      user: user,
+      title: AppLocale.l('jpPhalaTitle'),
+      subtitle: '${user.name} — ${AppLocale.l('jpBhavaPhalaSubtitle')}',
+      theme: t,
+      children: [
+        _buildSectionTitle(AppLocale.l('jpBhavaPhalaHeading'), t),
+        const SizedBox(height: 4),
+        ...prediction.bhavas.sublist(0, 6).map((b) => _buildPhalaBhavaCard(b, t)),
+      ],
+    ));
+
+    // ── Phala Page 2: Bhava Phala (houses 7-12) ──
+    pages.add(_buildPhalaPage(
+      user: user,
+      title: AppLocale.l('jpPhalaTitle'),
+      subtitle: '${user.name} — ${AppLocale.l('jpBhavaPhalaSubtitle')}',
+      theme: t,
+      children: [
+        _buildSectionTitle(AppLocale.l('jpBhavaPhalaHeading'), t),
+        const SizedBox(height: 4),
+        ...prediction.bhavas.sublist(6, 12).map((b) => _buildPhalaBhavaCard(b, t)),
+      ],
+    ));
+
+    // ── Phala Page 3: Dasha Phala ──
+    pages.add(_buildPhalaPage(
+      user: user,
+      title: AppLocale.l('jpPhalaTitle'),
+      subtitle: '${user.name} — ${AppLocale.l('jpDashaPhalaSubtitle')}',
+      theme: t,
+      children: [
+        // Current Dasha-Bhukti
+        if (prediction.currentDasha != null) ...[
+          _buildSectionTitle(AppLocale.l('jpCurrentDashaBhukti'), t),
+          const SizedBox(height: 4),
+          _buildPhalaCurrentDasha(prediction.currentDasha!, t),
+          const SizedBox(height: 8),
+        ],
+
+        // All Mahadasha periods
+        _buildSectionTitle(AppLocale.l('jpAllMahadashaPhala'), t),
+        const SizedBox(height: 4),
+        ...prediction.allDashas.map((md) => _buildPhalaDashaCard(md, prediction.currentDasha, t)),
+      ],
+    ));
+
+    return pages;
+  }
+
+  static Widget _buildPhalaPage({
+    required UserDetails user,
+    required String title,
+    required String subtitle,
+    required PdfThemeConfig theme,
+    required List<Widget> children,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(title, subtitle, theme),
+        const SizedBox(height: 6),
+        ...children,
+        const Spacer(),
+        _buildFooter(user.jyotishiName, user.jyotishiPhone, theme),
+      ],
+    );
+  }
+
+  /// Single bhava prediction card for PDF
+  static Widget _buildPhalaBhavaCard(BhavaPrediction b, PdfThemeConfig t) {
+    final qualityIcon = b.quality == PhalaQuality.good ? '✅'
+        : b.quality == PhalaQuality.challenging ? '⚠️' : '🔶';
+    final lordStr = '${AppLocale.l('jpPhalaLord')}: ${trAll(b.lordName)}';
+    final planetsStr = b.planetsInHouse.isNotEmpty
+        ? '${AppLocale.l('jpPhalaGraha')}: ${b.planetsInHouse.map((p) => trAll(p)).join(', ')}'
+        : '';
+    final aspectStr = b.aspectingPlanets.isNotEmpty
+        ? '${AppLocale.l('jpPhalaDrishti')}: ${b.aspectingPlanets.map((p) => trAll(p)).join(', ')}'
+        : '';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        border: Border.all(color: t.detailBorder),
+        borderRadius: BorderRadius.circular(6),
+        color: t.detailBoxBg,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // House header
+          Row(
+            children: [
+              Text('$qualityIcon ${b.bhavaNum}. ${b.bhavaName}',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: t.primaryDark)),
+              const Spacer(),
+              Text(lordStr, style: TextStyle(fontSize: 9, color: Colors.black54)),
+            ],
+          ),
+          // Significations
+          Text(b.significations, style: TextStyle(fontSize: 8, color: Colors.black45, fontStyle: FontStyle.italic)),
+          const SizedBox(height: 2),
+          // Planets & Aspects
+          if (planetsStr.isNotEmpty || aspectStr.isNotEmpty)
+            Wrap(
+              spacing: 12,
+              children: [
+                if (planetsStr.isNotEmpty) Text(planetsStr, style: TextStyle(fontSize: 9, color: Colors.black87)),
+                if (aspectStr.isNotEmpty) Text(aspectStr, style: TextStyle(fontSize: 9, color: Colors.black87)),
+              ],
+            ),
+          const SizedBox(height: 2),
+          // Phala text
+          Text(b.phala, style: TextStyle(fontSize: 10, height: 1.3, color: Colors.black87)),
+          // Remedy
+          if (b.remedy.isNotEmpty && b.quality == PhalaQuality.challenging)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text('💡 ${b.remedy}', style: TextStyle(fontSize: 9, color: t.primaryDark, fontStyle: FontStyle.italic)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Current dasha-bhukti card for PDF
+  static Widget _buildPhalaCurrentDasha(DashaPeriodPrediction d, PdfThemeConfig t) {
+    String fmtDate(DateTime dt) => '${dt.day.toString().padLeft(2, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.year}';
+
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: t.dashaHighlight,
+        border: Border.all(color: t.dashaHighlightBorder),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Text('${trAll(d.mdLord)} ${AppLocale.l('jpPhalaMainDasha')}', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: t.dashaHighlightText)),
+            const Spacer(),
+            Text('${fmtDate(d.mdStart)} — ${fmtDate(d.mdEnd)}', style: TextStyle(fontSize: 9, color: t.dashaHighlightText.withOpacity(0.7))),
+          ]),
+          const SizedBox(height: 2),
+          Text(d.mdPhala, style: TextStyle(fontSize: 10, height: 1.3, color: t.dashaHighlightText)),
+          const SizedBox(height: 6),
+          Row(children: [
+            Text('${trAll(d.adLord)} ${AppLocale.l('jpPhalaSubDasha')}', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11, color: t.dashaHighlightText)),
+            const Spacer(),
+            Text('${fmtDate(d.adStart)} — ${fmtDate(d.adEnd)}', style: TextStyle(fontSize: 9, color: t.dashaHighlightText.withOpacity(0.7))),
+          ]),
+          const SizedBox(height: 2),
+          Text(d.adPhala, style: TextStyle(fontSize: 10, height: 1.3, color: t.dashaHighlightText)),
+        ],
+      ),
+    );
+  }
+
+  /// Mahadasha card for PDF
+  static Widget _buildPhalaDashaCard(MahaDashaPrediction md, DashaPeriodPrediction? current, PdfThemeConfig t) {
+    String fmtDate(DateTime dt) => '${dt.day.toString().padLeft(2, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.year}';
+    final isCurrent = current != null && current.mdLord == md.lord;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        border: Border.all(color: isCurrent ? t.dashaHighlightBorder : t.detailBorder),
+        borderRadius: BorderRadius.circular(6),
+        color: isCurrent ? t.dashaHighlight.withOpacity(0.3) : t.detailBoxBg,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Text('${trAll(md.lord)} ${AppLocale.l('jpPhalaMainDasha')}',
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: t.primaryDark)),
+            if (isCurrent) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(color: t.dashaHighlightBorder, borderRadius: BorderRadius.circular(4)),
+                child: Text(AppLocale.l('jpPhalaCurrentTag'), style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: Colors.white)),
+              ),
+            ],
+            const Spacer(),
+            Text('${fmtDate(md.start)} — ${fmtDate(md.end)}', style: TextStyle(fontSize: 9, color: Colors.black54)),
+          ]),
+          const SizedBox(height: 2),
+          Text(md.phala, style: TextStyle(fontSize: 10, height: 1.3, color: Colors.black87)),
+        ],
+      ),
     );
   }
 }
