@@ -1281,37 +1281,42 @@ class JanmaPatrikeService {
     final p = result.panchang;
     final lagnaInfo = result.planets['ಲಗ್ನ'];
     final lagnaRashi = lagnaInfo != null ? trAll(lagnaInfo.rashi) : '-';
+    final moonPada = result.planets['ಚಂದ್ರ']?.pada ?? 1;
 
-    // Build birth details as paragraph
-    final birthPara = '${AppLocale.l('jpNativeName')}: ${user.name}, '
-        '${AppLocale.l('jpDob')}: ${user.dateStr}, '
-        '${AppLocale.l('jpTime')}: ${user.timeStr}, '
-        '${AppLocale.l('jpBirthPlace')}: ${user.place}. '
-        '${AppLocale.l('jpLatLon')}: ${user.lat.toStringAsFixed(4)}°, ${user.lon.toStringAsFixed(4)}°. ';
+    // Determine Shaka year from samvatsara string (contains "ಶಕ XXXX")
+    final shakaMatch = RegExp(r'(\d+)').firstMatch(p.samvatsara);
+    final shakaYear = shakaMatch != null ? shakaMatch.group(1) : '';
+    // Extract samvatsara name (before the parenthesis)
+    final samvatsaraName = p.samvatsara.contains('(') ? p.samvatsara.split('(')[0].trim() : trAll(p.samvatsara);
 
-    final panchangPara = '${AppLocale.l('jpSamvatsara')}: ${trAll(p.samvatsara)}, '
-        '${AppLocale.l('jpChandraMasa')}: ${trAll(p.chandraMasa)}, '
-        '${AppLocale.l('jpSouraMasa')}: ${trAll(p.souraMasa)}, '
-        '${AppLocale.l('jpVara')}: ${trAll(p.vara)}, '
-        '${AppLocale.l('jpTithi')}: ${trAll(p.tithi)}, '
-        '${AppLocale.l('jpNakshatra')}: ${trAll(p.nakshatra)}, '
-        '${AppLocale.l('jpYoga')}: ${trAll(p.yoga)}, '
-        '${AppLocale.l('jpKarana')}: ${trAll(p.karana)}, '
-        '${AppLocale.l('jpChandraRashi')}: ${trAll(p.chandraRashi)}, '
-        '${AppLocale.l('jpLagnaRashi')}: $lagnaRashi. '
-        '${AppLocale.l('jpUdayadiGhati')}: ${p.udayadiGhati}, '
-        '${AppLocale.l('jpGataGhati')}: ${p.gataGhati}, '
-        '${AppLocale.l('jpParamaGhati')}: ${p.paramaGhati}, '
-        '${AppLocale.l('jpSunrise')}: ${p.sunrise}, ${AppLocale.l('jpSunset')}: ${p.sunset}.';
+    // Determine paksha from tithiIndex
+    final paksha = p.tithiIndex < 15 ? 'ಶುಕ್ಲ' : 'ಕೃಷ್ಣ';
 
-    final familyPara = [
-      if (user.fatherName.isNotEmpty) '${AppLocale.l('jpFather')}: ${user.fatherName}',
-      if (user.motherName.isNotEmpty) '${AppLocale.l('jpMother')}: ${user.motherName}',
-      if (user.gotra.isNotEmpty) '${AppLocale.l('jpGotra')}: ${user.gotra}',
-    ].join(', ');
+    // Gender suffix
+    final genderSuffix = user.gender == 'female' ? 'ಅವರ' : 'ಅವರ';
 
-    final dashaPara = '${AppLocale.l('jpShishtaDasha')}: ${trAll(p.dashaLord)}, '
-        '${AppLocale.l('jpShishtaShesha')}: ${p.dashaBalance}.';
+    // Build traditional flowing paragraph like in reference image
+    final para = 'ಶ್ವಸ್ತ ಶ್ರೀ${user.name}${genderSuffix} '
+        '${user.fatherName.isNotEmpty ? "${user.fatherName}ರವರ ${user.gender == "female" ? "ಪುತ್ರಿ" : "ಪುತ್ರ"} " : ""}'
+        '${user.gotra.isNotEmpty ? "${user.gotra} ಗೋತ್ರ " : ""}'
+        'ವೃಷಕಲಾವಾಸನ ರಾಕಶಕವರ್ಷ $shakaYear ಕ್ರಿ.ಶ. '
+        '$samvatsaraName ಸಂವತ್ಸರದ '
+        '${trAll(p.chandraMasa)} ಮಾಸ $paksha ಪಕ್ಷ ${trAll(p.tithi)} ತಿಥಿ '
+        '${trAll(p.vara)}ವಾರದಲ್ಲಿ '
+        '${user.timeStr} ಸಮಯದಲ್ಲಿ ${user.place}ದಲ್ಲಿ ಜನಿಸಿರುತ್ತಾರೆ. '
+        '${trAll(p.nakshatra)} ನಕ್ಷತ್ರ ${moonPada}ನೇ ಪಾದ '
+        '${trAll(p.chandraRashi)} ಚಂದ್ರರಾಶಿ '
+        '$lagnaRashi ಲಗ್ನ '
+        '${trAll(p.yoga)} ಯೋಗ ${trAll(p.karana)} ಕರಣ. '
+        'ಸೂರ್ಯೋದಯ ${p.sunrise} ಸೂರ್ಯಾಸ್ತ ${p.sunset}. '
+        'ಉದಯಾದಿ ಘಟಿ ${p.udayadiGhati} ಗತ ಘಟಿ ${p.gataGhati} '
+        'ಪರಮ ಘಟಿ ${p.paramaGhati}. '
+        '${user.motherName.isNotEmpty ? "ಮಾತೃ ನಾಮ: ${user.motherName}. " : ""}'
+        'ಅಕ್ಷಾಂಶ: ${user.lat.toStringAsFixed(4)}° ರೇಖಾಂಶ: ${user.lon.toStringAsFixed(4)}°.';
+
+    // Dasha balance line
+    final dashaLine = 'ಜ್ಯೋತಿಷ್ಯ ಮೂಲ ದಶಾ ವರ್ಷ: ${trAll(p.dashaLord)}, '
+        'ಶೇಷ: ${p.dashaBalance}.';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1319,7 +1324,7 @@ class JanmaPatrikeService {
         _buildHeader(AppLocale.l('jpTitle'), AppLocale.l('jpSubtitle'), t),
         const SizedBox(height: 8),
 
-        // Birth details paragraph
+        // Birth details as flowing paragraph
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -1330,15 +1335,9 @@ class JanmaPatrikeService {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(birthPara, style: TextStyle(fontSize: 11, height: 1.5, color: Colors.black87)),
-              if (familyPara.isNotEmpty) ...[
-                const SizedBox(height: 2),
-                Text(familyPara, style: TextStyle(fontSize: 11, height: 1.5, color: Colors.black87)),
-              ],
+              Text(para, style: TextStyle(fontSize: 11, height: 1.6, color: Colors.black87)),
               const SizedBox(height: 4),
-              Text(panchangPara, style: TextStyle(fontSize: 11, height: 1.5, color: Colors.black87)),
-              const SizedBox(height: 2),
-              Text(dashaPara, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, height: 1.5, color: t.primaryDark)),
+              Text(dashaLine, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, height: 1.5, color: t.primaryDark)),
             ],
           ),
         ),
