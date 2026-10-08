@@ -53,7 +53,9 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
 
   void _loadEventDefaults() {
     final rules = muhurtaRules[_event];
-    _userTithis = Set<int>.from(rules?.allowedTithis ?? List.generate(30, (i) => i));
+    // Only Shukla Paksha tithis (0-14)
+    final allTithis = rules?.allowedTithis ?? List.generate(15, (i) => i);
+    _userTithis = Set<int>.from(allTithis.where((t) => t < 15));
     _userNakshatras = Set<int>.from(rules?.allowedNakshatras ?? List.generate(27, (i) => i));
     _userVaras = Set<int>.from(rules?.allowedVaras ?? List.generate(7, (i) => i));
   }
@@ -323,19 +325,19 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                     Expanded(
                       child: TabBarView(
                         children: [
-                          // ── TAB 1: TITHI ──
+                          // ── TAB 1: TITHI (Shukla Paksha only) ──
                           ListView(
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8),
                                 child: Row(children: [
-                                  Text('${_userTithis.length}/30', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
+                                  Text('${_userTithis.where((t) => t < 15).length}/15 ಶುಕ್ಲ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
                                   const Spacer(),
-                                  TextButton(onPressed: () => setDlgState(() => _userTithis = Set.from(List.generate(30, (i) => i))), child: Text('ಎಲ್ಲಾ', style: TextStyle(fontSize: 11))),
-                                  TextButton(onPressed: () => setDlgState(() => _userTithis.clear()), child: Text('ಯಾವುದೂ ಇಲ್ಲ', style: TextStyle(fontSize: 11))),
+                                  TextButton(onPressed: () => setDlgState(() => _userTithis.addAll(List.generate(15, (i) => i))), child: Text('ಎಲ್ಲಾ', style: TextStyle(fontSize: 11))),
+                                  TextButton(onPressed: () => setDlgState(() => _userTithis.removeWhere((t) => t < 15)), child: Text('ಯಾವುದೂ ಇಲ್ಲ', style: TextStyle(fontSize: 11))),
                                 ]),
                               ),
-                              ...List.generate(30, (i) => CheckboxListTile(
+                              ...List.generate(15, (i) => CheckboxListTile(
                                 dense: true,
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                 value: _userTithis.contains(i),
