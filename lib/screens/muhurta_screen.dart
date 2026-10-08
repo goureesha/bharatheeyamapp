@@ -26,8 +26,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
   static const _rashiNames = ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ'];
   static const _rashiEn = ['Mesha','Vrishabha','Mithuna','Kataka','Simha','Kanya','Tula','Vrischika','Dhanu','Makara','Kumbha','Meena'];
 
-  // Minimum score to show
-  int _minScore = 40;
   // Inputs
   MuhurtaEvent _event = MuhurtaEvent.vivaha;
   int _nakIdx = 0;
@@ -157,8 +155,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
           ),
         );
 
-        // Only show days with score >= 40
-        if (mResult.score >= _minScore) {
           // Compute lagna windows for this day
           final allLagnaWindows = _scanLagnas(srSs[0], srSs[1]);
           // Filter by user shuddhi settings
@@ -172,8 +168,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
 
           found.add({
             'date': d,
-            'score': mResult.score,
-            'verdict': mResult.verdict,
             'vara': pan.vara,
             'tithi': pan.tithi,
             'nakshatra': pan.nakshatra,
@@ -187,16 +181,13 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             'sunrise': pan.sunrise,
             'sunset': pan.sunset,
             'tara': mResult.personResults.isNotEmpty ? mResult.personResults[0].taraBala : null,
-            'isPerfect': mResult.score >= 80,
-            'isCandidate': mResult.score >= _minScore && mResult.score < 80,
             'lagnaWindows': lagnaWindows,
           });
-        }
       } catch (_) {}
     }
 
-    // Sort by score descending
-    found.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+    // Sort by date
+    found.sort((a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime));
 
     if (mounted) setState(() { _results = found; _searching = false; });
   }
@@ -677,11 +668,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             if (!_searching && _results.isNotEmpty) ...[
               Row(children: [
                 Text('${_results.length} ${AppLocale.l('mDaysFound')}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
-                const SizedBox(width: 8),
-                Text(
-                  '(${_results.where((r) => r['isPerfect'] == true).length} ${AppLocale.l('mPerfect')}, ${_results.where((r) => r['isCandidate'] == true).length} ${AppLocale.l('mConditional')})',
-                  style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600),
-                ),
               ]),
               const SizedBox(height: 8),
               ...List.generate(
@@ -713,10 +699,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
 
   Widget _buildResultCard(Map<String, dynamic> r) {
     final date = r['date'] as DateTime;
-    final score = r['score'] as int;
-    final isPerfect = r['isPerfect'] == true;
-    final isCandidate = r['isCandidate'] == true;
-    final Color scoreColor = isPerfect ? Colors.green : (isCandidate ? Colors.amber.shade800 : Colors.red);
     final dateStr = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
     final dateKey = dateStr;
     final isExpanded = _expanded.contains(dateKey);
@@ -725,7 +707,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: kCard, borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: scoreColor.withOpacity(0.4), width: 1.5),
+        border: Border.all(color: kTeal.withOpacity(0.4), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -739,13 +721,13 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: scoreColor.withOpacity(0.08),
+                color: kTeal.withOpacity(0.08),
                 borderRadius: isExpanded
                   ? const BorderRadius.vertical(top: Radius.circular(11))
                   : BorderRadius.circular(11),
               ),
               child: Row(children: [
-                Icon(isPerfect ? Icons.stars : (isCandidate ? Icons.warning_amber_rounded : Icons.calendar_today), size: 16, color: scoreColor),
+                Icon(Icons.event_available, size: 16, color: kTeal),
                 const SizedBox(width: 8),
                 Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -754,12 +736,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                     Text('${trAll(r['tithi'])} • ${trAll(r['nakshatra'])}', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
                   ],
                 )),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(color: scoreColor.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-                  child: Text('$score', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: scoreColor)),
-                ),
-                const SizedBox(width: 6),
                 Icon(isExpanded ? Icons.expand_less : Icons.expand_more, size: 20, color: kMuted),
               ]),
             ),
