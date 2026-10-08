@@ -1252,8 +1252,8 @@ class JanmaPatrikeService {
 
   /// Single bhava prediction card for PDF
   static Widget _buildPhalaBhavaCard(BhavaPrediction b, PdfThemeConfig t) {
-    final qualityIcon = b.quality == PhalaQuality.good ? '✅'
-        : b.quality == PhalaQuality.challenging ? '⚠️' : '🔶';
+    final qualityIcon = b.quality == PhalaQuality.shubha ? '✅'
+        : b.quality == PhalaQuality.ashubha ? '⚠️' : '🔶';
     final lordStr = '${AppLocale.l('jpPhalaLord')}: ${trAll(b.lordName)}';
     final planetsStr = b.planetsInHouse.isNotEmpty
         ? '${AppLocale.l('jpPhalaGraha')}: ${b.planetsInHouse.map((p) => trAll(p)).join(', ')}'
@@ -1304,7 +1304,7 @@ class JanmaPatrikeService {
               child: Text('📖 ${b.shloka}', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: Colors.black45, height: 1.3)),
             ),
           // Remedy
-          if (b.remedy.isNotEmpty && b.quality == PhalaQuality.challenging)
+          if (b.remedy.isNotEmpty && b.quality == PhalaQuality.ashubha)
             Padding(
               padding: const EdgeInsets.only(top: 2),
               child: Text('💡 ${b.remedy}', style: TextStyle(fontSize: 9, color: t.primaryDark, fontStyle: FontStyle.italic)),
