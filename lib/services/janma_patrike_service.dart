@@ -1397,7 +1397,7 @@ class JanmaPatrikeService {
   // ── Traditional Single-Page PDF ──
 
   static Future<Uint8List> _generateTraditionalPdfBytes(UserDetails user, KundaliResult result, {PdfThemeConfig? theme}) async {
-    final t = theme ?? PdfThemeConfig();
+    final t = theme ?? PdfThemes.traditional;
     final sc = ScreenshotController();
     final pageWidget = _buildPageWrapper(
       width: 793, height: 1122, theme: t,
