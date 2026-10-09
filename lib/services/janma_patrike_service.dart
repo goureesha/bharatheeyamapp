@@ -1466,7 +1466,7 @@ class JanmaPatrikeService {
       final d = info.longitude;
       final navNum = _navamshaNumber(d);
       final shortName = _shortNames[pName] ?? pName;
-      final label = '$shortName${_superscript(navNum)}';
+      final label = '$shortName($navNum)';
 
       int ri = 0;
       if (isBhava) {
@@ -1557,11 +1557,11 @@ class JanmaPatrikeService {
             color: t.detailBoxBg,
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(para, style: TextStyle(fontSize: 14, height: 1.6, color: t.primaryDark, fontWeight: FontWeight.w500)),
+              Text(para, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, height: 1.6, color: t.primaryDark, fontWeight: FontWeight.w500)),
               const SizedBox(height: 12),
-              Text(dashaLine, style: TextStyle(fontSize: 14, height: 1.6, color: t.primaryDark, fontWeight: FontWeight.bold)),
+              Text(dashaLine, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, height: 1.6, color: t.primaryDark, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
