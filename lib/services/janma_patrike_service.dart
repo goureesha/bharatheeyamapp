@@ -1494,7 +1494,6 @@ class JanmaPatrikeService {
 
   static Widget _buildTraditionalPage(UserDetails user, KundaliResult result, PdfThemeConfig t) {
     final p = result.panchang;
-    final genderSuffix = user.gender == "female" ? "ಳ" : "ನ";
     
     int shakaYear = 1946;
     if (p.samvatsara.contains('ಶ.ಕ.')) {
@@ -1523,25 +1522,36 @@ class JanmaPatrikeService {
     final lagnaInfo = result.planets['ಲಗ್ನ'];
     final lagnaRashi = trAll(lagnaInfo?.rashi ?? '-');
 
-    final para = 'ಶ್ವಸ್ತ ಶ್ರೀ${user.name}${genderSuffix} '
-        '${user.fatherName.isNotEmpty ? "${user.fatherName}ರವರ ${user.gender == "female" ? "ಪುತ್ರಿ" : "ಪುತ್ರ"} " : ""}'
-        '${user.gotra.isNotEmpty ? "${user.gotra} ಗೋತ್ರ " : ""}'
-        'ವೃಷಕಲಾವಾಸನ ರಾಕಶಕವರ್ಷ $shakaYear ಕ್ರಿ.ಶ. '
-        '$samvatsaraName ಸಂವತ್ಸರದ '
-        '${trAll(p.chandraMasa)} ಮಾಸ $paksha ಪಕ್ಷ ${trAll(p.tithi)} ತಿಥಿ '
-        '${trAll(p.vara)}ವಾರದಲ್ಲಿ '
-        '${user.timeStr} ಸಮಯದಲ್ಲಿ ${user.place}ದಲ್ಲಿ ಜನಿಸಿರುತ್ತಾರೆ. '
-        '${trAll(p.nakshatra)} ನಕ್ಷತ್ರ ${moonPada}ನೇ ಪಾದ '
-        '${trAll(p.chandraRashi)} ಚಂದ್ರರಾಶಿ '
-        '$lagnaRashi ಲಗ್ನ '
-        '${trAll(p.yoga)} ಯೋಗ ${trAll(p.karana)} ಕರಣ. '
-        'ಸೂರ್ಯೋದಯ ${p.sunrise} ಸೂರ್ಯಾಸ್ತ ${p.sunset}. '
-        'ಉದಯಾದಿ ಘಟಿ ${p.udayadiGhati} ಗತ ಘಟಿ ${p.gataGhati} '
-        'ಪರಮ ಘಟಿ ${p.paramaGhati}. '
-        '${user.motherName.isNotEmpty ? "ಮಾತೃ ನಾಮ: ${user.motherName}. " : ""}'
-        'ಅಕ್ಷಾಂಶ: ${user.lat.toStringAsFixed(4)}° ರೇಖಾಂಶ: ${user.lon.toStringAsFixed(4)}°.';
+    // Build proper readable sentence with all personal details
+    final namePart = 'ಶ್ರೀ ${user.name} ಅವರು';
+    final fatherPart = user.fatherName.isNotEmpty
+        ? ', ತಂದೆ: ${user.fatherName}'
+        : '';
+    final motherPart = user.motherName.isNotEmpty
+        ? ', ತಾಯಿ: ${user.motherName}'
+        : '';
+    final gotraPart = user.gotra.isNotEmpty
+        ? ', ${user.gotra} ಗೋತ್ರ'
+        : '';
 
-    final dashaLine = 'ಜ್ಯೋತಿಷ್ಯ ಮೂಲ ದಶಾ ವರ್ಷ: ${trAll(p.dashaLord)}, '
+    final para = '$namePart$fatherPart$motherPart$gotraPart. '
+        'ಶಾಲಿವಾಹನ ಶಕ $shakaYear, '
+        '$samvatsaraName ನಾಮ ಸಂವತ್ಸರ, '
+        '${trAll(p.chandraMasa)} ಮಾಸ, $paksha ಪಕ್ಷ, '
+        '${trAll(p.tithi)} ತಿಥಿ, ${trAll(p.vara)}ವಾರ, '
+        'ದಿನಾಂಕ ${user.dateStr}, '
+        'ಸಮಯ ${user.timeStr}ಕ್ಕೆ '
+        '${user.place}ದಲ್ಲಿ ಜನಿಸಿರುತ್ತಾರೆ. '
+        'ಜನ್ಮ ನಕ್ಷತ್ರ: ${trAll(p.nakshatra)} ${moonPada}ನೇ ಪಾದ, '
+        'ಚಂದ್ರ ರಾಶಿ: ${trAll(p.chandraRashi)}, '
+        'ಲಗ್ನ: $lagnaRashi, '
+        'ಯೋಗ: ${trAll(p.yoga)}, ಕರಣ: ${trAll(p.karana)}. '
+        'ಸೂರ್ಯೋದಯ: ${p.sunrise}, ಸೂರ್ಯಾಸ್ತ: ${p.sunset}. '
+        'ಉದಯಾದಿ ಘಟಿ: ${p.udayadiGhati}, ಗತ ಘಟಿ: ${p.gataGhati}, '
+        'ಪರಮ ಘಟಿ: ${p.paramaGhati}. '
+        'ಅಕ್ಷಾಂಶ: ${user.lat.toStringAsFixed(4)}°, ರೇಖಾಂಶ: ${user.lon.toStringAsFixed(4)}°.';
+
+    final dashaLine = 'ಜನ್ಮ ಶಿಷ್ಟ ದಶಾ: ${trAll(p.dashaLord)}, '
         'ಶೇಷ: ${p.dashaBalance}.';
 
     return Column(
