@@ -129,11 +129,19 @@ class AppointmentService {
 
       // Initialize default slots if none exist
       if (_availableSlots.isEmpty) {
-        for (int d = 1; d <= 6; d++) {
+        for (int d = 1; d <= 7; d++) {
           _availableSlots.add(AvailableSlot(
             dayOfWeek: d, startTime: '09:00', endTime: '17:00', slotMinutes: 60,
           ));
         }
+        await _saveToCache();
+      }
+
+      // Migration: add Sunday slot if missing (was excluded in older versions)
+      if (_availableSlots.isNotEmpty && !_availableSlots.any((s) => s.dayOfWeek == 7)) {
+        _availableSlots.add(AvailableSlot(
+          dayOfWeek: 7, startTime: '09:00', endTime: '17:00', slotMinutes: 60,
+        ));
         await _saveToCache();
       }
 
