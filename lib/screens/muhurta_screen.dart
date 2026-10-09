@@ -24,8 +24,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
   // Default allowed lagnas: Vrishabha(1), Mithuna(2), Kataka(3), Kanya(5), Tula(6), Dhanu(8), Meena(11)
   // Default allowed lagnas (user can change)
   final Set<int> _allowedLagnas = {1, 2, 3, 5, 6, 8, 11};
-  static const _rashiNames = ['ಮೇಷ','ವೃಷಭ','ಮಿಥುನ','ಕರ್ಕ','ಸಿಂಹ','ಕನ್ಯಾ','ತುಲಾ','ವೃಶ್ಚಿಕ','ಧನು','ಮಕರ','ಕುಂಭ','ಮೀನ'];
-  static const _rashiEn = ['Mesha','Vrishabha','Mithuna','Kataka','Simha','Kanya','Tula','Vrischika','Dhanu','Makara','Kumbha','Meena'];
 
   // Inputs
   MuhurtaEvent _event = MuhurtaEvent.vivaha;
@@ -352,7 +350,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
           final guruAnukoola = guruRashi >= 0 && isGuruAnukoolaForLagna(curRashi, guruRashi);
 
           windows.add({
-            'rashi': trAll(_rashiNames[curRashi]),
+            'rashi': appRashi[curRashi],
             'rashiIdx': curRashi,
             'start': _fmtMins(startMins),
             'end': _fmtMins(endMins),
@@ -385,7 +383,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             title: Row(children: [
               Icon(Icons.tune, color: kPurple1, size: 22),
               const SizedBox(width: 8),
-              Expanded(child: Text('ನಿಯಮ ಬದಲಾಯಿಸಿ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16))),
+              Expanded(child: Text(AppLocale.l('mEditRules'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16))),
             ]),
             content: SizedBox(
               width: 340, height: 500,
@@ -399,11 +397,11 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                       unselectedLabelColor: kMuted,
                       labelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
                       indicatorColor: kPurple1,
-                      tabs: const [
-                        Tab(text: 'ತಿಥಿ'),
-                        Tab(text: 'ನಕ್ಷತ್ರ'),
-                        Tab(text: 'ವಾರ'),
-                        Tab(text: 'ಲಗ್ನ'),
+                      tabs: [
+                        Tab(text: AppLocale.l('mTithi')),
+                        Tab(text: AppLocale.l('mNakshatra')),
+                        Tab(text: AppLocale.l('mVara')),
+                        Tab(text: AppLocale.l('mLagna')),
                       ],
                     ),
                     Expanded(
@@ -415,10 +413,10 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                               Padding(
                                 padding: const EdgeInsets.all(8),
                                 child: Row(children: [
-                                  Text('${_userTithis.where((t) => t < 15).length}/15 ಶುಕ್ಲ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
+                                  Text('${_userTithis.where((t) => t < 15).length}/15 ${AppLocale.l('mShuklaCount')}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
                                   const Spacer(),
-                                  TextButton(onPressed: () => setDlgState(() => _userTithis.addAll(List.generate(15, (i) => i))), child: Text('ಎಲ್ಲಾ', style: TextStyle(fontSize: 11))),
-                                  TextButton(onPressed: () => setDlgState(() => _userTithis.removeWhere((t) => t < 15)), child: Text('ಯಾವುದೂ ಇಲ್ಲ', style: TextStyle(fontSize: 11))),
+                                  TextButton(onPressed: () => setDlgState(() => _userTithis.addAll(List.generate(15, (i) => i))), child: Text(AppLocale.l('mAll'), style: TextStyle(fontSize: 11))),
+                                  TextButton(onPressed: () => setDlgState(() => _userTithis.removeWhere((t) => t < 15)), child: Text(AppLocale.l('mNone'), style: TextStyle(fontSize: 11))),
                                 ]),
                               ),
                               ...List.generate(15, (i) => CheckboxListTile(
@@ -426,7 +424,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                 value: _userTithis.contains(i),
                                 activeColor: kTeal,
-                                title: Text(knTithi[i], style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kText)),
+                                title: Text(appTithi[i], style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kText)),
                                 onChanged: (v) => setDlgState(() { if (v == true) _userTithis.add(i); else _userTithis.remove(i); }),
                               )),
                             ],
@@ -440,8 +438,8 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                                 child: Row(children: [
                                   Text('${_userNakshatras.length}/27', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
                                   const Spacer(),
-                                  TextButton(onPressed: () => setDlgState(() => _userNakshatras = Set.from(List.generate(27, (i) => i))), child: Text('ಎಲ್ಲಾ', style: TextStyle(fontSize: 11))),
-                                  TextButton(onPressed: () => setDlgState(() => _userNakshatras.clear()), child: Text('ಯಾವುದೂ ಇಲ್ಲ', style: TextStyle(fontSize: 11))),
+                                  TextButton(onPressed: () => setDlgState(() => _userNakshatras = Set.from(List.generate(27, (i) => i))), child: Text(AppLocale.l('mAll'), style: TextStyle(fontSize: 11))),
+                                  TextButton(onPressed: () => setDlgState(() => _userNakshatras.clear()), child: Text(AppLocale.l('mNone'), style: TextStyle(fontSize: 11))),
                                 ]),
                               ),
                               ...List.generate(27, (i) => CheckboxListTile(
@@ -449,7 +447,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                 value: _userNakshatras.contains(i),
                                 activeColor: kTeal,
-                                title: Text('${i + 1}. ${knNak[i]}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kText)),
+                                title: Text('${i + 1}. ${appNak[i]}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kText)),
                                 onChanged: (v) => setDlgState(() { if (v == true) _userNakshatras.add(i); else _userNakshatras.remove(i); }),
                               )),
                             ],
@@ -460,14 +458,14 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8),
-                                child: Text('${_userVaras.length}/7 ವಾರ ಆಯ್ಕೆ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
+                                child: Text('${_userVaras.length}/7 ${AppLocale.l('mVaraSelect')}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
                               ),
                               ...List.generate(7, (i) => CheckboxListTile(
                                 dense: true,
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                 value: _userVaras.contains(i),
                                 activeColor: kTeal,
-                                title: Text(knVara[i], style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+                                title: Text(appVara[i], style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
                                 onChanged: (v) => setDlgState(() { if (v == true) _userVaras.add(i); else _userVaras.remove(i); }),
                               )),
                             ],
@@ -479,10 +477,10 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                               Padding(
                                 padding: const EdgeInsets.all(8),
                                 child: Row(children: [
-                                  Text('${_allowedLagnas.length}/12 ಲಗ್ನ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
+                                  Text('${_allowedLagnas.length}/12 ${AppLocale.l('mLagnaCount')}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kTeal)),
                                   const Spacer(),
-                                  TextButton(onPressed: () => setDlgState(() => _allowedLagnas.addAll(List.generate(12, (i) => i))), child: Text('ಎಲ್ಲಾ', style: TextStyle(fontSize: 11))),
-                                  TextButton(onPressed: () => setDlgState(() => _allowedLagnas.clear()), child: Text('ಯಾವುದೂ ಇಲ್ಲ', style: TextStyle(fontSize: 11))),
+                                  TextButton(onPressed: () => setDlgState(() => _allowedLagnas.addAll(List.generate(12, (i) => i))), child: Text(AppLocale.l('mAll'), style: TextStyle(fontSize: 11))),
+                                  TextButton(onPressed: () => setDlgState(() => _allowedLagnas.clear()), child: Text(AppLocale.l('mNone'), style: TextStyle(fontSize: 11))),
                                 ]),
                               ),
                               ...List.generate(12, (i) => CheckboxListTile(
@@ -490,45 +488,45 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                 value: _allowedLagnas.contains(i),
                                 activeColor: kTeal,
-                                title: Text('${_rashiNames[i]} (${_rashiEn[i]})', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+                                title: Text(appRashi[i], style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
                                 onChanged: (v) => setDlgState(() { if (v == true) _allowedLagnas.add(i); else _allowedLagnas.remove(i); }),
                               )),
                               const Divider(height: 20),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: Text('🛡 ಲಗ್ನ ಶುದ್ಧಿ ನಿಯಮ', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kPurple1)),
+                                child: Text(AppLocale.l('mLagnaShuddhiRules'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kPurple1)),
                               ),
                               const SizedBox(height: 4),
                               SwitchListTile(
                                 dense: true, activeColor: kTeal,
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                 value: _filterLagnaShuddhi,
-                                title: Text('ಲಗ್ನ ಶುದ್ಧಿ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
-                                subtitle: Text('ಲಗ್ನದಲ್ಲಿ ಪಾಪ ಗ್ರಹ ಇಲ್ಲ', style: TextStyle(fontSize: 10, color: kMuted)),
+                                title: Text(AppLocale.l('mLagnaShuddhiTitle'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                                subtitle: Text(AppLocale.l('mLagnaShuddhiSub'), style: TextStyle(fontSize: 10, color: kMuted)),
                                 onChanged: (v) => setDlgState(() => _filterLagnaShuddhi = v),
                               ),
                               SwitchListTile(
                                 dense: true, activeColor: kTeal,
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                 value: _filterSaptamaShuddhi,
-                                title: Text('ಸಪ್ತಮ ಶುದ್ಧಿ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
-                                subtitle: Text('೭ನೇ ಮನೆಯಲ್ಲಿ ಪಾಪ ಗ್ರಹ ಇಲ್ಲ', style: TextStyle(fontSize: 10, color: kMuted)),
+                                title: Text(AppLocale.l('mSaptamaShuddhiTitle'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                                subtitle: Text(AppLocale.l('mSaptamaShuddhiSub'), style: TextStyle(fontSize: 10, color: kMuted)),
                                 onChanged: (v) => setDlgState(() => _filterSaptamaShuddhi = v),
                               ),
                               SwitchListTile(
                                 dense: true, activeColor: kTeal,
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                 value: _filterAshtamaShuddhi,
-                                title: Text('ಅಷ್ಟಮ ಶುದ್ಧಿ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
-                                subtitle: Text('೮ನೇ ಮನೆಯಲ್ಲಿ ಗ್ರಹ ಇಲ್ಲ', style: TextStyle(fontSize: 10, color: kMuted)),
+                                title: Text(AppLocale.l('mAshtamaShuddhiTitle'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                                subtitle: Text(AppLocale.l('mAshtamaShuddhiSub'), style: TextStyle(fontSize: 10, color: kMuted)),
                                 onChanged: (v) => setDlgState(() => _filterAshtamaShuddhi = v),
                               ),
                               SwitchListTile(
                                 dense: true, activeColor: kTeal,
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                 value: _filterGuruAnukoola,
-                                title: Text('ಗುರು ಅನುಕೂಲ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
-                                subtitle: Text('ಗುರು ಕೇಂದ್ರ/ತ್ರಿಕೋಣದಲ್ಲಿ', style: TextStyle(fontSize: 10, color: kMuted)),
+                                title: Text(AppLocale.l('mGuruAnukoolaTitle'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kText)),
+                                subtitle: Text(AppLocale.l('mGuruAnukoolaSub'), style: TextStyle(fontSize: 10, color: kMuted)),
                                 onChanged: (v) => setDlgState(() => _filterGuruAnukoola = v),
                               ),
                             ],
@@ -543,12 +541,12 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             actions: [
               TextButton(
                 onPressed: () => setDlgState(() => _loadEventDefaults()),
-                child: Text('ಡೀಫಾಲ್ಟ್', style: TextStyle(color: kMuted)),
+                child: Text(AppLocale.l('mDefault'), style: TextStyle(color: kMuted)),
               ),
               ElevatedButton(
                 onPressed: () { Navigator.pop(ctx); setState(() {}); },
                 style: ElevatedButton.styleFrom(backgroundColor: kPurple1, foregroundColor: Colors.white),
-                child: const Text('ಉಳಿಸಿ', style: TextStyle(fontWeight: FontWeight.w800)),
+                child: Text(AppLocale.l('mSave'), style: const TextStyle(fontWeight: FontWeight.w800)),
               ),
             ],
           );
@@ -624,7 +622,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.tune, color: kPurple2),
-            tooltip: 'ನಿಯಮ ಬದಲಾಯಿಸಿ',
+            tooltip: AppLocale.l('mEditRules'),
             onPressed: _showSettings,
           ),
         ],
@@ -678,7 +676,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                 const SizedBox(height: 10),
 
                 // Birth Nakshatra
-                Text('⭐ ಜನ್ಮ ನಕ್ಷತ್ರ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
+                Text(AppLocale.l('mBirthNak'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
                 const SizedBox(height: 4),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -776,7 +774,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             if (!_searching && _results.isEmpty && _expanded.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.all(32),
-                child: Center(child: Text('ಯಾವ ಮುಹೂರ್ತ ಸಿಗಲಿಲ್ಲ', style: TextStyle(fontSize: 14, color: kMuted))),
+                child: Center(child: Text(AppLocale.l('mNoMuhurtaMsg'), style: TextStyle(fontSize: 14, color: kMuted))),
               ),
           ],
         )),
@@ -840,7 +838,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                 Text('🌙 ${r['sunset']}', style: TextStyle(fontSize: 11, color: kMuted, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 if (r['hasAbhijit'] == true)
-                  Text('⏰ ಅಭಿಜಿತ್: ${r['abhijitTime']}', style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w700)),
+                  Text('⏰ ${AppLocale.l('abhijitLabel')}: ${r['abhijitTime']}', style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w700)),
               ]),
             ),
 
@@ -853,7 +851,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                   Icon((r['tara'] as TaraResult).isGood ? Icons.check_circle : Icons.cancel,
                     size: 14, color: (r['tara'] as TaraResult).isGood ? kGreen : Colors.red),
                   const SizedBox(width: 6),
-                  Text('ತಾರಾ ಬಲ: ${(r['tara'] as TaraResult).taraName}',
+                  Text('${AppLocale.l('mTaraBala')}: ${(r['tara'] as TaraResult).taraName}',
                     style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800,
                       color: (r['tara'] as TaraResult).isGood ? kGreen : Colors.red)),
                 ]),
@@ -914,7 +912,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('⚠ ದೋಷಗಳು:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.red)),
+                    Text('⚠ ${AppLocale.l('mDoshasLabel')}:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.red)),
                     ...(r['doshas'] as List).map((d) => Padding(
                       padding: const EdgeInsets.only(left: 8, top: 2),
                       child: Text('• $d', style: TextStyle(fontSize: 11, color: Colors.red.withOpacity(0.8))),
@@ -940,7 +938,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                         color: kTeal.withOpacity(0.08),
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                       ),
-                      child: Text('🏠 ಲಗ್ನ ಶುದ್ಧಿ', style: TextStyle(fontWeight: FontWeight.w800, color: kTeal, fontSize: 13)),
+                      child: Text(AppLocale.l('mLagnaShuddhiHeader'), style: TextStyle(fontWeight: FontWeight.w800, color: kTeal, fontSize: 13)),
                     ),
                     ...(r['lagnaWindows'] as List).map((w) {
                       final wMap = w as Map<String, dynamic>;
@@ -971,13 +969,13 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                             ]),
                             const SizedBox(height: 4),
                             Wrap(spacing: 10, runSpacing: 2, children: [
-                              _shuddhiChip('ಲಗ್ನ', lShuddhi, lG),
-                              _shuddhiChip('೭ ಮ', sShuddhi, sG),
-                              _shuddhiChip('೮ ಮ', aShuddhi, aG),
+                              _shuddhiChip(AppLocale.l('mLagna'), lShuddhi, lG),
+                              _shuddhiChip(AppLocale.l('mSaptamaShort'), sShuddhi, sG),
+                              _shuddhiChip(AppLocale.l('mAshtamaShort'), aShuddhi, aG),
                               if (guruOk) Row(mainAxisSize: MainAxisSize.min, children: [
                                 Icon(Icons.star, size: 12, color: Colors.amber),
                                 const SizedBox(width: 2),
-                                Text('ಗುರು✓', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.amber.shade800)),
+                                Text(AppLocale.l('mGuruOk'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.amber.shade800)),
                               ]),
                             ]),
                           ],
