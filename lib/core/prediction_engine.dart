@@ -6,6 +6,10 @@ import 'prediction_texts_ta.dart';
 import 'prediction_texts_te.dart';
 import 'prediction_texts_ml.dart';
 import 'prediction_shlokas.dart';
+import 'prediction_shlokas_kn.dart';
+import 'prediction_shlokas_ta.dart';
+import 'prediction_shlokas_te.dart';
+import 'prediction_shlokas_ml.dart';
 import '../widgets/common.dart';
 
 // ═══════════════════════════════════════════
@@ -276,6 +280,36 @@ class PredictionEngine {
         default: return planetRemedies;
       }
     }
+    Map<String, List<String>> _selectPlanetShloka() {
+      switch (_lang) {
+        case 'en': return planetInHouseShloka;   // English: keep Sanskrit/Devanagari
+        case 'hi': return planetInHouseShloka;   // Hindi: Devanagari
+        case 'ta': return planetInHouseShlokasTa;
+        case 'te': return planetInHouseShlokasTe;
+        case 'ml': return planetInHouseShlokasMl;
+        default: return planetInHouseShlokaKn;   // Kannada default
+      }
+    }
+    Map<String, String> _selectMahaDashaShloka() {
+      switch (_lang) {
+        case 'en': return mahadashaShloka;
+        case 'hi': return mahadashaShloka;
+        case 'ta': return mahadashaShlokasTa;
+        case 'te': return mahadashaShlokasTe;
+        case 'ml': return mahadashaShlokasMl;
+        default: return mahadashaShlokaKn;
+      }
+    }
+    Map<int, Map<int, String>> _selectLordShloka() {
+      switch (_lang) {
+        case 'en': return lordInHouseShloka;
+        case 'hi': return lordInHouseShloka;
+        case 'ta': return lordInHouseShlokasTa;
+        case 'te': return lordInHouseShlokasTe;
+        case 'ml': return lordInHouseShlokasMl;
+        default: return lordInHouseShlokaKn;
+      }
+    }
 
     final _bhavaInfo = _selectBhavaInfo();
     final _planetInHouse = _selectPlanetInHouse();
@@ -284,6 +318,9 @@ class PredictionEngine {
     final _dashaBhuktiP = _selectDashaBhukti();
     final _dignityMod = _selectDignity();
     final _remedies = _selectRemedies();
+    final _planetShloka = _selectPlanetShloka();
+    final _maDashaShloka = _selectMahaDashaShloka();
+    final _lordShloka = _selectLordShloka();
 
     final lagnaRashi = planets[_lagna]!.rashiIndex;
 
@@ -507,14 +544,14 @@ class PredictionEngine {
       String bhavaShloka = '';
       if (inHouse.isNotEmpty) {
         // Use first planet in the house
-        final shlokaList = planetInHouseShloka[inHouse.first];
+        final shlokaList = _planetShloka[inHouse.first];
         if (shlokaList != null && h - 1 < shlokaList.length) {
           bhavaShloka = shlokaList[h - 1];
         }
       }
       if (bhavaShloka.isEmpty) {
         // Fallback: lord-in-house shloka
-        final lordShlokas = lordInHouseShloka[h];
+        final lordShlokas = _lordShloka[h];
         if (lordShlokas != null && lordShlokas.containsKey(lordH)) {
           bhavaShloka = lordShlokas[lordH]!;
         }
@@ -624,7 +661,7 @@ class PredictionEngine {
             relationship: relationship,
             mdPhala: mdPhala,
             adPhala: dbPhala,
-            shloka: mahadashaShloka[mdLord] ?? '',
+            shloka: _maDashaShloka[mdLord] ?? '',
             quality: adQuality,
           );
         }
@@ -635,7 +672,7 @@ class PredictionEngine {
         start: md.start,
         end: md.end,
         phala: mdPhala,
-        shloka: mahadashaShloka[mdLord] ?? '',
+        shloka: _maDashaShloka[mdLord] ?? '',
         quality: mdQuality,
         bhuktis: bhuktis,
       ));
