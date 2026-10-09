@@ -138,6 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   String _selectedThemeId = 'traditional';
   String _selectedGender = 'male';
   List<bool> _pdfPageSelection = [true, true, true, true, true, true, true]; // 7 pages
+  String _patrikeFormat = 'detailed'; // 'detailed' or 'traditional'
 
   // Tippani PDF fields
   final _tippaniInvocationCtrl = TextEditingController(text: 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ');
@@ -5072,7 +5073,54 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 16),
 
-          // ── Page Selection ──
+          // ── Format Selection ──
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: kCard,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: kBorder),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.style, color: kPurple2),
+                    const SizedBox(width: 8),
+                    Text(AppLocale.l('pdfFormat'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kText)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                RadioListTile<String>(
+                  value: 'detailed',
+                  groupValue: _patrikeFormat,
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: kPurple2,
+                  title: Text(AppLocale.l('pdfDetailed'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+                  subtitle: Text(AppLocale.l('pdfDetailedDesc'), style: TextStyle(fontSize: 10, color: kMuted)),
+                  onChanged: (v) => setState(() => _patrikeFormat = v!),
+                ),
+                RadioListTile<String>(
+                  value: 'traditional',
+                  groupValue: _patrikeFormat,
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: kPurple2,
+                  title: Text(AppLocale.l('pdfTraditional'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+                  subtitle: Text(AppLocale.l('pdfTraditionalDesc'), style: TextStyle(fontSize: 10, color: kMuted)),
+                  onChanged: (v) => setState(() => _patrikeFormat = v!),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // ── Page Selection (only for detailed format) ──
+          if (_patrikeFormat == 'detailed')
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -5241,7 +5289,11 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                       try {
                         await Future.delayed(const Duration(milliseconds: 50));
-                        await JanmaPatrikeService.generateAndPrint(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection);
+                        if (_patrikeFormat == 'traditional') {
+                          await JanmaPatrikeService.generateTraditionalPdfAndPrint(ud, widget.result, theme: selectedTheme);
+                        } else {
+                          await JanmaPatrikeService.generateAndPrint(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection);
+                        }
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();
                       } catch (e) {
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();
@@ -5305,7 +5357,11 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                       try {
                         await Future.delayed(const Duration(milliseconds: 50)); // Let dialog render
-                        await JanmaPatrikeService.generateAndShare(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection);
+                        if (_patrikeFormat == 'traditional') {
+                          await JanmaPatrikeService.generateTraditionalPdfAndShare(ud, widget.result, theme: selectedTheme);
+                        } else {
+                          await JanmaPatrikeService.generateAndShare(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection);
+                        }
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();
                       } catch (e) {
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();
