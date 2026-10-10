@@ -214,7 +214,7 @@ class JanmaPatrikeService {
     });
   }
 
-  static Future<Uint8List> _generatePdfBytes(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages}) async {
+  static Future<Uint8List> _generatePdfBytes(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages, String firstPageStyle = 'detailed'}) async {
     theme ??= PdfThemes.traditional;
     final pages = selectedPages ?? [true, true, true, true, true, true, true];
     final controller = ScreenshotController();
@@ -228,7 +228,9 @@ class JanmaPatrikeService {
 
     // Pages 1-6: existing pages
     final pageBuilders = [
-      () => _buildPage1Content(user, result, theme!),
+      () => firstPageStyle == 'traditional'
+          ? _buildTraditionalPage(user, result, theme!)
+          : _buildPage1Content(user, result, theme!),
       () => _buildPage2Content(user, result, theme!),
       () => _buildPage3Content(user, result, theme!),
       () => _buildPage4Content(user, result, theme!),
@@ -290,16 +292,16 @@ class JanmaPatrikeService {
     return doc.save();
   }
 
-  static Future<void> generateAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages}) async {
-    final bytes = await _generatePdfBytes(user, result, theme: theme, selectedPages: selectedPages);
+  static Future<void> generateAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages, String firstPageStyle = 'detailed'}) async {
+    final bytes = await _generatePdfBytes(user, result, theme: theme, selectedPages: selectedPages, firstPageStyle: firstPageStyle);
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => bytes,
       name: '${user.name}_janmapatrike',
     );
   }
 
-  static Future<void> generateAndShare(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages}) async {
-    final bytes = await _generatePdfBytes(user, result, theme: theme, selectedPages: selectedPages);
+  static Future<void> generateAndShare(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages, String firstPageStyle = 'detailed'}) async {
+    final bytes = await _generatePdfBytes(user, result, theme: theme, selectedPages: selectedPages, firstPageStyle: firstPageStyle);
     await Printing.sharePdf(bytes: bytes, filename: '${user.name}_janmapatrike.pdf');
   }
 
@@ -1394,42 +1396,7 @@ class JanmaPatrikeService {
     );
   }
 
-  // ── Traditional Single-Page PDF ──
 
-  static Future<Uint8List> _generateTraditionalPdfBytes(UserDetails user, KundaliResult result, {PdfThemeConfig? theme}) async {
-    final t = theme ?? PdfThemes.traditional;
-    final sc = ScreenshotController();
-    final pageWidget = _buildPageWrapper(
-      width: 793, height: 1122, theme: t,
-      child: _buildTraditionalPage(user, result, t),
-    );
-    final pageBytes = await sc.captureFromWidget(
-      pageWidget, targetSize: const Size(793, 1122), pixelRatio: 2.5,
-      delay: const Duration(milliseconds: 100),
-    );
-
-    final doc = pw.Document();
-    final image = pw.MemoryImage(pageBytes);
-    doc.addPage(pw.Page(
-      pageFormat: PdfPageFormat.a4,
-      margin: pw.EdgeInsets.zero,
-      build: (ctx) => pw.FullPage(ignoreMargins: true, child: pw.Image(image, fit: pw.BoxFit.contain)),
-    ));
-    return doc.save();
-  }
-
-  static Future<void> generateTraditionalPdfAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme}) async {
-    final bytes = await _generateTraditionalPdfBytes(user, result, theme: theme);
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => bytes,
-      name: '${user.name}_traditional_patrike',
-    );
-  }
-
-  static Future<void> generateTraditionalPdfAndShare(UserDetails user, KundaliResult result, {PdfThemeConfig? theme}) async {
-    final bytes = await _generateTraditionalPdfBytes(user, result, theme: theme);
-    await Printing.sharePdf(bytes: bytes, filename: '${user.name}_traditional_patrike.pdf');
-  }
 
   static int _navamshaNumber(double longitude) {
     final posInSign = longitude % 30.0;

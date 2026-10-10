@@ -5119,8 +5119,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 12),
 
-          // ── Page Selection (only for detailed format) ──
-          if (_patrikeFormat == 'detailed')
+          // ── Page Selection (always shown) ──
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -5289,11 +5288,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                       try {
                         await Future.delayed(const Duration(milliseconds: 50));
-                        if (_patrikeFormat == 'traditional') {
-                          await JanmaPatrikeService.generateTraditionalPdfAndPrint(ud, widget.result, theme: selectedTheme);
-                        } else {
-                          await JanmaPatrikeService.generateAndPrint(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection);
-                        }
+                        await JanmaPatrikeService.generateAndPrint(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection, firstPageStyle: _patrikeFormat);
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();
                       } catch (e) {
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();
@@ -5357,11 +5352,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                       try {
                         await Future.delayed(const Duration(milliseconds: 50)); // Let dialog render
-                        if (_patrikeFormat == 'traditional') {
-                          await JanmaPatrikeService.generateTraditionalPdfAndShare(ud, widget.result, theme: selectedTheme);
-                        } else {
-                          await JanmaPatrikeService.generateAndShare(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection);
-                        }
+                        await JanmaPatrikeService.generateAndShare(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection, firstPageStyle: _patrikeFormat);
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();
                       } catch (e) {
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();
