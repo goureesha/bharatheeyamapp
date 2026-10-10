@@ -23,6 +23,7 @@ class KundaliChart extends StatelessWidget {
   final double textScale; // scale text on larger screens
   final Map<String, Color>? highlightPlanets; // planet name → highlight color (e.g. dasha=orange, bhukti=green)
   final bool forceShortNames; // force single-letter mode (for PDF)
+  final bool forceSingleLetter; // force truly single-letter graha (for match PDF)
 
   const KundaliChart({
     super.key,
@@ -39,6 +40,7 @@ class KundaliChart extends StatelessWidget {
     this.textScale = 1.0,
     this.highlightPlanets,
     this.forceShortNames = false,
+    this.forceSingleLetter = false,
   });
 
   // Grid layout: indices into rashi boxes, null = center
@@ -594,6 +596,48 @@ class KundaliChart extends StatelessWidget {
     }
   }
 
+  // Single-letter planet abbreviations (for match PDF where space is tight)
+  static const _singleLetterKn = <String, String>{
+    'ರವಿ': 'ರ', 'ಸೂರ್ಯ': 'ರ', 'ಚಂದ್ರ': 'ಚ', 'ಕುಜ': 'ಕ', 'ಮಂಗಳ': 'ಕ',
+    'ಬುಧ': 'ಬ', 'ಗುರು': 'ಗ', 'ಶುಕ್ರ': 'ಶ', 'ಶನಿ': 'ಶ', 'ರಾಹು': 'ರಾ',
+    'ಕೇತು': 'ಕೇ', 'ಲಗ್ನ': 'ಲ', 'ಮಾಂದಿ': 'ಮಾ',
+  };
+  static const _singleLetterHi = <String, String>{
+    'ರವಿ': 'सू', 'ಸೂರ್ಯ': 'सू', 'ಚಂದ್ರ': 'चं', 'ಕುಜ': 'मं', 'ಮಂಗಳ': 'मं',
+    'ಬುಧ': 'बु', 'ಗುರು': 'गु', 'ಶುಕ್ರ': 'शु', 'ಶನಿ': 'श', 'ರಾಹು': 'रा',
+    'ಕೇತು': 'के', 'ಲಗ್ನ': 'ल', 'ಮಾಂದಿ': 'मा',
+  };
+  static const _singleLetterTa = <String, String>{
+    'ರವಿ': 'சூ', 'ಸೂರ್ಯ': 'சூ', 'ಚಂದ್ರ': 'ச', 'ಕುಜ': 'செ', 'ಮಂಗಳ': 'செ',
+    'ಬುಧ': 'பு', 'ಗುರು': 'கு', 'ಶುಕ್ರ': 'சு', 'ಶನಿ': 'ச', 'ರಾಹು': 'ரா',
+    'ಕೇತು': 'கே', 'ಲಗ್ನ': 'ல', 'ಮಾಂದಿ': 'மா',
+  };
+  static const _singleLetterTe = <String, String>{
+    'ರವಿ': 'ర', 'ಸೂರ್ಯ': 'ర', 'ಚಂದ್ರ': 'చ', 'ಕುಜ': 'కు', 'ಮಂಗಳ': 'కు',
+    'ಬುಧ': 'బు', 'ಗುರು': 'గు', 'ಶುಕ್ರ': 'శు', 'ಶನಿ': 'శ', 'ರಾಹು': 'రా',
+    'ಕೇತು': 'కే', 'ಲಗ್ನ': 'ల', 'ಮಾಂದಿ': 'మా',
+  };
+  static const _singleLetterMl = <String, String>{
+    'ರವಿ': 'ര', 'ಸೂರ್ಯ': 'ര', 'ಚಂದ್ರ': 'ച', 'ಕುಜ': 'കു', 'ಮಂಗಳ': 'കു',
+    'ಬುಧ': 'ബു', 'ಗುರು': 'ഗു', 'ಶುಕ್ರ': 'ശു', 'ಶನಿ': 'ശ', 'ರಾಹು': 'രാ',
+    'ಕೇತು': 'കേ', 'ಲಗ್ನ': 'ല', 'ಮಾಂದಿ': 'മാ',
+  };
+  static const _singleLetterEn = <String, String>{
+    'ರವಿ': 'Su', 'ಚಂದ್ರ': 'Mo', 'ಕುಜ': 'Ma', 'ಬುಧ': 'Me',
+    'ಗುರು': 'Ju', 'ಶುಕ್ರ': 'Ve', 'ಶನಿ': 'Sa', 'ರಾಹು': 'Ra',
+    'ಕೇತು': 'Ke', 'ಲಗ್ನ': 'As', 'ಮಾಂದಿ': 'Md',
+  };
+  static Map<String, String> get _singleLetters {
+    switch (AppLocale.current) {
+      case 'en': return _singleLetterEn;
+      case 'hi': return _singleLetterHi;
+      case 'ta': return _singleLetterTa;
+      case 'te': return _singleLetterTe;
+      case 'ml': return _singleLetterMl;
+      default: return _singleLetterKn;
+    }
+  }
+
   Widget _planetChip(String name, {PlanetInfo? info, required ChipType type, double? displayDeg}) {
     Color color;
     switch (type) {
@@ -605,7 +649,7 @@ class KundaliChart extends StatelessWidget {
     }
 
     // Build display text
-    final map = _shortNames;
+    final map = forceSingleLetter ? _singleLetters : _shortNames;
     final shortName = map[name] ?? translateKn(name);
     String displayText = shortName;
     bool isCombust = false;
@@ -620,7 +664,7 @@ class KundaliChart extends StatelessWidget {
       final bool showDeg = (varga == 1) || isBhava;
       final bool showAmshaDeg = (varga != 1) && !isBhava;
 
-      if (forceShortNames) {
+      if (forceShortNames || forceSingleLetter) {
         // PDF mode: always use short names, skip all other modes
         displayText = shortName;
       } else if (showDeg && SamshakaMode.isActive) {
