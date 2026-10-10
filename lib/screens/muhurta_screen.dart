@@ -557,40 +557,47 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
 
   // ── Location picker ──
   Future<void> _pickLocation() async {
+    List<Map<String, dynamic>> results = [];
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDlgState) {
-          List<Map<String, dynamic>> results = [];
-          return AlertDialog(
-            title: Text(AppLocale.l('selectPlace')),
-            content: SizedBox(
-              width: 300, height: 400,
-              child: Column(
-                children: [
-                  TextField(
-                    decoration: InputDecoration(hintText: AppLocale.l('searchPlace'), prefixIcon: const Icon(Icons.search)),
-                    onChanged: (v) {
-                      if (v.length < 2) { setDlgState(() => results = []); return; }
-                      final r = searchWorldCities(v, limit: 20);
-                      setDlgState(() => results = r);
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: results.length,
-                      itemBuilder: (_, i) {
-                        final r = results[i];
-                        return ListTile(
-                          title: Text('${r['n']} (${r['c']})', style: const TextStyle(fontSize: 13)),
-                          subtitle: Text('${(r['la'] as double).toStringAsFixed(2)}°, ${(r['lo'] as double).toStringAsFixed(2)}°', style: const TextStyle(fontSize: 11)),
-                          onTap: () => Navigator.pop(ctx, r),
-                        );
+          return GestureDetector(
+            onTap: () => FocusScope.of(ctx).unfocus(),
+            behavior: HitTestBehavior.opaque,
+            child: AlertDialog(
+              title: Text(AppLocale.l('selectPlace')),
+              content: SizedBox(
+                width: 300, height: 400,
+                child: Column(
+                  children: [
+                    TextField(
+                      autofocus: true,
+                      textInputAction: TextInputAction.search,
+                      decoration: InputDecoration(hintText: AppLocale.l('searchPlace'), prefixIcon: const Icon(Icons.search)),
+                      onChanged: (v) {
+                        if (v.length < 2) { setDlgState(() => results = []); return; }
+                        final r = searchWorldCities(v, limit: 20);
+                        setDlgState(() => results = r);
                       },
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: ListView.builder(
+                        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                        itemCount: results.length,
+                        itemBuilder: (_, i) {
+                          final r = results[i];
+                          return ListTile(
+                            title: Text('${r['n']} (${r['c']})', style: const TextStyle(fontSize: 13)),
+                            subtitle: Text('${(r['la'] as double).toStringAsFixed(2)}°, ${(r['lo'] as double).toStringAsFixed(2)}°', style: const TextStyle(fontSize: 11)),
+                            onTap: () => Navigator.pop(ctx, r),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -627,7 +634,10 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        behavior: HitTestBehavior.opaque,
+        child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: ResponsiveCenter(child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -778,6 +788,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
               ),
           ],
         )),
+      ),
       ),
     );
   }
