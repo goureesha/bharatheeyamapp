@@ -1522,37 +1522,54 @@ class JanmaPatrikeService {
     final lagnaInfo = result.planets['ಲಗ್ನ'];
     final lagnaRashi = trAll(lagnaInfo?.rashi ?? '-');
 
-    // Build proper readable sentence with all personal details
-    final namePart = 'ಶ್ರೀ ${user.name} ಅವರು';
-    final fatherPart = user.fatherName.isNotEmpty
-        ? ', ತಂದೆ: ${user.fatherName}'
-        : '';
-    final motherPart = user.motherName.isNotEmpty
-        ? ', ತಾಯಿ: ${user.motherName}'
-        : '';
-    final gotraPart = user.gotra.isNotEmpty
-        ? ', ${user.gotra} ಗೋತ್ರ'
-        : '';
+    // Convert to Kannada numerals
+    String toKn(String s) {
+      const en = ['0','1','2','3','4','5','6','7','8','9'];
+      const kn = ['೦','೧','೨','೩','೪','೫','೬','೭','೮','೯'];
+      for (int i = 0; i < 10; i++) s = s.replaceAll(en[i], kn[i]);
+      return s;
+    }
 
-    final para = '$namePart$fatherPart$motherPart$gotraPart. '
-        'ಶಾಲಿವಾಹನ ಶಕ $shakaYear, '
-        '$samvatsaraName ನಾಮ ಸಂವತ್ಸರ, '
-        '${trAll(p.chandraMasa)} ಮಾಸ, $paksha ಪಕ್ಷ, '
-        '${trAll(p.tithi)} ತಿಥಿ, ${trAll(p.vara)}ವಾರ, '
-        'ದಿನಾಂಕ ${user.dateStr}, '
-        'ಸಮಯ ${user.timeStr}ಕ್ಕೆ '
-        '${user.place}ದಲ್ಲಿ ಜನಿಸಿರುತ್ತಾರೆ. '
-        'ಜನ್ಮ ನಕ್ಷತ್ರ: ${trAll(p.nakshatra)} ${moonPada}ನೇ ಪಾದ, '
-        'ಚಂದ್ರ ರಾಶಿ: ${trAll(p.chandraRashi)}, '
-        'ಲಗ್ನ: $lagnaRashi, '
-        'ಯೋಗ: ${trAll(p.yoga)}, ಕರಣ: ${trAll(p.karana)}. '
-        'ಸೂರ್ಯೋದಯ: ${p.sunrise}, ಸೂರ್ಯಾಸ್ತ: ${p.sunset}. '
-        'ಉದಯಾದಿ ಘಟಿ: ${p.udayadiGhati}, ಗತ ಘಟಿ: ${p.gataGhati}, '
-        'ಪರಮ ಘಟಿ: ${p.paramaGhati}. '
-        'ಅಕ್ಷಾಂಶ: ${user.lat.toStringAsFixed(4)}°, ರೇಖಾಂಶ: ${user.lon.toStringAsFixed(4)}°.';
+    final shakaKn = toKn('$shakaYear');
 
-    final dashaLine = 'ಜನ್ಮ ಶಿಷ್ಟ ದಶಾ: ${trAll(p.dashaLord)}, '
-        'ಶೇಷ: ${p.dashaBalance}.';
+    // Birth time in ghati from udayadiGhati
+    final birthGhati = p.udayadiGhati;
+
+    // Build the traditional panchanga paragraph
+    final panchaPara = 'ಸ್ವಸ್ತಿ ಶ್ರೀಮಜ್ಜಯಾಭ್ಯುದಯ ನೃಪಶಾಲಿವಾಹನ ಗತಶಕವರ್ಷ $shakaKn '
+        '${trAll(samvatsaraName)} ಸಂವತ್ಸರ '
+        '${trAll(p.chandraMasa)} ಮಾಸ '
+        '$paksha ಪಕ್ಷ ತಿಥಿ ${trAll(p.tithi)} '
+        '${p.tithiShesha.isNotEmpty ? "ಶೇಷ ${toKn(p.tithiShesha)} " : ""}'
+        '${trAll(p.vara)}ವಾಸರ '
+        '${p.suryaNakshatra.isNotEmpty ? "ರವಿನಕ್ಷತ್ರ ${trAll(p.suryaNakshatra)} " : ""}'
+        'ಚಂದ್ರ ನಕ್ಷತ್ರ ${trAll(p.nakshatra)} '
+        'ಪರಮ ಘಟಿ ${toKn(p.paramaGhati)} ಗತ ಘಟಿ ${toKn(p.gataGhati)} '
+        '${trAll(p.yoga)} ಯೋಗ '
+        '${p.yogaShesha.isNotEmpty ? "ಶೇಷ ${toKn(p.yogaShesha)} " : ""}'
+        '${trAll(p.karana)} ಕರಣ '
+        '${p.karanaShesha.isNotEmpty ? "ಶೇಷ ${toKn(p.karanaShesha)} " : ""}'
+        '${p.vishaPraghati.isNotEmpty ? "ವಿಷಘಟಿ ${toKn(p.vishaPraghati)} " : ""}'
+        '${p.amrutaPraghati.isNotEmpty ? "ಅಮೃತಘಟಿ ${toKn(p.amrutaPraghati)} " : ""}'
+        '${p.divamana.isNotEmpty ? "ದಿವಾಪ್ರಮಾಣ ${toKn(p.divamana)} " : ""}'
+        '${p.souraMasa.isNotEmpty ? "${trAll(p.souraMasa)} ಸಂಕ್ರಾಂತಿ " : ""}'
+        '${p.souraMasaGataDina.isNotEmpty ? "ಗತದಿನ ${toKn(p.souraMasaGataDina)} " : ""}'
+        'ಇವಂ ಪಂಚಾಂಗಮ್ ॥ '
+        'ಅಸ್ಮಿನ್ ಶುಭದಿನೇ ಸೂರ್ಯೋದಯಾತ್ ಘಟಿ ${toKn(birthGhati)} '
+        '(ಭಾರತೀಯ ಪ್ರಮಾಣ ವೇಳೆ ${user.timeStr}) '
+        '${user.fatherName.isNotEmpty ? "${user.fatherName} " : "___________"} '
+        'ಇವರ ${user.gender == "female" ? "ಪುತ್ರಿ" : "ಪುತ್ರ"} '
+        '${user.name} ಜನನಮ್ ॥ '
+        '${user.motherName.isNotEmpty ? "ಮಾತೃ ನಾಮ: ${user.motherName}. " : ""}'
+        '${user.gotra.isNotEmpty ? "ಗೋತ್ರ: ${user.gotra}. " : ""}'
+        'ಜನ್ಮ ಸಮಯೇ ${trAll(p.nakshatra)} ನಕ್ಷತ್ರ ${moonPada}ನೇ ಪಾದ '
+        'ಪರಮ ಘಟಿ ${toKn(p.paramaGhati)} '
+        'ಚಂದ್ರರಾಶಿ ${trAll(p.chandraRashi)} '
+        'ಲಗ್ನ $lagnaRashi ॥';
+
+    final dashaLine = 'ಜನ್ಮಶಿಷ್ಟ ${trAll(p.dashaLord)} ದಶಾ ಶೇಷ: ${p.dashaBalance}';
+    final dateLine = 'ಜನ್ಮ ತಾರೀಖು: ${toKn(user.dateStr)}';
+    final sunLine = 'ಸೂರ್ಯೋದಯ: ${toKn(p.sunrise)} - ಸೂರ್ಯಾಸ್ತ: ${toKn(p.sunset)}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1569,9 +1586,11 @@ class JanmaPatrikeService {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(para, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, height: 1.6, color: t.primaryDark, fontWeight: FontWeight.w500)),
-              const SizedBox(height: 12),
-              Text(dashaLine, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, height: 1.6, color: t.primaryDark, fontWeight: FontWeight.bold)),
+              Text(panchaPara, textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.7, color: t.primaryDark, fontWeight: FontWeight.w500)),
+              const SizedBox(height: 10),
+              Text(dashaLine, textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.5, color: t.primaryDark, fontWeight: FontWeight.bold)),
+              Text(dateLine, textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.5, color: t.primaryDark, fontWeight: FontWeight.bold)),
+              Text(sunLine, textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.5, color: t.primaryDark, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
