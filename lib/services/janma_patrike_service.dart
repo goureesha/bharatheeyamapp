@@ -1208,7 +1208,11 @@ class JanmaPatrikeService {
       ],
     ));
 
-    // ── Phala Page 3: Dasha Phala ──
+    // ── Phala Page 3: Dasha Phala (current + first 5 mahadashas) ──
+    final allDashas = prediction.allDashas;
+    final firstBatch = allDashas.length > 5 ? allDashas.sublist(0, 5) : allDashas;
+    final secondBatch = allDashas.length > 5 ? allDashas.sublist(5) : <MahaDashaPrediction>[];
+
     pages.add(_buildPhalaPage(
       user: user,
       title: AppLocale.l('jpPhalaTitle'),
@@ -1223,12 +1227,27 @@ class JanmaPatrikeService {
           const SizedBox(height: 8),
         ],
 
-        // All Mahadasha periods
+        // Mahadasha periods (first batch)
         _buildSectionTitle(AppLocale.l('jpAllMahadashaPhala'), t),
         const SizedBox(height: 4),
-        ...prediction.allDashas.map((md) => _buildPhalaDashaCard(md, prediction.currentDasha, t)),
+        ...firstBatch.map((md) => _buildPhalaDashaCard(md, prediction.currentDasha, t)),
       ],
     ));
+
+    // ── Phala Page 4: Remaining Dasha Phala ──
+    if (secondBatch.isNotEmpty) {
+      pages.add(_buildPhalaPage(
+        user: user,
+        title: AppLocale.l('jpPhalaTitle'),
+        subtitle: '${user.name} — ${AppLocale.l('jpDashaPhalaSubtitle')}',
+        theme: t,
+        children: [
+          _buildSectionTitle(AppLocale.l('jpAllMahadashaPhala'), t),
+          const SizedBox(height: 4),
+          ...secondBatch.map((md) => _buildPhalaDashaCard(md, prediction.currentDasha, t)),
+        ],
+      ));
+    }
 
     return pages;
   }
