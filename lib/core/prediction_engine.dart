@@ -506,22 +506,22 @@ class PredictionEngine {
         final rem = _remedies[lord];
         if (rem != null) {
           remedy = _t(
-            kn: 'ಪರಿಹಾರ: ${rem.mantra} ಜಪಿಸಿ. ${rem.gemstone} ಧರಿಸಿ. ${rem.day} ${rem.charity}. ${rem.deity} ಪೂಜೆ ಮಾಡಿ.',
-            hi: 'उपाय: ${rem.mantra} जपें. ${rem.gemstone} धारण करें. ${rem.day} ${rem.charity}. ${rem.deity} पूजा करें.',
-            ta: 'பரிகாரம்: ${rem.mantra} ஜபிக்கவும். ${rem.gemstone} அணியவும். ${rem.day} ${rem.charity}. ${rem.deity} பூஜை செய்யவும்.',
-            te: 'పరిహారం: ${rem.mantra} జపించండి. ${rem.gemstone} ధరించండి. ${rem.day} ${rem.charity}. ${rem.deity} పూజ చేయండి.',
-            ml: 'പരിഹാരം: ${rem.mantra} ജപിക്കുക. ${rem.gemstone} ധരിക്കുക. ${rem.day} ${rem.charity}. ${rem.deity} പൂജ ചെയ്യുക.',
-            en: 'Remedy: Chant ${rem.mantra}. Wear ${rem.gemstone}. On ${rem.day}, ${rem.charity}. Worship ${rem.deity}.');
+            kn: 'ಪರಿಹಾರ: ${rem.mantra} ಮಂತ್ರವನ್ನು ಜಪಿಸಿ. ${rem.gemstone} ರತ್ನವನ್ನು ಧರಿಸಿ. ${rem.day} ${rem.charity} ದಾನ ಮಾಡಿ. ${rem.deity} ಪೂಜೆ ಮಾಡಿ.',
+            hi: 'उपाय: ${rem.mantra} मंत्र का जाप करें. ${rem.gemstone} रत्न धारण करें. ${rem.day} को ${rem.charity} दान करें. ${rem.deity} की पूजा करें.',
+            ta: 'பரிகாரம்: ${rem.mantra} மந்திரம் ஜபிக்கவும். ${rem.gemstone} ரத்தினம் அணியவும். ${rem.day} அன்று ${rem.charity} தானம் செய்யவும். ${rem.deity} பூஜை செய்யவும்.',
+            te: 'పరిహారం: ${rem.mantra} మంత్రాన్ని జపించండి. ${rem.gemstone} రత్నాన్ని ధరించండి. ${rem.day} నాడు ${rem.charity} దానం చేయండి. ${rem.deity} పూజ చేయండి.',
+            ml: 'പരിഹാരം: ${rem.mantra} മന്ത്രം ജപിക്കുക. ${rem.gemstone} രത്നം ധരിക്കുക. ${rem.day} ദിവസം ${rem.charity} ദാനം ചെയ്യുക. ${rem.deity} പൂജ ചെയ്യുക.',
+            en: 'Remedy: Chant the ${rem.mantra} mantra. Wear ${rem.gemstone}. On ${rem.day}, donate ${rem.charity}. Worship ${rem.deity}.');
         }
       } else if (quality == PhalaQuality.mishra) {
         final rem = _remedies[lord];
         if (rem != null) {
           remedy = _t(
-            kn: 'ಸಲಹೆ: ${rem.deity} ಪ್ರಾರ್ಥನೆ ಮಾಡಿ. ${rem.day} ${rem.color} ಬಣ್ಣದ ಬಟ್ಟೆ ಧರಿಸಿ.',
-            hi: 'सलाह: ${rem.deity} से प्रार्थना करें. ${rem.day} ${rem.color} रंग के कपड़े पहनें.',
-            ta: 'ஆலோசனை: ${rem.deity} வழிபடவும். ${rem.day} ${rem.color} நிற ஆடை அணியவும்.',
-            te: 'సలహా: ${rem.deity} ప్రార్థన చేయండి. ${rem.day} ${rem.color} రంగు బట్టలు ధరించండి.',
-            ml: 'ഉപദേശം: ${rem.deity} പ്രാർഥിക്കുക. ${rem.day} ${rem.color} നിറത്തിലുള്ള വസ്ത്രം ധരിക്കുക.',
+            kn: 'ಸಲಹೆ: ${rem.deity} ಪ್ರಾರ್ಥನೆ ಮಾಡಿ. ${rem.day} ದಿನ ${rem.color} ಬಣ್ಣದ ಬಟ್ಟೆ ಧರಿಸಿ.',
+            hi: 'सलाह: ${rem.deity} से प्रार्थना करें. ${rem.day} को ${rem.color} रंग के वस्त्र धारण करें.',
+            ta: 'ஆலோசனை: ${rem.deity} வழிபடவும். ${rem.day} அன்று ${rem.color} நிற ஆடை அணியவும்.',
+            te: 'సలహా: ${rem.deity} ప్రార్థన చేయండి. ${rem.day} నాడు ${rem.color} రంగు బట్టలు ధరించండి.',
+            ml: 'ഉപദേശം: ${rem.deity} പ്രാർഥിക്കുക. ${rem.day} ദിവസം ${rem.color} നിറത്തിലുള്ള വസ്ത്രം ധരിക്കുക.',
             en: 'Advice: Pray to ${rem.deity}. On ${rem.day}, wear ${rem.color} colored clothes.');
         }
       }
