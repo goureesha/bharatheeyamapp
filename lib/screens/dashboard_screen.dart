@@ -139,6 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   String _selectedGender = 'male';
   List<bool> _pdfPageSelection = [true, true, true, true, true, true, true]; // 7 pages
   String _patrikeFormat = 'detailed'; // 'detailed' or 'traditional'
+  bool _phalaDisclaimerShown = false; // show warning only once per session
 
   // Tippani PDF fields
   final _tippaniInvocationCtrl = TextEditingController(text: 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ');
@@ -252,6 +253,77 @@ class _DashboardScreenState extends State<DashboardScreen>
     // Rebuild charts when chart mode toggles change
     SingleLetterMode.notifier.addListener(_onChartModeChanged);
     SamshakaMode.notifier.addListener(_onChartModeChanged);
+
+    // Show phala disclaimer when user first opens Phala tab
+    _tabCtrl.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    if (!_tabCtrl.indexIsChanging && _tabCtrl.index == 10 && !_phalaDisclaimerShown) {
+      _phalaDisclaimerShown = true;
+      Future.microtask(() => _showPhalaDisclaimer());
+    }
+  }
+
+  void _showPhalaDisclaimer() {
+    if (!mounted) return;
+    const _disclaimerText = <String, Map<String, String>>{
+      'title': {
+        'kn': '⚠️ ಮುಖ್ಯ ಸೂಚನೆ',
+        'hi': '⚠️ महत्वपूर्ण सूचना',
+        'ta': '⚠️ முக்கிய அறிவிப்பு',
+        'te': '⚠️ ముఖ్యమైన గమనిక',
+        'ml': '⚠️ പ്രധാന അറിയിപ്പ്',
+        'en': '⚠️ Important Notice',
+      },
+      'body': {
+        'kn': 'ಇಲ್ಲಿ ತೋರಿಸಲಾದ ಫಲಗಳು ಶಾಸ್ತ್ರೀಯ ಗ್ರಂಥಗಳ ಆಧಾರದ ಮೇಲೆ ಸಾಮಾನ್ಯ ಮಾಹಿತಿಗಾಗಿ ಮಾತ್ರ ಒದಗಿಸಲಾಗಿದೆ. ಇವು ವೃತ್ತಿಪರ ಜ್ಯೋತಿಷ ಸಲಹೆಯ ಬದಲಿ ಅಲ್ಲ.\n\nಈ ಫಲಗಳನ್ನು ಬಳಸುವಾಗ ದಯವಿಟ್ಟು ನಿಮ್ಮ ಸ್ವಂತ ವಿವೇಚನೆ ಮತ್ತು ತಿಳುವಳಿಕೆಯನ್ನು ಬಳಸಿ. ಯಾವುದೇ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಮೊದಲು ಅನುಭವಿ ಜ್ಯೋತಿಷಿಯ ಮಾರ್ಗದರ್ಶನ ಪಡೆಯಿರಿ.\n\nಈ ಅಪ್ಲಿಕೇಶನ್ ಅಥವಾ ಅದರ ರಚನೆಕಾರರು ಈ ಫಲಗಳ ನಿಖರತೆಗೆ ಅಥವಾ ಇವುಗಳ ಆಧಾರದ ಮೇಲೆ ತೆಗೆದುಕೊಂಡ ನಿರ್ಧಾರಗಳಿಗೆ ಯಾವುದೇ ಜವಾಬ್ದಾರಿ ಹೊರುವುದಿಲ್ಲ.',
+        'hi': 'यहाँ दिखाए गए फल शास्त्रीय ग्रंथों के आधार पर केवल सामान्य जानकारी के लिए प्रदान किए गए हैं। ये पेशेवर ज्योतिष सलाह का विकल्प नहीं हैं।\n\nइन फलों का उपयोग करते समय कृपया अपने स्वयं के विवेक और ज्ञान का उपयोग करें। कोई भी निर्णय लेने से पहले अनुभवी ज्योतिषी का मार्गदर्शन लें।\n\nयह एप्लिकेशन या इसके निर्माता इन फलों की सटीकता या इनके आधार पर लिए गए निर्णयों की कोई जिम्मेदारी नहीं लेते।',
+        'ta': 'இங்கு காட்டப்படும் பலன்கள் சாஸ்திர நூல்களின் அடிப்படையில் பொதுவான தகவலுக்காக மட்டுமே வழங்கப்படுகின்றன. இவை தொழில்முறை ஜோதிட ஆலோசனைக்கு மாற்றாக இல்லை.\n\nஇந்த பலன்களைப் பயன்படுத்தும் போது உங்கள் சொந்த அறிவையும் விவேகத்தையும் பயன்படுத்தவும். எந்த முடிவும் எடுப்பதற்கு முன் அனுபவமுள்ள ஜோதிடரின் வழிகாட்டுதலைப் பெறவும்.\n\nஇந்த செயலி அல்லது அதன் உருவாக்குநர்கள் இந்த பலன்களின் துல்லியத்திற்கோ அல்லது இவற்றின் அடிப்படையில் எடுக்கப்படும் முடிவுகளுக்கோ எந்தப் பொறுப்பும் ஏற்க மாட்டார்கள்.',
+        'te': 'ఇక్కడ చూపించబడిన ఫలాలు శాస్త్రీయ గ్రంథాల ఆధారంగా సాధారణ సమాచారం కోసం మాత్రమే అందించబడ్డాయి. ఇవి వృత్తిపరమైన జ్యోతిష సలహాకు ప్రత్యామ్నాయం కాదు.\n\nఈ ఫలాలను ఉపయోగించేటప్పుడు దయచేసి మీ స్వంత విచక్షణ మరియు జ్ఞానాన్ని ఉపయోగించండి. ఏదైనా నిర్ణయం తీసుకునే ముందు అనుభవజ్ఞుడైన జ్యోతిష్కుడి మార్గదర్శకత్వం తీసుకోండి.\n\nఈ అప్లికేషన్ లేదా దాని సృష్టికర్తలు ఈ ఫలాల ఖచ్చితత్వానికి లేదా వీటి ఆధారంగా తీసుకున్న నిర్ణయాలకు ఎటువంటి బాధ్యత వహించరు.',
+        'ml': 'ഇവിടെ കാണിക്കുന്ന ഫലങ്ങൾ ശാസ്ത്രീയ ഗ്രന്ഥങ്ങളുടെ അടിസ്ഥാനത്തിൽ പൊതുവായ വിവരത്തിനായി മാത്രം നൽകിയിരിക്കുന്നു. ഇവ പ്രൊഫഷണൽ ജ്യോതിഷ ഉപദേശത്തിന് പകരമല്ല.\n\nഈ ഫലങ്ങൾ ഉപയോഗിക്കുമ്പോൾ ദയവായി നിങ്ങളുടെ സ്വന്തം വിവേകവും അറിവും ഉപയോഗിക്കുക. ഏതെങ്കിലും തീരുമാനം എടുക്കുന്നതിന് മുമ്പ് അനുഭവസമ്പന്നനായ ജ്യോതിഷിയുടെ മാർഗനിർദേശം തേടുക.\n\nഈ ആപ്ലിക്കേഷനോ അതിന്റെ നിർമ്മാതാക്കളോ ഈ ഫലങ്ങളുടെ കൃത്യതയ്ക്കോ ഇവയുടെ അടിസ്ഥാനത്തിൽ എടുക്കുന്ന തീരുമാനങ്ങൾക്കോ ഒരു ഉത്തരവാദിത്തവും വഹിക്കുന്നില്ല.',
+        'en': 'The predictions shown here are provided for general informational purposes only, based on classical Jyotish texts. They are not a substitute for professional astrological consultation.\n\nPlease use your own discretion and judgment when interpreting these predictions. Consult an experienced astrologer before making any important decisions based on them.\n\nThis application and its creators do not take any responsibility for the accuracy of these predictions or for any decisions made based on them.',
+      },
+      'ok': {
+        'kn': 'ನಾನು ಅರ್ಥಮಾಡಿಕೊಂಡಿದ್ದೇನೆ',
+        'hi': 'मैं समझता/समझती हूँ',
+        'ta': 'நான் புரிந்துகொண்டேன்',
+        'te': 'నేను అర్థం చేసుకున్నాను',
+        'ml': 'ഞാൻ മനസ്സിലാക്കി',
+        'en': 'I Understand',
+      },
+    };
+    final lang = AppLocale.current;
+    final title = _disclaimerText['title']?[lang] ?? _disclaimerText['title']!['en']!;
+    final body = _disclaimerText['body']?[lang] ?? _disclaimerText['body']!['en']!;
+    final ok = _disclaimerText['ok']?[lang] ?? _disclaimerText['ok']!['en']!;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+        content: SingleChildScrollView(
+          child: Text(body, style: const TextStyle(fontSize: 13, height: 1.6)),
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFE53E3E),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(ok, style: const TextStyle(fontWeight: FontWeight.w700)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _loadDashaHighlightPref() async {
@@ -266,6 +338,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _tabCtrl.removeListener(_onTabChanged);
     _tabCtrl.dispose();
     _newNoteController.dispose();
     _fatherNameCtrl.dispose();
