@@ -1421,6 +1421,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: kBg,
       body: KeyedSubtree(
         key: ValueKey(_resumeKey),
@@ -4643,7 +4644,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     return ListView.builder(
       itemCount: allPersons.length,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 300),
       itemBuilder: (ctx, i) {
         final pData = allPersons[i];
         return _buildIndividualNoteSection(
@@ -5035,7 +5036,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     final selectedTheme = PdfThemes.getById(_selectedThemeId);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 300),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
