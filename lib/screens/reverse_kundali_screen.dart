@@ -221,7 +221,7 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
     return Card(
       child: ListTile(
         dense: true,
-        leading: const Icon(Icons.location_on, color: kPurple2),
+        leading: Icon(Icons.location_on, color: kPurple2),
         title: Text(_locationName, style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Text('${_lat.toStringAsFixed(4)}, ${_lon.toStringAsFixed(4)} (UTC+${_tzOffset > 0 ? '+' : ''}${_tzOffset})', style: const TextStyle(fontSize: 11)),
         trailing: IconButton(
