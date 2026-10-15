@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:sweph/sweph.dart';
 import '../core/ephemeris.dart';
 import '../core/calculator.dart';
 import '../constants/strings.dart';
+import '../constants/places.dart';
+import '../services/timezone_service.dart';
 import '../widgets/common.dart';
 
 // ─────────────────────────────────────────────
@@ -54,6 +58,10 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
   double _progress = 0.0;
   int _totalSteps = 0;
   int _currentStep = 0;
+
+  // Location search
+  bool _geoLoading = false;
+  String _geoStatus = '';
 
   @override
   Widget build(BuildContext context) {
@@ -219,14 +227,62 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
 
   Widget _buildLocationRow() {
     return Card(
-      child: ListTile(
-        dense: true,
-        leading: Icon(Icons.location_on, color: kPurple2),
-        title: Text(_locationName, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text('${_lat.toStringAsFixed(4)}, ${_lon.toStringAsFixed(4)} (UTC+${_tzOffset > 0 ? '+' : ''}${_tzOffset})', style: const TextStyle(fontSize: 11)),
-        trailing: IconButton(
-          icon: const Icon(Icons.edit, size: 20),
-          onPressed: _editLocation,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Autocomplete<String>(
+              optionsBuilder: (textEditingValue) {
+                if (textEditingValue.text.length < 2) return const Iterable.empty();
+                final query = textEditingValue.text.toLowerCase();
+                final offline = offlinePlaces.keys.where((p) => p.toLowerCase().contains(query)).toList();
+                final worldResults = searchWorldCities(textEditingValue.text, limit: 15);
+                for (final w in worldResults) {
+                  final label = worldCityLabel(w);
+                  if (!offline.any((o) => o.toLowerCase() == label.toLowerCase())) offline.add(label);
+                }
+                return offline.take(20);
+              },
+              fieldViewBuilder: (context, textCtrl, focusNode, onFieldSubmitted) {
+                if (textCtrl.text.isEmpty && _locationName.isNotEmpty) textCtrl.text = _locationName;
+                return TextField(
+                  controller: textCtrl, focusNode: focusNode,
+                  style: TextStyle(color: kText),
+                  decoration: InputDecoration(
+                    labelText: _t(kn: '📍 ಸ್ಥಳ ಹುಡುಕಿ', hi: '📍 स्थान खोजें', ta: '📍 இடம் தேடுங்கள்', te: '📍 స్థలం వెతకండి', ml: '📍 സ്ഥലം തിരയുക', en: '📍 Search Place'),
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _geoLoading
+                        ? const Padding(padding: EdgeInsets.all(12), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))
+                        : IconButton(icon: Icon(Icons.my_location, color: kTeal), onPressed: () => _geocodeOnline(textCtrl.text)),
+                  ),
+                  onSubmitted: (_) => _geocodeOnline(textCtrl.text),
+                );
+              },
+              onSelected: (String selection) => _onPlaceSelected(selection),
+              optionsViewBuilder: (context, onSelected, options) {
+                return Align(
+                  alignment: Alignment.topLeft,
+                  child: Material(
+                    elevation: 4.0, borderRadius: BorderRadius.circular(8),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 250, maxWidth: 350),
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero, shrinkWrap: true, itemCount: options.length,
+                        itemBuilder: (_, i) {
+                          final option = options.elementAt(i);
+                          return ListTile(dense: true, leading: Icon(Icons.location_on, color: kPurple2, size: 18),
+                              title: Text(option, style: const TextStyle(fontSize: 13)), onTap: () => onSelected(option));
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            if (_geoStatus.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 6), child: Text(_geoStatus, style: TextStyle(fontSize: 11, color: Colors.green.shade700))),
+            Padding(padding: const EdgeInsets.only(top: 4), child: Text('${_lat.toStringAsFixed(4)}, ${_lon.toStringAsFixed(4)}  •  UTC${_tzOffset >= 0 ? '+' : ''}$_tzOffset', style: TextStyle(fontSize: 11, color: Colors.grey.shade600))),
+          ],
         ),
       ),
     );
@@ -406,42 +462,97 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
   }
 
   // ─────────────────────────────────────────────
-  // Location Editor
+  // Location Geocoding
   // ─────────────────────────────────────────────
-  void _editLocation() {
-    final latCtrl = TextEditingController(text: _lat.toString());
-    final lonCtrl = TextEditingController(text: _lon.toString());
-    final tzCtrl = TextEditingController(text: _tzOffset.toString());
-    final nameCtrl = TextEditingController(text: _locationName);
+  void _onPlaceSelected(String selection) {
+    if (offlinePlaces.containsKey(selection)) {
+      final coords = offlinePlaces[selection]!;
+      setState(() {
+        _locationName = selection;
+        _lat = coords[0]; _lon = coords[1]; _tzOffset = coords[2];
+        _geoStatus = '📍 $selection (TZ: ${coords[2] >= 0 ? '+' : ''}${coords[2]})';
+      });
+    } else {
+      final worldResults = searchWorldCities(selection.split(', ').first, limit: 1);
+      if (worldResults.isNotEmpty) {
+        final w = worldResults.first;
+        final lat = (w['la'] as num).toDouble();
+        final lon = (w['lo'] as num).toDouble();
+        final cc = w['c'] as String? ?? '';
+        final tz = cc.isNotEmpty ? getDstAwareOffset(cc, lat, lon, DateTime.now()) : (w['tz'] as num).toDouble();
+        setState(() {
+          _locationName = selection; _lat = lat; _lon = lon; _tzOffset = tz;
+          _geoStatus = '📍 $selection (TZ: ${tz >= 0 ? '+' : ''}$tz)';
+        });
+      } else {
+        _geocodeOnline(selection);
+      }
+    }
+  }
 
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(_t(kn: 'ಸ್ಥಳ ಬದಲಾಯಿಸಿ', hi: 'स्थान बदलें', ta: 'இடம் மாற்று', te: 'స్థలం మార్చండి', ml: 'സ്ഥലം മാറ്റുക', en: 'Change Location')),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: nameCtrl, decoration: InputDecoration(labelText: _t(kn: 'ಸ್ಥಳದ ಹೆಸರು', hi: 'स्थान का नाम', ta: 'இடத்தின் பெயர்', te: 'స్థలం పేరు', ml: 'സ്ഥലത്തിന്റെ പേര്', en: 'Place Name'))),
-            TextField(controller: latCtrl, decoration: const InputDecoration(labelText: 'Latitude'), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true)),
-            TextField(controller: lonCtrl, decoration: const InputDecoration(labelText: 'Longitude'), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true)),
-            TextField(controller: tzCtrl, decoration: const InputDecoration(labelText: 'UTC Offset (hours)'), keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true)),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(_t(kn: 'ರದ್ದು', hi: 'रद्द', ta: 'ரத்து', te: 'రద్దు', ml: 'റദ്ദാക്കുക', en: 'Cancel'))),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _lat = double.tryParse(latCtrl.text) ?? _lat;
-                _lon = double.tryParse(lonCtrl.text) ?? _lon;
-                _tzOffset = double.tryParse(tzCtrl.text) ?? _tzOffset;
-                _locationName = nameCtrl.text;
-              });
-              Navigator.pop(ctx);
+  Future<void> _geocodeOnline(String placeName) async {
+    if (placeName.trim().isEmpty) return;
+    setState(() { _geoLoading = true; _geoStatus = ''; });
+    try {
+      final q = Uri.encodeComponent(placeName.trim());
+      final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$q&format=json&limit=5');
+      final resp = await http.get(url, headers: {'User-Agent': 'BharatheeyamApp/1.0'}).timeout(const Duration(seconds: 10));
+      if (resp.statusCode == 200) {
+        final data = jsonDecode(resp.body) as List;
+        if (data.isEmpty) {
+          setState(() => _geoStatus = _t(kn: 'ಸ್ಥಳ ಸಿಕ್ಕಿಲ್ಲ', hi: 'स्थान नहीं मिला', ta: 'இடம் கிடைக்கவில்லை', te: 'స్థలం దొరకలేదు', ml: 'സ്ഥലം ലഭിച്ചില്ല', en: 'Place not found'));
+        } else if (data.length == 1) {
+          final lat = double.parse(data[0]['lat']);
+          final lon = double.parse(data[0]['lon']);
+          final displayName = data[0]['display_name'] as String;
+          final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+          setState(() {
+            _locationName = placeName.trim(); _lat = lat; _lon = lon; _tzOffset = autoTz;
+            _geoStatus = '📍 $displayName (TZ: ${autoTz >= 0 ? '+' : ''}$autoTz)';
+          });
+        } else {
+          if (mounted) _showPlaceDisambiguation(data);
+        }
+      }
+    } catch (_) {
+      setState(() => _geoStatus = _t(kn: 'ನೆಟ್‌ವರ್ಕ್ ದೋಷ', hi: 'नेटवर्क त्रुटि', ta: 'பிணைய பிழை', te: 'నెట్‌వర్క్ లోపం', ml: 'നെറ്റ്‌വർക്ക് പിശക്', en: 'Network error'));
+    }
+    setState(() => _geoLoading = false);
+  }
+
+  void _showPlaceDisambiguation(List<dynamic> results) {
+    showModalBottomSheet(
+      context: context, backgroundColor: kBg,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(padding: const EdgeInsets.all(16),
+            child: Text(_t(kn: 'ಸ್ಥಳ ಆಯ್ಕೆ ಮಾಡಿ', hi: 'स्थान चुनें', ta: 'இடம் தேர்வு', te: 'స్థలం ఎంచుకోండి', ml: 'സ്ഥലം തിരഞ്ഞെടുക്കുക', en: 'Select Place'),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: kPurple1))),
+          Flexible(child: ListView.separated(
+            shrinkWrap: true, itemCount: results.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (_, i) {
+              final place = results[i];
+              final displayName = place['display_name'] ?? '';
+              return ListTile(
+                leading: CircleAvatar(backgroundColor: kPurple1.withOpacity(0.1), child: Icon(Icons.location_on, color: kPurple1, size: 20)),
+                title: Text(displayName, style: const TextStyle(fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final lat = double.parse(place['lat']);
+                  final lon = double.parse(place['lon']);
+                  final autoTz = await getTimezoneForPlace(displayName, lat, lon);
+                  setState(() {
+                    _locationName = displayName.split(',').first; _lat = lat; _lon = lon; _tzOffset = autoTz;
+                    _geoStatus = '📍 $displayName (TZ: ${autoTz >= 0 ? '+' : ''}$autoTz)';
+                  });
+                },
+              );
             },
-            child: Text(_t(kn: 'ಸರಿ', hi: 'ठीक', ta: 'சரி', te: 'సరే', ml: 'ശരി', en: 'OK')),
-          ),
-        ],
+          )),
+          const SizedBox(height: 16),
+        ]),
       ),
     );
   }
