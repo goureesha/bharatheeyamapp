@@ -16,6 +16,7 @@ import 'appointment_screen.dart';
 import 'pooja_lists_screen.dart';
 import 'vastu_screen.dart';
 import 'muhurta_screen.dart';
+import 'reverse_kundali_screen.dart';
 import '../services/tester_service.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -44,6 +45,9 @@ class HomeScreen extends StatelessWidget {
       }),
       _Section(AppLocale.l('planets'), 'Planets', Icons.blur_circular, AppThemes.isTanjore ? const Color(0xFFB8941F) : const Color(0xFFc0392b), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const PlanetsScreen()));
+      }),
+      _Section(AppLocale.l('reverseKundali'), 'Reverse Kundali', Icons.find_replace_rounded, AppThemes.isTanjore ? const Color(0xFFAA8B3F) : const Color(0xFF8E44AD), () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const ReverseKundaliScreen()));
       }),
 
       _Section(AppLocale.l('vedicClock'), 'Vedic Clock', Icons.watch_later_rounded, AppThemes.isTanjore ? const Color(0xFFAA9B6F) : const Color(0xFF5B2C6F), () {

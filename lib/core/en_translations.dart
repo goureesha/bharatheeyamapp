@@ -1460,4 +1460,5 @@ const Map<String, String> enStrings = {
   'aaya8': 'Aaya8',
   'poojaLists': 'Pooja Lists',
   'vastuLabel': 'Vastu Label',
+  'reverseKundali': 'Reverse Kundali',
 };

@@ -979,7 +979,7 @@ class AppLocale {
       'aaya1': 'ಧ್ವಜ', 'aaya2': 'ಧೂಮ್ರ', 'aaya3': 'ಸಿಂಹ', 'aaya4': 'ಶ್ವಾನ',
       'aaya5': 'ವೃಷಭ', 'aaya6': 'ಖರ', 'aaya7': 'ಗಜ', 'aaya8': 'ಧ್ವಾಂಕ್ಷ',
 
-      'poojaLists': 'ಪೂಜಾ ಪಟ್ಟಿ', 'vastuLabel': 'ವಾಸ್ತು',
+      'poojaLists': 'ಪೂಜಾ ಪಟ್ಟಿ', 'vastuLabel': 'ವಾಸ್ತು', 'reverseKundali': 'ರಿವರ್ಸ್ ಕುಂಡಲಿ',
 },
     'hi': {
 
@@ -1736,7 +1736,7 @@ class AppLocale {
       'aaya1': 'ध्वज', 'aaya2': 'धूम्र', 'aaya3': 'सिंह', 'aaya4': 'श्वान',
       'aaya5': 'वृषभ', 'aaya6': 'खर', 'aaya7': 'गज', 'aaya8': 'ध्वांक्ष',
 
-      'poojaLists': 'पूजा सूची', 'vastuLabel': 'वास्तु',
+      'poojaLists': 'पूजा सूची', 'vastuLabel': 'वास्तु', 'reverseKundali': 'रिवर्स कुंडली',
 },
     'ta': {
 
@@ -2489,7 +2489,7 @@ class AppLocale {
       'aaya1': 'த்வஜம்', 'aaya2': 'தூம்ரம்', 'aaya3': 'சிம்மம்', 'aaya4': 'ச்வானம்',
       'aaya5': 'விருஷபம்', 'aaya6': 'கரம்', 'aaya7': 'கஜம்', 'aaya8': 'த்வாங்க்ஷம்',
 
-      'poojaLists': 'பூஜை பட்டியல்', 'vastuLabel': 'வாஸ்து',
+      'poojaLists': 'பூஜை பட்டியல்', 'vastuLabel': 'வாஸ்து', 'reverseKundali': 'ரிவர்ஸ் குண்டலி',
 },
     'te': {
 
@@ -3242,7 +3242,7 @@ class AppLocale {
       'aaya1': 'ధ్వజం', 'aaya2': 'ధూమ్రం', 'aaya3': 'సింహం', 'aaya4': 'శ్వానం',
       'aaya5': 'వృషభం', 'aaya6': 'ఖరం', 'aaya7': 'గజం', 'aaya8': 'ధ్వాంక్షం',
 
-      'poojaLists': 'పూజ జాబితా', 'vastuLabel': 'వాస్తు',
+      'poojaLists': 'పూజ జాబితా', 'vastuLabel': 'వాస్తు', 'reverseKundali': 'రివర్స్ కుండలి',
 },
     'ml': {
 
@@ -3995,7 +3995,7 @@ class AppLocale {
       'aaya1': 'ധ്വജം', 'aaya2': 'ധൂമ്രം', 'aaya3': 'സിംഹം', 'aaya4': 'ശ്വാനം',
       'aaya5': 'വൃഷഭം', 'aaya6': 'ഖരം', 'aaya7': 'ഗജം', 'aaya8': 'ധ്വാങ്ക്ഷം',
 
-      'poojaLists': 'പൂജാ പട്ടിക', 'vastuLabel': 'വാസ്തു',
+      'poojaLists': 'പൂജാ പട്ടിക', 'vastuLabel': 'വാസ്തു', 'reverseKundali': 'റിവേഴ്സ് കുണ്ഡലി',
 },
     'en': enStrings,
   };
