@@ -354,27 +354,40 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   void _onChartModeChanged() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      final focus = FocusManager.instance.primaryFocus;
+      if (focus != null && focus.context != null && focus.context!.widget is EditableText) return;
+      setState(() {});
+    }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Lightweight repaint on resume — fixes blank charts without destroying widget tree
+    // But skip if a TextField has focus (keyboard is open) to avoid dismissing it
     if (state == AppLifecycleState.resumed && mounted) {
       Future.delayed(const Duration(milliseconds: 100), () {
-        if (mounted) setState(() {});
+        if (mounted) {
+          final focus = FocusManager.instance.primaryFocus;
+          // Don't rebuild if user is typing in a text field — it would dismiss the keyboard
+          if (focus != null && focus.context != null) {
+            final ctx = focus.context!;
+            final isEditing = ctx.widget is EditableText;
+            if (isEditing) return;
+          }
+          setState(() {});
+        }
       });
     }
   }
   Future<void> _loadJyotishiDetails() async {
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
-      setState(() {
-        _jyotishiNameCtrl.text = prefs.getString('jyotishi_name') ?? prefs.getString('default_jyotishi_name') ?? '';
-        _jyotishiPhoneCtrl.text = prefs.getString('jyotishi_phone') ?? prefs.getString('default_jyotishi_phone') ?? '';
-        _tippaniInvocationCtrl.text = prefs.getString('tippani_invocation') ?? 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ';
-        _tippaniAddressCtrl.text = prefs.getString('tippani_address') ?? prefs.getString('default_jyotishi_address') ?? '';
-      });
+      // TextEditingController.text setter already notifies listeners — no setState needed
+      _jyotishiNameCtrl.text = prefs.getString('jyotishi_name') ?? prefs.getString('default_jyotishi_name') ?? '';
+      _jyotishiPhoneCtrl.text = prefs.getString('jyotishi_phone') ?? prefs.getString('default_jyotishi_phone') ?? '';
+      _tippaniInvocationCtrl.text = prefs.getString('tippani_invocation') ?? 'ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ';
+      _tippaniAddressCtrl.text = prefs.getString('tippani_address') ?? prefs.getString('default_jyotishi_address') ?? '';
     }
   }
 
