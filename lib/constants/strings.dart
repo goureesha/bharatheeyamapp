@@ -454,11 +454,19 @@ void _buildTranslateMapIfNeeded() {
   }
   // Planet names
   final localePlanets = appPlanetNames;
-  for (final entry in planetNames.entries) {
-    final knName = entry.value;
-    final localeName = localePlanets[entry.key];
-    if (localeName != null) map[knName] = localeName;
+  if (AppLocale.current == 'en') {
+    // enPlanetNames already has Kannada keys → English values
+    map.addAll(localePlanets);
+  } else {
+    for (final entry in planetNames.entries) {
+      final knName = entry.value;
+      final localeName = localePlanets[entry.key];
+      if (localeName != null) map[knName] = localeName;
+    }
   }
+  // Add alternate planet names
+  map['ಸೂರ್ಯ'] = map['ರವಿ'] ?? 'ರವಿ';
+  map['ಮಂಗಳ'] = map['ಕುಜ'] ?? 'ಕುಜ';
   // Sphutas (16)
   final localeSphutas = appSphutas16Order;
   for (int i = 0; i < sphutas16Order.length && i < localeSphutas.length; i++) {

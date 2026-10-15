@@ -695,7 +695,7 @@ class JanmaPatrikeService {
                             color: t.chartCenterBg,
                           ),
                           child: Text(
-                            title.split(' ')[0],
+                            title.split(' ').join('\n'),
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: t.chartCenterText),
                           ),
                         ),
@@ -1498,11 +1498,9 @@ class JanmaPatrikeService {
     final samvatsaraName = p.samvatsara.split(' ').first;
     
     final tithiName = trAll(p.tithi);
-    String paksha = '';
-    if (tithiName.contains('ಶುಕ್ಲ')) paksha = 'ಶುಕ್ಲ';
-    else if (tithiName.contains('ಕೃಷ್ಣ')) paksha = 'ಕೃಷ್ಣ';
-    else if (p.tithiIndex < 15) paksha = 'ಶುಕ್ಲ';
-    else paksha = 'ಕೃಷ್ಣ';
+    final paksha = p.tithiIndex < 15
+        ? AppLocale.l('shPaksha')
+        : AppLocale.l('krPaksha');
 
     final moonPada = result.planets['ಚಂದ್ರ']?.pada ?? 1;
     final lagnaInfo = result.planets['ಲಗ್ನ'];
@@ -1510,6 +1508,7 @@ class JanmaPatrikeService {
 
     // Convert to Kannada numerals
     String toKn(String s) {
+      if (AppLocale.current != 'kn') return s;
       const en = ['0','1','2','3','4','5','6','7','8','9'];
       const kn = ['೦','೧','೨','೩','೪','೫','೬','೭','೮','೯'];
       for (int i = 0; i < 10; i++) s = s.replaceAll(en[i], kn[i]);
@@ -1553,9 +1552,9 @@ class JanmaPatrikeService {
         'ಚಂದ್ರರಾಶಿ ${trAll(p.chandraRashi)} '
         'ಲಗ್ನ $lagnaRashi ॥';
 
-    final dashaLine = 'ಜನ್ಮಶಿಷ್ಟ ${trAll(p.dashaLord)} ದಶಾ ಶೇಷ: ${p.dashaBalance}';
-    final dateLine = 'ಜನ್ಮ ತಾರೀಖು: ${toKn(user.dateStr)}';
-    final sunLine = 'ಸೂರ್ಯೋದಯ: ${toKn(p.sunrise)} - ಸೂರ್ಯಾಸ್ತ: ${toKn(p.sunset)}';
+    final dashaLine = '${AppLocale.l('jpShishtaDasha')}: ${trAll(p.dashaLord)} — ${AppLocale.l('jpShesha')}: ${p.dashaBalance}';
+    final dateLine = '${AppLocale.l('jpDob')}: ${user.dateStr}';
+    final sunLine = '${AppLocale.l('jpSunrise')}: ${p.sunrise} — ${AppLocale.l('jpSunset')}: ${p.sunset}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -3037,7 +3037,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
             final currentMadhyas = getMadhyas(_bhavaPlanet);
             final title = _bhavaPlanet != null
-                ? '${AppLocale.l('bhavaRecalc')} (${_bhavaPlanet!})'
+                ? '${AppLocale.l('bhavaRecalc')} (${trAll(_bhavaPlanet!)})'
                 : '${AppLocale.l('bhavaRecalcFor')} (${AppLocale.l('lagna')})';
 
             // Compute Adi (start) and Antya (end) sphuta for each bhava

@@ -462,7 +462,7 @@ class KundaliChart extends StatelessWidget {
     String label = centerLabel ?? AppLocale.l('appName');
     if (AppLocale.current != 'kn' && centerLabel != null) {
       // Auto-translate each line of the center label
-      label = label.split('\n').map((line) => tr(line)).join('\n');
+      label = label.split('\n').map((line) => trAll(line)).join('\n');
     }
     return Container(
       margin: const EdgeInsets.all(0),
@@ -580,7 +580,7 @@ class KundaliChart extends StatelessWidget {
   };
 
   static const _shortNamesEn = <String, String>{
-    'ರವಿ': 'Su', 'ಚಂದ್ರ': 'Mo', 'ಕುಜ': 'Ma', 'ಬುಧ': 'Me',
+    'ರವಿ': 'Su', 'ಸೂರ್ಯ': 'Su', 'ಚಂದ್ರ': 'Mo', 'ಕುಜ': 'Ma', 'ಮಂಗಳ': 'Ma', 'ಬುಧ': 'Me',
     'ಗುರು': 'Ju', 'ಶುಕ್ರ': 'Ve', 'ಶನಿ': 'Sa', 'ರಾಹು': 'Ra',
     'ಕೇತು': 'Ke', 'ಲಗ್ನ': 'Asc', 'ಮಾಂದಿ': 'Md',
   };
@@ -623,7 +623,7 @@ class KundaliChart extends StatelessWidget {
     'ಕೇತು': 'കേ', 'ಲಗ್ನ': 'ല', 'ಮಾಂದಿ': 'മാ',
   };
   static const _singleLetterEn = <String, String>{
-    'ರವಿ': 'Su', 'ಚಂದ್ರ': 'Mo', 'ಕುಜ': 'Ma', 'ಬುಧ': 'Me',
+    'ರವಿ': 'Su', 'ಸೂರ್ಯ': 'S', 'ಚಂದ್ರ': 'Mo', 'ಕುಜ': 'Ma', 'ಮಂಗಳ': 'M', 'ಬುಧ': 'Me',
     'ಗುರು': 'Ju', 'ಶುಕ್ರ': 'Ve', 'ಶನಿ': 'Sa', 'ರಾಹು': 'Ra',
     'ಕೇತು': 'Ke', 'ಲಗ್ನ': 'As', 'ಮಾಂದಿ': 'Md',
   };

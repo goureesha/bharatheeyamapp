@@ -413,7 +413,7 @@ class NorthIndianChart extends StatelessWidget {
           children: [
             Image.asset('assets/images/logo.png', width: 36, height: 36),
             const SizedBox(height: 2),
-            Text(AppLocale.current != 'kn' && centerLabel != null ? centerLabel!.split('\n').map((line) => tr(line)).join('\n') : (centerLabel ?? AppLocale.l('appName')),
+            Text(AppLocale.current != 'kn' && centerLabel != null ? centerLabel!.split('\n').map((line) => trAll(line)).join('\n') : (centerLabel ?? AppLocale.l('appName')),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12 * textScale,
@@ -514,20 +514,20 @@ class NorthIndianChart extends StatelessWidget {
   }
 
   Widget _aroodhaChip(String label) {
-    return Text(label,
+    return Text(translateKn(label),
       style: TextStyle(fontSize: 9 * textScale, fontWeight: FontWeight.w800, color: const Color(0xFFDD6B20)),
     );
   }
 
   Widget _sphutaChip(String label) {
-    return Text(label,
+    return Text(translateKn(label),
       style: TextStyle(fontSize: 8 * textScale, fontWeight: FontWeight.w600, color: Colors.purple.withOpacity(0.6)),
     );
   }
 
   String _translateCenter(String label) {
     // Now handled inline via tr()
-    return label.split('\n').map((line) => tr(line)).join('\n');
+    return label.split('\n').map((line) => trAll(line)).join('\n');
   }
 
   static const _shortNamesKn = <String, String>{
@@ -601,7 +601,7 @@ class NorthIndianChart extends StatelessWidget {
   };
 
   static const _shortNamesEn = <String, String>{
-    'ರವಿ': 'Su', 'ಚಂದ್ರ': 'Mo', 'ಕುಜ': 'Ma', 'ಬುಧ': 'Me',
+    'ರವಿ': 'Su', 'ಸೂರ್ಯ': 'Su', 'ಚಂದ್ರ': 'Mo', 'ಕುಜ': 'Ma', 'ಮಂಗಳ': 'Ma', 'ಬುಧ': 'Me',
     'ಗುರು': 'Ju', 'ಶುಕ್ರ': 'Ve', 'ಶನಿ': 'Sa', 'ರಾಹು': 'Ra',
     'ಕೇತು': 'Ke', 'ಲಗ್ನ': 'Asc', 'ಮಾಂದಿ': 'Md',
   };

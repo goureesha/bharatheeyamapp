@@ -177,7 +177,7 @@ class _AshtakaVargaWidgetState extends State<AshtakaVargaWidget> {
   Widget _centerBox(int total) {
     final label = _selectedPlanet == 'SAV'
         ? AppLocale.l('sarvashtakaVarga')
-        : '$_selectedPlanet\n${AppLocale.l('ashtakavarga')}';
+        : '${trAll(_selectedPlanet)}\n${AppLocale.l('ashtakavarga')}';
     return Container(
       margin: const EdgeInsets.all(0),
       decoration: BoxDecoration(
