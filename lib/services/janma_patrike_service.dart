@@ -1539,7 +1539,7 @@ class JanmaPatrikeService {
         '${p.divamana.isNotEmpty ? "ದಿವಾಪ್ರಮಾಣ ${toKn(p.divamana)} " : ""}'
         '${p.souraMasa.isNotEmpty ? "${trAll(p.souraMasa)} ಸಂಕ್ರಾಂತಿ " : ""}'
         '${p.souraMasaGataDina.isNotEmpty ? "ಗತದಿನ ${toKn(p.souraMasaGataDina)} " : ""}'
-        'ಇವಂ ಪಂಚಾಂಗಮ್ ॥ '
+        'ಏವಂ ಪಂಚಾಂಗಮ್ ॥ '
         'ಅಸ್ಮಿನ್ ಶುಭದಿನೇ ಸೂರ್ಯೋದಯಾತ್ ಘಟಿ ${toKn(birthGhati)} '
         '(ಭಾರತೀಯ ಪ್ರಮಾಣ ವೇಳೆ ${user.timeStr}) '
         '${user.fatherName.isNotEmpty ? "${user.fatherName} " : "___________"} '
