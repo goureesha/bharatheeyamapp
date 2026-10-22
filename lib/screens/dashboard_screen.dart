@@ -4309,24 +4309,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ]),
               ),
             ],
-            // Remedy
-            if (b.remedy.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.06),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber.withOpacity(0.3)),
-                ),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Icon(Icons.healing, color: Colors.amber.shade700, size: 16),
-                  const SizedBox(width: 6),
-                  Expanded(child: Text(b.remedy, style: TextStyle(fontSize: 11, color: kText, height: 1.4))),
-                ]),
-              ),
-            ],
           ],
         ),
       ),

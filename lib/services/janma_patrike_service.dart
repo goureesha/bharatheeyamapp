@@ -1324,12 +1324,6 @@ class JanmaPatrikeService {
               padding: const EdgeInsets.only(top: 3),
               child: Text('📖 ${b.shloka}', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: Colors.black45, height: 1.3)),
             ),
-          // Remedy
-          if (b.remedy.isNotEmpty && b.quality == PhalaQuality.ashubha)
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text('💡 ${b.remedy}', style: TextStyle(fontSize: 9, color: t.primaryDark, fontStyle: FontStyle.italic)),
-            ),
         ],
       ),
     );
