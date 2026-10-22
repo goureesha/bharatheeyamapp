@@ -2016,7 +2016,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
-                    _tableHeader([AppLocale.l('hGraha'), AppLocale.l('hRashi'), AppLocale.l('hSphuta'), AppLocale.l('hNakPada')]),
+                    _tableHeader([AppLocale.l('hGraha'), AppLocale.l('hRashi'), AppLocale.l('hSphuta'), AppLocale.l('hNakPada')], big: true),
                     ...planetOrder.map((p) {
                       final info = personResult.planets[p];
                       if (info == null) return const SizedBox.shrink();
@@ -2026,7 +2026,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         appRashi[ri],
                         formatDeg(info.longitude),
                         '${trAll(info.nakshatra)} - ${info.pada}'
-                      ], bold0: true);
+                      ], bold0: true, big: true);
                     }),
                   ],
                 ),
@@ -2039,7 +2039,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
-                    _tableHeader([AppLocale.l('hUpagraha'), AppLocale.l('hRashi'), AppLocale.l('hDegree'), AppLocale.l('hNakshatraCol')]),
+                    _tableHeader([AppLocale.l('hUpagraha'), AppLocale.l('hRashi'), AppLocale.l('hDegree'), AppLocale.l('hNakshatraCol')], big: true),
                     ...sphutas16Order.map((sp) {
                       final deg = personResult.advSphutas[sp];
                       if (deg == null) return const SizedBox.shrink();
@@ -2047,7 +2047,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       final nakIdx = (deg / 13.333333).floor() % 27;
                       final pada = ((deg % 13.333333) / 3.333333).floor() + 1;
                       return _tableRow([trAll(sp), appRashi[ri], formatDeg(deg), '${appNak[nakIdx]}-$pada'],
-                        bold0: true);
+                        bold0: true, big: true);
                     }),
                   ],
                 ),
@@ -2670,18 +2670,18 @@ class _DashboardScreenState extends State<DashboardScreen>
                   child: Text(pName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kTeal)),
                 ),
               AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                if (pName.isNotEmpty) _kv(AppLocale.l('nameLabel'), pName),
-                _kv(AppLocale.l('placeLabel'), person['place'] as String),
-                _kv(AppLocale.l('dateLabel'), dateStr),
-                _kv(AppLocale.l('timeLabel'), timeStr),
-                _kv(AppLocale.l('dashaLord'), '${trAll(pan.dashaLord)}  ${AppLocale.l('dashaBalance')}: ${_trDashaBalance(pan.dashaBalance)}'),
+                if (pName.isNotEmpty) _kv(AppLocale.l('nameLabel'), pName, big: true),
+                _kv(AppLocale.l('placeLabel'), person['place'] as String, big: true),
+                _kv(AppLocale.l('dateLabel'), dateStr, big: true),
+                _kv(AppLocale.l('timeLabel'), timeStr, big: true),
+                _kv(AppLocale.l('dashaLord'), '${trAll(pan.dashaLord)}  ${AppLocale.l('dashaBalance')}: ${_trDashaBalance(pan.dashaBalance)}', big: true),
                 const Divider(height: 16),
-                _kv(AppLocale.l('ageLabel'), ageStr),
+                _kv(AppLocale.l('ageLabel'), ageStr, big: true),
                 if (currentDasha.isNotEmpty) ...[
                   const Divider(height: 16),
-                  _kv('${AppLocale.l('dasha')}', '$currentDasha  (${AppLocale.l('end')}: $dashaEnd)'),
+                  _kv('${AppLocale.l('dasha')}', '$currentDasha  (${AppLocale.l('end')}: $dashaEnd)', big: true),
                   if (currentBhukti.isNotEmpty)
-                    _kv(AppLocale.l('bhuktiLabel'), '$currentBhukti  (${AppLocale.l('end')}: $bhuktiEnd)'),
+                    _kv(AppLocale.l('bhuktiLabel'), '$currentBhukti  (${AppLocale.l('end')}: $bhuktiEnd)', big: true),
                 ],
               ])),
               const SizedBox(height: 8),
@@ -2690,11 +2690,11 @@ class _DashboardScreenState extends State<DashboardScreen>
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(children: [
-                  _tableRow([AppLocale.l('varaLabel'), trAll(pan.vara)]),
-                  _tableRow([AppLocale.l('tithiLabel'), '${trAll(pan.tithi)}${pan.tithiGata.isNotEmpty || pan.tithiParama.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.tithiGata}, ${AppLocale.l('paramaGhati')}: ${pan.tithiParama})' : ''}']),
-                  _tableRow([AppLocale.l('chandraNakshatra'), () { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p'; }()]),
-                  _tableRow([AppLocale.l('yogaLabel'), '${trAll(pan.yoga)}${pan.yogaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.yogaGata})' : ''}']),
-                  _tableRow([AppLocale.l('karanaLabel'), '${trAll(pan.karana)}${pan.karanaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.karanaGata})' : ''}']),
+                  _tableRow([AppLocale.l('varaLabel'), trAll(pan.vara)], big: true),
+                  _tableRow([AppLocale.l('tithiLabel'), '${trAll(pan.tithi)}${pan.tithiGata.isNotEmpty || pan.tithiParama.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.tithiGata}, ${AppLocale.l('paramaGhati')}: ${pan.tithiParama})' : ''}'], big: true),
+                  _tableRow([AppLocale.l('chandraNakshatra'), () { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p'; }()], big: true),
+                  _tableRow([AppLocale.l('yogaLabel'), '${trAll(pan.yoga)}${pan.yogaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.yogaGata})' : ''}'], big: true),
+                  _tableRow([AppLocale.l('karanaLabel'), '${trAll(pan.karana)}${pan.karanaGata.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.karanaGata})' : ''}'], big: true),
                 ]),
               ),
               const SizedBox(height: 8),
@@ -2704,14 +2704,14 @@ class _DashboardScreenState extends State<DashboardScreen>
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(children: [
-                  _tableRow([AppLocale.l('sunrise'), pan.sunrise]),
-                  _tableRow([AppLocale.l('sunset'), pan.sunset]),
-                  _tableRow([AppLocale.l('divamana'), pan.divamana]),
-                  _tableRow([AppLocale.l('ratrimana'), pan.ratrimana]),
-                  _tableRow([AppLocale.l('udayadiGhati'), pan.udayadiGhati]),
-                  _tableRow([AppLocale.l('suryaNakshatraLabel'), '${trAll(pan.suryaNakshatra)} - ${AppLocale.l('padaLabel')} ${pan.suryaPada}']),
-                  _tableRow([AppLocale.l('souraMasa'), trAll(pan.souraMasa)]),
-                  _tableRow([AppLocale.l('souraMasaGataDina'), pan.souraMasaGataDina]),
+                  _tableRow([AppLocale.l('sunrise'), pan.sunrise], big: true),
+                  _tableRow([AppLocale.l('sunset'), pan.sunset], big: true),
+                  _tableRow([AppLocale.l('divamana'), pan.divamana], big: true),
+                  _tableRow([AppLocale.l('ratrimana'), pan.ratrimana], big: true),
+                  _tableRow([AppLocale.l('udayadiGhati'), pan.udayadiGhati], big: true),
+                  _tableRow([AppLocale.l('suryaNakshatraLabel'), '${trAll(pan.suryaNakshatra)} - ${AppLocale.l('padaLabel')} ${pan.suryaPada}'], big: true),
+                  _tableRow([AppLocale.l('souraMasa'), trAll(pan.souraMasa)], big: true),
+                  _tableRow([AppLocale.l('souraMasaGataDina'), pan.souraMasaGataDina], big: true),
                 ]),
               ),
               const SizedBox(height: 8),
@@ -2721,16 +2721,16 @@ class _DashboardScreenState extends State<DashboardScreen>
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(children: [
-                  _tableRow([AppLocale.l('chandraNakshatra'), () { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p (${AppLocale.l('gataGhati')}: ${pan.gataGhati}, ${AppLocale.l('paramaGhati')}: ${pan.paramaGhati})'; }()]),
-                  _tableRow([AppLocale.l('chandraRashiLabel'), trAll(pan.chandraRashi)]),
-                  _tableRow([AppLocale.l('chandraMasa'), trAll(pan.chandraMasa)]),
-                  _tableRow([AppLocale.l('samvatsara'), trAll(pan.samvatsara)]),
-                  _tableRow([AppLocale.l('tithiLabel'), '${trAll(pan.tithi)}${pan.tithiGata.isNotEmpty || pan.tithiParama.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.tithiGata}, ${AppLocale.l('paramaGhati')}: ${pan.tithiParama})' : ''}']),
-                  _tableRow([AppLocale.l('gataGhati'), pan.gataGhati]),
-                  _tableRow([AppLocale.l('paramaGhati'), pan.paramaGhati]),
-                  _tableRow([AppLocale.l('sheshaGhati'), pan.shesha]),
-                  _tableRow([AppLocale.l('vishaPraghati'), pan.vishaPraghati]),
-                  _tableRow([AppLocale.l('amrutaPraghati'), pan.amrutaPraghati]),
+                  _tableRow([AppLocale.l('chandraNakshatra'), () { final moonPada = r.planets['ಚಂದ್ರ']?.pada; final fallback = (pan.nakPercent * 4).floor() + 1; final p = moonPada ?? (fallback < 1 ? 1 : fallback > 4 ? 4 : fallback); return '${trAll(pan.nakshatra)} - ${AppLocale.l('padaLabel')} $p (${AppLocale.l('gataGhati')}: ${pan.gataGhati}, ${AppLocale.l('paramaGhati')}: ${pan.paramaGhati})'; }()], big: true),
+                  _tableRow([AppLocale.l('chandraRashiLabel'), trAll(pan.chandraRashi)], big: true),
+                  _tableRow([AppLocale.l('chandraMasa'), trAll(pan.chandraMasa)], big: true),
+                  _tableRow([AppLocale.l('samvatsara'), trAll(pan.samvatsara)], big: true),
+                  _tableRow([AppLocale.l('tithiLabel'), '${trAll(pan.tithi)}${pan.tithiGata.isNotEmpty || pan.tithiParama.isNotEmpty ? ' (${AppLocale.l('gataGhati')}: ${pan.tithiGata}, ${AppLocale.l('paramaGhati')}: ${pan.tithiParama})' : ''}'], big: true),
+                  _tableRow([AppLocale.l('gataGhati'), pan.gataGhati], big: true),
+                  _tableRow([AppLocale.l('paramaGhati'), pan.paramaGhati], big: true),
+                  _tableRow([AppLocale.l('sheshaGhati'), pan.shesha], big: true),
+                  _tableRow([AppLocale.l('vishaPraghati'), pan.vishaPraghati], big: true),
+                  _tableRow([AppLocale.l('amrutaPraghati'), pan.amrutaPraghati], big: true),
                 ]),
               ),
               if (allPersons.length > 1) Divider(thickness: 2, color: kBorder),
@@ -5461,14 +5461,21 @@ class _DashboardScreenState extends State<DashboardScreen>
   // ─────────────────────────────────────────────
   // HELPERS
   // ─────────────────────────────────────────────
-  Widget _tableHeader(List<String> cols) {
+  Widget _tableHeader(List<String> cols, {bool big = false}) {
+    final base = TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: kText);
     return Container(
       color: kPurple2.withOpacity(0.12),
       child: Row(
         children: cols.asMap().entries.map((e) => Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-            child: Text(e.value, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: kText)),
+            child: big
+                ? _AdaptiveText(e.value, baseStyle: base, bigStyles: [
+                    base.copyWith(fontSize: 13.5, fontWeight: FontWeight.w900),
+                    base.copyWith(fontSize: 13, fontWeight: FontWeight.w900),
+                    base.copyWith(fontSize: 12.5, fontWeight: FontWeight.w900),
+                  ])
+                : Text(e.value, style: base),
           ),
         )).toList(),
       ),
@@ -5486,36 +5493,154 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _tableRow(List<String> cols, {bool bold0 = false}) {
+  Widget _tableRow(List<String> cols, {bool bold0 = false, bool big = false}) {
     return Container(
       decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder))),
       child: Row(
-        children: cols.asMap().entries.map((e) => Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-            child: Text(e.value,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: (e.key == 0 && bold0) ? FontWeight.w700 : FontWeight.normal,
-                color: kText,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+        children: cols.asMap().entries.map((e) {
+          final base = TextStyle(
+            fontSize: 12,
+            fontWeight: (e.key == 0 && bold0) ? FontWeight.w700 : FontWeight.normal,
+            color: kText,
+          );
+          // In big mode: first column (label / graha) extra bold, values semi-bold
+          final bigWeight = (e.key == 0) ? FontWeight.w800 : FontWeight.w600;
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+              child: big
+                  ? _AdaptiveText(e.value, baseStyle: base, maxLines: 2, bigStyles: [
+                      base.copyWith(fontSize: 13.5, fontWeight: bigWeight),
+                      base.copyWith(fontSize: 13, fontWeight: bigWeight),
+                      base.copyWith(fontSize: 12.5, fontWeight: bigWeight),
+                      base.copyWith(fontWeight: bigWeight),
+                    ])
+                  : Text(e.value,
+                      style: base,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
             ),
-          ),
-        )).toList(),
+          );
+        }).toList(),
       ),
     );
   }
 
-  Widget _kv(String k, String v) {
+  Widget _kv(String k, String v, {bool big = false}) {
+    if (!big) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(children: [
+          Text('$k: ', style: TextStyle(fontWeight: FontWeight.w800, color: kPurple2)),
+          Expanded(child: Text(v, style: TextStyle())),
+        ]),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(children: [
-        Text('$k: ', style: TextStyle(fontWeight: FontWeight.w800, color: kPurple2)),
-        Expanded(child: Text(v, style: TextStyle())),
-      ]),
+      child: _AdaptiveKv(k, v, keyColor: kPurple2),
     );
+  }
+}
+
+/// Text that grows to a bigger/bolder style ONLY when doing so does not add
+/// extra lines (no new wrapping, no ellipsis cut-off). Otherwise it keeps the
+/// original base style, so the existing layout never breaks.
+class _AdaptiveText extends StatelessWidget {
+  final String text;
+  final TextStyle baseStyle;
+  final List<TextStyle> bigStyles; // ordered from biggest to smallest
+  final int maxLines;
+  const _AdaptiveText(this.text, {required this.baseStyle, required this.bigStyles, this.maxLines = 2});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      final maxW = constraints.maxWidth;
+      if (!maxW.isFinite) return Text(text, style: baseStyle, maxLines: maxLines, overflow: TextOverflow.ellipsis);
+      final scaler = MediaQuery.textScalerOf(context);
+      final dir = Directionality.of(context);
+      final defStyle = DefaultTextStyle.of(context).style;
+
+      int lines(TextStyle st) {
+        final tp = TextPainter(
+          text: TextSpan(text: text, style: defStyle.merge(st)),
+          textDirection: dir,
+          textScaler: scaler,
+        )..layout(maxWidth: maxW);
+        final n = tp.computeLineMetrics().length;
+        tp.dispose();
+        return n;
+      }
+
+      final baseLines = lines(baseStyle);
+      var chosen = baseStyle;
+      for (final st in bigStyles) {
+        final n = lines(st);
+        if (n <= baseLines && n <= maxLines) { chosen = st; break; }
+      }
+      return Text(text, style: chosen, maxLines: maxLines, overflow: TextOverflow.ellipsis);
+    });
+  }
+}
+
+/// Key: value row that grows bigger/bolder only when the value does not
+/// wrap onto more lines than it does at the original size.
+class _AdaptiveKv extends StatelessWidget {
+  final String k;
+  final String v;
+  final Color keyColor;
+  const _AdaptiveKv(this.k, this.v, {required this.keyColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      final maxW = constraints.maxWidth;
+      final defStyle = DefaultTextStyle.of(context).style;
+      final baseSize = defStyle.fontSize ?? 14.0;
+      final baseKey = TextStyle(fontWeight: FontWeight.w800, color: keyColor);
+      const baseVal = TextStyle();
+
+      Widget row(TextStyle ks, TextStyle vs) => Row(children: [
+        Text('$k: ', style: ks),
+        Expanded(child: Text(v, style: vs)),
+      ]);
+
+      if (!maxW.isFinite) return row(baseKey, baseVal);
+      final scaler = MediaQuery.textScalerOf(context);
+      final dir = Directionality.of(context);
+
+      TextPainter paint(String t, TextStyle st, double w) => TextPainter(
+        text: TextSpan(text: t, style: defStyle.merge(st)),
+        textDirection: dir,
+        textScaler: scaler,
+      )..layout(maxWidth: w);
+
+      // Returns value line count, or -1 if the key itself wouldn't fit.
+      int valLines(TextStyle ks, TextStyle vs) {
+        final kp = paint('$k: ', ks, double.infinity);
+        final kw = kp.width;
+        kp.dispose();
+        final rem = maxW - kw;
+        if (rem <= 20) return -1;
+        final vp = paint(v, vs, rem);
+        final n = vp.computeLineMetrics().length;
+        vp.dispose();
+        return n;
+      }
+
+      final baseLines = valLines(baseKey, baseVal);
+      if (baseLines < 0) return row(baseKey, baseVal);
+
+      for (final delta in const [1.5, 1.0, 0.5, 0.0]) {
+        final ks = baseKey.copyWith(fontSize: baseSize + delta, fontWeight: FontWeight.w900);
+        final vs = baseVal.copyWith(fontSize: baseSize + delta, fontWeight: FontWeight.w600);
+        final n = valLines(ks, vs);
+        if (n > 0 && n <= baseLines) return row(ks, vs);
+      }
+      return row(baseKey, baseVal);
+    });
   }
 }
 
