@@ -729,7 +729,7 @@ class KundaliChart extends StatelessWidget {
         child: Text(
           displayText,
           style: TextStyle(
-            fontSize: (isSelected ? 14 : 11) * textScale,
+            fontSize: (isSelected ? 15 : 12.5) * textScale,
             fontWeight: FontWeight.w900,
             color: color.withValues(alpha: opacity),
             decoration: isSelected ? TextDecoration.underline : null,

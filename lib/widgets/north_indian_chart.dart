@@ -503,7 +503,7 @@ class NorthIndianChart extends StatelessWidget {
         child: Text(
           displayText,
           style: TextStyle(
-            fontSize: (isSelected ? 12 : 9) * textScale,
+            fontSize: (isSelected ? 13 : 10.5) * textScale,
             fontWeight: FontWeight.w900,
             color: color.withValues(alpha: opacity),
             decoration: isSelected ? TextDecoration.underline : null,
