@@ -10,6 +10,7 @@ import 'prediction_shlokas_kn.dart';
 import 'prediction_shlokas_ta.dart';
 import 'prediction_shlokas_te.dart';
 import 'prediction_shlokas_ml.dart';
+import 'prediction_classical.dart';
 import '../widgets/common.dart';
 
 // ═══════════════════════════════════════════
@@ -491,6 +492,96 @@ class PredictionEngine {
 
       // Remedies removed per user request
       const String remedy = '';
+
+      // ── 5. Classical Enhancement Layers (Saravali, Jataka Parijata, Chamatkar Chintamani) ──
+
+      // 5a. Karaka analysis — "Karako Bhava Nashaya" principle
+      final karakas = houseKarakas[h] ?? [];
+      for (final p in inHouse) {
+        if (karakas.contains(p)) {
+          final effect = karakaInHouseEffect[_lang] ?? karakaInHouseEffect['kn']!;
+          // If benefics support, it's a boost; otherwise warn
+          final hasBeneficSupport = aspecters.any((a) => _benefics.contains(a));
+          phalaBuffer.write(hasBeneficSupport ? effect['boost']! : effect['warn']!);
+          break; // Only apply once per house
+        }
+      }
+
+      // 5b. Digbala analysis
+      for (final p in inHouse) {
+        if (digbalaHouse.containsKey(p)) {
+          final effect = digbalaEffect[_lang] ?? digbalaEffect['kn']!;
+          if (digbalaHouse[p] == h) {
+            phalaBuffer.write(effect['has']!);
+          } else if (digbalaHouse[p] == ((h + 5) % 12 + 1)) {
+            // Opposite house = lost digbala
+            phalaBuffer.write(effect['lost']!);
+          }
+        }
+      }
+
+      // 5c. Moolatrikona analysis for lord
+      if (moolatrikonaSign.containsKey(lord)) {
+        final lordRashi = planets[lord]?.rashiIndex;
+        if (lordRashi != null && lordRashi == moolatrikonaSign[lord]) {
+          final effect = moolatrikonaEffect[_lang] ?? moolatrikonaEffect['kn']!;
+          phalaBuffer.write(effect['lord']!);
+        }
+      }
+      // Moolatrikona for planets in house
+      for (final p in inHouse) {
+        if (moolatrikonaSign.containsKey(p)) {
+          final pRashi = planets[p]?.rashiIndex;
+          if (pRashi != null && pRashi == moolatrikonaSign[p]) {
+            final effect = moolatrikonaEffect[_lang] ?? moolatrikonaEffect['kn']!;
+            phalaBuffer.write(effect['planet']!);
+          }
+        }
+      }
+
+      // 5d. House-type contextual insight (Chamatkar Chintamani / Saravali)
+      final insight = houseTypeInsight[_lang] ?? houseTypeInsight['kn']!;
+      for (final p in inHouse) {
+        final isBenefic = _benefics.contains(p);
+        final isMalefic = _malefics.contains(p);
+        if (isBenefic && _kendras.contains(h)) {
+          phalaBuffer.write(insight['benefic_kendra']!);
+          break;
+        } else if (isMalefic && _kendras.contains(h)) {
+          phalaBuffer.write(insight['malefic_kendra']!);
+          break;
+        } else if (isBenefic && _trikonas.contains(h) && h != 1) {
+          phalaBuffer.write(insight['benefic_trikona']!);
+          break;
+        } else if (isMalefic && _dusthanas.contains(h)) {
+          phalaBuffer.write(insight['malefic_dusthana']!);
+          break;
+        } else if (isBenefic && _dusthanas.contains(h)) {
+          phalaBuffer.write(insight['benefic_dusthana']!);
+          break;
+        } else if (_upachayas.contains(h) && h != 10) {
+          phalaBuffer.write(insight['upachaya']!);
+          break;
+        }
+      }
+
+      // 5e. Friend/enemy sign analysis for planets in house (Saravali)
+      for (final p in inHouse) {
+        if (p == 'ರಾಹು' || p == 'ಕೇತು') continue; // Skip shadow planets
+        final pRashi = planets[p]?.rashiIndex;
+        if (pRashi == null) continue;
+        final signLord = _rashiLord[pRashi];
+        if (signLord == p) continue; // Own sign — already covered by dignity
+        final friends = naturalFriends[p];
+        final enemies = naturalEnemies[p];
+        final feEffect = friendEnemyEffect[_lang] ?? friendEnemyEffect['kn']!;
+        if (friends != null && friends.contains(signLord)) {
+          phalaBuffer.write(feEffect['friend']!);
+        } else if (enemies != null && enemies.contains(signLord)) {
+          phalaBuffer.write(feEffect['enemy']!);
+        }
+        break; // Only apply for the first significant planet
+      }
 
       // Generate highlights for exceptional placements
       if (quality == PhalaQuality.shubha && (h == 1 || h == 5 || h == 9 || h == 10)) {
