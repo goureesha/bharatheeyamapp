@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sweph/sweph.dart' hide kIsWeb;
 import '../widgets/common.dart';
 import '../constants/strings.dart';
-import '../constants/places.dart';
 import '../core/calculator.dart';
 import '../core/ephemeris.dart';
 import '../core/muhurta_rules.dart';
@@ -59,12 +58,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     _userVaras = Set<int>.from(rules?.allowedVaras ?? List.generate(7, (i) => i));
   }
 
-  // Location
-  double _lat = LocationService.lat;
-  double _lon = LocationService.lon;
-  double _tz = LocationService.tzOffset;
-  String _place = LocationService.place;
-
   // Results
   bool _searching = false;
   List<Map<String, dynamic>> _results = [];
@@ -106,10 +99,10 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         await cache.generate(
           startDate: startDate,
           endDate: endDate,
-          lat: _lat,
-          lon: _lon,
-          tzOffset: _tz,
-          zoneName: _place,
+          lat: LocationService.lat,
+          lon: LocationService.lon,
+          tzOffset: LocationService.tzOffset,
+          zoneName: LocationService.place,
         );
       } catch (_) {
         // Fallback to non-cached
@@ -134,9 +127,9 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
       List<double>? srSs;
       try {
         srSs = Ephemeris.findSunriseSetForDate(
-          day.date.year, day.date.month, day.date.day, _lat, _lon, tzOffset: _tz);
-        final srFrac = ((srSs[0] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
-        final ssFrac = ((srSs[1] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
+          day.date.year, day.date.month, day.date.day, LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset);
+        final srFrac = ((srSs[0] + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
+        final ssFrac = ((srSs[1] + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
         final srMins = srFrac * 24.0 * 60.0;
         final ssMins = ssFrac * 24.0 * 60.0;
         final dayDur = ((ssMins - srMins) + 1440) % 1440;
@@ -215,15 +208,15 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
 
     for (var d = startDate; !d.isAfter(endDate); d = d.add(const Duration(days: 1))) {
       try {
-        final srSs = Ephemeris.findSunriseSetForDate(d.year, d.month, d.day, _lat, _lon, tzOffset: _tz);
-        final srFrac = ((srSs[0] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
+        final srSs = Ephemeris.findSunriseSetForDate(d.year, d.month, d.day, LocationService.lat, LocationService.lon, tzOffset: LocationService.tzOffset);
+        final srFrac = ((srSs[0] + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
         final srHour = srFrac * 24.0 + (1.0 / 60.0);
-        final ssFrac = ((srSs[1] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
+        final ssFrac = ((srSs[1] + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
 
         final kr = await AstroCalculator.calculate(
           year: d.year, month: d.month, day: d.day,
-          hourUtcOffset: _tz, hour24: srHour,
-          lat: _lat, lon: _lon,
+          hourUtcOffset: LocationService.tzOffset, hour24: srHour,
+          lat: LocationService.lat, lon: LocationService.lon,
           ayanamsaMode: 'lahiri', trueNode: true,
         );
         if (kr == null) continue;
@@ -311,11 +304,11 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     final samples = <_AscSample>[];
     double jd = srJd;
     while (jd <= ssJd + step) {
-      final houses = Ephemeris.placidusHousesFull(jd, _lat, _lon);
+      final houses = Ephemeris.placidusHousesFull(jd, LocationService.lat, LocationService.lon);
       if (houses != null && houses.ascmc.length >= 1) {
         final sidAsc = ((houses.ascmc[0] as double) - ayn) % 360.0;
         final rashiIdx = (sidAsc / 30.0).floor() % 12;
-        final localFrac = ((jd + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
+        final localFrac = ((jd + 0.5 + (LocationService.tzOffset / 24.0)) % 1.0 + 1.0) % 1.0;
         samples.add(_AscSample(jd: jd, rashiIdx: rashiIdx, localMins: localFrac * 24.0 * 60.0));
       }
       jd += step;
@@ -569,64 +562,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     );
   }
 
-  // ── Location picker ──
-  Future<void> _pickLocation() async {
-    List<Map<String, dynamic>> results = [];
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDlgState) {
-          return GestureDetector(
-            onTap: () => FocusScope.of(ctx).unfocus(),
-            behavior: HitTestBehavior.opaque,
-            child: AlertDialog(
-              title: Text(AppLocale.l('selectPlace')),
-              content: SizedBox(
-                width: 300, height: 400,
-                child: Column(
-                  children: [
-                    TextField(
-                      autofocus: true,
-                      textInputAction: TextInputAction.search,
-                      decoration: InputDecoration(hintText: AppLocale.l('searchPlace'), prefixIcon: const Icon(Icons.search)),
-                      onChanged: (v) {
-                        if (v.length < 2) { setDlgState(() => results = []); return; }
-                        final r = searchWorldCities(v, limit: 20);
-                        setDlgState(() => results = r);
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    Expanded(
-                      child: ListView.builder(
-                        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                        itemCount: results.length,
-                        itemBuilder: (_, i) {
-                          final r = results[i];
-                          return ListTile(
-                            title: Text('${r['n']} (${r['c']})', style: const TextStyle(fontSize: 13)),
-                            subtitle: Text('${(r['la'] as double).toStringAsFixed(2)}°, ${(r['lo'] as double).toStringAsFixed(2)}°', style: const TextStyle(fontSize: 11)),
-                            onTap: () => Navigator.pop(ctx, r),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-    if (result != null) {
-      setState(() {
-        _lat = (result['la'] as num).toDouble();
-        _lon = (result['lo'] as num).toDouble();
-        _tz = (result['tz'] as num).toDouble();
-        _place = '${result['n']}, ${result['c']}';
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -662,24 +597,6 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
               children: [
                 Text(AppLocale.l('muhurtaLabel'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kPurple1)),
                 const SizedBox(height: 12),
-
-                // Location
-                Text('📍 ${AppLocale.l('selectPlace')}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
-                const SizedBox(height: 4),
-                InkWell(
-                  onTap: _pickLocation,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                    decoration: BoxDecoration(color: kBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
-                    child: Row(children: [
-                      Icon(Icons.location_on, size: 16, color: kPurple2),
-                      const SizedBox(width: 6),
-                      Expanded(child: Text(_place, style: TextStyle(fontSize: 13, color: kText), overflow: TextOverflow.ellipsis)),
-                      Icon(Icons.edit, size: 14, color: kMuted),
-                    ]),
-                  ),
-                ),
-                const SizedBox(height: 10),
 
                 // Event type
                 Text('🪔 ${AppLocale.l('selectEvent')}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kMuted)),
