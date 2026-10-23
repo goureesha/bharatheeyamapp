@@ -466,29 +466,7 @@ class PredictionEngine {
         }
       }
 
-      // 4. Aspect effects
-      if (aspecters.isNotEmpty) {
-        final beneficAspecters = aspecters.where((p) => _benefics.contains(p)).toList();
-        final maleficAspecters = aspecters.where((p) => _malefics.contains(p)).toList();
-        if (beneficAspecters.isNotEmpty) {
-          phalaBuffer.write(_t(
-            kn: ' ${beneficAspecters.join(', ')} ದೃಷ್ಟಿಯಿಂದ ಶುಭ ಫಲ ವೃದ್ಧಿ.',
-            hi: ' ${beneficAspecters.join(', ')} की दृष्टि से शुभ फल में वृद्धि.',
-            ta: ' ${beneficAspecters.join(', ')} பார்வையால் நல்ல பலன் அதிகரிக்கும்.',
-            te: ' ${beneficAspecters.join(', ')} దృష్టి వల్ల శుభ ఫలాలు పెరుగుతాయి.',
-            ml: ' ${beneficAspecters.join(', ')} ദൃഷ്ടിയാൽ ശുഭ ഫലം വർധിക്കും.',
-            en: ' ${beneficAspecters.join(', ')} aspect enhances positive results.'));
-        }
-        if (maleficAspecters.isNotEmpty) {
-          phalaBuffer.write(_t(
-            kn: ' ${maleficAspecters.join(', ')} ದೃಷ್ಟಿಯಿಂದ ಕೆಲವು ಸವಾಲುಗಳು ಸಾಧ್ಯ.',
-            hi: ' ${maleficAspecters.join(', ')} की दृष्टि से कुछ चुनौतियाँ संभव.',
-            ta: ' ${maleficAspecters.join(', ')} பார்வையால் சில சவால்கள் சாத்தியம்.',
-            te: ' ${maleficAspecters.join(', ')} దృష్టి వల్ల కొన్ని సవాళ్లు సాధ్యం.',
-            ml: ' ${maleficAspecters.join(', ')} ദൃഷ്ടിയാൽ ചില വെല്ലുവിളികൾ സാധ്യം.',
-            en: ' ${maleficAspecters.join(', ')} aspect may bring some challenges.'));
-        }
-      }
+      // 4. Aspect effects — removed per user request (no drishti in phala)
 
       // Remedies removed per user request
       const String remedy = '';

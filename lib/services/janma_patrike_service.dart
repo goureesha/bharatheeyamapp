@@ -1279,9 +1279,8 @@ class JanmaPatrikeService {
     final planetsStr = b.planetsInHouse.isNotEmpty
         ? '${AppLocale.l('jpPhalaGraha')}: ${b.planetsInHouse.map((p) => trAll(p)).join(', ')}'
         : '';
-    final aspectStr = b.aspectingPlanets.isNotEmpty
-        ? '${AppLocale.l('jpPhalaDrishti')}: ${b.aspectingPlanets.map((p) => trAll(p)).join(', ')}'
-        : '';
+    // Drishti removed per user request
+    const aspectStr = '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 4),

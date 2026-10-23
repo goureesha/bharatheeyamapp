@@ -4046,7 +4046,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       'prasthuta': {'kn': 'ಪ್ರಸ್ತುತ', 'hi': 'वर्तमान', 'ta': 'நடப்பு', 'te': 'ప్రస్తుతం', 'ml': 'നിലവിലെ', 'en': 'Current'},
       'adhipati': {'kn': 'ಅಧಿಪತಿ: ', 'hi': 'अधिपति: ', 'ta': 'அதிபதி: ', 'te': 'అధిపతి: ', 'ml': 'അധിപതി: ', 'en': 'Lord: '},
       'bhavaGrahagalu': {'kn': 'ಭಾವ ಗ್ರಹಗಳು: ', 'hi': 'भाव ग्रह: ', 'ta': 'பாவ கிரகங்கள்: ', 'te': 'భావ గ్రహాలు: ', 'ml': 'ഭാവ ഗ്രഹങ്ങൾ: ', 'en': 'Planets in House: '},
-      'drushti': {'kn': 'ದೃಷ್ಟಿ: ', 'hi': 'दृष्टि: ', 'ta': 'திருஷ்டி: ', 'te': 'దృష్టి: ', 'ml': 'ദൃഷ്ടി: ', 'en': 'Aspects: '},
+      'drushti': {'kn': 'ದೃಷ್ಟಿ: ', 'hi': 'दृष्टि: ', 'ta': 'திருஷ்டி: ', 'te': 'దృష్టి: ', 'ml': 'ദൃഷ്ടി: ', 'en': 'Aspects: '}, // kept for reference but unused
     };
     String _pl(String key) => _phalaStrings[key]?[AppLocale.current] ?? _phalaStrings[key]?['kn'] ?? key;
 
@@ -4281,11 +4281,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   Text('${_pl('bhavaGrahagalu')}${b.planetsInHouse.map((p) => trAll(p)).join(', ')}',
                     style: TextStyle(fontSize: 10, color: kText)),
                 ],
-                if (b.aspectingPlanets.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Text('${_pl('drushti')}${b.aspectingPlanets.map((p) => trAll(p)).join(', ')}',
-                    style: TextStyle(fontSize: 10, color: kText)),
-                ],
+                // Drishti display removed per user request
               ]),
             ),
             // Phala text
