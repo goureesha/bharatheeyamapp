@@ -747,6 +747,47 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                 ]),
                 const SizedBox(height: 14),
 
+                // ── Panchanga Data Status ──
+                Builder(builder: (_) {
+                  final cache = PanchangaCache.instance;
+                  if (cache.isLoaded) {
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0x104CAF50),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0x404CAF50)),
+                      ),
+                      child: Row(children: [
+                        Icon(Icons.check_circle, color: kTeal, size: 16),
+                        const SizedBox(width: 6),
+                        Expanded(child: Text(
+                          '⚡ ${cache.statusSummary}',
+                          style: TextStyle(fontSize: 11, color: kTeal, fontWeight: FontWeight.w600),
+                        )),
+                      ]),
+                    );
+                  }
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: kOrange.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: kOrange.withOpacity(0.3)),
+                    ),
+                    child: Row(children: [
+                      Icon(Icons.info_outline, color: kOrange, size: 16),
+                      const SizedBox(width: 6),
+                      Expanded(child: Text(
+                        AppLocale.l('mCacheNotLoaded'),
+                        style: TextStyle(fontSize: 11, color: kOrange, fontWeight: FontWeight.w600),
+                      )),
+                    ]),
+                  );
+                }),
+
                 // Search button
                 ElevatedButton.icon(
                   onPressed: _searching ? null : _search,
@@ -754,7 +795,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                     ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                     : const Icon(Icons.search),
                   label: Text(
-                    _searching ? '...' : AppLocale.l('searchMuhurta'),
+                    _searching ? '...' : (PanchangaCache.instance.isLoaded ? '⚡ ${AppLocale.l('searchMuhurta')}' : AppLocale.l('searchMuhurta')),
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                   style: ElevatedButton.styleFrom(

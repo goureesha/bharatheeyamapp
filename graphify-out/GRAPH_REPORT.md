@@ -1,16 +1,16 @@
-# Graph Report - bharatheeyamapp sample  (2026-10-22)
+# Graph Report - bharatheeyamapp sample  (2026-10-23)
 
 ## Corpus Check
-- 148 files · ~631,893 words
+- 148 files · ~631,974 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3407 nodes · 4049 edges · 163 communities (141 shown, 22 thin omitted)
+- 3407 nodes · 4051 edges · 163 communities (141 shown, 22 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9f95bc92`
+- Built from commit: `13c640bb`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -207,7 +207,7 @@ Nodes (119): aadaayaGtVyaya, aadaayaRem, aadaayaValue, _aayaColor, _aayaEnglish,
 
 ### Community 4 - "Community 4"
 Cohesion: 0.02
-Nodes (130): KundaliResult, List, MuhurtaEvent, package:wakelock_plus/wakelock_plus.dart, _AscSample, ashtamaBhavaGrahas, ashtamaBhavaShuddhi, ashtamaGrahas (+122 more)
+Nodes (128): KundaliResult, package:wakelock_plus/wakelock_plus.dart, _AscSample, ashtamaBhavaGrahas, ashtamaBhavaShuddhi, ashtamaGrahas, ashtamaShuddhi, _balaBadge (+120 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.04
@@ -363,7 +363,7 @@ Nodes (69): adEnd, adLord, adPhala, adStart, allDashas, analyze, aspectingPlanet
 
 ### Community 43 - "Community 43"
 Cohesion: 0.05
-Nodes (37): _allowedLagnas, _AscSample, build, _buildResultCard, createState, _displayCount, _event, _expanded (+29 more)
+Nodes (39): List, MuhurtaEvent, _allowedLagnas, _AscSample, build, _buildResultCard, createState, _displayCount (+31 more)
 
 ### Community 44 - "Community 44"
 Cohesion: 0.11
@@ -710,7 +710,7 @@ Cohesion: 0.50
 Nodes (4): _AlwaysNotify, _t, T, ValueNotifier
 
 ## Knowledge Gaps
-- **2729 isolated node(s):** `summary`, `updatedAt`, `summary`, `updatedAt`, `summary` (+2724 more)
+- **2729 isolated node(s):** `_AscSample`, `_allowedLagnas`, `_event`, `_nakIdx`, `_monthFrom` (+2724 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **22 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -718,10 +718,10 @@ Nodes (4): _AlwaysNotify, _t, T, ValueNotifier
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `list` connect `Community 147` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 7`, `Community 8`, `Community 11`, `Community 12`, `Community 14`, `Community 21`, `Community 152`, `Community 154`, `Community 155`, `Community 33`, `Community 37`, `Community 42`, `Community 43`, `Community 61`, `Community 67`, `Community 69`, `Community 74`, `Community 81`, `Community 82`, `Community 88`, `Community 91`?**
-  _High betweenness centrality (0.080) - this node is a cross-community bridge._
+  _High betweenness centrality (0.075) - this node is a cross-community bridge._
 - **Why does `Double` connect `Community 40` to `Community 61`?**
-  _High betweenness centrality (0.022) - this node is a cross-community bridge._
-- **What connects `summary`, `updatedAt`, `summary` to the rest of the system?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **What connects `_AscSample`, `_allowedLagnas`, `_event` to the rest of the system?**
   _2745 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.013986013986013986 - nodes in this community are weakly interconnected._
