@@ -5,7 +5,7 @@
     "semantic_hash": ""
   },
   "android/app/build.gradle": {
-    "mtime": 1789048214.3769116,
+    "mtime": 1789800775.3081143,
     "ast_hash": "1f312db1acdc190983603e189f835f6b",
     "semantic_hash": ""
   },
@@ -35,7 +35,7 @@
     "semantic_hash": ""
   },
   "android/build.gradle": {
-    "mtime": 1784697327.0220363,
+    "mtime": 1789800775.3081143,
     "ast_hash": "5fe8f2b95911c3003a3d4f38f5502ff6",
     "semantic_hash": ""
   },
@@ -45,7 +45,7 @@
     "semantic_hash": ""
   },
   "android/settings.gradle": {
-    "mtime": 1776949378.8557868,
+    "mtime": 1789800775.309112,
     "ast_hash": "f325dfcdf192f80704aceebd98664706",
     "semantic_hash": ""
   },
@@ -60,8 +60,8 @@
     "semantic_hash": ""
   },
   "lib/constants/strings.dart": {
-    "mtime": 1789276790.995983,
-    "ast_hash": "7e8bf166f74a172b3f4d2cd3915e9a12",
+    "mtime": 1792062851.6408725,
+    "ast_hash": "1c34019446aaefa7aadf2327305ac7ae",
     "semantic_hash": ""
   },
   "lib/core/ashtakavarga.dart": {
@@ -70,8 +70,8 @@
     "semantic_hash": ""
   },
   "lib/core/calculator.dart": {
-    "mtime": 1786799201.4559271,
-    "ast_hash": "e5cb9f0b9588460dde5704113e03abc3",
+    "mtime": 1791348909.134367,
+    "ast_hash": "d84506b4fe43aacbfe2f86b88afcb3b0",
     "semantic_hash": ""
   },
   "lib/core/ephemeris.dart": {
@@ -135,13 +135,13 @@
     "semantic_hash": ""
   },
   "lib/screens/dashboard_screen.dart": {
-    "mtime": 1789276013.9878018,
-    "ast_hash": "58520740cb13345cc52c68b5bf86ccac",
+    "mtime": 1792669902.2198203,
+    "ast_hash": "de4ccca3d52450fa6b1b7451a310cc79",
     "semantic_hash": ""
   },
   "lib/screens/home_screen.dart": {
-    "mtime": 1784956942.3378024,
-    "ast_hash": "86c94f93a852a15fb20b61c2dc13cb61",
+    "mtime": 1792031137.356022,
+    "ast_hash": "a912f50b89887c1359fd905f9baf320c",
     "semantic_hash": ""
   },
   "lib/screens/input_screen.dart": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "lib/screens/panchanga_screen.dart": {
-    "mtime": 1785742253.9001327,
-    "ast_hash": "ff9263c001e23b3c33f6a1db9507420d",
+    "mtime": 1791468309.958011,
+    "ast_hash": "f2e3592cba78cab737e77998ae266b5f",
     "semantic_hash": ""
   },
   "lib/screens/panchanga_search_screen.dart": {
@@ -195,8 +195,8 @@
     "semantic_hash": ""
   },
   "lib/screens/vastu_screen.dart": {
-    "mtime": 1789094064.5470102,
-    "ast_hash": "0b78917e24b7807e09363fc1069b13d2",
+    "mtime": 1789276885.899394,
+    "ast_hash": "8d98db5e7b079589dd1340fd27791a2c",
     "semantic_hash": ""
   },
   "lib/screens/vedic_clock_screen.dart": {
@@ -205,8 +205,8 @@
     "semantic_hash": ""
   },
   "lib/services/appointment_service.dart": {
-    "mtime": 1780232683.0920231,
-    "ast_hash": "50d776c4767f1db999dbc6b70a771ec5",
+    "mtime": 1791518460.5727599,
+    "ast_hash": "086c37661311d425c5068d34472cb24b",
     "semantic_hash": ""
   },
   "lib/services/backup_service.dart": {
@@ -295,8 +295,8 @@
     "semantic_hash": ""
   },
   "lib/services/janma_patrike_service.dart": {
-    "mtime": 1789276030.5986755,
-    "ast_hash": "62bc382f6922020b428a43927231d9e5",
+    "mtime": 1792669913.9653792,
+    "ast_hash": "02e6da74346cabe3cd16e0ab30f26064",
     "semantic_hash": ""
   },
   "lib/services/local_export_mobile.dart": {
@@ -365,13 +365,13 @@
     "semantic_hash": ""
   },
   "lib/widgets/ashtakavarga_widget.dart": {
-    "mtime": 1777118463.7587736,
-    "ast_hash": "b6abcabbadfff63ad23cb2aa2ddf99ab",
+    "mtime": 1792062928.0086434,
+    "ast_hash": "8961c4d56113286cb710720b9ba160a0",
     "semantic_hash": ""
   },
   "lib/widgets/common.dart": {
-    "mtime": 1789276676.4299748,
-    "ast_hash": "81dead113ee12cc241c0d11fd2f6c1b5",
+    "mtime": 1792031099.4126735,
+    "ast_hash": "0c5fe534f8d051a374f8955e3b7b4b53",
     "semantic_hash": ""
   },
   "lib/widgets/dasha_widget.dart": {
@@ -380,13 +380,13 @@
     "semantic_hash": ""
   },
   "lib/widgets/kundali_chart.dart": {
-    "mtime": 1789276784.1802478,
-    "ast_hash": "a9cd3671c802ff2d1f815f5ef41437c3",
+    "mtime": 1792671610.8361998,
+    "ast_hash": "2d76915c52f59bf8bbad0dd7d80760ef",
     "semantic_hash": ""
   },
   "lib/widgets/north_indian_chart.dart": {
-    "mtime": 1789276790.1140797,
-    "ast_hash": "6721b0b4aba9c727ccf0611a9448bb95",
+    "mtime": 1792671610.8921213,
+    "ast_hash": "c43133462e53b7562a62e43b33d36773",
     "semantic_hash": ""
   },
   "lib/widgets/planet_detail_sheet.dart": {
@@ -430,7 +430,7 @@
     "semantic_hash": ""
   },
   ".github/workflows/build.yml": {
-    "mtime": 1783266219.832184,
+    "mtime": 1789799589.1120613,
     "ast_hash": "db544dd695439bf4acf67e83923fa8de",
     "semantic_hash": ""
   },
@@ -480,8 +480,8 @@
     "semantic_hash": ""
   },
   "pubspec.yaml": {
-    "mtime": 1789005838.9075062,
-    "ast_hash": "aa19e3c88aef29c95ac987e6f7082fcf",
+    "mtime": 1791615160.7853115,
+    "ast_hash": "746934ff464b1cee73ec60dff1db9c74",
     "semantic_hash": ""
   },
   "script/brihad_jataka.txt": {
@@ -805,8 +805,8 @@
     "semantic_hash": ""
   },
   "lib/services/match_pdf_service.dart": {
-    "mtime": 1789276045.3603034,
-    "ast_hash": "f7f8857ff71857c3c4bc16e1d03991de",
+    "mtime": 1791632804.2066047,
+    "ast_hash": "685d00a84cd082fcb6620a7788cceb5f",
     "semantic_hash": ""
   },
   "lib/services/timezone_service.dart": {
@@ -850,13 +850,13 @@
     "semantic_hash": ""
   },
   "lib/core/en_translations.dart": {
-    "mtime": 1789276745.6905813,
-    "ast_hash": "1b69461d0ce042b20ca43a6d6cf6ba34",
+    "mtime": 1792063269.9863696,
+    "ast_hash": "81581c2f05a0e86dc6cbf2bd8262eb34",
     "semantic_hash": ""
   },
   "lib/core/prediction_engine.dart": {
-    "mtime": 1789271892.4079213,
-    "ast_hash": "61f7f3aed1fa7dbac3b1f0a4e66155b9",
+    "mtime": 1792676783.1074145,
+    "ast_hash": "0ee51087a5d792a577458cf9a9c948a7",
     "semantic_hash": ""
   },
   "lib/core/prediction_texts.dart": {
@@ -867,6 +867,76 @@
   "tools/output/PANCHANGA_DATA_FILES_INFO.txt": {
     "mtime": 1785762999.3657355,
     "ast_hash": "c86c959f29a98d159ce11d02feb5d8a7",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_classical.dart": {
+    "mtime": 1792676749.7244828,
+    "ast_hash": "fe97420bf249b77992da97fac8b7bfef",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_shlokas.dart": {
+    "mtime": 1791477692.4379344,
+    "ast_hash": "dbc5a90354c89ced625b100da6909dd6",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_shlokas_kn.dart": {
+    "mtime": 1791515472.8227472,
+    "ast_hash": "1c8bdfbe35437db20fdfa7beaa0ca9b4",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_shlokas_ml.dart": {
+    "mtime": 1791515663.7705367,
+    "ast_hash": "26f3bd542a5113618e7f9f9deee1e933",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_shlokas_ta.dart": {
+    "mtime": 1791515695.038119,
+    "ast_hash": "166f31464cbce66d4b901ccacb537db3",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_shlokas_te.dart": {
+    "mtime": 1791515664.5174005,
+    "ast_hash": "2e05ecb2e04ec603f8c3792723721e5b",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_texts_en.dart": {
+    "mtime": 1789796527.7563262,
+    "ast_hash": "186c379e2d18d446a616d04a5d5444e6",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_texts_hi.dart": {
+    "mtime": 1789286765.7820637,
+    "ast_hash": "1d98c871dbe2178836ab746afd932515",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_texts_ml.dart": {
+    "mtime": 1789286349.2599192,
+    "ast_hash": "c3bc87c76587af6d68d93c85310516b3",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_texts_ta.dart": {
+    "mtime": 1789286891.0536263,
+    "ast_hash": "d0caa838563db324fd958bccb06a1342",
+    "semantic_hash": ""
+  },
+  "lib/core/prediction_texts_te.dart": {
+    "mtime": 1789286330.7489765,
+    "ast_hash": "8b2e8df196a5d5c291e11b6f918c25e7",
+    "semantic_hash": ""
+  },
+  "lib/screens/muhurta_screen.dart": {
+    "mtime": 1791633188.2391715,
+    "ast_hash": "919b7537000a6459ffca4e14794250aa",
+    "semantic_hash": ""
+  },
+  "lib/screens/reverse_kundali_screen.dart": {
+    "mtime": 1792034740.3430736,
+    "ast_hash": "b14f60fec582d060cfa2a6d75d3a350b",
+    "semantic_hash": ""
+  },
+  "scratch_script.py": {
+    "mtime": 1789286344.9270692,
+    "ast_hash": "8a60ab788b936e3b00b43a7a216c45eb",
     "semantic_hash": ""
   }
 }

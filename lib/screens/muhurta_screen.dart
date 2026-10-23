@@ -46,6 +46,8 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
   void initState() {
     super.initState();
     _loadEventDefaults();
+    // Preload imported/saved panchanga .bdat cache (same as Taranukoola tab)
+    PanchangaCache.instance.loadFromStorage();
   }
 
   void _loadEventDefaults() {
@@ -86,7 +88,19 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
     final startDate = DateTime(_monthFrom.year, _monthFrom.month, 1);
     final endDate = DateTime(_monthTo.year, _monthTo.month + 1, 0);
 
-    // Auto-generate cache if not loaded
+    // Load saved/imported .bdat cache first (fast path)
+    if (!cache.isLoaded) {
+      try { await cache.loadFromStorage(); } catch (_) {}
+    }
+
+    // Generate only if no cache at all; if an imported cache exists but
+    // doesn't cover the range, don't overwrite it — use the slow path instead.
+    final covers = cache.isLoaded &&
+        cache.startDate != null && cache.endDate != null &&
+        !cache.startDate!.isAfter(startDate) && !cache.endDate!.isBefore(endDate);
+    if (cache.isLoaded && !covers) {
+      return _searchNonCached();
+    }
     if (!cache.isLoaded) {
       try {
         await cache.generate(
@@ -115,10 +129,11 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
       if (!_userNakshatras.contains(day.nakshatraIndex)) continue;
       if (!_userVaras.contains(day.varaIndex)) continue;
 
-      // Abhijit time from sunrise/sunset
+      // Abhijit time from sunrise/sunset (computed once per day, reused for lagnas)
       String abhStr = '';
+      List<double>? srSs;
       try {
-        final srSs = Ephemeris.findSunriseSetForDate(
+        srSs = Ephemeris.findSunriseSetForDate(
           day.date.year, day.date.month, day.date.day, _lat, _lon, tzOffset: _tz);
         final srFrac = ((srSs[0] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
         final ssFrac = ((srSs[1] + 0.5 + (_tz / 24.0)) % 1.0 + 1.0) % 1.0;
@@ -158,8 +173,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
       // Compute lagna windows
       List<Map<String, dynamic>> lagnaWindows = [];
       try {
-        final srSs = Ephemeris.findSunriseSetForDate(
-          day.date.year, day.date.month, day.date.day, _lat, _lon, tzOffset: _tz);
+        if (srSs == null) throw Exception('no sunrise');
         final allLagnaWindows = _scanLagnas(srSs[0], srSs[1]);
         lagnaWindows = allLagnaWindows.where((w) {
           if (_filterLagnaShuddhi && w['lagnaShuddhi'] != true) return false;
