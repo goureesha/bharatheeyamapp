@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:flutter/services.dart';
@@ -4041,6 +4041,9 @@ class _DashboardScreenState extends State<DashboardScreen>
       'currentDashaBhukti': {'kn': 'ಪ್ರಸ್ತುತ ದಶಾ-ಭುಕ್ತಿ', 'hi': 'वर्तमान दशा-भुक्ति', 'ta': 'நடப்பு தசா-புக்தி', 'te': 'ప్రస్తుత దశా-భుక్తి', 'ml': 'നിലവിലെ ദശാ-ഭുക്തി', 'en': 'Current Dasha-Bhukti'},
       'mahadasha': {'kn': 'ಮಹಾದಶಾ', 'hi': 'महादशा', 'ta': 'மகாதசா', 'te': 'మహాదశా', 'ml': 'മഹാദశా', 'en': 'Mahadasha'},
       'antardasha': {'kn': 'ಅಂತರ್ದಶಾ', 'hi': 'अंतर्दशा', 'ta': 'அந்தர்தசா', 'te': 'అంతర్దశా', 'ml': 'അന്തർദശാ', 'en': 'Antardasha'},
+      'pratyantardasha': {'kn': 'ಪ್ರತ್ಯಂತರ್ದಶಾ', 'hi': 'प्रत्यंतर्दशा', 'ta': 'பிரத்யந்தர்தசா', 'te': 'ప్రత్యంతర్దశా', 'ml': 'പ്രത്യംതർദശാ', 'en': 'Pratyantardasha'},
+      'sookshmadasha': {'kn': 'ಸೂಕ್ಷ್ಮದಶಾ', 'hi': 'सूक्ष्मदशा', 'ta': 'சூக்ஷ்மதசா', 'te': 'సూక్ష్మదశా', 'ml': 'സൂക്ഷ്മദശാ', 'en': 'Sookshmadasha'},
+      'pranadasha': {'kn': 'ಪ್ರಾಣದಶಾ', 'hi': 'प्राणदशा', 'ta': 'பிராணதசா', 'te': 'ప్రాణదశా', 'ml': 'പ്രാണദശാ', 'en': 'Pranadasha'},
       'bhavaPhala': {'kn': 'ಭಾವ ಫಲ', 'hi': 'भाव फल', 'ta': 'பாவ பலன்', 'te': 'భావ ఫలం', 'ml': 'ഭാവ ഫലം', 'en': 'House Predictions'},
       'dashaPhala': {'kn': 'ದಶಾ ಫಲ', 'hi': 'दशा फल', 'ta': 'தசா பலன்', 'te': 'దశా ఫలం', 'ml': 'ദശാ ഫലം', 'en': 'Dasha Predictions'},
       'prasthuta': {'kn': 'ಪ್ರಸ್ತುತ', 'hi': 'वर्तमान', 'ta': 'நடப்பு', 'te': 'ప్రస్తుతం', 'ml': 'നിലവിലെ', 'en': 'Current'},
@@ -4106,7 +4109,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
 
               // ── Current Dasha-Bhukti ──
-              if (prediction.currentDasha != null) _buildCurrentDashaCard(prediction.currentDasha!, _pl),
+              if (prediction.currentDasha != null) _buildCurrentDashaCard(prediction.currentDasha!, r.dashas, _pl),
 
               const SizedBox(height: 12),
 
@@ -4132,7 +4135,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               const SizedBox(height: 8),
 
               // ── All Mahadasha periods ──
-              ...prediction.allDashas.map((md) => _buildMahaDashaCard(md, prediction.currentDasha, _pl)),
+              ...r.dashas.map((md) => _buildDashaEntryTile(md, 0, prediction, _pl)),
 
               if (allPersons.length > 1) const Divider(height: 32),
             ],
@@ -4143,7 +4146,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   /// Current running dasha-bhukti card (highlighted at top)
-  Widget _buildCurrentDashaCard(DashaPeriodPrediction d, String Function(String) _pl) {
+  Widget _buildCurrentDashaCard(DashaPeriodPrediction d, List<DashaEntry> dashas, String Function(String) _pl) {
     final qualityColor = _phalaColor(d.quality);
     final qualityIcon = _phalaIcon(d.quality);
     final now = DateTime.now();
@@ -4184,7 +4187,40 @@ class _DashboardScreenState extends State<DashboardScreen>
             child: Text('${trAll(d.adLord)} ${_pl('antardasha')}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kOrange)),
           ),
         ]),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
+        // ── Deeper levels: PD → SD → PR ──
+        Builder(builder: (_) {
+          // Walk the dasha tree to find current PD/SD/PR
+          final deeper = <String, String>{};
+          final levelNames = ['pratyantardasha', 'sookshmadasha', 'pranadasha'];
+          DashaEntry? currentMd = dashas.where((e) => e.lord == d.mdLord && now.isAfter(e.start) && now.isBefore(e.end)).firstOrNull;
+          DashaEntry? currentAd = currentMd?.antardashas.where((e) => now.isAfter(e.start) && now.isBefore(e.end)).firstOrNull;
+          List<DashaEntry>? subEntries = currentAd?.antardashas;
+          for (int i = 0; i < 3 && subEntries != null; i++) {
+            final current = subEntries!.where((e) => now.isAfter(e.start) && now.isBefore(e.end)).firstOrNull;
+            if (current == null) break;
+            deeper[levelNames[i]] = current.lord;
+            subEntries = current.antardashas.isNotEmpty ? current.antardashas : null;
+          }
+          if (deeper.isEmpty) return const SizedBox.shrink();
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: deeper.entries.map((e) => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: kPurple2.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: kPurple2.withOpacity(0.2)),
+                ),
+                child: Text('${trAll(e.value)} ${_pl(e.key)}',
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: kPurple2)),
+              )).toList(),
+            ),
+          );
+        }),
         // Progress bar for current antardasha
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
@@ -4312,50 +4348,118 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   /// Mahadasha card with expandable bhukti list
-  Widget _buildMahaDashaCard(MahaDashaPrediction md, DashaPeriodPrediction? current, String Function(String) _pl) {
-    final isCurrent = current != null && current.mdLord == md.lord &&
-        DateTime.now().isAfter(md.start) && DateTime.now().isBefore(md.end);
-    final qualityColor = _phalaColor(md.quality);
 
+  /// â”€â”€ Dasha level names for recursive display â”€â”€
+  static const _dashaLevelKeys = ['mahadasha', 'antardasha', 'pratyantardasha', 'sookshmadasha', 'pranadasha'];
+
+  /// Check if a DashaEntry is the current running period
+  bool _isDashaCurrent(DashaEntry entry) {
+    final now = DateTime.now();
+    return now.isAfter(entry.start) && now.isBefore(entry.end);
+  }
+
+  /// Recursive dasha entry tile â€” works for all 5 levels
+  Widget _buildDashaEntryTile(DashaEntry entry, int level, PredictionResult prediction, String Function(String) _pl) {
+    final isCurrent = _isDashaCurrent(entry);
+    final levelKey = level < _dashaLevelKeys.length ? _dashaLevelKeys[level] : 'pranadasha';
+    final levelLabel = _pl(levelKey);
+
+    // Colors get progressively lighter at deeper levels
+    final bgOpacity = isCurrent ? 0.06 : (level == 0 ? 0.0 : 0.02 * level);
+    final borderOpacity = isCurrent ? 0.6 : 0.3;
+    final fontSize = (13.0 - level * 0.5).clamp(10.0, 13.0);
+    final dateFontSize = (10.0 - level * 0.3).clamp(8.0, 10.0);
+
+    final hasChildren = entry.antardashas.isNotEmpty;
+    final isLeaf = !hasChildren;
+
+    // For mahadasha level (0), use prediction data for phala/shloka
+    String? phala;
+    String? shloka;
+    if (level == 0) {
+      final mdPred = _primaryResult == r
+          ? PredictionEngine.analyze(r).allDashas.where((d) => d.lord == entry.lord).firstOrNull
+          : null;
+      phala = mdPred?.phala;
+      shloka = mdPred?.shloka;
+    }
+
+    // Leaf nodes (Prana level or entries without children) â€” simple row
+    if (isLeaf) {
+      return Container(
+        margin: EdgeInsets.only(bottom: 2, left: level > 0 ? 4.0 : 0),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isCurrent ? kOrange.withOpacity(0.08) : kBg.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(6),
+          border: isCurrent ? Border.all(color: kOrange.withOpacity(0.4)) : null,
+        ),
+        child: Row(children: [
+          if (isCurrent)
+            Icon(Icons.play_arrow, color: kOrange, size: 12)
+          else
+            Icon(Icons.circle, color: kMuted.withOpacity(0.3), size: 6),
+          const SizedBox(width: 6),
+          Text('${trAll(entry.lord)} $levelLabel', style: TextStyle(
+            fontSize: fontSize, fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
+            color: isCurrent ? kOrange : kText)),
+          const Spacer(),
+          Text('${_fmtDate(entry.start)} → ${_fmtDate(entry.end)}',
+            style: TextStyle(fontSize: dateFontSize, color: kMuted)),
+        ]),
+      );
+    }
+
+    // Expandable tile for levels with children
     return Container(
-      margin: const EdgeInsets.only(bottom: 6),
+      margin: EdgeInsets.only(bottom: level == 0 ? 6.0 : 3.0, left: level > 1 ? 4.0 : 0),
       decoration: BoxDecoration(
-        color: kCard,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isCurrent ? kOrange.withOpacity(0.6) : kBorder.withOpacity(0.5), width: isCurrent ? 1.5 : 1),
+        color: isCurrent ? kOrange.withOpacity(bgOpacity) : kCard,
+        borderRadius: BorderRadius.circular(level == 0 ? 12 : 8),
+        border: Border.all(
+          color: isCurrent ? kOrange.withOpacity(borderOpacity) : kBorder.withOpacity(0.3 + level * 0.05),
+          width: isCurrent && level == 0 ? 1.5 : 1,
+        ),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-          initiallyExpanded: isCurrent,
-          leading: Icon(isCurrent ? Icons.play_circle_fill : Icons.circle_outlined,
-            color: isCurrent ? kOrange : qualityColor, size: 22),
+          tilePadding: EdgeInsets.symmetric(horizontal: level == 0 ? 12 : 8, vertical: 0),
+          childrenPadding: EdgeInsets.fromLTRB(level == 0 ? 12 : 6, 0, level == 0 ? 12 : 6, level == 0 ? 12 : 6),
+          initiallyExpanded: isCurrent && level < 2, // auto-expand current MD and AD
+          leading: level == 0
+            ? Icon(isCurrent ? Icons.play_circle_fill : Icons.circle_outlined,
+                color: isCurrent ? kOrange : kPurple2, size: 22)
+            : (isCurrent
+                ? Icon(Icons.play_arrow, color: kOrange, size: 16)
+                : Icon(Icons.circle, color: kMuted.withOpacity(0.4), size: 8)),
           title: Row(children: [
-            Text('${trAll(md.lord)} ${_pl('mahadasha')}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: isCurrent ? kOrange : kText)),
+            Expanded(child: Text('${trAll(entry.lord)} $levelLabel', style: TextStyle(
+              fontSize: fontSize, fontWeight: FontWeight.w800,
+              color: isCurrent ? kOrange : kText))),
             if (isCurrent) ...[
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(color: kOrange.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
-                child: Text(_pl('prasthuta'), style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: kOrange)),
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                decoration: BoxDecoration(color: kOrange.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+                child: Text(_pl('prasthuta'), style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: kOrange)),
               ),
             ],
           ]),
-          subtitle: Text('${_fmtDate(md.start)} → ${_fmtDate(md.end)}',
-            style: TextStyle(fontSize: 10, color: kMuted)),
+          subtitle: Text('${_fmtDate(entry.start)} → ${_fmtDate(entry.end)}',
+            style: TextStyle(fontSize: dateFontSize, color: kMuted)),
           children: [
-            if (md.phala.isNotEmpty)
+            // Show phala/shloka for mahadasha level
+            if (phala != null && phala.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Text(md.phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
               ),
-            if (md.shloka.isNotEmpty)
+            if (shloka != null && shloka.isNotEmpty)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(8),
-                margin: const EdgeInsets.only(bottom: 10),
+                margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
                   color: kPurple2.withOpacity(0.04),
                   borderRadius: BorderRadius.circular(8),
@@ -4364,47 +4468,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Icon(Icons.menu_book, size: 14, color: kPurple2.withOpacity(0.5)),
                   const SizedBox(width: 6),
-                  Expanded(child: Text(md.shloka, style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: kMuted, height: 1.5))),
+                  Expanded(child: Text(shloka, style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: kMuted, height: 1.5))),
                 ]),
               ),
-            // Bhukti list
-            ...md.bhuktis.map((bk) {
-              final isCurrentBk = isCurrent && current!.adLord == bk.lord &&
-                  DateTime.now().isAfter(bk.start) && DateTime.now().isBefore(bk.end);
-              final bkColor = _phalaColor(bk.quality);
-              return Container(
-                margin: const EdgeInsets.only(bottom: 4),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: isCurrentBk ? kOrange.withOpacity(0.06) : kBg,
-                  borderRadius: BorderRadius.circular(8),
-                  border: isCurrentBk ? Border.all(color: kOrange.withOpacity(0.4)) : null,
-                ),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    if (isCurrentBk)
-                      Icon(Icons.play_arrow, color: kOrange, size: 14)
-                    else
-                      Icon(_phalaIcon(bk.quality), color: bkColor, size: 12),
-                    const SizedBox(width: 4),
-                    Text('${trAll(bk.lord)} ${_pl('antardasha')}', style: TextStyle(
-                      fontSize: 11, fontWeight: FontWeight.w700, color: isCurrentBk ? kOrange : kText)),
-                    const Spacer(),
-                    Text('${_fmtDate(bk.start)} → ${_fmtDate(bk.end)}',
-                      style: TextStyle(fontSize: 9, color: kMuted)),
-                  ]),
-                  if (bk.phala.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(bk.phala, style: TextStyle(fontSize: 11, color: kText, height: 1.4)),
-                  ],
-                ]),
-              );
-            }),
+            // Sub-level entries
+            ...entry.antardashas.map((sub) => _buildDashaEntryTile(sub, level + 1, prediction, _pl)),
           ],
         ),
       ),
     );
   }
+
 
   /// Quality color helper
   Color _phalaColor(PhalaQuality q) {
