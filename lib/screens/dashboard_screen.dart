@@ -4135,7 +4135,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               const SizedBox(height: 8),
 
               // ── All Mahadasha periods ──
-              ...r.dashas.map((md) => _buildDashaEntryTile(md, 0, prediction, _pl)),
+              ...r.dashas.map((md) => _buildDashaEntryTile(md, 0, prediction, _pl, mdLord: null)),
 
               if (allPersons.length > 1) const Divider(height: 32),
             ],
@@ -4359,7 +4359,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   /// Recursive dasha entry tile â€” works for all 5 levels
-  Widget _buildDashaEntryTile(DashaEntry entry, int level, PredictionResult prediction, String Function(String) _pl) {
+  Widget _buildDashaEntryTile(DashaEntry entry, int level, PredictionResult prediction, String Function(String) _pl, {String? mdLord}) {
     final isCurrent = _isDashaCurrent(entry);
     final levelKey = level < _dashaLevelKeys.length ? _dashaLevelKeys[level] : 'pranadasha';
     final levelLabel = _pl(levelKey);
@@ -4373,15 +4373,17 @@ class _DashboardScreenState extends State<DashboardScreen>
     final hasChildren = entry.antardashas.isNotEmpty;
     final isLeaf = !hasChildren;
 
-    // For mahadasha level (0), use prediction data for phala/shloka
+    // For mahadasha (level 0) and antardasha (level 1), show phala text
     String? phala;
     String? shloka;
     if (level == 0) {
-      final mdPred = _primaryResult == r
-          ? PredictionEngine.analyze(r).allDashas.where((d) => d.lord == entry.lord).firstOrNull
-          : null;
+      final mdPred = prediction.allDashas.where((d) => d.lord == entry.lord).firstOrNull;
       phala = mdPred?.phala;
       shloka = mdPred?.shloka;
+    } else if (level == 1 && mdLord != null) {
+      final mdPred = prediction.allDashas.where((d) => d.lord == mdLord).firstOrNull;
+      final bkPred = mdPred?.bhuktis.where((b) => b.lord == entry.lord).firstOrNull;
+      phala = bkPred?.phala;
     }
 
     // Leaf nodes (Prana level or entries without children) â€” simple row
@@ -4449,7 +4451,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           subtitle: Text('${_fmtDate(entry.start)} → ${_fmtDate(entry.end)}',
             style: TextStyle(fontSize: dateFontSize, color: kMuted)),
           children: [
-            // Show phala/shloka for mahadasha level
+            // Show phala/shloka for mahadasha and bhukti levels
             if (phala != null && phala.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -4472,7 +4474,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ]),
               ),
             // Sub-level entries
-            ...entry.antardashas.map((sub) => _buildDashaEntryTile(sub, level + 1, prediction, _pl)),
+            ...entry.antardashas.map((sub) => _buildDashaEntryTile(sub, level + 1, prediction, _pl, mdLord: level == 0 ? entry.lord : null)),
           ],
         ),
       ),
