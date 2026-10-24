@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "updated": "2026-10-24",
+  "cities": [
+    {"name": "Anantapur", "nameKn": "ಅನಂತಪುರ", "fileName": "bharatheeyam_panchanga_Anantapur.bdat", "sizeKB": 269, "fromYear": 2025, "toYear": 2045},
+    {"name": "Bengaluru", "nameKn": "ಬೆಂಗಳೂರು", "fileName": "bharatheeyam_panchanga_Bengaluru.bdat", "sizeKB": 268, "fromYear": 2025, "toYear": 2045},
+    {"name": "Chennai", "nameKn": "ಚೆನ್ನೈ", "fileName": "bharatheeyam_panchanga_Chennai.bdat", "sizeKB": 268, "fromYear": 2025, "toYear": 2045},
+    {"name": "Coimbatore", "nameKn": "ಕೊಯಮತ್ತೂರು", "fileName": "bharatheeyam_panchanga_Coimbatore.bdat", "sizeKB": 267, "fromYear": 2025, "toYear": 2045},
+    {"name": "Hyderabad", "nameKn": "ಹೈದರಾಬಾದ್", "fileName": "bharatheeyam_panchanga_Hyderabad.bdat", "sizeKB": 271, "fromYear": 2025, "toYear": 2045},
+    {"name": "Kalaburagi", "nameKn": "ಕಲಬುರಗಿ", "fileName": "bharatheeyam_panchanga_Kalaburagi.bdat", "sizeKB": 271, "fromYear": 2025, "toYear": 2045},
+    {"name": "Kannur", "nameKn": "ಕಣ್ಣೂರು", "fileName": "bharatheeyam_panchanga_Kannur.bdat", "sizeKB": 268, "fromYear": 2025, "toYear": 2045},
+    {"name": "Khammam", "nameKn": "ಖಮ್ಮಂ", "fileName": "bharatheeyam_panchanga_Khammam.bdat", "sizeKB": 271, "fromYear": 2025, "toYear": 2045},
+    {"name": "Kochi", "nameKn": "ಕೊಚ್ಚಿ", "fileName": "bharatheeyam_panchanga_Kochi.bdat", "sizeKB": 267, "fromYear": 2025, "toYear": 2045},
+    {"name": "Madurai", "nameKn": "ಮಧುರೈ", "fileName": "bharatheeyam_panchanga_Madurai.bdat", "sizeKB": 267, "fromYear": 2025, "toYear": 2045},
+    {"name": "Mangaluru", "nameKn": "ಮಂಗಳೂರು", "fileName": "bharatheeyam_panchanga_Mangaluru.bdat", "sizeKB": 268, "fromYear": 2025, "toYear": 2045},
+    {"name": "Mysuru", "nameKn": "ಮೈಸೂರು", "fileName": "bharatheeyam_panchanga_Mysuru.bdat", "sizeKB": 268, "fromYear": 2025, "toYear": 2045},
+    {"name": "Panaji", "nameKn": "ಪಣಜಿ", "fileName": "bharatheeyam_panchanga_Panaji.bdat", "sizeKB": 270, "fromYear": 2025, "toYear": 2045},
+    {"name": "Shivamogga", "nameKn": "ಶಿವಮೊಗ್ಗ", "fileName": "bharatheeyam_panchanga_Shivamogga.bdat", "sizeKB": 269, "fromYear": 2025, "toYear": 2045},
+    {"name": "Thiruvananthapuram", "nameKn": "ತಿರುವನಂತಪುರಂ", "fileName": "bharatheeyam_panchanga_Thiruvananthapuram.bdat", "sizeKB": 266, "fromYear": 2025, "toYear": 2045},
+    {"name": "Vijayawada", "nameKn": "ವಿಜಯವಾಡ", "fileName": "bharatheeyam_panchanga_Vijayawada.bdat", "sizeKB": 271, "fromYear": 2025, "toYear": 2045},
+    {"name": "Visakhapatnam", "nameKn": "ವಿಶಾಖಪಟ್ಟಣಂ", "fileName": "bharatheeyam_panchanga_Visakhapatnam.bdat", "sizeKB": 271, "fromYear": 2025, "toYear": 2045}
+  ]
+}
