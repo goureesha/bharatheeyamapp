@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'trusted_time_service.dart';
 import 'google_auth_service.dart';
 import 'offline_access_service.dart';
+import 'secure_storage_service.dart';
 import '../widgets/common.dart';
 
 class AppAccessService {
@@ -96,8 +96,7 @@ class AppAccessService {
   /// Record a successful online verification
   static Future<void> recordOnlineCheck() async {
     lastOnlineCheck = TrustedTimeService.now();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_lastOnlineCheckKey, lastOnlineCheck!.millisecondsSinceEpoch);
+    await SecureStorageService.setInt(_lastOnlineCheckKey, lastOnlineCheck!.millisecondsSinceEpoch);
     debugPrint('🌐 Online check recorded: $lastOnlineCheck');
   }
 
@@ -135,8 +134,7 @@ class AppAccessService {
     if (isActivated || adminAccess) return; // Only for trial users
     if (trialOpenCount > _trialMaxOpens) return; // Already expired
     trialOpenCount++;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_trialOpenCountKey, trialOpenCount);
+    await SecureStorageService.setInt(_trialOpenCountKey, trialOpenCount);
     debugPrint('📱 Trial open/resume #$trialOpenCount / $_trialMaxOpens');
   }
 
@@ -148,8 +146,7 @@ class AppAccessService {
     _trialSessionStart = null;
     // Cap at max
     if (trialUsedSeconds > _trialTotalSeconds) trialUsedSeconds = _trialTotalSeconds;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_trialUsedSecondsKey, trialUsedSeconds);
+    await SecureStorageService.setInt(_trialUsedSecondsKey, trialUsedSeconds);
     debugPrint('⏱️ Trial session paused. Session: ${sessionDuration}s, Total: ${trialUsedSeconds}s, Remaining: ${_trialTotalSeconds - trialUsedSeconds}s');
   }
 
@@ -158,8 +155,7 @@ class AppAccessService {
     if (_trialSessionStart == null) return;
     final sessionDuration = TrustedTimeService.now().difference(_trialSessionStart!).inSeconds;
     final total = trialUsedSeconds + sessionDuration;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_trialUsedSecondsKey, total > _trialTotalSeconds ? _trialTotalSeconds : total);
+    await SecureStorageService.setInt(_trialUsedSecondsKey, total > _trialTotalSeconds ? _trialTotalSeconds : total);
   }
 
   /// App status text for UI display
@@ -184,31 +180,29 @@ class AppAccessService {
   // ════════════════════════════════════════════════
 
   static Future<void> initialize() async {
-    final prefs = await SharedPreferences.getInstance();
-
     // Load accumulated trial usage (usage-based: counts foreground seconds)
-    trialUsedSeconds = prefs.getInt(_trialUsedSecondsKey) ?? 0;
+    trialUsedSeconds = await SecureStorageService.getInt(_trialUsedSecondsKey);
     // Load and increment trial open count
-    trialOpenCount = prefs.getInt(_trialOpenCountKey) ?? 0;
+    trialOpenCount = await SecureStorageService.getInt(_trialOpenCountKey);
     if (!isActivated && !adminAccess && trialOpenCount <= _trialMaxOpens) {
       trialOpenCount++;
-      await prefs.setInt(_trialOpenCountKey, trialOpenCount);
+      await SecureStorageService.setInt(_trialOpenCountKey, trialOpenCount);
       debugPrint('📱 Trial app open #$trialOpenCount / $_trialMaxOpens');
     }
     // Start tracking this session immediately
     startTrialSession();
 
     // Load last online check timestamp
-    final lastCheckTs = prefs.getInt(_lastOnlineCheckKey);
-    if (lastCheckTs != null) {
+    final lastCheckTs = await SecureStorageService.getInt(_lastOnlineCheckKey);
+    if (lastCheckTs > 0) {
       lastOnlineCheck = DateTime.fromMillisecondsSinceEpoch(lastCheckTs);
     }
 
     if (kIsWeb) return;
 
     // Load cached blocked status (fail-open default: not blocked)
-    isBlocked = prefs.getBool(_blockedKey) ?? false;
-    blockedReason = prefs.getString(_blockedReasonKey) ?? '';
+    isBlocked = await SecureStorageService.getBool(_blockedKey);
+    blockedReason = await SecureStorageService.getString(_blockedReasonKey) ?? '';
 
     // ── CRITICAL: Check Firestore on EVERY app open ──
     // Do NOT load cached access status first — always check server.
@@ -221,11 +215,17 @@ class AppAccessService {
       // The 10-day grace period is enforced by needsInternetVerification.
       // After 10 days without successful Firestore check, app locks.
       // Migration: also check old pref key for users updating from older versions
-      isActivated = prefs.getBool(_accessStatusKey) ??
-                    prefs.getBool('has_active_subscription') ?? false;
+      final cachedAccess = await SecureStorageService.getBool(_accessStatusKey);
+      if (!cachedAccess) {
+        // Also check legacy key for users upgrading from old versions
+        final legacyAccess = await SecureStorageService.getBool('has_active_subscription');
+        isActivated = legacyAccess;
+      } else {
+        isActivated = cachedAccess;
+      }
       adminAccess = isActivated;
-      muhurtaUnlocked = prefs.getBool(_muhurtaUnlockedKey) ?? false;
-      isStudent = prefs.getBool(_isStudentKey) ?? false;
+      muhurtaUnlocked = await SecureStorageService.getBool(_muhurtaUnlockedKey);
+      isStudent = await SecureStorageService.getBool(_isStudentKey);
       debugPrint('⚠️ Firestore unreachable — using cached access: $isActivated');
       debugPrint('⚠️ Last online check: $lastOnlineCheck');
       if (lastOnlineCheck != null) {
@@ -266,8 +266,7 @@ class AppAccessService {
         // Server has more usage (e.g. used on another device) → restore it
         trialUsedSeconds = firestoreUsed;
         _trialSessionStart = null; // Reset session, will restart
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setInt(_trialUsedSecondsKey, firestoreUsed);
+        await SecureStorageService.setInt(_trialUsedSecondsKey, firestoreUsed);
         startTrialSession();
         debugPrint('🔄 Trial usage restored from Firestore: ${firestoreUsed}s (prevents trial reset)');
       } else if (localUsed > firestoreUsed) {
@@ -327,8 +326,7 @@ class AppAccessService {
         await recordOnlineCheck();
         adminAccess = false;
         isActivated = false;
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool(_accessStatusKey, false);
+        await SecureStorageService.setBool(_accessStatusKey, false);
         return true;
       }
 
@@ -342,9 +340,8 @@ class AppAccessService {
       final reason = data['blockedReason'] as String? ?? '';
       isBlocked = blockedFlag;
       blockedReason = reason;
-      final prefs2 = await SharedPreferences.getInstance();
-      await prefs2.setBool(_blockedKey, blockedFlag);
-      await prefs2.setString(_blockedReasonKey, reason);
+      await SecureStorageService.setBool(_blockedKey, blockedFlag);
+      await SecureStorageService.setString(_blockedReasonKey, reason);
       if (blockedFlag) {
         debugPrint('🚫 User BLOCKED: $reason');
       }
@@ -355,14 +352,13 @@ class AppAccessService {
       // ── Muhurta unlock (separate premium feature) ──
       final muhurtaFlag = data['muhurtaUnlocked'] == true;
       muhurtaUnlocked = muhurtaFlag;
-      final prefs3 = await SharedPreferences.getInstance();
-      await prefs3.setBool(_muhurtaUnlockedKey, muhurtaFlag);
+      await SecureStorageService.setBool(_muhurtaUnlockedKey, muhurtaFlag);
       debugPrint('🔮 Muhurta access: ${muhurtaFlag ? 'UNLOCKED' : 'LOCKED'}');
 
       // ── Student mode (locks taranukoola + vastu) ──
       final studentFlag = data['isStudent'] == true;
       isStudent = studentFlag;
-      await prefs3.setBool(_isStudentKey, studentFlag);
+      await SecureStorageService.setBool(_isStudentKey, studentFlag);
       debugPrint('🎓 Student mode: ${studentFlag ? 'ON' : 'OFF'}');
 
       if (hasAdminGrant) {
@@ -375,15 +371,14 @@ class AppAccessService {
             adminAccess = false;
             adminAccessExpiry = null;
             isActivated = false;
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setBool(_accessStatusKey, false);
+            await SecureStorageService.setBool(_accessStatusKey, false);
             debugPrint('🔒 Admin access EXPIRED on $expiryDate');
 
             // Write back to Firestore so admin dashboard reflects it
             try {
               await FirebaseFirestore.instance
                   .collection('device_bindings')
-                  .doc(email!.toLowerCase())
+                  .doc(email.toLowerCase())
                   .update({'manualPremium': false});
               debugPrint('🔄 Firestore updated: access revoked');
             } catch (_) {}
@@ -392,24 +387,21 @@ class AppAccessService {
           adminAccessExpiry = expiryDate;
           adminAccess = true;
           isActivated = true;
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool(_accessStatusKey, true);
+          await SecureStorageService.setBool(_accessStatusKey, true);
           debugPrint('✅ Admin access ACTIVE for $email (expires: $expiryDate)');
         } else {
           // Flag set but NO expiry → deny access
           adminAccess = false;
           adminAccessExpiry = null;
           isActivated = false;
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool(_accessStatusKey, false);
+          await SecureStorageService.setBool(_accessStatusKey, false);
           debugPrint('🔒 Admin flag set but NO expiry — access denied');
         }
       } else {
         adminAccess = false;
         adminAccessExpiry = null;
         isActivated = false;
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool(_accessStatusKey, false);
+        await SecureStorageService.setBool(_accessStatusKey, false);
         debugPrint('🔒 Admin access REVOKED/OFF for $email');
       }
       return true;

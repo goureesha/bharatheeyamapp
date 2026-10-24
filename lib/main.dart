@@ -29,9 +29,16 @@ import 'package:sweph/sweph.dart' hide kIsWeb;
 import 'core/ephemeris.dart';
 import 'core/calculator.dart';
 import 'services/timezone_service.dart';
+import 'services/security_service.dart';
+import 'services/secure_storage_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 🔒 Strip debug prints in release mode — prevents info leaks via logcat
+  if (kReleaseMode) {
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -71,6 +78,9 @@ Future<void> main() async {
   ]);
 
   // Phase 2: AppAccess (needs userEmail from sign-in)
+  // Phase 2b: Encrypted storage migration (must run before access checks)
+  await SecureStorageService.initialize();
+
   await AppAccessService.initialize();
   await OfflineAccessService.initialize();
 
@@ -83,6 +93,10 @@ Future<void> main() async {
     loadWorldCities(); // Load 34K+ world cities in background
     await _initAuthAndBinding();
     TesterService.init();
+    await SecurityService.initialize(); // Root/emulator/debugger checks
+    if (SecurityService.isTampered) {
+      deviceBindingNotifier.value = deviceBindingNotifier.value; // Rebuild UI to show blocked screen
+    }
     _deferredInit();
     // Preload 10 years of planet transit data in background
     TransitCache.preloadRange();
@@ -484,7 +498,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   ? _WebPasswordScreen(onUnlocked: () => setState(() => _webUnlocked = true))
                   : _isVersionOutdated
                   ? const _ForceUpdateScreen()
-                  : (AppAccessService.isBlocked || DeviceBindingService.isDeviceBlocked)
+                  : (AppAccessService.isBlocked || DeviceBindingService.isDeviceBlocked || SecurityService.isTampered)
                   ? _BlockedScreen()
                   : !GoogleAuthService.isSignedIn && !kIsWeb
                   ? (AppAccessService.lastOnlineCheck == null
@@ -688,9 +702,9 @@ class _BlockedScreenState extends State<_BlockedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final reason = AppAccessService.isBlocked
-        ? AppAccessService.blockedReason
-        : DeviceBindingService.deviceBlockedReason;
+    final reason = SecurityService.isTampered
+        ? SecurityService.tamperReason
+        : AppAccessService.isBlocked ? AppAccessService.blockedReason : DeviceBindingService.deviceBlockedReason;
     return Scaffold(
       backgroundColor: kBg,
       body: SafeArea(
@@ -751,7 +765,7 @@ class _BlockedScreenState extends State<_BlockedScreen> {
                     await DeviceBindingService.checkDeviceBlock();
                   } catch (_) {}
                   if (mounted) {
-                    if (!AppAccessService.isBlocked && !DeviceBindingService.isDeviceBlocked) {
+                    if (!AppAccessService.isBlocked && !DeviceBindingService.isDeviceBlocked && !SecurityService.isTampered) {
                       // Unblocked! Rebuild the app
                       deviceBindingNotifier.value = deviceBindingNotifier.value;
                     } else {

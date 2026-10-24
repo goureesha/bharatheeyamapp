@@ -35,6 +35,8 @@ dependencies:
   device_info_plus: any
   wakelock_plus: ^1.3.3
   timezone: ^0.9.4
+  flutter_secure_storage: ^9.2.4
+  safe_device: ^1.1.8
 
 dev_dependencies:
   flutter_test:

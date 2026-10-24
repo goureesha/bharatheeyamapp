@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -7,6 +6,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'google_auth_service.dart';
 import 'app_access_service.dart';
+import 'secure_storage_service.dart';
 
 /// Manages one-Gmail-one-device binding using Firestore for cross-device enforcement.
 ///
@@ -14,7 +14,7 @@ import 'app_access_service.dart';
 /// If Firestore is unreachable, we BLOCK (fail-closed) to prevent bypass.
 ///
 /// Flow:
-///   1. Each device gets a unique UUID (persisted in SharedPreferences).
+///   1. Each device gets a unique UUID (persisted in encrypted storage).
 ///   2. On sign-in, we check Firestore: `device_bindings/{email}` → stored deviceId.
 ///   3. If no binding exists → register this device.
 ///   4. If binding exists AND matches this device → OK.
@@ -40,11 +40,10 @@ class DeviceBindingService {
   /// Get or generate a unique device ID (persisted locally)
   static Future<String> getDeviceId() async {
     if (_deviceId != null) return _deviceId!;
-    final prefs = await SharedPreferences.getInstance();
-    _deviceId = prefs.getString(_deviceIdKey);
+    _deviceId = await SecureStorageService.getString(_deviceIdKey);
     if (_deviceId == null) {
       _deviceId = const Uuid().v4();
-      await prefs.setString(_deviceIdKey, _deviceId!);
+      await SecureStorageService.setString(_deviceIdKey, _deviceId!);
       debugPrint('DeviceBinding: new deviceId=$_deviceId');
     }
     return _deviceId!;
@@ -250,18 +249,16 @@ class DeviceBindingService {
   }
   /// Cache a successful Firestore verification locally
   static Future<void> _cacheLocalBinding(String email, String devId) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_localBoundEmailKey, email.toLowerCase());
-    await prefs.setString(_localBoundDeviceKey, devId);
-    await prefs.setInt(_lastFirestoreCheckKey, DateTime.now().millisecondsSinceEpoch);
+    await SecureStorageService.setString(_localBoundEmailKey, email.toLowerCase());
+    await SecureStorageService.setString(_localBoundDeviceKey, devId);
+    await SecureStorageService.setInt(_lastFirestoreCheckKey, DateTime.now().millisecondsSinceEpoch);
   }
 
   /// Clear local binding cache (called on mismatch)
   static Future<void> _clearLocalBinding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_localBoundEmailKey);
-    await prefs.remove(_localBoundDeviceKey);
-    await prefs.remove(_lastFirestoreCheckKey);
+    await SecureStorageService.delete(_localBoundEmailKey);
+    await SecureStorageService.delete(_localBoundDeviceKey);
+    await SecureStorageService.delete(_lastFirestoreCheckKey);
   }
 
   /// STRICT local fallback: only allows if we've previously verified via Firestore
@@ -269,10 +266,9 @@ class DeviceBindingService {
   /// New devices that never verified via Firestore are BLOCKED.
   static Future<bool> _strictLocalFallback(String email, String devId) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final cachedEmail = prefs.getString(_localBoundEmailKey);
-      final cachedDevice = prefs.getString(_localBoundDeviceKey);
-      final lastCheck = prefs.getInt(_lastFirestoreCheckKey) ?? 0;
+      final cachedEmail = await SecureStorageService.getString(_localBoundEmailKey);
+      final cachedDevice = await SecureStorageService.getString(_localBoundDeviceKey);
+      final lastCheck = await SecureStorageService.getInt(_lastFirestoreCheckKey);
 
       // If never verified via Firestore → BLOCK
       if (cachedEmail == null || cachedDevice == null || lastCheck == 0) {
@@ -463,9 +459,8 @@ class DeviceBindingService {
       if (kIsWeb) return;
 
       // Load cached value first
-      final prefs = await SharedPreferences.getInstance();
-      isDeviceBlocked = prefs.getBool('device_blocked') ?? false;
-      deviceBlockedReason = prefs.getString('device_blocked_reason') ?? '';
+      isDeviceBlocked = await SecureStorageService.getBool('device_blocked');
+      deviceBlockedReason = await SecureStorageService.getString('device_blocked_reason') ?? '';
 
       final firebaseReady = await _ensureFirebase();
       if (!firebaseReady) return; // use cached
@@ -483,8 +478,8 @@ class DeviceBindingService {
         final reason = data['blockedReason'] as String? ?? '';
         isDeviceBlocked = blocked;
         deviceBlockedReason = reason;
-        await prefs.setBool('device_blocked', blocked);
-        await prefs.setString('device_blocked_reason', reason);
+        await SecureStorageService.setBool('device_blocked', blocked);
+        await SecureStorageService.setString('device_blocked_reason', reason);
         if (blocked) {
           debugPrint('🚫 DEVICE BLOCKED: $devId reason=$reason');
         }
