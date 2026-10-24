@@ -1,7 +1,7 @@
 import 'calculator.dart';
 import 'prediction_texts.dart';
-import 'prediction_texts_en.dart';
-import 'prediction_texts_hi.dart';
+import 'prediction_texts_en.dart' hide dashaBhuktiPhalasEn;
+import 'prediction_texts_hi.dart' hide dashaBhuktiPhalasHi;
 import 'prediction_texts_ta.dart';
 import 'prediction_texts_te.dart';
 import 'prediction_texts_ml.dart';
