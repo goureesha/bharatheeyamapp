@@ -4359,7 +4359,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   /// Recursive dasha entry tile â€” works for all 5 levels
-  Widget _buildDashaEntryTile(DashaEntry entry, int level, PredictionResult prediction, String Function(String) _pl) {
+  Widget _buildDashaEntryTile(DashaEntry entry, int level, PredictionResult prediction, String Function(String) _pl, {String? mdLord}) {
     final isCurrent = _isDashaCurrent(entry);
     final levelKey = level < _dashaLevelKeys.length ? _dashaLevelKeys[level] : 'pranadasha';
     final levelLabel = _pl(levelKey);
@@ -4373,7 +4373,19 @@ class _DashboardScreenState extends State<DashboardScreen>
     final hasChildren = entry.antardashas.isNotEmpty;
     final isLeaf = !hasChildren;
 
-    // Phala text shown only in Phala section, not in Dasha drill-down
+    // Phala text for Mahadasha and Bhukti levels
+    String? phala;
+    String? shloka;
+    if (level == 0) {
+      final mdPred = prediction.allDashas.where((d) => d.lord == entry.lord).firstOrNull;
+      phala = mdPred?.phala;
+      shloka = mdPred?.shloka;
+    } else if (level == 1 && mdLord != null) {
+      final mdPred = prediction.allDashas.where((d) => d.lord == mdLord).firstOrNull;
+      final bkPred = mdPred?.bhuktis.where((b) => b.lord == entry.lord).firstOrNull;
+      phala = bkPred?.phala;
+    }
+
     // Leaf nodes (Prana level or entries without children) â€” simple row
     if (isLeaf) {
       return Container(
@@ -4439,8 +4451,30 @@ class _DashboardScreenState extends State<DashboardScreen>
           subtitle: Text('${_fmtDate(entry.start)} → ${_fmtDate(entry.end)}',
             style: TextStyle(fontSize: dateFontSize, color: kMuted)),
           children: [
+            // Dasha/Bhukti phala text
+            if (phala != null && phala.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+              ),
+            if (shloka != null && shloka.isNotEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(8),
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  color: kPurple2.withOpacity(0.04),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: kPurple2.withOpacity(0.15)),
+                ),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Icon(Icons.menu_book, size: 14, color: kPurple2.withOpacity(0.5)),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text(shloka, style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: kMuted, height: 1.5))),
+                ]),
+              ),
             // Sub-level entries
-            ...entry.antardashas.map((sub) => _buildDashaEntryTile(sub, level + 1, prediction, _pl)),
+            ...entry.antardashas.map((sub) => _buildDashaEntryTile(sub, level + 1, prediction, _pl, mdLord: level == 0 ? entry.lord : null)),
           ],
         ),
       ),
