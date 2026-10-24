@@ -1,4 +1,4 @@
-﻿import 'dart:typed_data';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:flutter/services.dart';
@@ -4262,6 +4262,22 @@ class _DashboardScreenState extends State<DashboardScreen>
             ]),
           ),
         ],
+        if (d.adShloka.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: kPurple2.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: kPurple2.withOpacity(0.15)),
+            ),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(Icons.menu_book, size: 14, color: kPurple2.withOpacity(0.5)),
+              const SizedBox(width: 6),
+              Expanded(child: Text(d.adShloka, style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: kMuted, height: 1.5))),
+            ]),
+          ),
+        ],
       ]),
     );
   }
@@ -4384,6 +4400,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       final mdPred = prediction.allDashas.where((d) => d.lord == mdLord).firstOrNull;
       final bkPred = mdPred?.bhuktis.where((b) => b.lord == entry.lord).firstOrNull;
       phala = bkPred?.phala;
+      shloka = bkPred?.shloka;
     }
 
     // Leaf nodes (Prana level or entries without children) â€” simple row

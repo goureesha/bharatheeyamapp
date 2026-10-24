@@ -11,6 +11,13 @@ import 'prediction_shlokas_ta.dart';
 import 'prediction_shlokas_te.dart';
 import 'prediction_shlokas_ml.dart';
 import 'prediction_classical.dart';
+import 'prediction_texts_bhukti_kn.dart';
+import 'prediction_texts_bhukti_en.dart';
+import 'prediction_texts_bhukti_hi.dart';
+import 'prediction_texts_bhukti_ta.dart';
+import 'prediction_texts_bhukti_te.dart';
+import 'prediction_texts_bhukti_ml.dart';
+import 'prediction_shlokas_bhukti.dart';
 import '../widgets/common.dart';
 
 // ═══════════════════════════════════════════
@@ -128,7 +135,8 @@ class DashaPeriodPrediction {
   final String relationship;       // kendra, trikona, 6-8, 2-12, etc.
   final String mdPhala;            // mahadasha lord phala
   final String adPhala;            // dasha-bhukti combination phala
-  final String shloka;             // Sanskrit shloka
+  final String shloka;             // Sanskrit shloka (mahadasha)
+  final String adShloka;           // Sanskrit shloka (bhukti)
   final PhalaQuality quality;
 
   const DashaPeriodPrediction({
@@ -142,6 +150,7 @@ class DashaPeriodPrediction {
     required this.mdPhala,
     required this.adPhala,
     this.shloka = '',
+    this.adShloka = '',
     required this.quality,
   });
 }
@@ -173,6 +182,7 @@ class BhuktiPrediction {
   final DateTime start;
   final DateTime end;
   final String phala;
+  final String shloka;
   final PhalaQuality quality;
 
   const BhuktiPrediction({
@@ -180,6 +190,7 @@ class BhuktiPrediction {
     required this.start,
     required this.end,
     required this.phala,
+    this.shloka = '',
     required this.quality,
   });
 }
@@ -255,10 +266,10 @@ class PredictionEngine {
       switch (_lang) {
         case 'en': return dashaBhuktiPhalasEn;
         case 'hi': return dashaBhuktiPhalasHi;
-        case 'ta': return dashaBhuktiPhalasTa;
-        case 'te': return dashaBhuktiPhalasTe;
-        case 'ml': return dashaBhuktiPhalasMl;
-        default: return dashaBhuktiPhalas;
+        case 'ta': return dashaBhuktiPhalasTaExpanded;
+        case 'te': return dashaBhuktiPhalasTeExpanded;
+        case 'ml': return dashaBhuktiPhalasMlExpanded;
+        default: return dashaBhuktiPhalasExpanded;
       }
     }
     Map<String, String> _selectDignity() {
@@ -301,6 +312,10 @@ class PredictionEngine {
         default: return lordInHouseShlokaKn;
       }
     }
+    // Bhukti shlokas are in Sanskrit (Devanagari), same for all languages
+    Map<String, Map<String, String>> _selectBhuktiShloka() {
+      return dashaBhuktiShlokas;
+    }
 
     final _bhavaInfo = _selectBhavaInfo();
     final _planetInHouse = _selectPlanetInHouse();
@@ -310,6 +325,7 @@ class PredictionEngine {
     final _dignityMod = _selectDignity();
     final _planetShloka = _selectPlanetShloka();
     final _maDashaShloka = _selectMahaDashaShloka();
+    final _bhuktiShloka = _selectBhuktiShloka();
     final _lordShloka = _selectLordShloka();
 
     final lagnaRashi = planets[_lagna]!.rashiIndex;
@@ -680,6 +696,7 @@ class PredictionEngine {
           start: ad.start,
           end: ad.end,
           phala: dbPhala,
+          shloka: _bhuktiShloka[mdLord]?[adLord] ?? '',
           quality: adQuality,
         ));
 
@@ -697,6 +714,7 @@ class PredictionEngine {
             mdPhala: mdPhala,
             adPhala: dbPhala,
             shloka: _maDashaShloka[mdLord] ?? '',
+            adShloka: _bhuktiShloka[mdLord]?[adLord] ?? '',
             quality: adQuality,
           );
         }
