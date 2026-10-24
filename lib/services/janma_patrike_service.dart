@@ -1181,6 +1181,7 @@ class JanmaPatrikeService {
 
   static List<Widget> _buildPhalaPages(UserDetails user, KundaliResult result, PredictionResult prediction, PdfThemeConfig t) {
     final pages = <Widget>[];
+    String fmtDate(DateTime dt) => '${dt.day.toString().padLeft(2, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.year}';
 
     // ── Phala Page 1: Bhava Phala (houses 1-6) ──
     pages.add(_buildPhalaPage(
@@ -1408,7 +1409,7 @@ class JanmaPatrikeService {
           ],
           if (d.adShloka.isNotEmpty) ...[
             const SizedBox(height: 4),
-            Text('\u{1F4D6} \', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: t.dashaHighlightText.withOpacity(0.6), height: 1.3)),
+            Text('📖 ${d.adShloka}', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: t.dashaHighlightText.withOpacity(0.6), height: 1.3)),
           ],
         ],
       ),
