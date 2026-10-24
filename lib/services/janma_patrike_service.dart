@@ -1304,7 +1304,7 @@ class JanmaPatrikeService {
 
         // Section title for bhukti cards
         final pageLabel = totalPages > 1 ? ' ($pageNum/$totalPages)' : '';
-        children.add(_buildSectionTitle('${trAll(md.lord)} ${AppLocale.l('jpPhalaMainDasha')} — ${AppLocale.l('jpPhalaSubDasha')}$pageLabel', t));
+        children.add(_buildSectionTitle('${trAll(md.lord)} ${AppLocale.l('jpPhalaMainDasha')} — ${AppLocale.l('jpAntardashaTitle')}$pageLabel', t));
         children.add(const SizedBox(height: 4));
 
         // Bhukti cards for this chunk
