@@ -1361,6 +1361,10 @@ class JanmaPatrikeService {
             const SizedBox(height: 4),
             Text('📖 ${d.shloka}', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: t.dashaHighlightText.withOpacity(0.6), height: 1.3)),
           ],
+          if (d.adShloka.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text('\u{1F4D6} \', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: t.dashaHighlightText.withOpacity(0.6), height: 1.3)),
+          ],
         ],
       ),
     );
