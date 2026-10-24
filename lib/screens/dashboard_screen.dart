@@ -4439,7 +4439,6 @@ class _DashboardScreenState extends State<DashboardScreen>
           subtitle: Text('${_fmtDate(entry.start)} → ${_fmtDate(entry.end)}',
             style: TextStyle(fontSize: dateFontSize, color: kMuted)),
           children: [
-              ),
             // Sub-level entries
             ...entry.antardashas.map((sub) => _buildDashaEntryTile(sub, level + 1, prediction, _pl)),
           ],
