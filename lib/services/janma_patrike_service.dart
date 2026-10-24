@@ -1251,46 +1251,97 @@ class JanmaPatrikeService {
     }
 
     // ── Phala Pages 5+: Bhukti Phala Details (per Mahadasha) ──
+    // Each mahadasha gets its own pages with bhukti cards.
+    // Max 4 bhukti cards per page to prevent overflow.
+    const int _maxBhuktisPerPage = 4;
     for (final md in allDashas) {
       if (md.bhuktis.isEmpty) continue;
-      final bhuktiCards = <Widget>[];
-      for (final bk in md.bhuktis) {
-        if (bk.phala.isEmpty) continue;
-        bhuktiCards.add(Container(
-          margin: const EdgeInsets.only(bottom: 6),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: t.detailBoxBg,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: t.detailBorder),
-          ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('${trAll(md.lord)} - ${trAll(bk.lord)}',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11, color: t.primaryDark)),
-            const SizedBox(height: 2),
-            Text('${fmtDate(bk.start)} — ${fmtDate(bk.end)}',
-              style: TextStyle(fontSize: 9, color: Colors.black54)),
+      final validBhuktis = md.bhuktis.where((bk) => bk.phala.isNotEmpty).toList();
+      if (validBhuktis.isEmpty) continue;
+
+      // Split bhuktis into chunks of _maxBhuktisPerPage
+      for (int chunk = 0; chunk < validBhuktis.length; chunk += _maxBhuktisPerPage) {
+        final end = (chunk + _maxBhuktisPerPage > validBhuktis.length) ? validBhuktis.length : chunk + _maxBhuktisPerPage;
+        final batch = validBhuktis.sublist(chunk, end);
+        final isFirstPage = chunk == 0;
+        final pageNum = (chunk ~/ _maxBhuktisPerPage) + 1;
+        final totalPages = (validBhuktis.length + _maxBhuktisPerPage - 1) ~/ _maxBhuktisPerPage;
+
+        final children = <Widget>[];
+
+        // On the first page of each mahadasha, show the mahadasha phala header
+        if (isFirstPage) {
+          children.addAll([
+            _buildSectionTitle('${trAll(md.lord)} ${AppLocale.l('jpPhalaMainDasha')}', t),
             const SizedBox(height: 4),
-            Text(bk.phala, style: TextStyle(fontSize: 10, height: 1.3, color: Colors.black87)),
-            if (bk.shloka.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 3),
-                child: Text('📖 ${bk.shloka}', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: Colors.black45, height: 1.3)),
+            Container(
+              padding: const EdgeInsets.all(8),
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: t.dashaHighlight.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: t.dashaHighlightBorder.withOpacity(0.3)),
               ),
-          ]),
-        ));
-      }
-      if (bhuktiCards.isNotEmpty) {
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Text('${trAll(md.lord)} ${AppLocale.l('jpPhalaMainDasha')}',
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: t.primaryDark)),
+                  const Spacer(),
+                  Text('${fmtDate(md.start)} — ${fmtDate(md.end)}',
+                    style: TextStyle(fontSize: 9, color: Colors.black54)),
+                ]),
+                const SizedBox(height: 4),
+                Text(md.phala, style: TextStyle(fontSize: 10, height: 1.3, color: Colors.black87)),
+                if (md.shloka.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 3),
+                    child: Text('📖 ${md.shloka}', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: Colors.black45, height: 1.3)),
+                  ),
+              ]),
+            ),
+          ]);
+        }
+
+        // Section title for bhukti cards
+        final pageLabel = totalPages > 1 ? ' ($pageNum/$totalPages)' : '';
+        children.add(_buildSectionTitle('${trAll(md.lord)} ${AppLocale.l('jpPhalaMainDasha')} — ${AppLocale.l('jpPhalaSubDasha')}$pageLabel', t));
+        children.add(const SizedBox(height: 4));
+
+        // Bhukti cards for this chunk
+        for (final bk in batch) {
+          children.add(Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: t.detailBoxBg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: t.detailBorder),
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Text('${trAll(md.lord)} — ${trAll(bk.lord)}',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11, color: t.primaryDark)),
+                const Spacer(),
+                Text('${fmtDate(bk.start)} — ${fmtDate(bk.end)}',
+                  style: TextStyle(fontSize: 9, color: Colors.black54)),
+              ]),
+              const SizedBox(height: 4),
+              Text(bk.phala, style: TextStyle(fontSize: 10, height: 1.3, color: Colors.black87)),
+              if (bk.shloka.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 3),
+                  child: Text('📖 ${bk.shloka}', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: Colors.black45, height: 1.3)),
+                ),
+            ]),
+          ));
+        }
+
         pages.add(_buildPhalaPage(
           user: user,
           title: AppLocale.l('jpPhalaTitle'),
           subtitle: '${user.name} — ${trAll(md.lord)} ${AppLocale.l('jpPhalaMainDasha')}',
           theme: t,
-          children: [
-            _buildSectionTitle('${trAll(md.lord)} ${AppLocale.l('jpPhalaMainDasha')} - ${AppLocale.l('jpPhalaSubDasha')}', t),
-            const SizedBox(height: 4),
-            ...bhuktiCards,
-          ],
+          children: children,
         ));
       }
     }
