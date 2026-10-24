@@ -1249,6 +1249,51 @@ class JanmaPatrikeService {
       ));
     }
 
+    // ── Phala Pages 5+: Bhukti Phala Details (per Mahadasha) ──
+    for (final md in allDashas) {
+      if (md.bhuktis.isEmpty) continue;
+      final bhuktiCards = <Widget>[];
+      for (final bk in md.bhuktis) {
+        if (bk.phala.isEmpty) continue;
+        bhuktiCards.add(Container(
+          margin: const EdgeInsets.only(bottom: 6),
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: t.detailBoxBg,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: t.detailBorder),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('${trAll(md.lord)} - ${trAll(bk.lord)}',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11, color: t.primaryDark)),
+            const SizedBox(height: 2),
+            Text('${fmtDate(bk.start)} — ${fmtDate(bk.end)}',
+              style: TextStyle(fontSize: 9, color: Colors.black54)),
+            const SizedBox(height: 4),
+            Text(bk.phala, style: TextStyle(fontSize: 10, height: 1.3, color: Colors.black87)),
+            if (bk.shloka.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 3),
+                child: Text('📖 ${bk.shloka}', style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: Colors.black45, height: 1.3)),
+              ),
+          ]),
+        ));
+      }
+      if (bhuktiCards.isNotEmpty) {
+        pages.add(_buildPhalaPage(
+          user: user,
+          title: AppLocale.l('jpPhalaTitle'),
+          subtitle: '${user.name} — ${trAll(md.lord)} ${AppLocale.l('jpPhalaMainDasha')}',
+          theme: t,
+          children: [
+            _buildSectionTitle('${trAll(md.lord)} ${AppLocale.l('jpPhalaMainDasha')} - ${AppLocale.l('jpPhalaSubDasha')}', t),
+            const SizedBox(height: 4),
+            ...bhuktiCards,
+          ],
+        ));
+      }
+    }
+
     return pages;
   }
 
