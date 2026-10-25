@@ -489,7 +489,7 @@ class _BharatheeyamAppState extends State<BharatheeyamApp> with WidgetsBindingOb
                   labelColor: kGreen,
                   unselectedLabelColor: kMuted,
                   labelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
-                  unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
                   indicatorColor: kGreen,
                   indicatorSize: TabBarIndicatorSize.tab,
                 ),
