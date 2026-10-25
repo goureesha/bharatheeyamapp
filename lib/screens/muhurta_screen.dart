@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:sweph/sweph.dart' hide kIsWeb;
 import '../widgets/common.dart';
 import '../constants/strings.dart';
@@ -7,6 +7,7 @@ import '../core/ephemeris.dart';
 import '../core/muhurta_rules.dart';
 import '../services/location_service.dart';
 import '../services/panchanga_cache.dart';
+import '../services/panchanga_download_service.dart';
 
 /// ──────────────────────────────────────────────────────────────
 /// Simplified Muhoorta Screen
@@ -705,6 +706,19 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
                   );
                 }),
 
+                // ── Download Location Data ──
+                OutlinedButton.icon(
+                  onPressed: () => _showCityDownloadSheet(),
+                  icon: const Icon(Icons.cloud_download_outlined, size: 18),
+                  label: Text('⬇️ ಪಂಚಾಂಗ ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ / Download City Data', style: const TextStyle(fontWeight: FontWeight.w700)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: kTeal,
+                    side: BorderSide(color: kTeal),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 // Search button
                 ElevatedButton.icon(
                   onPressed: _searching ? null : _search,
@@ -725,6 +739,8 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             )),
             const SizedBox(height: 12),
 
+            // ── City Coverage Info ──
+            _buildCoverageInfoTile(),
             // ── RESULTS ──
             if (_searching)
               const Padding(
@@ -981,6 +997,246 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
       const SizedBox(width: 2),
       Text('$label${ok ? '' : ' ($grahas)'}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: ok ? Colors.green : Colors.red)),
     ]);
+  }
+  // ─────────────────────────────────────────────────────────────────
+  // Download Sheet
+  // ─────────────────────────────────────────────────────────────────
+  Future<void> _showCityDownloadSheet() async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: kCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => _MuhurtaCityDownloadSheet(onDone: () {
+        if (mounted) setState(() {});
+      }),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // City Coverage Data
+  // ─────────────────────────────────────────────────────────────────
+  static const _cityCoverage = <String, Map<String, String>>{
+    'Bengaluru':          {'icon':'🏙️','kn':'ಬೆಂಗಳೂರು','covers':'ಬೆಂಗಳೂರು ನಗರ, ಬೆಂಗಳೂರು ಗ್ರಾಮಾಂತರ, ರಾಮನಗರ, ಚಿಕ್ಕಬಳ್ಳಾಪುರ, ತುಮಕೂರು (ಭಾಗ)'},
+    'Mysuru':             {'icon':'🏰','kn':'ಮೈಸೂರು','covers':'ಮೈಸೂರು, ಮಂಡ್ಯ, ಹಾಸನ, ಚಾಮರಾಜನಗರ, ಕೊಡಗು'},
+    'Mangaluru':          {'icon':'⛵','kn':'ಮಂಗಳೂರು','covers':'ದಕ್ಷಿಣ ಕನ್ನಡ, ಉಡುಪಿ, ಕಾಸರಗೋಡು (ಭಾಗ)'},
+    'Shivamogga':         {'icon':'🌲','kn':'ಶಿವಮೊಗ್ಗ','covers':'ಶಿವಮೊಗ್ಗ, ದಾವಣಗೆರೆ, ಚಿಕ್ಕಮಗಳೂರು, ಉತ್ತರ ಕನ್ನಡ (ಭಾಗ)'},
+    'Kalaburagi':         {'icon':'🏜️','kn':'ಕಲಬುರಗಿ','covers':'ಕಲಬುರಗಿ, ಯಾದಗಿರಿ, ವಿಜಯಪುರ, ರಾಯಚೂರು, ಬೀದರ್'},
+    'Kochi':              {'icon':'🌊','kn':'ಕೊಚ್ಚಿ','covers':'ಎರ್ನಾಕುಳಂ, ತ್ರಿಶ್ಶೂರ್, ಇಡುಕ್ಕಿ, ಆಲಪ್ಪುಳ (ಭಾಗ)'},
+    'Kannur':             {'icon':'🌿','kn':'ಕಣ್ಣೂರು','covers':'ಕಣ್ಣೂರು, ವಯನಾಡ್, ಕೋಝಿಕ್ಕೋಡ್, ಮಲಪ್ಪುರಂ (ಭಾಗ)'},
+    'Thiruvananthapuram': {'icon':'🏛️','kn':'ತಿರುವನಂತಪುರಂ','covers':'ತಿರುವನಂತಪುರಂ, ಕೊಲ್ಲಂ, ಪತ್ತನಂತಿಟ್ಟ'},
+    'Chennai':            {'icon':'🌆','kn':'ಚೆನ್ನೈ','covers':'ಚೆನ್ನೈ, ತಿರುವಳ್ಳೂರು, ಕಾಂಚೀಪುರಂ, ವೆಲ್ಲೂರು (ಭಾಗ)'},
+    'Coimbatore':         {'icon':'⛰️','kn':'ಕೊಯಮತ್ತೂರು','covers':'ಕೊಯಮತ್ತೂರು, ತಿರುಪ್ಪೂರ್, ಈರೋಡ್, ನೀಲಗಿರಿ'},
+    'Madurai':            {'icon':'🏯','kn':'ಮಧುರೈ','covers':'ಮಧುರೈ, ಡಿಂಡಿಗಲ್, ವಿರುಧುನಗರ, ಸಿವಗಂಗೈ'},
+    'Hyderabad':          {'icon':'🕌','kn':'ಹೈದರಾಬಾದ್','covers':'ಹೈದರಾಬಾದ್, ರಂಗಾರೆಡ್ಡಿ, ಮೆಡಕ್, ನಲ್ಗೊಂಡ (ಭಾಗ)'},
+    'Khammam':            {'icon':'🌾','kn':'ಖಮ್ಮಂ','covers':'ಖಮ್ಮಂ, ಭದ್ರಾದ್ರಿ ಕೊತ್ತಗೂಡೆಂ, ಸೂರ್ಯಾಪೇಟ'},
+    'Vijayawada':         {'icon':'🌉','kn':'ವಿಜಯವಾಡ','covers':'ಕೃಷ್ಣ, ಎನ್‌ಟಿಆರ್ ಜಿಲ್ಲೆ, ಗುಂಟೂರು, ಪಲ್ನಾಡು'},
+    'Visakhapatnam':      {'icon':'⚓','kn':'ವಿಶಾಖಪಟ್ಟಣಂ','covers':'ವಿಶಾಖಪಟ್ಟಣಂ, ಅನಕಾಪಲ್ಲಿ, ಶ್ರೀಕಾಕುಳಂ, ಅಲ್ಲೂರಿ (ಭಾಗ)'},
+    'Anantapur':          {'icon':'🌞','kn':'ಅನಂತಪುರ','covers':'ಅನಂತಪುರ, ಕರ್ನೂಲು, ನಂದ್ಯಾಲ, ಶ್ರೀ ಸತ್ಯಸಾಯಿ'},
+    'Panaji':             {'icon':'🏖️','kn':'ಪಣಜಿ','covers':'ಉತ್ತರ ಗೋವಾ, ದಕ್ಷಿಣ ಗೋವಾ (ಸಂಪೂರ್ಣ ಗೋವಾ)'},
+  };
+
+  Widget _buildCoverageInfoTile() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: kCard,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: kBorder.withOpacity(0.4)),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+          childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          leading: Icon(Icons.map_outlined, color: kTeal, size: 22),
+          title: Text(
+            '📍 ಲಭ್ಯ ನಗರಗಳು ಮತ್ತು ಪ್ರದೇಶ ವ್ಯಾಪ್ತಿ',
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kText),
+          ),
+          subtitle: Text(
+            '17 cities • tap to view coverage',
+            style: TextStyle(fontSize: 11, color: kMuted),
+          ),
+          children: _cityCoverage.entries.map((e) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(e.value['icon']!, style: const TextStyle(fontSize: 18)),
+              const SizedBox(width: 8),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(
+                  '${e.value['kn']} (${e.key})',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: kText),
+                ),
+                Text(
+                  e.value['covers']!,
+                  style: TextStyle(fontSize: 11, color: kMuted, height: 1.4),
+                ),
+              ])),
+            ]),
+          )).toList(),
+        ),
+      ),
+    );
+  }
+
+}
+
+
+class _MuhurtaCityDownloadSheet extends StatefulWidget {
+  final VoidCallback onDone;
+  const _MuhurtaCityDownloadSheet({required this.onDone});
+  @override
+  State<_MuhurtaCityDownloadSheet> createState() => _MuhurtaCityDownloadSheetState();
+}
+
+class _MuhurtaCityDownloadSheetState extends State<_MuhurtaCityDownloadSheet> {
+  List<PanchangaCityInfo>? _cities;
+  bool _loading = true;
+  String? _error;
+  String? _downloadingCity;
+  double _progress = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCities();
+  }
+
+  Future<void> _loadCities() async {
+    try {
+      final cities = await PanchangaDownloadService.fetchAvailableCities();
+      if (mounted) setState(() { _cities = cities; _loading = false; });
+    } catch (e) {
+      if (mounted) setState(() { _error = e.toString(); _loading = false; });
+    }
+  }
+
+  Future<void> _download(PanchangaCityInfo city) async {
+    setState(() { _downloadingCity = city.nameKn; _progress = 0; });
+    final err = await PanchangaDownloadService.downloadAndImport(
+      city,
+      onProgress: (p) { if (mounted) setState(() => _progress = p); },
+    );
+    if (mounted) {
+      setState(() { _downloadingCity = null; });
+      if (err == null) {
+        widget.onDone();
+        if (mounted) Navigator.pop(context);
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('✅ ${city.nameKn} ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ ಆಯಿತು'),
+          backgroundColor: Colors.green,
+        ));
+      } else {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('❌ $err'),
+          backgroundColor: Colors.red,
+        ));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      maxChildSize: 0.92,
+      minChildSize: 0.35,
+      expand: false,
+      builder: (ctx, scrollController) => Column(children: [
+        const SizedBox(height: 8),
+        Container(width: 40, height: 4, decoration: BoxDecoration(color: kBorder, borderRadius: BorderRadius.circular(2))),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(children: [
+            Icon(Icons.cloud_download_outlined, color: kTeal, size: 22),
+            const SizedBox(width: 10),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('ಪಂಚಾಂಗ ಡೇಟಾ ಡೌನ್‌ಲೋಡ್', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: kText)),
+              Text('ನಿಮ್ಮ ನಗರ ಆಯ್ಕೆ ಮಾಡಿ • Select your city', style: TextStyle(fontSize: 12, color: kMuted)),
+            ])),
+          ]),
+        ),
+        const Divider(),
+        if (_downloadingCity != null) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Column(children: [
+              Text('⬇️ $_downloadingCity ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ...', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: kText)),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: LinearProgressIndicator(
+                  value: _progress, minHeight: 8,
+                  backgroundColor: kBorder.withOpacity(0.3),
+                  valueColor: AlwaysStoppedAnimation(kTeal),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text('${(_progress * 100).toInt()}%', style: TextStyle(fontSize: 12, color: kMuted)),
+            ]),
+          ),
+        ] else if (_loading) ...[
+          const Padding(padding: EdgeInsets.all(40), child: CircularProgressIndicator()),
+        ] else if (_error != null) ...[
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(children: [
+              const Icon(Icons.error_outline, color: Colors.red, size: 48),
+              const SizedBox(height: 12),
+              Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 14)),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () { setState(() { _loading = true; _error = null; }); _loadCities(); },
+                child: const Text('ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ'),
+              ),
+            ]),
+          ),
+        ] else if (_cities == null || _cities!.isEmpty) ...[
+          Padding(padding: const EdgeInsets.all(40), child: Text('ನಗರಗಳು ಲಭ್ಯವಿಲ್ಲ', style: TextStyle(color: kMuted, fontSize: 16))),
+        ] else ...[
+          Expanded(
+            child: ListView.separated(
+              controller: scrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              itemCount: _cities!.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 6),
+              itemBuilder: (ctx, i) {
+                final city = _cities![i];
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: _downloadingCity != null ? null : () => _download(city),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: kBorder.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: kBorder.withOpacity(0.2)),
+                      ),
+                      child: Row(children: [
+                        Icon(Icons.location_city, color: kTeal, size: 28),
+                        const SizedBox(width: 14),
+                        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(city.nameKn, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: kText)),
+                          Text('${city.name} • ${city.fromYear}–${city.toYear} • ~${city.sizeKB} KB',
+                            style: TextStyle(fontSize: 11, color: kMuted)),
+                        ])),
+                        Icon(Icons.download_rounded, color: kTeal, size: 24),
+                      ]),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ]),
+    );
   }
 }
 
