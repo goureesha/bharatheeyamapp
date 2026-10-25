@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:flutter/services.dart';
@@ -5428,25 +5428,51 @@ class _DashboardScreenState extends State<DashboardScreen>
                         gender: _selectedGender,
                       );
 
+                      // ── Progress-aware PDF generation ──
+                      int _pdfCur = 0, _pdfTotal = 0;
+                      StateSetter? _dialogSetState;
+
                       showDialog(
                         context: context,
                         barrierDismissible: false,
-                        builder: (_) => Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)),
-                            child: Column(mainAxisSize: MainAxisSize.min, children: [
-                              CircularProgressIndicator(color: kPurple1),
-                              const SizedBox(height: 16),
-                              Text('${AppLocale.l('pdfCreating')}', style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none)),
-                            ]),
-                          ),
+                        builder: (_) => StatefulBuilder(
+                          builder: (ctx, setSt) {
+                            _dialogSetState = setSt;
+                            return Center(
+                              child: Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)),
+                                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                                  CircularProgressIndicator(
+                                    value: _pdfTotal > 0 ? _pdfCur / _pdfTotal : null,
+                                    color: kPurple1,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    _pdfTotal > 0
+                                      ? '${AppLocale.l('pdfCreating')} ($_pdfCur/$_pdfTotal)'
+                                      : AppLocale.l('pdfCreating'),
+                                    style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none),
+                                  ),
+                                ]),
+                              ),
+                            );
+                          },
                         ),
                       );
 
                       try {
-                        await Future.delayed(const Duration(milliseconds: 50));
-                        await JanmaPatrikeService.generateAndPrint(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection, firstPageStyle: _patrikeFormat);
+                        await Future.delayed(const Duration(milliseconds: 80));
+                        await JanmaPatrikeService.generateAndPrint(
+                          ud, widget.result,
+                          theme: selectedTheme,
+                          selectedPages: _pdfPageSelection,
+                          firstPageStyle: _patrikeFormat,
+                          onProgress: (cur, total) {
+                            _pdfCur = cur; _pdfTotal = total;
+                            _dialogSetState?.call(() {});
+                          },
+                        );
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();
                       } catch (e) {
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();
@@ -5492,25 +5518,51 @@ class _DashboardScreenState extends State<DashboardScreen>
                       );
 
                       // Show loading dialog
+                      // ── Progress-aware PDF generation ──
+                      int _pdfCur2 = 0, _pdfTotal2 = 0;
+                      StateSetter? _dialogSetState2;
+
                       showDialog(
                         context: context,
                         barrierDismissible: false,
-                        builder: (_) => Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)),
-                            child: Column(mainAxisSize: MainAxisSize.min, children: [
-                              CircularProgressIndicator(color: kPurple1),
-                              const SizedBox(height: 16),
-                              Text('${AppLocale.l('pdfCreating')}', style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none)),
-                            ]),
-                          ),
+                        builder: (_) => StatefulBuilder(
+                          builder: (ctx, setSt) {
+                            _dialogSetState2 = setSt;
+                            return Center(
+                              child: Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)),
+                                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                                  CircularProgressIndicator(
+                                    value: _pdfTotal2 > 0 ? _pdfCur2 / _pdfTotal2 : null,
+                                    color: kPurple1,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    _pdfTotal2 > 0
+                                      ? '${AppLocale.l('pdfCreating')} ($_pdfCur2/$_pdfTotal2)'
+                                      : AppLocale.l('pdfCreating'),
+                                    style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none),
+                                  ),
+                                ]),
+                              ),
+                            );
+                          },
                         ),
                       );
 
                       try {
-                        await Future.delayed(const Duration(milliseconds: 50)); // Let dialog render
-                        await JanmaPatrikeService.generateAndShare(ud, widget.result, theme: selectedTheme, selectedPages: _pdfPageSelection, firstPageStyle: _patrikeFormat);
+                        await Future.delayed(const Duration(milliseconds: 80));
+                        await JanmaPatrikeService.generateAndShare(
+                          ud, widget.result,
+                          theme: selectedTheme,
+                          selectedPages: _pdfPageSelection,
+                          firstPageStyle: _patrikeFormat,
+                          onProgress: (cur, total) {
+                            _pdfCur2 = cur; _pdfTotal2 = total;
+                            _dialogSetState2?.call(() {});
+                          },
+                        );
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();
                       } catch (e) {
                         if (mounted) Navigator.of(context, rootNavigator: true).pop();

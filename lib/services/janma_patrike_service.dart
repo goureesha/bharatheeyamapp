@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -214,7 +214,14 @@ class JanmaPatrikeService {
     });
   }
 
-  static Future<Uint8List> _generatePdfBytes(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages, String firstPageStyle = 'detailed'}) async {
+  static Future<Uint8List> _generatePdfBytes(
+    UserDetails user,
+    KundaliResult result, {
+    PdfThemeConfig? theme,
+    List<bool>? selectedPages,
+    String firstPageStyle = 'detailed',
+    void Function(int current, int total)? onProgress,
+  }) async {
     theme ??= PdfThemes.traditional;
     final pages = selectedPages ?? [true, true, true, true, true, true, true];
     final controller = ScreenshotController();
@@ -223,10 +230,40 @@ class JanmaPatrikeService {
     const double pageWidth = 793.0;
     const double pageHeight = 1122.0;
     final targetSize = const Size(pageWidth, pageHeight);
+    // Reduced pixelRatio: 1.8 gives crisp A4 output with ~2× less memory than 2.5
+    const double kPixelRatio = 1.8;
 
     final List<Uint8List?> allPageBytes = [];
 
-    // Pages 1-6: existing pages
+    // ── Count total pages upfront for progress reporting ──
+    int totalPages = 0;
+    for (int i = 0; i < 6; i++) {
+      if (i < pages.length && pages[i]) totalPages++;
+    }
+    if (pages.length > 6 && pages[6]) {
+      final prediction = PredictionEngine.analyze(result);
+      totalPages += _buildPhalaPages(user, result, prediction, theme).length;
+    }
+    int currentPage = 0;
+
+    // ── Helper: capture one page with progress + event-loop yield ──
+    Future<Uint8List> capturePage(Widget widget) async {
+      // Yield to let UI thread update (dialog, etc.) before heavy render
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      final bytes = await controller.captureFromWidget(
+        widget,
+        targetSize: targetSize,
+        pixelRatio: kPixelRatio,
+        delay: const Duration(milliseconds: 50),
+      );
+      currentPage++;
+      onProgress?.call(currentPage, totalPages);
+      // Yield again after capture so the event loop can breathe
+      await Future<void>.delayed(Duration.zero);
+      return bytes;
+    }
+
+    // Pages 1-6
     final pageBuilders = [
       () => firstPageStyle == 'traditional'
           ? _buildTraditionalPage(user, result, theme!)
@@ -244,34 +281,26 @@ class JanmaPatrikeService {
           width: pageWidth, height: pageHeight, theme: theme,
           child: pageBuilders[i](),
         );
-        allPageBytes.add(await controller.captureFromWidget(
-          widget, targetSize: targetSize, pixelRatio: 2.5,
-          delay: const Duration(milliseconds: 10),
-        ));
+        allPageBytes.add(await capturePage(widget));
       } else {
         allPageBytes.add(null);
       }
     }
 
-    // Page 7: Phala (Predictions)
+    // Page 7: Phala (Predictions) — can be many pages
     if (pages.length > 6 && pages[6]) {
       final prediction = PredictionEngine.analyze(result);
-      // Phala can span multiple pages — build all phala pages
       final phalaPages = _buildPhalaPages(user, result, prediction, theme);
       for (final phalaPage in phalaPages) {
         final widget = _buildPageWrapper(
           width: pageWidth, height: pageHeight, theme: theme,
           child: phalaPage,
         );
-        allPageBytes.add(await controller.captureFromWidget(
-          widget, targetSize: targetSize, pixelRatio: 2.5,
-          delay: const Duration(milliseconds: 10),
-        ));
+        allPageBytes.add(await capturePage(widget));
       }
     }
 
     final doc = pw.Document();
-
     for (final bytes in allPageBytes) {
       if (bytes != null) {
         doc.addPage(
@@ -292,18 +321,19 @@ class JanmaPatrikeService {
     return doc.save();
   }
 
-  static Future<void> generateAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages, String firstPageStyle = 'detailed'}) async {
-    final bytes = await _generatePdfBytes(user, result, theme: theme, selectedPages: selectedPages, firstPageStyle: firstPageStyle);
+  static Future<void> generateAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages, String firstPageStyle = 'detailed', void Function(int, int)? onProgress}) async {
+    final bytes = await _generatePdfBytes(user, result, theme: theme, selectedPages: selectedPages, firstPageStyle: firstPageStyle, onProgress: onProgress);
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => bytes,
       name: '${user.name}_janmapatrike',
     );
   }
 
-  static Future<void> generateAndShare(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages, String firstPageStyle = 'detailed'}) async {
-    final bytes = await _generatePdfBytes(user, result, theme: theme, selectedPages: selectedPages, firstPageStyle: firstPageStyle);
+  static Future<void> generateAndShare(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, List<bool>? selectedPages, String firstPageStyle = 'detailed', void Function(int, int)? onProgress}) async {
+    final bytes = await _generatePdfBytes(user, result, theme: theme, selectedPages: selectedPages, firstPageStyle: firstPageStyle, onProgress: onProgress);
     await Printing.sharePdf(bytes: bytes, filename: '${user.name}_janmapatrike.pdf');
   }
+
 
   static Widget _buildPageWrapper({
     required double width,
