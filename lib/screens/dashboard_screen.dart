@@ -4101,7 +4101,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text('• ', style: TextStyle(color: kText, fontWeight: FontWeight.bold)),
-                          Expanded(child: Text(h, style: TextStyle(fontSize: 12, color: kText))),
+                          Expanded(child: Text(h, style: TextStyle(fontSize: 12, color: kText, fontWeight: FontWeight.w700))),
                         ]),
                       )),
                     ],
@@ -4240,11 +4240,11 @@ class _DashboardScreenState extends State<DashboardScreen>
         ]),
         if (d.mdPhala.isNotEmpty) ...[
           const SizedBox(height: 10),
-          Text(d.mdPhala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+          Text(d.mdPhala, style: TextStyle(fontSize: 12, color: kText, height: 1.5, fontWeight: FontWeight.w700)),
         ],
         if (d.adPhala.isNotEmpty) ...[
           const SizedBox(height: 6),
-          Text(d.adPhala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+          Text(d.adPhala, style: TextStyle(fontSize: 12, color: kText, height: 1.5, fontWeight: FontWeight.w700)),
         ],
         if (d.shloka.isNotEmpty) ...[
           const SizedBox(height: 8),
@@ -4338,7 +4338,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
             // Phala text
             if (b.phala.isNotEmpty)
-              Text(b.phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+              Text(b.phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5, fontWeight: FontWeight.w700)),
             // Shloka
             if (b.shloka.isNotEmpty) ...[
               const SizedBox(height: 8),
@@ -4472,7 +4472,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             if (phala != null && phala.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: Text(phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5)),
+                child: Text(phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5, fontWeight: FontWeight.w700)),
               ),
             if (shloka != null && shloka.isNotEmpty)
               Container(
