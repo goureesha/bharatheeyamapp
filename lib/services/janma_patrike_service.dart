@@ -1,4 +1,4 @@
-﻿import 'dart:typed_data';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -1281,22 +1281,28 @@ class JanmaPatrikeService {
     }
 
     // ── Phala Pages 5+: Bhukti Phala Details (per Mahadasha) ──
-    // Each mahadasha gets its own pages with bhukti cards.
-    // Max 4 bhukti cards per page to prevent overflow.
-    const int _maxBhuktisPerPage = 4;
+    // First page has MD header (uses 5 bhuktis); subsequent pages use 6.
+    const int _maxBhuktisFirst = 5;
+    const int _maxBhuktisRest  = 6;
     for (final md in allDashas) {
       if (md.bhuktis.isEmpty) continue;
       final validBhuktis = md.bhuktis.where((bk) => bk.phala.isNotEmpty).toList();
       if (validBhuktis.isEmpty) continue;
 
-      // Split bhuktis into chunks of _maxBhuktisPerPage
-      for (int chunk = 0; chunk < validBhuktis.length; chunk += _maxBhuktisPerPage) {
-        final end = (chunk + _maxBhuktisPerPage > validBhuktis.length) ? validBhuktis.length : chunk + _maxBhuktisPerPage;
-        final batch = validBhuktis.sublist(chunk, end);
-        final isFirstPage = chunk == 0;
-        final pageNum = (chunk ~/ _maxBhuktisPerPage) + 1;
-        final totalPages = (validBhuktis.length + _maxBhuktisPerPage - 1) ~/ _maxBhuktisPerPage;
-
+      // Build page chunks: first page = 5 bhuktis, rest = 6
+      final List<List<dynamic>> pageChunks = [];
+      int bkIdx = 0;
+      while (bkIdx < validBhuktis.length) {
+        final cap = pageChunks.isEmpty ? _maxBhuktisFirst : _maxBhuktisRest;
+        final end = (bkIdx + cap > validBhuktis.length) ? validBhuktis.length : bkIdx + cap;
+        pageChunks.add(validBhuktis.sublist(bkIdx, end));
+        bkIdx = end;
+      }
+      for (int pi = 0; pi < pageChunks.length; pi++) {
+        final batch = pageChunks[pi];
+        final isFirstPage = pi == 0;
+        final pageNum = pi + 1;
+        final totalPages = pageChunks.length;
         final children = <Widget>[];
 
         // On the first page of each mahadasha, show the mahadasha phala header
@@ -1340,7 +1346,7 @@ class JanmaPatrikeService {
         // Bhukti cards for this chunk
         for (final bk in batch) {
           children.add(Container(
-            margin: const EdgeInsets.only(bottom: 6),
+            margin: const EdgeInsets.only(bottom: 4),
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: t.detailBoxBg,
@@ -1355,7 +1361,7 @@ class JanmaPatrikeService {
                 Text('${fmtDate(bk.start)} — ${fmtDate(bk.end)}',
                   style: TextStyle(fontSize: 9, color: Colors.black54)),
               ]),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(bk.phala, style: TextStyle(fontSize: 10, height: 1.3, color: Colors.black87)),
               if (bk.shloka.isNotEmpty)
                 Padding(
