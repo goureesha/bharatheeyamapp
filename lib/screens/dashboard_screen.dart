@@ -5939,21 +5939,46 @@ class _LazyTab extends StatefulWidget {
   State<_LazyTab> createState() => _LazyTabState();
 }
 
+// Defers first build to the frame AFTER the tab-switch animation completes.
+// This prevents the tab-switch from janking because heavy content (Kundali
+// charts, Yoga table, etc.) is not painted until the transition is done.
+// AutomaticKeepAliveClientMixin keeps the subtree alive once built so that
+// revisiting a tab never triggers a rebuild.
 class _LazyTabState extends State<_LazyTab>
     with AutomaticKeepAliveClientMixin {
-  bool _built = false;
-  late Widget _child;
+  bool _ready = false;  // true once post-frame callback has fired
+  Widget? _child;       // cached widget tree
 
   @override
   bool get wantKeepAlive => true;
 
   @override
+  void initState() {
+    super.initState();
+    // Schedule the actual build for the next frame so the tab-switch
+    // animation renders first without any jank.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() => _ready = true);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context); // required by AutomaticKeepAliveClientMixin
-    if (!_built) {
-      _built = true;
-      _child = widget.builder(context);
+    if (!_ready) {
+      // Show a lightweight placeholder during the tab switch animation
+      return const Center(
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
     }
-    return _child;
+    // Build (and cache) the real content on first ready frame
+    _child ??= widget.builder(context);
+    return _child!;
   }
 }
