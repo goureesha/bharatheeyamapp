@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -36,7 +36,7 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
   final List<int> _selectedRashi = List.filled(9, -1);
 
   // Navamsha selected (0 = not set, 1-9 = navamsha pada)
-  final List<int> _selectedNavamsha = List.filled(9, 0);
+  final List<int> _selectedNavamsha = List.filled(9, -1); // -1 = not set, 0-11 = navamsha rashi index
 
   // Lagna rashi
   int _lagnaRashi = -1;
@@ -347,12 +347,15 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<int>(
-                  value: _selectedNavamsha[index] > 0 ? _selectedNavamsha[index] : null,
+                  value: _selectedNavamsha[index] >= 0 ? _selectedNavamsha[index] : null,
                   isExpanded: true,
                   hint: const Text('D9', style: TextStyle(fontSize: 10, color: Colors.grey)),
-                  style: const TextStyle(fontSize: 12, color: Colors.black87),
-                  items: List.generate(9, (n) => DropdownMenuItem(value: n + 1, child: Text('${n + 1}'))),
-                  onChanged: (v) => setState(() => _selectedNavamsha[index] = v ?? 0),
+                  style: const TextStyle(fontSize: 11, color: Colors.black87),
+                  items: List.generate(12, (r) => DropdownMenuItem(
+                    value: r,
+                    child: Text(appRashi[r], style: const TextStyle(fontSize: 11)),
+                  )),
+                  onChanged: (v) => setState(() => _selectedNavamsha[index] = v ?? -1),
                 ),
               ),
             ),
@@ -707,10 +710,10 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
           if (moonRashi != _selectedRashi[5]) continue;
         }
 
-        // Check navamsha if provided for Sun
-        if (_selectedNavamsha[4] > 0) {
-          final sunNav = _degToNavamsha(positions['Sun']![0]);
-          if (sunNav != _selectedNavamsha[4]) continue;
+        // Check navamsha rashi if provided for Sun
+        if (_selectedNavamsha[4] >= 0) {
+          final sunNavRashi = _degToNavamshaRashi(positions['Sun']![0]);
+          if (sunNavRashi != _selectedNavamsha[4]) continue;
         }
 
         // Check remaining planets (Kuja, Budha, Shukra)
@@ -804,8 +807,8 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
       final pRashi = _degToRashi(positions[ephKeys[i]]![0]);
       final isMatch = pRashi == _selectedRashi[i];
       // Also check navamsha if provided
-      if (isMatch && _selectedNavamsha[i] > 0) {
-        final pNav = _degToNavamsha(positions[ephKeys[i]]![0]);
+      if (isMatch && _selectedNavamsha[i] >= 0) {
+        final pNav = _degToNavamshaRashi(positions[ephKeys[i]]![0]);
         final navMatch = pNav == _selectedNavamsha[i];
         planetMatches[_planets[i]] = navMatch;
         if (navMatch) matched++;
@@ -855,9 +858,25 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
 
   int _degToRashi(double deg) => ((deg % 360) / 30).floor() % 12;
 
+  /// Returns the navamsha rashi index (0-11) for a given longitude.
+  /// Traditional rule:
+  ///   Chara  (Mesha/0, Karka/3, Tula/6, Makara/9)   â†’ starts from own sign
+  ///   Sthira (Vrisha/1, Simha/4, Vrischika/7, Kumbha/10) â†’ starts from 9th (Makara/Mesha/Karka/Tula)
+  ///   Dwiswa (Mithuna/2, Kanya/5, Dhanu/8, Meena/11)    â†’ starts from 5th (Tula/Makara/Mesha/Karka)
+  int _degToNavamshaRashi(double deg) {
+    final normDeg = (deg % 360 + 360) % 360;
+    final rashiIdx = (normDeg / 30).floor() % 12;
+    final inRashi = normDeg % 30;
+    final pada = (inRashi / 3.333333333).floor(); // 0-8
+    // Navamsha start rashi for each of the 12 rashis
+    const navStart = [0, 9, 6, 3, 0, 9, 6, 3, 0, 9, 6, 3];
+    return (navStart[rashiIdx] + pada) % 12;
+  }
+
+  /// Legacy: returns pada number 1-9 within the rashi (used only for raw degree display)
   int _degToNavamsha(double deg) {
-    final inRashi = (deg % 360) % 30; // 0-30 within rashi
-    return (inRashi / 3.333333333).floor() + 1; // 1-9
+    final inRashi = (deg % 360) % 30;
+    return (inRashi / 3.333333333).floor() + 1;
   }
 
   void _updateStatus(String msg) {
