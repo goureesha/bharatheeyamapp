@@ -1638,20 +1638,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                           child: TabBarView(
                             controller: _tabCtrl,
                             children: [
-                              _buildPanchangTab(),
-                              _buildKundaliTab(),
-                              _buildSphutas(),
-                              _buildAroodhaTab(),
-                              _buildDashaTab(),
-                              _buildBhavaTab(),
-                              _buildGrahaShadvargaTab(),
-                              _buildShadbalaTab(),
-                              _buildAshtakaTab(),
-                              _buildYogaTab(),
-                              _buildPredictionTab(),
-                              _buildGocharTab(),
-                              _buildNotesTab(),
-                              _buildJanmaPatrikeTab(),
+                              _LazyTab(builder: (_) => _buildPanchangTab()),
+                              _LazyTab(builder: (_) => _buildKundaliTab()),
+                              _LazyTab(builder: (_) => _buildSphutas()),
+                              _LazyTab(builder: (_) => _buildAroodhaTab()),
+                              _LazyTab(builder: (_) => _buildDashaTab()),
+                              _LazyTab(builder: (_) => _buildBhavaTab()),
+                              _LazyTab(builder: (_) => _buildGrahaShadvargaTab()),
+                              _LazyTab(builder: (_) => _buildShadbalaTab()),
+                              _LazyTab(builder: (_) => _buildAshtakaTab()),
+                              _LazyTab(builder: (_) => _buildYogaTab()),
+                              _LazyTab(builder: (_) => _buildPredictionTab()),
+                              _LazyTab(builder: (_) => _buildGocharTab()),
+                              _LazyTab(builder: (_) => _buildNotesTab()),
+                              _LazyTab(builder: (_) => _buildJanmaPatrikeTab()),
                             ],
                           ),
                         ),
@@ -1668,20 +1668,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                               TabBarView(
                                 controller: _tabCtrl,
                                 children: [
-                                  _buildPanchangTab(),
-                                  _buildKundaliTab(),
-                                  _buildSphutas(),
-                                  _buildAroodhaTab(),
-                                  _buildDashaTab(),
-                                  _buildBhavaTab(),
-                                  _buildGrahaShadvargaTab(),
-                                  _buildShadbalaTab(),
-                                  _buildAshtakaTab(),
-                                  _buildYogaTab(),
-                                  _buildPredictionTab(),
-                                  _buildGocharTab(),
-                                  _buildNotesTab(),
-                                  _buildJanmaPatrikeTab(),
+                                  _LazyTab(builder: (_) => _buildPanchangTab()),
+                                  _LazyTab(builder: (_) => _buildKundaliTab()),
+                                  _LazyTab(builder: (_) => _buildSphutas()),
+                                  _LazyTab(builder: (_) => _buildAroodhaTab()),
+                                  _LazyTab(builder: (_) => _buildDashaTab()),
+                                  _LazyTab(builder: (_) => _buildBhavaTab()),
+                                  _LazyTab(builder: (_) => _buildGrahaShadvargaTab()),
+                                  _LazyTab(builder: (_) => _buildShadbalaTab()),
+                                  _LazyTab(builder: (_) => _buildAshtakaTab()),
+                                  _LazyTab(builder: (_) => _buildYogaTab()),
+                                  _LazyTab(builder: (_) => _buildPredictionTab()),
+                                  _LazyTab(builder: (_) => _buildGocharTab()),
+                                  _LazyTab(builder: (_) => _buildNotesTab()),
+                                  _LazyTab(builder: (_) => _buildJanmaPatrikeTab()),
                                 ],
                               ),
                               // Floating expand button when bars are hidden
@@ -5791,6 +5791,7 @@ class _KundaliPageView extends StatefulWidget {
 
 class _KundaliPageViewState extends State<_KundaliPageView> {
   int _page = 0;
+  late final PageController _pageCtrl = PageController(keepPage: true);
 
   Widget _buildChart(int chartIdx) {
     final chart = widget.charts[chartIdx];
@@ -5835,6 +5836,12 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
   }
 
   @override
+  void dispose() {
+    _pageCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
@@ -5848,6 +5855,7 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
           children: [
             Expanded(
               child: PageView.builder(
+                controller: _pageCtrl,
                 onPageChanged: (i) => setState(() => _page = i),
                 itemCount: widget.charts.length,
                 itemBuilder: (context, i) => Padding(
@@ -5914,4 +5922,38 @@ class _GocharSegment {
   final String fromDate;
   final String toDate;
   _GocharSegment({required this.rashiIdx, required this.fromDate, required this.toDate});
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lazy tab wrapper — defers building the child until the tab is first shown,
+// then keeps it alive so re-selecting the tab does not rebuild from scratch.
+// This prevents the Kundali / heavy tabs from blocking the main thread when
+// the screen first loads or rebuilds due to an unrelated setState call.
+// ─────────────────────────────────────────────────────────────────────────────
+class _LazyTab extends StatefulWidget {
+  final WidgetBuilder builder;
+  const _LazyTab({required this.builder});
+
+  @override
+  State<_LazyTab> createState() => _LazyTabState();
+}
+
+class _LazyTabState extends State<_LazyTab>
+    with AutomaticKeepAliveClientMixin {
+  bool _built = false;
+  late Widget _child;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // required by AutomaticKeepAliveClientMixin
+    if (!_built) {
+      _built = true;
+      _child = widget.builder(context);
+    }
+    return _child;
+  }
 }
