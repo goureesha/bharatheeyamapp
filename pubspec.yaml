@@ -37,6 +37,7 @@ dependencies:
   timezone: ^0.9.4
   flutter_secure_storage: ^9.2.4
   safe_device: ^1.1.8
+  in_app_update: ^4.2.3
 
 dev_dependencies:
   flutter_test:

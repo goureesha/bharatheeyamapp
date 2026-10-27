@@ -3,6 +3,7 @@ import '../widgets/common.dart';
 
 import '../services/google_auth_service.dart';
 import '../services/calendar_service.dart';
+import '../services/update_service.dart';
 import 'input_screen.dart';
 import 'panchanga_screen.dart';
 import 'panchanga_search_screen.dart';
@@ -19,8 +20,22 @@ import 'muhurta_screen.dart';
 import 'reverse_kundali_screen.dart';
 import '../services/tester_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Check Play Store for a new version after first frame renders
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      UpdateService.check(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
