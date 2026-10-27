@@ -99,7 +99,7 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
                       ta: 'கிரகங்களின் ராசி நிலையை கொடுங்கள், பிறந்த தேதி மற்றும் நேரத்தை கண்டறியுங்கள்.',
                       te: 'గ్రహాల రాశి స్థానం ఇవ్వండి, జన్మ తేదీ మరియు సమయాన్ని కనుగొనండి.',
                       ml: 'ഗ്രഹങ്ങളുടെ രാശി സ്ഥാനം നൽകുക, ജനന തീയതിയും സമയവും കണ്ടെത്തുക.',
-                      en: 'Enter planetary rashi positions to find the birth date and time.',
+                      en: 'Enter planetary rashi positions to find the birth date and time. For D9 (navamsha): use the rashi number written in old kundali papers (e.g. Ravi 5 = Simha navamsha, Chandra 1 = Mesha navamsha).',
                     ),
                     style: const TextStyle(fontSize: 13, height: 1.4),
                     textAlign: TextAlign.center,
@@ -335,9 +335,10 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
             ),
           ),
           const SizedBox(width: 6),
-          // Navamsha dropdown (optional)
+          // Navamsha dropdown - shows rashi number+name matching old paper format
+          // e.g. ''Ravi 5'' in old kundali = Ravi navamsha rashi #5 = Simha
           SizedBox(
-            width: 52,
+            width: 90,
             height: 36,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -349,11 +350,11 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
                 child: DropdownButton<int>(
                   value: _selectedNavamsha[index] >= 0 ? _selectedNavamsha[index] : null,
                   isExpanded: true,
-                  hint: const Text('D9', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                  hint: const Text('D9 #', style: TextStyle(fontSize: 10, color: Colors.grey)),
                   style: const TextStyle(fontSize: 11, color: Colors.black87),
                   items: List.generate(12, (r) => DropdownMenuItem(
                     value: r,
-                    child: Text(appRashi[r], style: const TextStyle(fontSize: 11)),
+                    child: Text('${r + 1}. ${appRashi[r]}', style: const TextStyle(fontSize: 11)),
                   )),
                   onChanged: (v) => setState(() => _selectedNavamsha[index] = v ?? -1),
                 ),
