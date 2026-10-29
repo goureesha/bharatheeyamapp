@@ -1,4 +1,4 @@
-import 'calculator.dart';
+﻿import 'calculator.dart';
 
 // ═══════════════════════════════════════════
 // YOGA ENGINE — Evaluates classical Vedic planetary Yogas
@@ -812,6 +812,109 @@ class YogaEngine {
     }
 
 
+
+    // ═══════════════════════════════════════
+    // 36. RAJA YOGA — Lagna lord conjunct 9th / 10th / 11th lord
+    // Lagna lord in same rashi as lord of 9, 10, or 11
+    // ═══════════════════════════════════════
+    {
+      final lagnaLord = lordOfHouse(1);
+      final lagnaLordRashi = planets[lagnaLord]?.rashiIndex;
+      if (lagnaLordRashi != null) {
+        for (final targetHouse in [9, 10, 11]) {
+          final targetLord = lordOfHouse(targetHouse);
+          if (targetLord == lagnaLord) continue;
+          final targetRashi = planets[targetLord]?.rashiIndex;
+          if (targetRashi != null && targetRashi == lagnaLordRashi) {
+            final houseLabel = targetHouse == 9 ? '9' : targetHouse == 10 ? '10' : '11';
+            yogas.add(YogaResult(
+              nameKn: 'ರಾಜ ಯೋಗ (ಲಗ್ನ–${houseLabel}ನೇ)',
+              nameEn: 'Raja Yoga (Lagna–${houseLabel}th)',
+              category: 'raja',
+              descKn: 'ಲಗ್ನಾಧಿಪತಿ ಮತ್ತು ${houseLabel}ನೇ ಭಾವಾಧಿಪತಿ ಒಂದೇ ರಾಶಿಯಲ್ಲಿ ಸಂಯೋಗದಲ್ಲಿದ್ದರೆ. '
+                  'ಉನ್ನತ ಸ್ಥಾನಮಾನ, ರಾಜ್ಯ ಸಮಾನ ಅಧಿಕಾರ ಮತ್ತು ಜೀವನದಲ್ಲಿ ಮಹತ್ತರ ಯಶಸ್ಸು ಪ್ರಾಪ್ತಿಯಾಗುತ್ತದೆ. '
+                  'ಸಮಾಜದಲ್ಲಿ ಕೀರ್ತಿ ಮತ್ತು ಗೌರವ ಲಭಿಸುತ್ತದೆ.',
+              descEn: 'Lagna lord conjunct lord of the ${houseLabel}th house. '
+                  'High status and authority akin to royalty. Great success in life with fame and '
+                  'recognition in society.',
+            ));
+            break;
+          }
+        }
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // 37. PARIJATA YOGA
+    // Dispositor of the lagna lord placed in a Kendra or Trikona
+    // ═══════════════════════════════════════
+    {
+      final lagnaLord = lordOfHouse(1);
+      final lagnaLordRashi = planets[lagnaLord]?.rashiIndex;
+      if (lagnaLordRashi != null) {
+        final dispositor = _rashiLord[lagnaLordRashi];
+        if (dispositor != lagnaLord) {
+          final dispH = houseOf(dispositor);
+          if (_kendras.contains(dispH) || _trikonas.contains(dispH)) {
+            yogas.add(const YogaResult(
+              nameKn: 'ಪಾರಿಜಾತ ಯೋಗ',
+              nameEn: 'Parijata Yoga',
+              category: 'raja',
+              descKn: 'ಲಗ್ನಾಧಿಪತಿಯ ಅಧಿಪತಿ (ಡಿಸ್ಪೊಸಿಟರ್) ಕೇಂದ್ರ ಅಥವಾ ತ್ರಿಕೋಣದಲ್ಲಿದ್ದರೆ. '
+                  'ಸ್ವಭಾವ ವಿಶಿಷ್ಟ, ಜನಪ್ರಿಯ ಮತ್ತು ಗಣ್ಯ ವ್ಯಕ್ತಿಯಾಗುತ್ತಾರೆ. '
+                  'ರಾಜ ಮರ್ಯಾದೆ, ಸಂಪತ್ತು ಮತ್ತು ಸ್ಥಿರ ಜೀವನ ಪ್ರಾಪ್ತಿಯಾಗುತ್ತದೆ.',
+              descEn: 'Dispositor of the lagna lord placed in a Kendra or Trikona. '
+                  'Unique character, popular and distinguished personality. '
+                  'Royal honour, wealth and a stable prosperous life.',
+            ));
+          }
+        }
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // 38. MAHA BHAGYA YOGA
+    // Day birth: Lagna, Sun, Moon all in odd rashis (index 0,2,4,6,8,10)
+    // Night birth: Lagna, Sun, Moon all in even rashis (index 1,3,5,7,9,11)
+    // Day birth approximation: Sun in houses 7-12 (above horizon)
+    // ═══════════════════════════════════════
+    {
+      final sunRashi  = planets[_sun]?.rashiIndex;
+      final moonRashi = planets[_moon]?.rashiIndex;
+      if (sunRashi != null && moonRashi != null) {
+        bool isOdd(int idx) => idx % 2 == 0; // 0=Mesha=odd, 2=Mithuna=odd...
+        final sunH = houseOf(_sun);
+        final isDayBirth = sunH >= 7 && sunH <= 12;
+        final lagnaOdd = isOdd(lagnaRashi);
+        final sunOdd   = isOdd(sunRashi);
+        final moonOdd  = isOdd(moonRashi);
+        if (isDayBirth && lagnaOdd && sunOdd && moonOdd) {
+          yogas.add(const YogaResult(
+            nameKn: 'ಮಹಾಭಾಗ್ಯ ಯೋಗ',
+            nameEn: 'Maha Bhagya Yoga',
+            category: 'raja',
+            descKn: 'ಹಗಲು ಜನನ: ಲಗ್ನ, ರವಿ ಮತ್ತು ಚಂದ್ರ ಮೂವರೂ ಬೆಸ ರಾಶಿಯಲ್ಲಿದ್ದರೆ ಮಹಾಭಾಗ್ಯ ಯೋಗ. '
+                'ಅಪೂರ್ವ ಭಾಗ್ಯ, ರಾಜ ಸಮಾನ ಜೀವನ ಮತ್ತು ಅಪಾರ ಸಂಪತ್ತು. '
+                'ಸಮಾಜದಲ್ಲಿ ಉನ್ನತ ಸ್ಥಾನ ಹಾಗೂ ಸುದೀರ್ಘ ಕೀರ್ತಿ ಪ್ರಾಪ್ತಿಯಾಗುತ್ತದೆ.',
+            descEn: 'Day birth: Lagna, Sun and Moon all in odd signs. '
+                'Exceptional fortune, life akin to royalty and immense wealth. '
+                'High social standing and lasting fame throughout life.',
+          ));
+        } else if (!isDayBirth && !lagnaOdd && !sunOdd && !moonOdd) {
+          yogas.add(const YogaResult(
+            nameKn: 'ಮಹಾಭಾಗ್ಯ ಯೋಗ',
+            nameEn: 'Maha Bhagya Yoga',
+            category: 'raja',
+            descKn: 'ರಾತ್ರಿ ಜನನ: ಲಗ್ನ, ರವಿ ಮತ್ತು ಚಂದ್ರ ಮೂವರೂ ಸಮ ರಾಶಿಯಲ್ಲಿದ್ದರೆ ಮಹಾಭಾಗ್ಯ ಯೋಗ. '
+                'ಅಪೂರ್ವ ಭಾಗ್ಯ, ರಾಜ ಸಮಾನ ಜೀವನ ಮತ್ತು ಅಪಾರ ಸಂಪತ್ತು. '
+                'ಸಮಾಜದಲ್ಲಿ ಉನ್ನತ ಸ್ಥಾನ ಹಾಗೂ ಸುದೀರ್ಘ ಕೀರ್ತಿ ಪ್ರಾಪ್ತಿಯಾಗುತ್ತದೆ.',
+            descEn: 'Night birth: Lagna, Sun and Moon all in even signs. '
+                'Exceptional fortune, life akin to royalty and immense wealth. '
+                'High social standing and lasting fame throughout life.',
+          ));
+        }
+      }
+    }
     return yogas;
   }
 }
