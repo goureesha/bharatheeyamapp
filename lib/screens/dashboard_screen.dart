@@ -1882,61 +1882,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     ];
     allPersons = _filterPersons(allPersons);
 
-    // â”€â”€ FULL-SCREEN mode: single person gets the whole tab area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    if (allPersons.length == 1) {
-      final person = allPersons.first;
-      final personResult = person['result'] as KundaliResult;
-      final personName = person['name'] as String;
-      return Column(
-        children: [
-          // Thin top bar: name Â· edit Â· add person
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-            child: Row(
-              children: [
-                Icon(Icons.person, size: 16, color: kPurple2),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    personName,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kPurple2),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.edit, size: 18, color: kPurple2),
-                  tooltip: AppLocale.l('editTooltip'),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                  onPressed: _showEditPrimaryDialog,
-                ),
-                IconButton(
-                  icon: Icon(Icons.person_add, size: 18, color: kPurple2),
-                  tooltip: AppLocale.l('addPerson'),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                  onPressed: _showAddPersonDialog,
-                ),
-              ],
-            ),
-          ),
-          // Chart fills all remaining space
-          Expanded(
-            child: _KundaliPageView(
-              charts: charts,
-              personResult: personResult,
-              bhavaPlanet: _bhavaPlanet,
-              onBhavaPlanetToggle: (pName) => setState(() => _bhavaPlanet = _bhavaPlanet == pName ? null : pName),
-              onPlanetTap: _showPlanetDetail,
-              highlightDashaLords: _dashaHighlightEnabled,
-              fullScreen: true,
-            ),
-          ),
-        ],
-      );
-    }
-
-    // â”€â”€ MULTI-PERSON mode: scrollable column (unchanged) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -5830,8 +5775,6 @@ class _KundaliPageView extends StatefulWidget {
   final void Function(String) onBhavaPlanetToggle;
   final void Function(String) onPlanetTap;
   final bool highlightDashaLords;
-  /// When true the widget expands to fill its parent (Expanded must wrap it).
-  final bool fullScreen;
 
   const _KundaliPageView({
     required this.charts,
@@ -5840,7 +5783,6 @@ class _KundaliPageView extends StatefulWidget {
     required this.onBhavaPlanetToggle,
     required this.onPlanetTap,
     this.highlightDashaLords = true,
-    this.fullScreen = false,
   });
 
   @override
@@ -5907,9 +5849,10 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
       // ── PORTRAIT: single chart per page ──
       final screenWidth = MediaQuery.of(context).size.width;
       final chartSize = screenWidth - 32;
-      // fullScreen: fill parent (Expanded in column), else fixed square size
-      final child = Column(
-        children: [
+      return SizedBox(
+        height: chartSize + 40,
+        child: Column(
+          children: [
             Expanded(
               child: PageView.builder(
                 controller: _pageCtrl,
@@ -5935,10 +5878,8 @@ class _KundaliPageViewState extends State<_KundaliPageView> {
             ),
             const SizedBox(height: 6),
           ],
-        );
-      return widget.fullScreen
-          ? child  // parent Expanded sizes it
-          : SizedBox(height: chartSize + 40, child: child);
+        ),
+      );
     } else {
       // ── LANDSCAPE: exactly 2 charts visible, no title labels ──
       final screenHeight = MediaQuery.of(context).size.height;
