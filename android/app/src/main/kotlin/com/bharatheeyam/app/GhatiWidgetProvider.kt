@@ -47,19 +47,18 @@ class GhatiWidgetProvider : AppWidgetProvider() {
         fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
             val views = RemoteViews(context.packageName, R.layout.ghati_widget_layout)
 
-            try {
-                // Get sunrise from SharedPreferences (saved by Flutter app)
-                val prefs = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
-                // Flutter shared_preferences stores doubles as Long (IEEE 754 bits) — not as Float.
-                // Use getLong + longBitsToDouble; fall back to 6.0 if key absent.
-                val sunriseHour: Double = if (prefs.contains("flutter.sunrise_hour24")) {
-                    val bits = prefs.getLong("flutter.sunrise_hour24", java.lang.Double.doubleToLongBits(6.0))
-                    java.lang.Double.longBitsToDouble(bits)
-                } else {
-                    6.0
-                }
+            // Read sunrise from SharedPreferences BEFORE try-catch so fallback can use it too.
+            // Flutter shared_preferences stores doubles as Long (IEEE 754 bits) — not Float.
+            val prefs = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+            val sunriseHour: Double = if (prefs.contains("flutter.sunrise_hour24")) {
+                val bits = prefs.getLong("flutter.sunrise_hour24", java.lang.Double.doubleToLongBits(6.0))
+                java.lang.Double.longBitsToDouble(bits)
+            } else {
+                6.0 // App not opened yet — will correct on first launch
+            }
 
-                // Calculate current ghati
+            try {
+                // Calculate current ghati from actual sunrise
                 val cal = Calendar.getInstance()
                 val nowHour = cal.get(Calendar.HOUR_OF_DAY) + cal.get(Calendar.MINUTE) / 60.0 + cal.get(Calendar.SECOND) / 3600.0
                 val elapsedHours = nowHour - sunriseHour
@@ -68,7 +67,7 @@ class GhatiWidgetProvider : AppWidgetProvider() {
                 // Draw clock with safe bitmap size
                 val displayMetrics = context.resources.displayMetrics
                 val widgetSize = minOf(WIDGET_SIZE, (displayMetrics.widthPixels * 0.8).toInt())
-                val safeSize = maxOf(widgetSize, 200) // At least 200px
+                val safeSize = maxOf(widgetSize, 200)
                 val bitmap = drawClock(ghati, safeSize)
                 views.setImageViewBitmap(R.id.ghati_clock_image, bitmap)
 
@@ -89,11 +88,11 @@ class GhatiWidgetProvider : AppWidgetProvider() {
                     views.setOnClickPendingIntent(R.id.ghati_widget_root, pendingIntent)
                 }
             } catch (e: Exception) {
-                // Fallback: draw clock using default sunrise 6:00 AM so widget always shows content
+                // Fallback: use actual sunriseHour (read above) to draw the clock
                 try {
                     val cal2 = Calendar.getInstance()
                     val nowH2 = cal2.get(Calendar.HOUR_OF_DAY) + cal2.get(Calendar.MINUTE) / 60.0 + cal2.get(Calendar.SECOND) / 3600.0
-                    val ghati2 = (nowH2 - 6.0) * (60.0 / 24.0)
+                    val ghati2 = (nowH2 - sunriseHour) * (60.0 / 24.0)
                     val fallbackBitmap = drawClock(ghati2, 300)
                     views.setImageViewBitmap(R.id.ghati_clock_image, fallbackBitmap)
                     val gh2 = ghati2.toInt() % 60
