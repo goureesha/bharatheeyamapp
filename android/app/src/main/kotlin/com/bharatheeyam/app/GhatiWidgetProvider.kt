@@ -1,4 +1,4 @@
-package com.bharatheeyam.app
+﻿package com.bharatheeyam.app
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -50,7 +50,14 @@ class GhatiWidgetProvider : AppWidgetProvider() {
             try {
                 // Get sunrise from SharedPreferences (saved by Flutter app)
                 val prefs = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
-                val sunriseHour = prefs.getFloat("flutter.sunrise_hour24", 6.0f).toDouble()
+                // Flutter shared_preferences stores doubles as Long (IEEE 754 bits) — not as Float.
+                // Use getLong + longBitsToDouble; fall back to 6.0 if key absent.
+                val sunriseHour: Double = if (prefs.contains("flutter.sunrise_hour24")) {
+                    val bits = prefs.getLong("flutter.sunrise_hour24", java.lang.Double.doubleToLongBits(6.0))
+                    java.lang.Double.longBitsToDouble(bits)
+                } else {
+                    6.0
+                }
 
                 // Calculate current ghati
                 val cal = Calendar.getInstance()
@@ -82,25 +89,21 @@ class GhatiWidgetProvider : AppWidgetProvider() {
                     views.setOnClickPendingIntent(R.id.ghati_widget_root, pendingIntent)
                 }
             } catch (e: Exception) {
-                // Show fallback with a simple colored bitmap so widget isn't blank
+                // Fallback: draw clock using default sunrise 6:00 AM so widget always shows content
                 try {
-                    val fallbackBitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888)
-                    val canvas = Canvas(fallbackBitmap)
-                    canvas.drawColor(0xFF1A1A2E.toInt())
-                    val paint = Paint().apply {
-                        color = 0xFFD4AF37.toInt()
-                        textSize = 22f
-                        textAlign = Paint.Align.CENTER
-                        isAntiAlias = true
-                        typeface = Typeface.DEFAULT_BOLD
-                    }
-                    canvas.drawText("ಭಾರತೀಯಮ್", 100f, 90f, paint)
-                    paint.textSize = 16f
-                    paint.color = 0xCCFFFFFF.toInt()
-                    canvas.drawText("ಅಪ್ ತೆರೆಯಿರಿ", 100f, 120f, paint)
+                    val cal2 = Calendar.getInstance()
+                    val nowH2 = cal2.get(Calendar.HOUR_OF_DAY) + cal2.get(Calendar.MINUTE) / 60.0 + cal2.get(Calendar.SECOND) / 3600.0
+                    val ghati2 = (nowH2 - 6.0) * (60.0 / 24.0)
+                    val fallbackBitmap = drawClock(ghati2, 300)
                     views.setImageViewBitmap(R.id.ghati_clock_image, fallbackBitmap)
-                } catch (_: Exception) {}
-                views.setTextViewText(R.id.ghati_text, "ಭಾರತೀಯಮ್ - ಅಪ್ ತೆರೆಯಿರಿ")
+                    val gh2 = ghati2.toInt() % 60
+                    val viT2 = (ghati2 - ghati2.toInt()) * 60
+                    val vi2 = viT2.toInt()
+                    val av2 = ((viT2 - vi2) * 60).toInt()
+                    views.setTextViewText(R.id.ghati_text, "${gh2} ಘ : ${vi2.toString().padStart(2, '0')} ವಿ : ${av2.toString().padStart(2, '0')} ಅ")
+                } catch (_: Exception) {
+                    views.setTextViewText(R.id.ghati_text, "ಭಾರತೀಯಮ್")
+                }
             }
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
