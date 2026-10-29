@@ -329,7 +329,7 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
                       style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
                   style: const TextStyle(fontSize: 13, color: Colors.black87),
                   items: List.generate(12, (r) => DropdownMenuItem(value: r, child: Text(rashiNames[r]))),
-                  onChanged: (v) => setState(() => _selectedRashi[index] = v ?? -1),
+                  onChanged: (v) => setState(() { _selectedRashi[index] = v ?? -1; _selectedNavamsha[index] = -1; }),
                 ),
               ),
             ),
@@ -352,11 +352,14 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
                   isExpanded: true,
                   hint: const Text('D9 #', style: TextStyle(fontSize: 10, color: Colors.grey)),
                   style: const TextStyle(fontSize: 11, color: Colors.black87),
-                  items: List.generate(12, (r) => DropdownMenuItem(
-                    value: r,
-                    child: Text('${r + 1}. ${appRashi[r]}', style: const TextStyle(fontSize: 11)),
-                  )),
-                  onChanged: (v) => setState(() => _selectedNavamsha[index] = v ?? -1),
+                  items: _selectedRashi[index] < 0 ? const [] : List.generate(9, (p) {
+                    final r = (_navStart[_selectedRashi[index]] + p) % 12;
+                    return DropdownMenuItem(
+                      value: r,
+                      child: Text('${r + 1}. ${appRashi[r]}', style: const TextStyle(fontSize: 11)),
+                    );
+                  }),
+                  onChanged: _selectedRashi[index] < 0 ? null : (v) => setState(() => _selectedNavamsha[index] = v ?? -1),
                 ),
               ),
             ),
@@ -864,14 +867,16 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
   ///   Chara  (Mesha/0, Karka/3, Tula/6, Makara/9)   â†’ starts from own sign
   ///   Sthira (Vrisha/1, Simha/4, Vrischika/7, Kumbha/10) â†’ starts from 9th (Makara/Mesha/Karka/Tula)
   ///   Dwiswa (Mithuna/2, Kanya/5, Dhanu/8, Meena/11)    â†’ starts from 5th (Tula/Makara/Mesha/Karka)
+  // First navamsha rashi for each rashi (9 navamshas follow in zodiac order)
+  static const List<int> _navStart = [0, 9, 6, 3, 0, 9, 6, 3, 0, 9, 6, 3];
+
   int _degToNavamshaRashi(double deg) {
     final normDeg = (deg % 360 + 360) % 360;
     final rashiIdx = (normDeg / 30).floor() % 12;
     final inRashi = normDeg % 30;
     final pada = (inRashi / 3.333333333).floor(); // 0-8
     // Navamsha start rashi for each of the 12 rashis
-    const navStart = [0, 9, 6, 3, 0, 9, 6, 3, 0, 9, 6, 3];
-    return (navStart[rashiIdx] + pada) % 12;
+    return (_navStart[rashiIdx] + pada) % 12;
   }
 
   /// Legacy: returns pada number 1-9 within the rashi (used only for raw degree display)
