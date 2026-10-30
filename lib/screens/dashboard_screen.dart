@@ -191,12 +191,12 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   static List<String> get _tabs {
     switch (AppLocale.current) {
-      case 'hi': return ['पंचांग', 'कुंडली', 'स्फुट', 'आरूढ', 'दशा', 'भाव', 'ग्रह षड्वर्ग', 'षड्बल', 'अष्टक', 'योग', 'फल', 'गोचर', 'टिप्पणी', 'पत्रिका', 'à¤…à¤µà¤•à¤¾à¤¹à¤¦'];
-      case 'ta': return ['பஞ்சாங்கம்', 'ஜாதகம்', 'ஸ்புடம்', 'ஆரூடம்', 'தசை', 'பாவம்', 'ஷட்வர்கம்', 'ஷட்பலம்', 'அஷ்டகம்', 'யோகம்', 'பலன்', 'கோசாரம்', 'குறிப்பு', 'பத்ரிகை', 'à®…à®µà®•à®¾à®¹à®Ÿ'];
-      case 'te': return ['పంచాంగం', 'కుండలి', 'స్ఫుటం', 'ఆరూఢం', 'దశ', 'భావం', 'షడ్వర్గం', 'షడ్బలం', 'అష్టకం', 'యోగం', 'ఫలం', 'గోచారం', 'గమనికలు', 'పత్రిక', 'à°…à°µà°•à°¾à°¹à°¦'];
-      case 'ml': return ['പഞ്ചാംഗം', 'ജാതകം', 'സ്ഫുടം', 'ആരൂഢം', 'ദശ', 'ഭാവം', 'ഷഡ്വർഗം', 'ഷഡ്ബലം', 'അഷ്ടകം', 'യോഗം', 'ഫലം', 'ഗോചരം', 'കുറിപ്പുകൾ', 'പത്രിക', 'à´…à´µà´•à´¾à´¹à´¦'];
+      case 'hi': return ['पंचांग', 'कुंडली', 'स्फुट', 'आरूढ', 'दशा', 'भाव', 'ग्रह षड्वर्ग', 'षड्बल', 'अष्टक', 'योग', 'फल', 'गोचर', 'टिप्पणी', 'पत्रिका', 'अवकाहड'];
+      case 'ta': return ['பஞ்சாங்கம்', 'ஜாதகம்', 'ஸ்புடம்', 'ஆரூடம்', 'தசை', 'பாவம்', 'ஷட்வர்கம்', 'ஷட்பலம்', 'அஷ்டகம்', 'யோகம்', 'பலன்', 'கோசாரம்', 'குறிப்பு', 'பத்ரிகை', 'அவகாஹட'];
+      case 'te': return ['పంచాంగం', 'కుండలి', 'స్ఫుటం', 'ఆరూఢం', 'దశ', 'భావం', 'షడ్వర్గం', 'షడ్బలం', 'అష్టకం', 'యోగం', 'ఫలం', 'గోచారం', 'గమనికలు', 'పత్రిక', 'అవకాహడ'];
+      case 'ml': return ['പഞ്ചാംഗം', 'ജാതകം', 'സ്ഫുടം', 'ആരൂഢം', 'ദശ', 'ഭാവം', 'ഷഡ്വർഗം', 'ഷഡ്ബലം', 'അഷ്ടകം', 'യോഗം', 'ഫലം', 'ഗോചരം', 'കുറിപ്പുകൾ', 'പത്രിക', 'അവകാഹഡ'];
       case 'en': return ['Panchanga', 'Kundali', 'Sphuta', 'Aroodha', 'Dasha', 'Bhava', 'Shadvarga', 'Shadbala', 'Ashtaka', 'Yoga', 'Phala', 'Gochara', 'Notes', 'Patrike', 'Avakahada'];
-      default: return ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಆರೂಢ', 'ದಶ', 'ಭಾವ', 'ಗ್ರಹ ಷಡ್ವರ್ಗ', 'ಷಡ್ಬಲ', 'ಅಷ್ಟಕ', 'ಯೋಗ', 'ಫಲ', 'ಗೋಚಾರ', 'ಟಿಪ್ಪಣಿ', 'ಪತ್ರಿಕೆ', 'à²…à²µà²•à²¹à²¦'];
+      default: return ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಆರೂಢ', 'ದಶ', 'ಭಾವ', 'ಗ್ರಹ ಷಡ್ವರ್ಗ', 'ಷಡ್ಬಲ', 'ಅಷ್ಟಕ', 'ಯೋಗ', 'ಫಲ', 'ಗೋಚಾರ', 'ಟಿಪ್ಪಣಿ', 'ಪತ್ರಿಕೆ', 'ಅವಕಾಹಡ'];
     }
   }
 
@@ -5244,7 +5244,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   padding: const EdgeInsets.only(top:8, bottom:4),
                   child: Text(pName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kTeal)),
                 ),
-              _sectionLabel('\u2638 ${avStr({'kn':'\u0C85\u0CB5\u0C95\u0CB9\u0CA6 \u0C9A\u0C95\u0CCD\u0CB0','hi':'\u0905\u0935\u0915\u093E\u0939\u0926 \u091A\u0915\u094D\u0930','ta':'\u0B85\u0BB5\u0B95\u0BBE\u0BB9\u0B9F \u0B9A\u0B95\u0BCD\u0B95\u0BB0\u0BAE\u0BCD','te':'\u0C05\u0C35\u0C15\u0C3E\u0C39\u0C26 \u0C1A\u0C15\u0C4D\u0C30\u0C02','ml':'\u0D05\u0D35\u0D15\u0D3E\u0D39\u0D26 \u0D1A\u0D15\u0D4D\u0D30\u0D02','en':'Avakahada Chakra'})}', kOrange),
+              _sectionLabel('\u2638 ${avStr({'kn':'\u0C85\u0CB5\u0C95\u0CBE\u0CB9\u0CA1 \u0C9A\u0C95\u0CCD\u0CB0','hi':'\u0905\u0935\u0915\u093E\u0939\u0921 \u091A\u0915\u094D\u0930','ta':'\u0B85\u0BB5\u0B95\u0BBE\u0BB9\u0B9F \u0B9A\u0B95\u0BCD\u0B95\u0BB0\u0BAE\u0BCD','te':'\u0C05\u0C35\u0C15\u0C3E\u0C39\u0C21 \u0C1A\u0C15\u0C4D\u0C30\u0C02','ml':'\u0D05\u0D35\u0D15\u0D3E\u0D39\u0D21 \u0D1A\u0D15\u0D4D\u0D30\u0D02','en':'Avakahada Chakra'})}', kOrange),
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(
