@@ -8,7 +8,6 @@ import '../core/calculator.dart';
 import '../constants/strings.dart';
 import 'pdf_theme.dart';
 import '../widgets/common.dart';
-import '../widgets/kundali_chart.dart';
 
 /// Data container for Match Making PDF
 class MatchPdfData {
@@ -130,25 +129,31 @@ class MatchPdfService {
           const SizedBox(height: 10),
           _sectionTitle(AppLocale.l('kundaliLabel'), t),
           const SizedBox(height: 6),
-          // Charts: 3 columns x 2 rows (groom top, bride bottom)
-          Row(
-            children: [
-              Expanded(child: _chartBox(d.groomResult, 1, false, AppLocale.l('rashi'), t)),
-              const SizedBox(width: 6),
-              Expanded(child: _chartBox(d.groomResult, 9, false, AppLocale.l('navamsha'), t)),
-              const SizedBox(width: 6),
-              Expanded(child: _chartBox(d.groomResult, 1, true, AppLocale.l('bhavaLabel'), t)),
-            ],
+          // Charts: 3 columns x 2 rows (groom top, bride bottom) — Janma Patrika style
+          SizedBox(
+            height: 230,
+            child: Row(
+              children: [
+                Expanded(child: _chartBox(_rashiChart(d.groomResult), AppLocale.l('rashi'), t)),
+                const SizedBox(width: 6),
+                Expanded(child: _chartBox(_navamshaChart(d.groomResult), AppLocale.l('navamsha'), t)),
+                const SizedBox(width: 6),
+                Expanded(child: _chartBox(_bhavaChart(d.groomResult), AppLocale.l('bhavaLabel'), t)),
+              ],
+            ),
           ),
           const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(child: _chartBox(d.brideResult, 1, false, AppLocale.l('rashi'), t)),
-              const SizedBox(width: 6),
-              Expanded(child: _chartBox(d.brideResult, 9, false, AppLocale.l('navamsha'), t)),
-              const SizedBox(width: 6),
-              Expanded(child: _chartBox(d.brideResult, 1, true, AppLocale.l('bhavaLabel'), t)),
-            ],
+          SizedBox(
+            height: 230,
+            child: Row(
+              children: [
+                Expanded(child: _chartBox(_rashiChart(d.brideResult), AppLocale.l('rashi'), t)),
+                const SizedBox(width: 6),
+                Expanded(child: _chartBox(_navamshaChart(d.brideResult), AppLocale.l('navamsha'), t)),
+                const SizedBox(width: 6),
+                Expanded(child: _chartBox(_bhavaChart(d.brideResult), AppLocale.l('bhavaLabel'), t)),
+              ],
+            ),
           ),
           const Spacer(),
           _footer(d, t),
@@ -334,17 +339,189 @@ class MatchPdfService {
     );
   }
 
-  // ═══════════════ CHART BOX ═══════════════
+  // ═══════════════ CHART HELPERS (Janma Patrika style) ═══════════════
 
-  static Widget _chartBox(KundaliResult r, int varga, bool isBhava, String label, PdfThemeConfig t) {
-    return Column(children: [
-      SizedBox(
-        width: 220, height: 220,
-        child: KundaliChart(result: r, varga: varga, isBhava: isBhava, showSphutas: false, forceShortNames: true, forceSingleLetter: true),
+  static Map<String, String> get _shortNames {
+    const kn = <String, String>{
+      'ಲಗ್ನ': 'ಲ', 'ರವಿ': 'ರ', 'ಚಂದ್ರ': 'ಚಂ', 'ಕುಜ': 'ಕು',
+      'ಬುಧ': 'ಬು', 'ಗುರು': 'ಗು', 'ಶುಕ್ರ': 'ಶು', 'ಶನಿ': 'ಶ',
+      'ರಾಹು': 'ರಾ', 'ಕೇತು': 'ಕೇ', 'ಮಾಂದಿ': 'ಮಾ',
+    };
+    const hi = <String, String>{
+      'ಲಗ್ನ': 'ल', 'ರವಿ': 'सू', 'ಚಂದ್ರ': 'चं', 'ಕುಜ': 'मं',
+      'ಬುಧ': 'बु', 'ಗುರು': 'गु', 'ಶುಕ್ರ': 'शु', 'ಶನಿ': 'श',
+      'ರಾಹು': 'रा', 'ಕೇತು': 'के', 'ಮಾಂದಿ': 'मा',
+    };
+    const ta = <String, String>{
+      'ಲಗ್ನ': 'ல', 'ರವಿ': 'சூ', 'ಚಂದ್ರ': 'சந்', 'ಕುಜ': 'செ',
+      'ಬುಧ': 'பு', 'ಗುರು': 'கு', 'ಶುಕ್ರ': 'சு', 'ಶನಿ': 'ச',
+      'ರಾಹು': 'ரா', 'ಕೇತು': 'கே', 'ಮಾಂದಿ': 'மா',
+    };
+    const te = <String, String>{
+      'ಲಗ್ನ': 'ల', 'ರವಿ': 'ర', 'ಚಂದ್ರ': 'చం', 'ಕುಜ': 'కు',
+      'ಬుಧ': 'బు', 'ಗుರు': 'గు', 'ಶುಕ್ರ': 'శు', 'ಶನಿ': 'శ',
+      'ರಾಹು': 'రా', 'ಕೇತు': 'కే', 'ಮಾಂದಿ': 'మా',
+    };
+    const ml = <String, String>{
+      'ಲಗ್ನ': 'ല', 'ರವಿ': 'ര', 'ಚಂದ್ರ': 'ചം', 'ಕುಜ': 'കു',
+      'ಬುಧ': 'ബു', 'ಗುರು': 'ഗു', 'ಶುಕ್ರ': 'ശു', 'ಶನಿ': 'ശ',
+      'ರಾಹು': 'രാ', 'ಕೇತು': 'കേ', 'ಮಾಂದಿ': 'മാ',
+    };
+    const en = <String, String>{
+      'ಲಗ್ನ': 'Asc', 'ರವಿ': 'Su', 'ಚಂದ್ರ': 'Mo', 'ಕುಜ': 'Ma',
+      'ಬುಧ': 'Me', 'ಗುರು': 'Ju', 'ಶುಕ್ರ': 'Ve', 'ಶನಿ': 'Sa',
+      'ರಾಹು': 'Ra', 'ಕೇತು': 'Ke', 'ಮಾಂದಿ': 'Md',
+    };
+    switch (AppLocale.current) {
+      case 'hi': return hi;
+      case 'ta': return ta;
+      case 'te': return te;
+      case 'ml': return ml;
+      case 'en': return en;
+      default:   return kn;
+    }
+  }
+
+  static List<List<String>> _computeChart(KundaliResult result, int Function(double) resolver) {
+    final chart = List.generate(12, (_) => <String>[]);
+    for (final pName in planetOrder) {
+      final info = result.planets[pName];
+      if (info == null) continue;
+      final ri = resolver(info.longitude);
+      if (ri >= 0 && ri < 12) chart[ri].add(_shortNames[pName] ?? pName);
+    }
+    return chart;
+  }
+
+  static List<List<String>> _rashiChart(KundaliResult r) =>
+      _computeChart(r, (deg) => (deg / 30).floor() % 12);
+
+  static List<List<String>> _navamshaChart(KundaliResult r) =>
+      _computeChart(r, (deg) {
+        final block = (deg / 30).floor() % 4;
+        final start = [0, 9, 6, 3][block];
+        final steps = ((deg % 30) / 3.33333).floor();
+        return (start + steps) % 12;
+      });
+
+  static List<List<String>> _bhavaChart(KundaliResult r) {
+    final lagnaIdx = (r.planets['ಲಗ್ನ']?.longitude ?? 0) ~/ 30 % 12;
+    final madhyas = r.bhavas;
+    final boundaries = List.generate(12, (i) {
+      final m1 = madhyas[i];
+      final m2 = madhyas[(i + 1) % 12];
+      return (m1 + ((m2 - m1 + 360.0) % 360.0) / 2.0) % 360.0;
+    });
+    final chart = List.generate(12, (_) => <String>[]);
+    for (final pName in planetOrder) {
+      final info = r.planets[pName];
+      if (info == null) continue;
+      final d = info.longitude;
+      int bhavaIdx = 0;
+      for (int i = 0; i < 12; i++) {
+        final s = boundaries[(i + 11) % 12];
+        final e = boundaries[i];
+        if (s < e ? (d >= s && d < e) : (d >= s || d < e)) { bhavaIdx = i; break; }
+      }
+      final ri = (lagnaIdx + bhavaIdx) % 12;
+      if (ri >= 0 && ri < 12) chart[ri].add(_shortNames[pName] ?? pName);
+    }
+    return chart;
+  }
+
+  // ═══════════════ CHART BOX — Janma Patrika style ═══════════════
+
+  static Widget _chartBox(List<List<String>> chart, String label, PdfThemeConfig t) {
+    if (chart.isEmpty) chart = List.generate(12, (_) => []);
+
+    Widget cell(int idx) {
+      final items = chart[idx];
+      final count = items.length;
+      String text;
+      if (count <= 3) {
+        text = items.join('\n');
+      } else {
+        final rows = <String>[];
+        for (int i = 0; i < count; i += 3) {
+          rows.add(items.sublist(i, (i + 3 > count) ? count : i + 3).join(' '));
+        }
+        text = rows.join('\n');
+      }
+      final fontSize = count <= 3 ? 11.5 : count <= 5 ? 9.5 : 8.0;
+      final lineH   = count <= 3 ? 1.1  : count <= 5 ? 1.05 : 1.0;
+      return Expanded(
+        child: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            border: Border.all(color: t.chartBorder, width: 0.5),
+            color: Colors.white,
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: fontSize,
+                  color: const Color(0xFF1A1A1A), height: lineH),
+            ),
+          ),
+        ),
+      );
+    }
+
+    Widget rowCells(List<int> idxs) => Expanded(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: idxs.map((i) => cell(i)).toList(),
       ),
-      const SizedBox(height: 2),
-      Text(label, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: t.primaryDark)),
-    ]);
+    );
+
+    return Column(
+      children: [
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(border: Border.all(color: t.primaryDark, width: 1.5)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                rowCells([11, 0, 1, 2]),
+                Expanded(
+                  flex: 2,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [cell(10), cell(9)])),
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: t.chartBorder, width: 0.5),
+                            color: t.chartCenterBg,
+                          ),
+                          child: Text(
+                            label.split(' ').join('\n'),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: t.chartCenterText),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [cell(3), cell(4)])),
+                    ],
+                  ),
+                ),
+                rowCells([8, 7, 6, 5]),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(label, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: t.primaryDark)),
+      ],
+    );
   }
 
   // ═══════════════ KOOTA TABLE ═══════════════
