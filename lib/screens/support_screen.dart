@@ -110,7 +110,7 @@ class _SupportScreenState extends State<SupportScreen> {
                     ]),
                     const SizedBox(height: 6),
                     Text(
-                      'Contact us for activation, pricing, or any questions.',
+                      'Contact support for more info.',
                       style: TextStyle(fontSize: 12, color: kMuted),
                       textAlign: TextAlign.center,
                     ),
@@ -130,7 +130,7 @@ class _SupportScreenState extends State<SupportScreen> {
                           return ElevatedButton.icon(
                             onPressed: () async {
                               final msg = Uri.encodeComponent(
-                                'Hello, I need access to Bharatheeyam app.\nEmail: $email\nDevice: $deviceId');
+                                'Hi, I need more info about Bharatheeyam app.');
                               final url = Uri.parse('https://wa.me/${_supportPhone.replaceAll('+', '')}?text=$msg');
                               if (await canLaunchUrl(url)) {
                                 await launchUrl(url, mode: LaunchMode.externalApplication);
