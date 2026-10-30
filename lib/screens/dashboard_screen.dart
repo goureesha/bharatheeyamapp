@@ -191,12 +191,12 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   static List<String> get _tabs {
     switch (AppLocale.current) {
-      case 'hi': return ['पंचांग', 'कुंडली', 'स्फुट', 'आरूढ', 'दशा', 'भाव', 'ग्रह षड्वर्ग', 'षड्बल', 'अष्टक', 'योग', 'फल', 'गोचर', 'टिप्पणी', 'पत्रिका'];
-      case 'ta': return ['பஞ்சாங்கம்', 'ஜாதகம்', 'ஸ்புடம்', 'ஆரூடம்', 'தசை', 'பாவம்', 'ஷட்வர்கம்', 'ஷட்பலம்', 'அஷ்டகம்', 'யோகம்', 'பலன்', 'கோசாரம்', 'குறிப்பு', 'பத்ரிகை'];
-      case 'te': return ['పంచాంగం', 'కుండలి', 'స్ఫుటం', 'ఆరూఢం', 'దశ', 'భావం', 'షడ్వర్గం', 'షడ్బలం', 'అష్టకం', 'యోగం', 'ఫలం', 'గోచారం', 'గమనికలు', 'పత్రిక'];
-      case 'ml': return ['പഞ്ചാംഗം', 'ജാതകം', 'സ്ഫുടം', 'ആരൂഢം', 'ദശ', 'ഭാവം', 'ഷഡ്വർഗം', 'ഷഡ്ബലം', 'അഷ്ടകം', 'യോഗം', 'ഫലം', 'ഗോചരം', 'കുറിപ്പുകൾ', 'പത്രിക'];
-      case 'en': return ['Panchanga', 'Kundali', 'Sphuta', 'Aroodha', 'Dasha', 'Bhava', 'Shadvarga', 'Shadbala', 'Ashtaka', 'Yoga', 'Phala', 'Gochara', 'Notes', 'Patrike'];
-      default: return ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಆರೂಢ', 'ದಶ', 'ಭಾವ', 'ಗ್ರಹ ಷಡ್ವರ್ಗ', 'ಷಡ್ಬಲ', 'ಅಷ್ಟಕ', 'ಯೋಗ', 'ಫಲ', 'ಗೋಚಾರ', 'ಟಿಪ್ಪಣಿ', 'ಪತ್ರಿಕೆ'];
+      case 'hi': return ['पंचांग', 'कुंडली', 'स्फुट', 'आरूढ', 'दशा', 'भाव', 'ग्रह षड्वर्ग', 'षड्बल', 'अष्टक', 'योग', 'फल', 'गोचर', 'टिप्पणी', 'पत्रिका', 'अवकाहद'];
+      case 'ta': return ['பஞ்சாங்கம்', 'ஜாதகம்', 'ஸ்புடம்', 'ஆரூடம்', 'தசை', 'பாவம்', 'ஷட்வர்கம்', 'ஷட்பலம்', 'அஷ்டகம்', 'யோகம்', 'பலன்', 'கோசாரம்', 'குறிப்பு', 'பத்ரிகை', 'அவகாஹඣ'];
+      case 'te': return ['పంచాంగం', 'కుండలి', 'స్ఫుటం', 'ఆరూఢం', 'దశ', 'భావం', 'షడ్వర్గం', 'షడ్బలం', 'అష్టకం', 'యోగం', 'ఫలం', 'గోచారం', 'గమనికలు', 'పత్రిక', 'అవకాహద'];
+      case 'ml': return ['പഞ്ചാംഗം', 'ജാതകം', 'സ്ഫുടം', 'ആരൂഢം', 'ദശ', 'ഭാവം', 'ഷഡ്വർഗം', 'ഷഡ്ബലം', 'അഷ്ടകം', 'യോഗം', 'ഫലം', 'ഗോചരം', 'കുറിപ്പുകൾ', 'പത്രിക', 'അവകാഹദ'];
+      case 'en': return ['Panchanga', 'Kundali', 'Sphuta', 'Aroodha', 'Dasha', 'Bhava', 'Shadvarga', 'Shadbala', 'Ashtaka', 'Yoga', 'Phala', 'Gochara', 'Notes', 'Patrike', 'Avakahada'];
+      default: return ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಆರೂಢ', 'ದಶ', 'ಭಾವ', 'ಗ್ರಹ ಷಡ್ವರ್ಗ', 'ಷಡ್ಬಲ', 'ಅಷ್ಟಕ', 'ಯೋಗ', 'ಫಲ', 'ಗೋಚಾರ', 'ಟಿಪ್ಪಣಿ', 'ಪತ್ರಿಕೆ', 'ಅವಕಹದ'];
     }
   }
 
@@ -204,7 +204,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _tabCtrl = TabController(length: _tabs.length, vsync: this); // 11 tabs
+    _tabCtrl = TabController(length: _tabs.length, vsync: this); // 15 tabs
     _notes = widget.initialNotes;
     _aroodhas = Map.from(widget.initialAroodhas);
     _janmaNakshatraIdx = widget.initialJanmaNakshatraIdx;
@@ -1652,6 +1652,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                               _LazyTab(builder: (_) => _buildGocharTab()),
                               _LazyTab(builder: (_) => _buildNotesTab()),
                               _LazyTab(builder: (_) => _buildJanmaPatrikeTab()),
+              _LazyTab(builder: (_) => _buildAvakahadaTab()),
                             ],
                           ),
                         ),
@@ -1682,6 +1683,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   _LazyTab(builder: (_) => _buildGocharTab()),
                                   _LazyTab(builder: (_) => _buildNotesTab()),
                                   _LazyTab(builder: (_) => _buildJanmaPatrikeTab()),
+                  _LazyTab(builder: (_) => _buildAvakahadaTab()),
                                 ],
                               ),
                               // Floating expand button when bars are hidden
@@ -5931,6 +5933,175 @@ class _GocharSegment {
 // This prevents the Kundali / heavy tabs from blocking the main thread when
 // the screen first loads or rebuilds due to an unrelated setState call.
 // ─────────────────────────────────────────────────────────────────────────────
+  // =====================================================================
+  // AVAKAHADA CHAKRA TAB
+  // =====================================================================
+  Widget _buildAvakahadaTab() {
+    var allPersons = <Map<String, dynamic>>[
+      {'name': _primaryName, 'result': _primaryResult, 'dob': _primaryDob,
+       'hour': _primaryHour, 'minute': _primaryMinute, 'ampm': _primaryAmpm, 'place': _primaryPlace},
+      ..._extraPersons.map((p) => {'name': p.name, 'result': p.result, 'dob': p.dob,
+       'hour': p.hour, 'minute': p.minute, 'ampm': p.ampm, 'place': p.place}),
+    ];
+    allPersons = _filterPersons(allPersons);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      child: Column(
+        children: allPersons.map((person) {
+          final r = person['result'] as KundaliResult;
+          final pName = person['name'] as String;
+          final pan = r.panchang;
+          final moonPlanet = r.planets['à²šà²‚à²¦à³à²°'];
+          final lagnaPlanet = r.planets['à²²à²—à³à²¨'];
+          final nakIdx   = pan.nakshatraIndex.clamp(0, 26);
+          final rashiIdx = (moonPlanet?.rashiIndex ?? 0).clamp(0, 11);
+
+          String avStr(Map<String,String> m) => m[AppLocale.current] ?? m['en'] ?? m.values.first;
+
+          String getVarna(int ri) {
+            if ([3,7,11].contains(ri)) return avStr({'kn':'à²¬à³à²°à²¾à²¹à³à²®à²£','hi':'à¤¬à¥à¤°à¤¾à¤¹à¥à¤®à¤£','ta':'à®ªà®¿à®°à®¾à®®à®£','te':'à°¬à±à°°à°¾à°¹à±à°®à°£','ml':'à´¬àµà´°à´¾à´¹àµà´®à´£','en':'Brahmin'});
+            if ([0,4,8].contains(ri))  return avStr({'kn':'à²•à³à²·à²¤à³à²°à²¿à²¯','hi':'à¤•à¥à¤·à¤¤à¥à¤°à¤¿à¤¯','ta':'à®•à¯à®·à®¤à¯à®°à®¿à®¯','te':'à°•à±à°·à°¤à±à°°à°¿à°¯','ml':'à´•àµà´·à´¤àµà´°à´¿à´¯','en':'Kshatriya'});
+            if ([1,5,9].contains(ri))  return avStr({'kn':'à²µà³ˆà²¶à³à²¯','hi':'à¤µà¥ˆà¤¶à¥à¤¯','ta':'à®µà¯ˆà®·à¯à®¯','te':'à°µà±ˆà°¶à±à°¯','ml':'à´µàµˆà´¶àµà´¯','en':'Vaishya'});
+            return avStr({'kn':'à²¶à³‚à²¦à³à²°','hi':'à¤¶à¥‚à¤¦à¥à¤°','ta':'à®šà¯‚à®¤à¯à®°','te':'à°¶à±‚à°¦à±à°°','ml':'à´¶àµ‚à´¦àµà´°','en':'Shudra'});
+          }
+
+          String getVasya(int ri) {
+            if ([2,5,6,8,10].contains(ri)) return avStr({'kn':'à²®à²¾à²¨à²µ','hi':'à¤®à¤¾à¤¨à¤µ','ta':'à®®à®©à®¿à®¤','te':'à°®à°¾à°¨à°µ','ml':'à´®à´¨àµà´·àµà´¯','en':'Manava'});
+            if (ri == 4)                    return avStr({'kn':'à²µà²¨à²šà²°','hi':'à¤µà¤¨à¤šà¤°','ta':'à®µà®©à®šà®°','te':'à°µà°¨à°šà°°','ml':'à´µà´¨à´šà´°','en':'Vanachara'});
+            if ([0,1,9].contains(ri))       return avStr({'kn':'à²šà²¤à³à²·à³à²ªà²¦','hi':'à¤šà¤¤à¥à¤·à¥à¤ªà¤¦','ta':'à®¨à®¾à®©à¯à®•à®Ÿà®¿','te':'à°šà°¤à±à°·à±à°ªà°¦','ml':'à´šà´¤àµà´·àµà´ªà´¦','en':'Chatushpada'});
+            if ([3,11].contains(ri))        return avStr({'kn':'à²œà²²à²šà²°','hi':'à¤œà¤²à¤šà¤°','ta':'à®œà®²à®šà®°','te':'à°œà°²à°šà°°','ml':'à´œà´²à´šà´°','en':'Jalachar'});
+            return avStr({'kn':'à²•à³€à²Ÿ','hi':'à¤•à¥€à¤Ÿ','ta':'à®ªà¯‚à®šà¯à®šà®¿','te':'à°•à±€à°Ÿ','ml':'à´•àµ€à´Ÿ','en':'Keeta'});
+          }
+
+          const List<Map<String,String>> yoniList = [
+            {'kn':'à²…à²¶à³à²µ','hi':'à¤…à¤¶à¥à¤µ','ta':'à®•à¯à®¤à®¿à®°à¯ˆ','te':'à°…à°¶à±à°µ','ml':'à´…à´¶àµà´µ','en':'Horse'},
+            {'kn':'à²—à²œ','hi':'à¤—à¤œ','ta':'à®¯à®¾à®©à¯ˆ','te':'à°—à°œ','ml':'à´—à´œ','en':'Elephant'},
+            {'kn':'à²®à³‡à²·','hi':'à¤®à¥‡à¤·','ta':'à®†à®Ÿà¯','te':'à°®à±‡à°·','ml':'à´®àµ‡à´·','en':'Ram'},
+            {'kn':'à²¸à²°à³à²ª','hi':'à¤¸à¤°à¥à¤ª','ta':'à®ªà®¾à®®à¯à®ªà¯','te':'à°¸à°°à±à°ª','ml':'à´¸àµ¼à´ªàµà´ª','en':'Serpent'},
+            {'kn':'à²¸à²°à³à²ª','hi':'à¤¸à¤°à¥à¤ª','ta':'à®ªà®¾à®®à¯à®ªà¯','te':'à°¸à°°à±à°ª','ml':'à´¸àµ¼Ù¾àµà´ª','en':'Serpent'},
+            {'kn':'à²¶à³à²µà²¾à²¨','hi':'à¤¶à¥à¤µà¤¾à¤¨','ta':'à®¨à®¾à®¯à¯','te':'à°¶à±à°µà°¾à°¨','ml':'à´¶àµà´µà´¾à´¨','en':'Dog'},
+            {'kn':'à²®à²¾à²°à³à²œà²¾à²²','hi':'à¤®à¤¾à¤°à¥à¤œà¤¾à¤²','ta':'à®ªà¯‚à®©à¯ˆ','te':'à°®à°¾à°°à±à°œà°¾à°²','ml':'à´®à´¾àµ¼à´œà´¾à´²','en':'Cat'},
+            {'kn':'à²®à³‡à²·','hi':'à¤®à¥‡à¤·','ta':'à®†à®Ÿà¯','te':'à°®à±‡à°·','ml':'à´®àµ‡à´·','en':'Ram'},
+            {'kn':'à²¶à³à²µà²¾à²¨','hi':'à¤¶à¥à¤µà¤¾à¤¨','ta':'à®¨à®¾à®¯à¯','te':'à°¶à±à°µà°¾à°¨','ml':'à´¶àµà´µà´¾à´¨','en':'Dog'},
+            {'kn':'à²¨à²¾à²—','hi':'à¤¨à¤¾à¤—','ta':'à®ªà®¾à®®à¯à®ªà¯','te':'à°¨à°¾à°—','ml':'à´¨à´¾à´—','en':'Snake'},
+            {'kn':'à²¨à²¾à²—','hi':'à¤¨à¤¾à¤—','ta':'à®ªà®¾à®®à¯à®ªà¯','te':'à°¨à°¾à°—','ml':'à´¨à´¾à´—','en':'Snake'},
+            {'kn':'à²—à³‹','hi':'à¤—à¥‹','ta':'à®ªà®šà¯','te':'à°—à±‹','ml':'à´—àµ‹','en':'Cow'},
+            {'kn':'à²®à²¹à²¿à²·','hi':'à¤®à¤¹à¤¿à¤·','ta':'à®®à®¹à®¿à®·','te':'à°®à°¹à°¿à°·','ml':'à´®à´¹à´¿à´·','en':'Buffalo'},
+            {'kn':'à²µà³à²¯à²¾à²˜à³à²°','hi':'à¤µà¥à¤¯à¤¾à¤˜à¥à¤°','ta':'à®ªà¯à®²à®¿','te':'à°µà±à°¯à°¾à°˜à±à°°','ml':'à´µàµà´¯à´¾à´˜àµà´°','en':'Tiger'},
+            {'kn':'à²®à²¹à²¿à²·','hi':'à¤®à¤¹à¤¿à¤·','ta':'à®®à®¹à®¿à®·','te':'à°®à°¹à°¿à°·','ml':'à´®à´¹à´¿à´·','en':'Buffalo'},
+            {'kn':'à²µà³à²¯à²¾à²˜à³à²°','hi':'à¤µà¥à¤¯à¤¾à¤˜à¥à¤°','ta':'à®ªà¯à®²à®¿','te':'à°µà±à°¯à°¾à°˜à±à°°','ml':'à´µàµà´¯à´¾à´˜àµà´°','en':'Tiger'},
+            {'kn':'à²®à³ƒà²—','hi':'à¤®à¥ƒà¤—','ta':'à®®à®¾à®©à¯','te':'à°®à±ƒà°—','ml':'à´®àµƒà´—','en':'Deer'},
+            {'kn':'à²®à³ƒà²—','hi':'à¤®à¥ƒà¤—','ta':'à®®à®¾à®©à¯','te':'à°®à±ƒà°—','ml':'à´®àµƒà´—','en':'Deer'},
+            {'kn':'à²¶à³à²µà²¾à²¨','hi':'à¤¶à¥à¤µà¤¾à¤¨','ta':'à®¨à®¾à®¯à¯','te':'à°¶à±à°µà°¾à°¨','ml':'à´¶àµà´µà´¾à´¨','en':'Dog'},
+            {'kn':'à²µà²¾à²¨à²°','hi':'à¤µà¤¾à¤¨à¤°','ta':'à®•à¯à®°à®™à¯à®•à¯','te':'à°µà°¾à°¨à°°','ml':'à´µà´¾à´¨à´°','en':'Monkey'},
+            {'kn':'à²µà²¾à²¨à²°','hi':'à¤µà¤¾à¤¨à¤°','ta':'à®•à¯à®°à®™à¯à®•à¯','te':'à°µà°¾à°¨à°°','ml':'à´µà´¾à´¨à´°','en':'Monkey'},
+            {'kn':'à²—à³‹','hi':'à¤—à¥‹','ta':'à®ªà®šà¯','te':'à°—à±‹','ml':'à´—àµ‹','en':'Cow'},
+            {'kn':'à²¸à²¿à²‚à²¹','hi':'à¤¸à¤¿à¤‚à¤¹','ta':'à®šà®¿à®™à¯à®•à®®à¯','te':'à°¸à°¿à°‚à°¹','ml':'à´¸à´¿à´‚à´¹','en':'Lion'},
+            {'kn':'à²—à²œ','hi':'à¤—à¤œ','ta':'à®¯à®¾à®©à¯ˆ','te':'à°—à°œ','ml':'à´—à´œ','en':'Elephant'},
+            {'kn':'à²¸à²¿à²‚à²¹','hi':'à¤¸à¤¿à¤‚à¤¹','ta':'à®šà®¿à®™à¯à®•à®®à¯','te':'à°¸à°¿à°‚à°¹','ml':'à´¸à´¿à´‚à´¹','en':'Lion'},
+            {'kn':'à²—à³‹','hi':'à¤—à¥‹','ta':'à®ªà®šà¯','te':'à°—à±‹','ml':'à´—àµ‹','en':'Cow'},
+            {'kn':'à²—à²œ','hi':'à¤—à¤œ','ta':'à®¯à®¾à®©à¯ˆ','te':'à°—à°œ','ml':'à´—à´œ','en':'Elephant'},
+          ];
+
+          String getGana(int ni) {
+            const deva     = [0,4,6,7,12,14,16,21,26];
+            const manushya = [1,3,5,10,11,19,20,24,25];
+            if (deva.contains(ni))      return avStr({'kn':'à²¦à³‡à²µ','hi':'à¤¦à¥‡à¤µ','ta':'à®¤à¯‡à®µ','te':'à°¦à±‡à°µ','ml':'à´¦àµ‡à´µ','en':'Deva'});
+            if (manushya.contains(ni)) return avStr({'kn':'à²®à²¨à³à²·à³à²¯','hi':'à¤®à¤¨à¥à¤·à¥à¤¯','ta':'à®®à®©à®¿à®¤','te':'à°®à°¨à±à°·à±à°¯','ml':'à´®à´¨àµà´·àµà´¯','en':'Manushya'});
+            return avStr({'kn':'à²°à²¾à²•à³à²·à²¸','hi':'à¤°à¤¾à¤•à¥à¤·à¤¸','ta':'à®°à®¾à®•à¯à®·à®¸','te':'à°°à°¾à°•à±à°·à°¸','ml':'à´°à´¾à´•àµà´·à´¸','en':'Rakshasa'});
+          }
+
+          String getNadi(int ni) {
+            const adi    = [0,5,6,11,12,17,18,23,24];
+            const madhya = [1,4,7,10,13,16,19,22,25];
+            if (adi.contains(ni))    return avStr({'kn':'à²†à²¦à²¿','hi':'à¤†à¤¦à¤¿','ta':'à®†à®¤à®¿','te':'à°†à°¦à°¿','ml':'à´†à´¦à´¿','en':'Adi'});
+            if (madhya.contains(ni)) return avStr({'kn':'à²®à²§à³à²¯','hi':'à¤®à¤§à¥à¤¯','ta':'à®®à®¤à¯à®¯','te':'à°®à°§à±à°¯','ml':'à´®à´¦àµà´§àµà´¯','en':'Madhya'});
+            return avStr({'kn':'à²…à²‚à²¤à³à²¯','hi':'à¤…à¤¨à¥à¤¤à¥à¤¯','ta':'à®…à®¨à¯à®¤à¯à®¯','te':'à°…à°‚à°¤à±à°¯','ml':'à´…à´¨àµà´¤àµà´¯','en':'Antya'});
+          }
+
+          String getRajju(int ni) {
+            const map = [4,3,2,1,0, 1,2,3,4, 4,3,2,1,0, 1,2,3,4, 4,3,2,1,0, 1,2,3,4];
+            const names = <int, Map<String,String>>{
+              0: {'kn':'à²ªà²¾à²¦','hi':'à¤ªà¤¾à¤¦','ta':'à®ªà®¾à®¤','te':'à°ªà°¾à°¦','ml':'à´ªà´¾à´¦','en':'Paada'},
+              1: {'kn':'à²•à²Ÿà²¿','hi':'à¤•à¤Ÿà¤¿','ta':'à®‡à®Ÿà¯à®ªà¯à®ªà¯','te':'à°•à°Ÿà°¿','ml':'à´•à´Ÿà´¿','en':'Kati'},
+              2: {'kn':'à²¨à²¾à²­à²¿','hi':'à¤¨à¤¾à¤­à¤¿','ta':'à®¨à®¾à®ªà®¿','te':'à°¨à°¾à°­à°¿','ml':'à´¨à´¾à´­à´¿','en':'Nabhi'},
+              3: {'kn':'à²•à²‚à² ','hi':'à¤•à¤‚à¤ ','ta':'à®•à®£à¯à®Ÿ','te':'à°•à°‚à° ','ml':'à´•à´£àµà´ ','en':'Kantha'},
+              4: {'kn':'à²¶à²¿à²°','hi':'à¤¶à¤¿à¤°','ta':'à®šà®¿à®°','te':'à°¶à°¿à°°','ml':'à´¶à´¿à´°','en':'Shira'},
+            };
+            return avStr(names[map[ni % 27]]!);
+          }
+
+          const rashiLords = ['à²•à³à²œ','à²¶à³à²•à³à²°','à²¬à³à²§','à²šà²‚à²¦à³à²°','à²°à²µà²¿','à²¬à³à²§','à²¶à³à²•à³à²°','à²•à³à²œ','à²—à³à²°à³','à²¶à²¨à²¿','à²¶à²¨à²¿','à²—à³à²°à³'];
+          const nakLords   = ['à²•à³‡à²¤à³','à²¶à³à²•à³à²°','à²°à²µà²¿','à²šà²‚à²¦à³à²°','à²•à³à²œ','à²°à²¾à²¹à³','à²—à³à²°à³','à²¶à²¨à²¿','à²¬à³à²§',
+                              'à²•à³‡à²¤à³','à²¶à³à²•à³à²°','à²°à²µà²¿','à²šà²‚à²¦à³à²°','à²•à³à²œ','à²°à²¾à²¹à³','à²—à³à²°à³','à²¶à²¨à²¿','à²¬à³à²§',
+                              'à²•à³‡à²¤à³','à²¶à³à²•à³à²°','à²°à²µà²¿','à²šà²‚à²¦à³à²°','à²•à³à²œ','à²°à²¾à²¹à³','à²—à³à²°à³','à²¶à²¨à²¿','à²¬à³à²§'];
+          final rashiLord   = trAll(rashiLords[rashiIdx]);
+          final nakLord     = trAll(nakLords[nakIdx]);
+          final moonPada    = (moonPlanet?.pada ?? ((pan.nakPercent * 4).floor() + 1)).clamp(1, 4);
+          final lagnaRashi  = (lagnaPlanet?.rashiIndex ?? 0).clamp(0, 11);
+          final lagnaLord   = trAll(rashiLords[lagnaRashi]);
+          final yoni        = avStr(yoniList[nakIdx]);
+
+          final rows = <Map<String,String>>[
+            {'label': avStr({'kn':'à²µà²°à³à²£','hi':'à¤µà¤°à¥à¤£','ta':'à®µà®°à¯à®£','te':'à°µà°°à±à°£','ml':'à´µàµ¼à´£','en':'Varna'}),              'value': getVarna(rashiIdx)},
+            {'label': avStr({'kn':'à²µà²¶à³à²¯','hi':'à¤µà¤¶à¥à¤¯','ta':'à®µà®¶à¯à®¯','te':'à°µà°¶à±à°¯','ml':'à´µà´¶àµà´¯','en':'Vashya'}),            'value': getVasya(rashiIdx)},
+            {'label': avStr({'kn':'à²¯à³‹à²¨à²¿','hi':'à¤¯à¥‹à¤¨à¤¿','ta':'à®¯à¯‹à®©à®¿','te':'à°¯à±‹à°¨à°¿','ml':'à´¯àµ‹à´¨à´¿','en':'Yoni'}),              'value': yoni},
+            {'label': avStr({'kn':'à²—à²£','hi':'à¤—à¤£','ta':'à®•à®£','te':'à°—à°£','ml':'à´—à´£','en':'Gana'}),                       'value': getGana(nakIdx)},
+            {'label': avStr({'kn':'à²¨à²¾à²¡à²¿','hi':'à¤¨à¤¾à¤¡à¥€','ta':'à®¨à®¾à®Ÿà®¿','te':'à°¨à°¾à°¡à°¿','ml':'à´¨à´¾à´¡à´¿','en':'Nadi'}),              'value': getNadi(nakIdx)},
+            {'label': avStr({'kn':'à²°à²¾à²¶à²¿','hi':'à¤°à¤¾à¤¶à¤¿','ta':'à®°à®¾à®šà®¿','te':'à°°à°¾à°¶à°¿','ml':'à´°à´¾à´¶à´¿','en':'Rashi'}),             'value': trAll(pan.chandraRashi)},
+            {'label': avStr({'kn':'à²°à²¾à²¶à³à²¯à²§à²¿à²ª','hi':'à¤°à¤¾à¤¶à¥à¤¯à¤¾à¤§à¤¿à¤ª','ta':'à®°à®¾à®šà®¿à®¯à®¤à®¿à®ª','te':'à°°à°¾à°¶à±à°¯à°§à°¿à°ª','ml':'à´°à´¾à´¶àµà´¯à´§à´¿à´ª','en':'Rashi Lord'}), 'value': rashiLord},
+            {'label': avStr({'kn':'à²¨à²•à³à²·à²¤à³à²°','hi':'à¤¨à¤•à¥à¤·à¤¤à¥à¤°','ta':'à®¨à®Ÿà¯à®šà®¤à¯à®¤à®¿à®°','te':'à°¨à°•à±à°·à°¤à±à°°','ml':'à´¨à´•àµà´·à´¤àµà´°','en':'Nakshatra'}),     'value': trAll(pan.nakshatra.split(' ')[0])},
+            {'label': avStr({'kn':'à²¨à²•à³à²·à²¤à³à²°à²¾à²§à²¿à²ª','hi':'à¤¨à¤•à¥à¤·à¤¤à¥à¤°à¤¾à¤§à¤¿à¤ª','ta':'à®¨à®Ÿà¯à®šà®¤à¯à®¤à®¿à®°à®¾à®¤à®¿à®ª','te':'à°¨à°•à±à°·à°¤à±à°°à°¾à°§à°¿à°ª','ml':'à´¨à´•àµà´·. à²…à²§à²¿à²ª','en':'Nak. Lord'}), 'value': nakLord},
+            {'label': avStr({'kn':'à²šà²°à²£','hi':'à¤šà¤°à¤£','ta':'à®šà®°à®£','te':'à°šà°°à°£','ml':'à´šà´°à´£','en':'Charan (Pada)'}),          'value': '$moonPada'},
+            {'label': avStr({'kn':'à²¤à²¿à²¥à²¿','hi':'à¤¤à¤¿à¤¥à¤¿','ta':'à®¤à®¿à®¤à®¿','te':'à°¤à°¿à°¥à°¿','ml':'à´¤à´¿à´¥à´¿','en':'Tithi'}),              'value': trAll(pan.tithi.split(' ')[0])},
+            {'label': avStr({'kn':'à²•à²°à²£','hi':'à¤•à¤°à¤£','ta':'à®•à®°à®£','te':'à°•à°°à°£','ml':'à´•à´°à´£','en':'Karana'}),                 'value': trAll(pan.karana)},
+            {'label': avStr({'kn':'à²¯à³‹à²—','hi':'à¤¯à¥‹à¤—','ta':'à®¯à¯‹à®•','te':'à°¯à±‹à°—','ml':'à´¯àµ‹à´—','en':'Yoga'}),                   'value': trAll(pan.yoga)},
+            {'label': avStr({'kn':'à²µà²¾à²°','hi':'à¤µà¤¾à¤°','ta':'à®µà®¾à®°à®®à¯','te':'à°µà°¾à°°à°®à±','ml':'à´µà´¾à´°','en':'Vara'}),                'value': trAll(pan.vara)},
+            {'label': avStr({'kn':'à²²à²—à³à²¨','hi':'à¤²à¤—à¥à¤¨','ta':'à®²à®•à¯à®©','te':'à°²à°—à±à°¨','ml':'à´²à´—àµà´¨','en':'Lagna'}),             'value': trAll(lagnaPlanet?.rashi ?? '')},
+            {'label': avStr({'kn':'à²²à²—à³à²¨à²¾à²§à²¿à²ª','hi':'à¤²à¤—à¥à¤¨à¤¾à¤§à¤¿à¤ª','ta':'à®²à®•à¯à®©à®¾à®¤à®¿à®ª','te':'à°²à°—à±à°¨à°¾à°§à°¿à°ª','ml':'à´²à´—àµà´¨à´¾à´§à´¿à´ª','en':'Lagna Lord'}), 'value': lagnaLord},
+            {'label': avStr({'kn':'à²°à²œà³à²œà³','hi':'à¤°à¤œà¥à¤œà¥','ta':'à®°à®œà¯à®œà¯','te':'à°°à°œà±à°œà±','ml':'à´°à´œàµà´œàµ','en':'Rajju'}),        'value': getRajju(nakIdx)},
+          ];
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (allPersons.length > 1)
+                Padding(
+                  padding: const EdgeInsets.only(top:8, bottom:4),
+                  child: Text(pName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kTeal)),
+                ),
+              _sectionLabel(avStr({
+                'kn': '\u2638 \u0C85\u0CB5\u0C95\u0CB9\u0CA6 \u0C9A\u0C95\u0CCD\u0CB0',
+                'hi': '\u2638 \u0905\u0935\u0915\u093E\u0939\u0926 \u091A\u0915\u094D\u0930',
+                'ta': '\u2638 \u0B85\u0BB5\u0B95\u0BBE\u0BB9\u0B9F \u0B9A\u0B95\u0BCD\u0B95\u0BB0\u0BAE\u0BCD',
+                'te': '\u2638 \u0C05\u0C35\u0C15\u0C3E\u0C39\u0C26 \u0C1A\u0C15\u0C4D\u0C30\u0C02',
+                'ml': '\u2638 \u0D05\u0D35\u0D15\u0D3E\u0D39\u0D26 \u0D1A\u0D15\u0D4D\u0D30\u0D02',
+                'en': '\u2638 Avakahada Chakra',
+              }), kOrange),
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: rows.asMap().entries.map((e) {
+                    final isEven = e.key.isEven;
+                    return Container(
+                      color: isEven
+                          ? Colors.transparent
+                          : (AppThemes.isTanjore
+                              ? const Color(0xFF1A1200)
+                              : Colors.white.withOpacity(0.03)),
+                      child: _tableRow([e.value['label']!, e.value['value']!], big: true),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
 class _LazyTab extends StatefulWidget {
   final WidgetBuilder builder;
   const _LazyTab({required this.builder});
