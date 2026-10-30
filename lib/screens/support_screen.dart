@@ -22,6 +22,11 @@ class _SupportScreenState extends State<SupportScreen> {
   static const _supportEmail = 'goureesh3690@gmail.com';
   bool _signingIn = false;
 
+  static String _ls(Map<String,String> m) {
+    final lang = AppLocale.current;
+    return m[lang] ?? m['en'] ?? m.values.first;
+  }
+
   Future<void> _handleGmailSignIn() async {
     setState(() => _signingIn = true);
     try {
@@ -110,7 +115,7 @@ class _SupportScreenState extends State<SupportScreen> {
                     ]),
                     const SizedBox(height: 6),
                     Text(
-                      'Contact support for more info.',
+                      _ls({'kn':'\u0CB9\u0CC6\u0C9A\u0CCD\u0C9A\u0CBF\u0CA8 \u0CAE\u0CBE\u0CB9\u0CBF\u0CA4\u0CBF\u0C97\u0CBE\u0C97\u0CBF \u0CB8\u0C82\u0CAA\u0CB0\u0CCD\u0C95\u0CBF\u0CB8\u0CBF', 'hi':'\u0905\u0927\u093F\u0915 \u091C\u093E\u0928\u0915\u093E\u0930\u0940 \u0915\u0947 \u0932\u093F\u090F \u0938\u0902\u092A\u0930\u094D\u0915 \u0915\u0930\u0947\u0902', 'ta':'\u0BAE\u0BC7\u0BB2\u0BC1\u0BAE\u0BCD \u0BA4\u0B95\u0BB5\u0BB2\u0BC1\u0B95\u0BCD\u0B95\u0BC1 \u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1 \u0B95\u0BCA\u0BB3\u0BCD\u0BB3\u0BC1\u0B99\u0BCD\u0B95\u0BB3\u0BCD', 'te':'\u0C2E\u0C30\u0C3F\u0C02\u0C24 \u0C38\u0C2E\u0C3E\u0C1A\u0C3E\u0C30\u0C02\u0C15\u0C4B\u0C38\u0C02 \u0C38\u0C02\u0C2A\u0C30\u0C4D\u0C15\u0C3F\u0C02\u0C1A\u0C02\u0C21\u0C3F', 'ml':'\u0D15\u0D42\u0D1F\u0D41\u0D24\u0D32\u0D4D \u0D35\u0D3F\u0D35\u0D30\u0D19\u0D4D\u0D19\u0D33\u0D4D\u0D15\u0D4D\u0D15\u0D4D \u0D2C\u0D28\u0D4D\u0D27\u0D2A\u0D4D\u0D2A\u0D46\u0D1F\u0D41\u0D15', 'en':'Contact support for more info.'}),
                       style: TextStyle(fontSize: 12, color: kMuted),
                       textAlign: TextAlign.center,
                     ),
@@ -137,7 +142,7 @@ class _SupportScreenState extends State<SupportScreen> {
                               }
                             },
                             icon: const Icon(Icons.chat, size: 20),
-                            label: const Text('Message on WhatsApp',
+                            label: const Text(_ls({'kn':'WhatsApp \u0CA8\u0CB2\u0CCD\u0CB2\u0CBF \u0CB8\u0C82\u0CA6\u0CC7\u0CB6', 'hi':'WhatsApp \u092A\u0930 \u0938\u0902\u0926\u0947\u0936', 'ta':'WhatsApp \u0BB5\u0BB4\u0BBF \u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1', 'te':'WhatsApp \u0C32\u0C4B \u0C38\u0C02\u0C2A\u0C30\u0C4D\u0C15\u0C3F\u0C02\u0C1A\u0C02\u0C21\u0C3F', 'ml':'WhatsApp \u0D35\u0D34\u0D3F \u0D2C\u0D28\u0D4D\u0D27\u0D2A\u0D4D\u0D2A\u0D46\u0D1F\u0D41\u0D15', 'en':'Message on WhatsApp'}),
                               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF25D366),
@@ -291,7 +296,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Contact Support', style: TextStyle(
+                      Text(_ls({'kn':'\u0CB8\u0C82\u0CAA\u0CB0\u0CCD\u0C95 \u0CB5\u0CBF\u0CB5\u0CB0', 'hi':'\u0938\u0939\u093E\u092F\u0924\u093E \u0938\u0902\u092A\u0930\u094D\u0915', 'ta':'\u0B86\u0BA4\u0BB0\u0BB5\u0BC1 \u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1', 'te':'\u0C38\u0C39\u0C3E\u0C2F\u0C02 \u0C38\u0C02\u0C2A\u0C30\u0C4D\u0C15\u0C3F\u0C02\u0C1A\u0C3F', 'ml':'\u0D38\u0D39\u0D3E\u0D2F\u0D02 \u0D15\u0D23\u0D4D\u0D26\u0D46\u0D15\u0D4D\u0D15\u0D41\u0D15', 'en':'Contact Support'}), style: TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w800, color: kPurple2)),
                       const SizedBox(height: 14),
                       _infoRow(Icons.phone, 'Phone', _supportPhone, context),
