@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../widgets/common.dart';
@@ -88,6 +88,69 @@ class _SupportScreenState extends State<SupportScreen> {
 
                 // Access info
                 _buildLockInfo(widget.lockType),
+                const SizedBox(height: 16),
+
+                // ── Contact Support (shown immediately after trial ended) ──
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF25D366).withOpacity(0.08), Color(0xFF128C7E).withOpacity(0.12)],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Color(0xFF25D366).withOpacity(0.5), width: 1.5),
+                  ),
+                  child: Column(children: [
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Icon(Icons.support_agent, color: Color(0xFF25D366), size: 26),
+                      const SizedBox(width: 8),
+                      Text('Contact Support',
+                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF25D366))),
+                    ]),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Contact us for activation, pricing, or any questions.',
+                      style: TextStyle(fontSize: 12, color: kMuted),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      _supportPhone,
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: kText, letterSpacing: 1),
+                    ),
+                    const SizedBox(height: 14),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FutureBuilder<String>(
+                        future: DeviceBindingService.getDeviceId(),
+                        builder: (context, snapshot) {
+                          final deviceId = snapshot.data ?? '';
+                          final email = GoogleAuthService.userEmail ?? '';
+                          return ElevatedButton.icon(
+                            onPressed: () async {
+                              final msg = Uri.encodeComponent(
+                                'Hello, I need access to Bharatheeyam app.\nEmail: $email\nDevice: $deviceId');
+                              final url = Uri.parse('https://wa.me/${_supportPhone.replaceAll('+', '')}?text=$msg');
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url, mode: LaunchMode.externalApplication);
+                              }
+                            },
+                            icon: const Icon(Icons.chat, size: 20),
+                            label: const Text('Message on WhatsApp',
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF25D366),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 13),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ]),
+                ),
                 const SizedBox(height: 16),
 
                 // ── App Demo Video ──
