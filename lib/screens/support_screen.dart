@@ -142,7 +142,7 @@ class _SupportScreenState extends State<SupportScreen> {
                               }
                             },
                             icon: const Icon(Icons.chat, size: 20),
-                            label: const Text(_ls({'kn':'WhatsApp \u0CA8\u0CB2\u0CCD\u0CB2\u0CBF \u0CB8\u0C82\u0CA6\u0CC7\u0CB6', 'hi':'WhatsApp \u092A\u0930 \u0938\u0902\u0926\u0947\u0936', 'ta':'WhatsApp \u0BB5\u0BB4\u0BBF \u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1', 'te':'WhatsApp \u0C32\u0C4B \u0C38\u0C02\u0C2A\u0C30\u0C4D\u0C15\u0C3F\u0C02\u0C1A\u0C02\u0C21\u0C3F', 'ml':'WhatsApp \u0D35\u0D34\u0D3F \u0D2C\u0D28\u0D4D\u0D27\u0D2A\u0D4D\u0D2A\u0D46\u0D1F\u0D41\u0D15', 'en':'Message on WhatsApp'}),
+                            label: Text(_ls({'kn':'WhatsApp \u0CA8\u0CB2\u0CCD\u0CB2\u0CBF \u0CB8\u0C82\u0CA6\u0CC7\u0CB6', 'hi':'WhatsApp \u092A\u0930 \u0938\u0902\u0926\u0947\u0936', 'ta':'WhatsApp \u0BB5\u0BB4\u0BBF \u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1', 'te':'WhatsApp \u0C32\u0C4B \u0C38\u0C02\u0C2A\u0C30\u0C4D\u0C15\u0C3F\u0C02\u0C1A\u0C02\u0C21\u0C3F', 'ml':'WhatsApp \u0D35\u0D34\u0D3F \u0D2C\u0D28\u0D4D\u0D27\u0D2A\u0D4D\u0D2A\u0D46\u0D1F\u0D41\u0D15', 'en':'Message on WhatsApp'}),
                               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF25D366),
