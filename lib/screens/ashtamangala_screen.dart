@@ -1157,7 +1157,6 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
       varga: varga,
       isBhava: isBhava,
       showSphutas: false,
-      showNavamshaNumber: isRashiOrBhava, // ಕೇವಲ ರಾಶಿ & ಭಾವ ಕುಂಡಲಿಗಳಲ್ಲಿ ಮಾತ್ರ ನವಾಂಶ ಸಂಖ್ಯೆ
       forceSingleLetter: true, // ಎಲ್ಲ ಕುಂಡಲಿಗಳಲ್ಲೂ ಸಿಂಗಲ್ ಲೆಟರ್ ಗ್ರಹ ಹೆಸರುಗಳು
       aroodhas: aroodhas,
       centerLabel: label,
