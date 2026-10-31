@@ -18,6 +18,7 @@ import 'pooja_lists_screen.dart';
 import 'vastu_screen.dart';
 import 'muhurta_screen.dart';
 import 'reverse_kundali_screen.dart';
+import 'ashtamangala_screen.dart';
 import '../services/tester_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -76,6 +77,9 @@ class _HomeScreenState extends State<HomeScreen> {
       }),
       _Section(AppLocale.l('vastuLabel'), 'Vastu', Icons.home_work_rounded, AppThemes.isTanjore ? const Color(0xFFD4AF37) : const Color(0xFFD4A017), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const VastuScreen()));
+      }),
+      _Section(AppLocale.isHindi ? 'अष्टमंगल' : 'ಅಷ್ಟಮಂಗಲ', 'Ashtamangala', Icons.auto_fix_high, AppThemes.isTanjore ? const Color(0xFFCDA434) : const Color(0xFFE67E22), () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const AshtamangalaScreen()));
       }),
 
       _Section(AppLocale.l('settings'), 'Settings', Icons.settings, kMuted, () {

@@ -1,0 +1,1502 @@
+﻿// Ashtamangala Prashna Calculations based on Prashna Marga & Kerala Astrological Tradition
+
+import '../constants/strings.dart';
+import 'calculator.dart';
+
+class AshtamangalaDetails {
+  final String ashtamangalaNumber;
+  final String graha;
+  final String yoni;
+  final String jantu;
+  final String panchabhuta;
+  final String paksha;
+  final String tithi;
+  final String nakshatra;
+  final String vara;
+  final String rashi;
+
+  // Dhumadi Panchasphuta (Sign-Deg-Min-Sec)
+  final String dhooma;
+  final String vyatipata;
+  final String parivesha;
+  final String indrachapa;
+  final String upaketu;
+
+  // Chandra micro-divisions
+  final String chandraKriya;
+  final String chandraAvastha;
+  final String chandraVela;
+
+  // Pancha Sutras
+  final String samanyaSutra;
+  final String adhipaSutra;
+  final String amshaSutra;
+  final String nakshatraSutra;
+  final String mahaSutra;
+
+  // ═══ NEW: ತ್ರಿಸ್ಫುಟಾದಿ ಗಣಿತ (from advSphutas) ═══
+  final String trisphuta;
+  final String chatusphuta;
+  final String panchasphuta;
+  final String pranaSphuta;
+  final String dehaSphuta;
+  final String mrityuSphuta;
+  final String sookshmaTrisphuta;
+  final String rudraSphuta;
+  final String maheswaraSphuta;
+  final String brahmaSphuta;
+  final String vishnuSphuta;
+  final String yamaghantaSphuta;
+
+  // ═══ NEW: ವಿಶೇಷ ಪ್ರಶ್ನೆ ಸ್ಫುಟಗಳು ═══
+  final String bimbaSphuta;
+  final String pakshantaraBimbaSphuta;
+  final String yamaKantaka;
+  final String kalaSphuta;
+  final String ardhaPraharaSphuta;
+  final String bhutodaya; // Element name text
+  final String arudhaSphuta;
+  final String vithiSphuta;
+  final String chattraSphuta;
+  final String lagnaRaviYoga;
+  final String sannidhyaSphuta;
+  final String chaitanyaSphuta;
+  final String chalanaSphuta;
+  final String karanaSphuta;
+  final String prasadaSphuta;
+  final String pakshantaraPrasadaSphuta;
+  final String anganaSphuta;
+  final String mukhaMandapaSphuta;
+  final String deepaSphuta;
+  final String acharyaSphuta;
+  final String pakshantaraAcharyaSphuta;
+  final String devalakaSphuta;
+  final String dhvajaSphuta;
+
+  // ═══ ದ್ವಿ-ವಿಧಾನ (Dual Methods per Kerala Prashna Shastra) ═══
+  final String bimbaSphutaDevaprasna;   // ದೇವಪ್ರಶ್ನ ಬಿಂಬ (5-factor)
+  final String vithiRasi;               // ಶಾಸ್ತ್ರೀಯ ವೀಥಿ ರಾಶಿ (Sun-based)
+  final String chattraSphutaClassical;  // ಶಾಸ್ತ್ರೀಯ ಛತ್ರ (Vithi-based)
+
+  // ═══ NEW: ಪಂಚಸೂತ್ರ ಹೆಚ್ಚುವರಿ ═══
+  final String beejaSphutaJeeva;
+  final String beejaSphutaKshetra;
+  final String dinaSaptaBhaga;
+  final String dinaAshtaBhaga;
+  final String dinaAshtaBhagaPhala;
+  final String tamboolaGraha;
+  final String tamboolaLagna; // Rashi where Tamboola Graha sits
+  final String santanaTithiPanchagga;
+  final String santanaTithiChandra;
+  final String santanaTithiRavindu;
+
+  // Additional Prashna Marga calculations
+  final String dehaPranaMrityuTulane;
+  final String digitPastAnalysis;
+  final String digitPresentAnalysis;
+  final String digitFutureAnalysis;
+  final String navagrahaFromNumber;
+  final String panchabhutaFromNumber;
+  final String kalaHora;
+  final String arudhaAvastha;
+  final String sprashtangaDosha;
+
+  // ═══ ತ್ರಿಸ್ಫುಟ ದಶಾ ═══
+  final List<DashaEntry> trisphutaDashas;
+  final String trisphutaNakshatra;
+  final String trisphutaDashaBalance;
+
+  // ═══ ಪ್ರಶ್ನೆ ಸಮಯ ದೋಷಗಳು ═══
+  final Map<String, String> prashnaDoshas;
+
+  AshtamangalaDetails({
+    required this.ashtamangalaNumber,
+    required this.graha,
+    required this.yoni,
+    required this.jantu,
+    required this.panchabhuta,
+    required this.paksha,
+    required this.tithi,
+    required this.nakshatra,
+    required this.vara,
+    required this.rashi,
+    required this.dhooma,
+    required this.vyatipata,
+    required this.parivesha,
+    required this.indrachapa,
+    required this.upaketu,
+    required this.chandraKriya,
+    required this.chandraAvastha,
+    required this.chandraVela,
+    required this.samanyaSutra,
+    required this.adhipaSutra,
+    required this.amshaSutra,
+    required this.nakshatraSutra,
+    required this.mahaSutra,
+    // New fields
+    required this.trisphuta,
+    required this.chatusphuta,
+    required this.panchasphuta,
+    required this.pranaSphuta,
+    required this.dehaSphuta,
+    required this.mrityuSphuta,
+    required this.sookshmaTrisphuta,
+    required this.rudraSphuta,
+    required this.maheswaraSphuta,
+    required this.brahmaSphuta,
+    required this.vishnuSphuta,
+    required this.yamaghantaSphuta,
+    required this.bimbaSphuta,
+    required this.pakshantaraBimbaSphuta,
+    required this.yamaKantaka,
+    required this.kalaSphuta,
+    required this.ardhaPraharaSphuta,
+    required this.bhutodaya,
+    required this.arudhaSphuta,
+    required this.vithiSphuta,
+    required this.chattraSphuta,
+    required this.lagnaRaviYoga,
+    required this.sannidhyaSphuta,
+    required this.chaitanyaSphuta,
+    required this.chalanaSphuta,
+    required this.karanaSphuta,
+    required this.prasadaSphuta,
+    required this.pakshantaraPrasadaSphuta,
+    required this.anganaSphuta,
+    required this.mukhaMandapaSphuta,
+    required this.deepaSphuta,
+    required this.acharyaSphuta,
+    required this.pakshantaraAcharyaSphuta,
+    required this.devalakaSphuta,
+    required this.dhvajaSphuta,
+    required this.bimbaSphutaDevaprasna,
+    required this.vithiRasi,
+    required this.chattraSphutaClassical,
+    required this.beejaSphutaJeeva,
+    required this.beejaSphutaKshetra,
+    required this.dinaSaptaBhaga,
+    required this.dinaAshtaBhaga,
+    required this.dinaAshtaBhagaPhala,
+    required this.tamboolaGraha,
+    required this.tamboolaLagna,
+    required this.santanaTithiPanchagga,
+    required this.santanaTithiChandra,
+    required this.santanaTithiRavindu,
+    // Additional Prashna Marga
+    required this.dehaPranaMrityuTulane,
+    required this.digitPastAnalysis,
+    required this.digitPresentAnalysis,
+    required this.digitFutureAnalysis,
+    required this.navagrahaFromNumber,
+    required this.panchabhutaFromNumber,
+    required this.kalaHora,
+    required this.arudhaAvastha,
+    required this.sprashtangaDosha,
+    required this.trisphutaDashas,
+    required this.trisphutaNakshatra,
+    required this.trisphutaDashaBalance,
+    required this.prashnaDoshas,
+  });
+}
+
+class AshtamangalaCalculator {
+  // ೧ ರಿಂದ ೮ ಅಷ್ಟಮಂಗಲ ಗ್ರಹಗಳು (Prashna Marga) — index 0..7 → digit 1..8
+  static const List<String> _grahas = [
+    'ರವಿ', 'ಕುಜ', 'ಗುರು', 'ಬುಧ', 'ಶುಕ್ರ', 'ಶನಿ', 'ಚಂದ್ರ', 'ರಾಹು',
+  ];
+
+  // ೧ ರಿಂದ ೮ ಅಷ್ಟಮಂಗಲ ಯೋನಿಗಳು
+  static const List<String> _yonis = [
+    'ಧ್ವಜ', 'ಧೂಮ', 'ಸಿಂಹ', 'ಶ್ವಾನ', 'ವೃಷಭ', 'ಖರ', 'ಗಜ', 'ಧ್ವಾಂಕ್ಷ',
+  ];
+
+  // ೧ ರಿಂದ ೮ ಅಷ್ಟಮಂಗಲ ಜಂತುಗಳು
+  static const List<String> _jantus = [
+    'ಗರುಡ', 'ಮಾರ್ಜಾರ', 'ಸಿಂಹ', 'ಶ್ವಾನ', 'ಸರ್ಪ', 'ಮೂಷಿಕ', 'ಗಜ', 'ವಾಯಸ',
+  ];
+
+  // ೧ ರಿಂದ ೮ ಅಷ್ಟಮಂಗಲ ಪಂಚಭೂತಗಳು
+  static const List<String> _panchabhutas = [
+    'ಅಗ್ನಿ', 'ಅಗ್ನಿ', 'ಪೃಥ್ವೀ', 'ವಾಯು', 'ಜಲ', 'ವಾಯು', 'ಜಲ', 'ಆಕಾಶ',
+  ];
+
+  // ೧೫ ತಿಥಿಗಳು (ಶುಕ್ಲ/ಕೃಷ್ಣ ಎರಡರಲ್ಲೂ ಬಳಕೆ)
+  static const List<String> _tithiNames = [
+    'ಪಾಡ್ಯಮಿ', 'ದ್ವಿತೀಯಾ', 'ತೃತೀಯಾ', 'ಚತುರ್ಥೀ', 'ಪಂಚಮೀ',
+    'ಷಷ್ಠೀ', 'ಸಪ್ತಮೀ', 'ಅಷ್ಟಮೀ', 'ನವಮೀ', 'ದಶಮೀ',
+    'ಏಕಾದಶೀ', 'ದ್ವಾದಶೀ', 'ತ್ರಯೋದಶೀ', 'ಚತುರ್ದಶೀ', 'ಹುಣ್ಣಿಮೆ'
+  ];
+
+  // ೧೨ ಚಂದ್ರ ಅವಸ್ಥೆಗಳು (Phaladeepika Ch. 4)
+  static const List<String> _chandraAvasthas = [
+    'ಪ್ರವಾಸ',
+    'ರಾಜಸನ್ಮಾನ',
+    'ದಾಸತ್ವದಿಂದ ಪ್ರಾಣರಕ್ಷಿಸಿಕೊಂಡವನು',
+    'ರಾಜ್ಯಭಾರ ಲಕ್ಷಣ',
+    'ಕುಲಾಚಾರ ನಿಷ್ಠ',
+    'ರೋಗಪೀಡಿತ',
+    'ರಾಜಸಭಾಸ್ಥ',
+    'ಭಯ-ಆತಂಕ',
+    'ಶರೀರ ಬಾಧೆ',
+    'ವಿವಾಹ-ಸಂಯೋಗ',
+    'ಸುಖಶಯನ',
+    'ಮೃಷ್ಟಾನ್ನ ಭೋಜನ'
+  ];
+
+  // ೩೬ ಚಂದ್ರ ವೇಲೆಗಳು (Phaladeepika Ch. 4)
+  static const List<String> _chandraVelas = [
+    'ಶಿರೋವೇದನೆ',
+    'ಆನಂದ-ಪ್ರಮೋದ',
+    'ಯಾಗ-ಪೂಜೆ',
+    'ಸುಖವಾಸ',
+    'ನೇತ್ರರೋಗ',
+    'ಸಂತೋಷ',
+    'ಸ್ತ್ರೀಕ್ರೀಡಾರತ',
+    'ತೀವ್ರ ಜ್ವರ',
+    'ಸ್ವರ್ಣಾಭರಣ ಧಾರಣೆ',
+    'ಅಶ್ರುಪಾತ',
+    'ವಿಷಭಕ್ಷಣ ಭೀತಿ',
+    'ಸಂಭೋಗ',
+    'ಉದರಶೂಲೆ',
+    'ಜಲಕ್ರೀಡೆ',
+    'ಹಾಸ್ಯಶೀಲ',
+    'ಚಿತ್ರಲೇಖನ-ಕಲೆ',
+    'ಮಧುಪಾನ',
+    'ಮಿಷ್ಟಾನ್ನ ಭೋಜನ',
+    'ರತ್ನಪರೀಕ್ಷೆ',
+    'ನಿದ್ರಾ-ವಿಶ್ರಾಂತಿ',
+    'ಶಾಸ್ತ್ರಾಧ್ಯಯನ',
+    'ವಸ್ತ್ರಲಾಭ',
+    'ದ್ಯೂತಕ್ರೀಡೆ',
+    'ರಣ-ಯುದ್ಧ',
+    'ದೇವತಾರಾಧನೆ',
+    'ಔಷಧ ಸೇವನೆ',
+    'ಸಂಗೀತ-ನೃತ್ಯ',
+    'ವಾಹನಾರೋಹಣ',
+    'ದೇಹಕ್ಕೆ ಗಾಯ',
+    'ಧನಲಾಭ',
+    'ಬಂಧುಸಮಾಗಮ',
+    'ದೇಶಾಟನ',
+    'ಬಂಧನ ಭೀತಿ',
+    'ಕಲಹ',
+    'ರಾಜದರ್ಶನ',
+    'ಪರಮಾನಂದ-ಉತ್ಸಾಹ'
+  ];
+
+  // ೬೦ ಚಂದ್ರ ಕ್ರಿಯೆಗಳು (Phaladeepika Ch. 4 / Prashna Marga)
+  static const List<String> _chandraKriyas = [
+    'ಸ್ಥಾನಭ್ರಂಶ',
+    'ತಪೋವೃತ್ತಿ',
+    'ಪರಸ್ತ್ರೀ ರತಿ',
+    'ತಸ್ಕರತ್ವ',
+    'ಗಜಾರೋಹಣ',
+    'ಸಿಂಹಾಸನಸ್ಥಿತಿ',
+    'ರಾಜಯೋಗ',
+    'ಶತ್ರುಜಯ',
+    'ದಂಡನಾಥತ್ವ',
+    'ಗುಣವಂತಿಕೆ',
+    'ನಿಷ್ಪ್ರಾಣತ್ವ',
+    'ತಲೆಗೆ ಗಾಯವಾದವನು',
+    'ಕರಚರಣ ಕ್ಷತಿ',
+    'ಬಂಧನ ಸ್ಥಿತಿ',
+    'ವಿನಾಶ',
+    'ರಾಜತ್ವ',
+    'ವೇದಾಧ್ಯಯನ',
+    'ನಿದ್ರಾ',
+    'ಸುಚರಿತ ಸ್ಮರಣೆ',
+    'ಧರ್ಮ ಕರ್ತೃತ್ವ',
+    'ಸದ್ವಂಶತ್ವ',
+    'ನಿಧಿ ಲಬ್ಧಿ',
+    'ತೋಲನ ಪ್ರವೃತ್ತಿ',
+    'ವ್ಯಾಖ್ಯಾನ ವೃತ್ತಿ',
+    'ಶತ್ರು ಹನನ',
+    'ರೋಗ',
+    'ಶತ್ರು ಪರಾಜಯ',
+    'ಪ್ರವಾಸ',
+    'ದಾಸ್ಯ (ಸೇವಕ ವೃತ್ತಿ)',
+    'ಅರ್ಥನಾಶ',
+    'ಆಸ್ಥಾನ ಸ್ಥಿತಿ',
+    'ಸ್ವಮಂತ್ರಿತ್ವ',
+    'ಅನ್ಯಭೂಮಿ ಸಂಚಾರ',
+    'ಸಭಾರ್ಯತ್ವ',
+    'ಗಜಭಯ',
+    'ಯುದ್ಧಭಯ',
+    'ಅತಿಭಯ',
+    'ಲೀನತ್ವ',
+    'ಅನ್ನದಾತೃತ್ವ',
+    'ಅಗ್ನಿ ಸಂಗಮ',
+    'ಕ್ಷುತ್ಪೀಡಿತ',
+    'ಭಕ್ಷಣ',
+    'ಸಂಚಾರ',
+    'ಮಾಂಸ ಭೋಜನ',
+    'ಶಸ್ತ್ರಕ್ಷತಿ',
+    'ವಿವಾಹ ಯೋಗ',
+    'ಕಂದುಕ ಕ್ರೀಡೆ',
+    'ದ್ಯೂತ ಕ್ರೀಡೆ',
+    'ರಾಜತ್ವ',
+    'ದುಃಖಿತತ್ವ',
+    'ಶಯನ ಸ್ಥಿತಿ',
+    'ಶತ್ರು ಸೇವಿತತ್ವ',
+    'ಬಂಧು ಯೋಗ',
+    'ಧ್ಯಾನ',
+    'ಸಭಾರ್ಯತ್ವ',
+    'ಮೃಷ್ಟಾನ್ನ ಭೋಜನ',
+    'ಕ್ಷೀರಪಾನ',
+    'ಸುಕೃತ ಕರ್ಮ',
+    'ಸ್ವಸ್ಥತೆ',
+    'ಸುಖ ಸ್ಥಿತಿ'
+  ];
+
+  // ರಾಶಿ ಅಧಿಪತಿಗಳು (0=ಮೇಷ .. 11=ಮೀನ)
+  static const List<String> _rashiLords = [
+    'ಕುಜ', 'ಶುಕ್ರ', 'ಬುಧ', 'ಚಂದ್ರ', 'ರವಿ', 'ಬುಧ',
+    'ಶುಕ್ರ', 'ಕುಜ', 'ಗುರು', 'ಶನಿ', 'ಶನಿ', 'ಗುರು'
+  ];
+
+  // ನೈಸರ್ಗಿಕ ಮಿತ್ರರು (class-level for performance)
+  static const Map<String, List<String>> _naturalFriends = {
+    'ರವಿ': ['ಚಂದ್ರ', 'ಕುಜ', 'ಗುರು'],
+    'ಚಂದ್ರ': ['ರವಿ', 'ಬುಧ'],
+    'ಕುಜ': ['ರವಿ', 'ಚಂದ್ರ', 'ಗುರು'],
+    'ಬುಧ': ['ರವಿ', 'ಶುಕ್ರ'],
+    'ಗುರು': ['ರವಿ', 'ಚಂದ್ರ', 'ಕುಜ'],
+    'ಶುಕ್ರ': ['ಬುಧ', 'ಶನಿ'],
+    'ಶನಿ': ['ಬುಧ', 'ಶುಕ್ರ'],
+  };
+
+  // ನೈಸರ್ಗಿಕ ಶತ್ರುಗಳು
+  static const Map<String, List<String>> _naturalEnemies = {
+    'ರವಿ': ['ಶುಕ್ರ', 'ಶನಿ'],
+    'ಚಂದ್ರ': [],
+    'ಕುಜ': ['ಬುಧ'],
+    'ಬುಧ': ['ಚಂದ್ರ'],
+    'ಗುರು': ['ಬುಧ', 'ಶುಕ್ರ'],
+    'ಶುಕ್ರ': ['ರವಿ', 'ಚಂದ್ರ'],
+    'ಶನಿ': ['ರವಿ', 'ಚಂದ್ರ', 'ಕುಜ'],
+  };
+
+  // ದಿನ ಸಪ್ತ ಭಾಗ ಫಲಗಳು (7 segments of the day)
+  static const List<String> _saptaBhagaPhala = [
+    'ಸೌಖ್ಯ', 'ಲಾಭ', 'ಹಾನಿ', 'ಕಲಹ', 'ಶುಭ', 'ರೋಗ', 'ಮೃತ್ಯು'
+  ];
+
+  // ದಿನಾಷ್ಟ ಭಾಗ ಫಲಗಳು (8 segments of the day, mapped to planets)
+  static const List<String> _ashtaBhagaPlanets = [
+    'ರವಿ', 'ಚಂದ್ರ', 'ಕುಜ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ', 'ರಾಹು'
+  ];
+
+  // ದಿನಾಷ್ಟ ಭಾಗ ಫಲ (result for each planet)
+  static const List<String> _ashtaBhagaPhala = [
+    'ಉತ್ತರುಂ', 'ಸೌಖ್ಯ', 'ರೋಗ', 'ಲಾಭ', 'ಶುಭ', 'ಸುಖ', 'ಹಾನಿ', 'ಮೃತ್ಯು'
+  ];
+
+  /// Sign-Deg-Min-Sec format: "SS-DD-MM-SS"
+  /// Fixed: seconds now properly cascade instead of overflowing to 60
+  static String formatRasiDMS(double totalDeg) {
+    final norm = (totalDeg % 360 + 360) % 360;
+    final sign = (norm / 30).floor();
+    final remDeg = norm - sign * 30;
+    int deg = remDeg.floor();
+    double fracMin = (remDeg - deg) * 60;
+    int min = fracMin.floor();
+    int sec = ((fracMin - min) * 60).round();
+
+    // Cascade overflow: 60 sec → +1 min, 60 min → +1 deg
+    if (sec >= 60) {
+      sec -= 60;
+      min++;
+    }
+    if (min >= 60) {
+      min -= 60;
+      deg++;
+    }
+
+    return '${sign.toString().padLeft(2, '0')}-'
+           '${deg.toString().padLeft(2, '0')}-'
+           '${min.toString().padLeft(2, '0')}-'
+           '${sec.toString().padLeft(2, '0')}';
+  }
+
+  /// Normalize degrees to 0..360
+  static double _norm(double d) => ((d % 360) + 360) % 360;
+
+  /// Map any digit to 1-8 range (0→8, 9→1, per cyclic Ashtamangala tradition)
+  static int _normalizeDigit(int d) {
+    if (d == 0) return 8; // 0 maps to ರಾಹು (8)
+    if (d == 9) return 1; // 9 maps to ರವಿ (1)
+    return d;             // 1-8 as-is
+  }
+
+  /// Modality: 0 = Chara (ಚರ), 1 = Sthira (ಸ್ಥಿರ), 2 = Dwiswabhava (ದ್ವಿಸ್ವಭಾವ)
+  /// ಮೇಷ(0)=ಚರ, ವೃಷಭ(1)=ಸ್ಥಿರ, ಮಿಥುನ(2)=ದ್ವಿ, ಕರ್ಕ(3)=ಚರ, ...
+  static int _getModality(int rashiIdx) => rashiIdx % 3;
+
+  /// Evaluate modality pair → ಜೀವ / ರೋಗ / ಮೃತ್ಯು (Prashna Marga)
+  static String _evaluateModalityPair(int m1, int m2) {
+    // Sort so we only need to check unique unordered pairs
+    final a = m1 <= m2 ? m1 : m2;
+    final b = m1 <= m2 ? m2 : m1;
+
+    // (a, b) unordered pairs:
+    // (0,0) Chara+Chara = ಜೀವ
+    // (1,2) Sthira+Dwi  = ಜೀವ
+    if ((a == 0 && b == 0) || (a == 1 && b == 2)) return 'ಜೀವ';
+
+    // (1,1) Sthira+Sthira = ಮೃತ್ಯು
+    // (0,2) Chara+Dwi     = ಮೃತ್ಯು
+    if ((a == 1 && b == 1) || (a == 0 && b == 2)) return 'ಮೃತ್ಯು';
+
+    // (0,1) Chara+Sthira  = ರೋಗ
+    // (2,2) Dwi+Dwi       = ರೋಗ
+    return 'ರೋಗ';
+  }
+
+  /// Evaluate planetary friendship → ಜೀವ / ರೋಗ / ಮೃತ್ಯು
+  static String _evaluatePlanetaryRelation(String p1, String p2) {
+    if (p1 == p2) return 'ಜೀವ'; // Same lord = best friends
+
+    final isFriend = (_naturalFriends[p1]?.contains(p2) ?? false) ||
+                     (_naturalFriends[p2]?.contains(p1) ?? false);
+    if (isFriend) return 'ಜೀವ';
+
+    final isEnemy = (_naturalEnemies[p1]?.contains(p2) ?? false) ||
+                    (_naturalEnemies[p2]?.contains(p1) ?? false);
+    if (isEnemy) return 'ಮೃತ್ಯು';
+
+    return 'ರೋಗ'; // Neutral
+  }
+
+  /// ಭೂತೋದಯ: Determine the rising Pancha Bhuta based on Lagna longitude
+  /// Per Prashna Marga Ch.16 - each 30 degree sign divided into 5 x 6 degree blocks.
+  /// Odd signs (Oja): forward  ಪೃಥ್ವಿ -> ಜಲ -> ತೇಜಸ್ (ಅಗ್ನಿ) -> ವಾಯು -> ಆಕಾಶ
+  /// Even signs (Yugma): reverse ಆಕಾಶ -> ವಾಯು -> ತೇಜಸ್ (ಅಗ್ನಿ) -> ಜಲ -> ಪೃಥ್ವಿ
+  static String _getBhutodaya(double lagnaLong) {
+    final rashi = (lagnaLong / 30).floor() % 12;
+    final degInSign = lagnaLong % 30; // 0..30
+    final blockIdx = (degInSign / 6).floor().clamp(0, 4); // 0..4
+    // Odd rashi index (0-based): 0=Mesha,2=Mithuna,4=Simha,6=Tula,8=Dhanu,10=Kumbha
+    final isOdd = rashi % 2 == 0;
+    // Forward: Prithvi(0) Jala(1) Tejas(2) Vayu(3) Akasha(4)
+    // Reverse: Akasha(0) Vayu(1) Tejas(2) Jala(3) Prithvi(4)
+    const bhutas = ['ಪೃಥ್ವಿ', 'ಜಲ', 'ತೇಜಸ್ (ಅಗ್ನಿ)', 'ವಾಯು', 'ಆಕಾಶ'];
+    final idx = isOdd ? blockIdx : (4 - blockIdx);
+    return bhutas[idx];
+  }
+
+  /// ತಾಂಬೂಲ ಗ್ರಹದ ರೇಖಾಂಶ (Longitude of Tamboola Graha planet)
+  /// Maps remainder (0-6) to planet name and returns its longitude from KundaliResult.
+  /// Remainder: 0=Shani, 1=Ravi, 2=Chandra, 3=Kuja, 4=Budha, 5=Guru, 6=Shukra
+  static double? _getTamboolaGrahaLongitude(int remainder, KundaliResult result) {
+    const planetMap = {
+      0: 'ಶನಿ',    // Saturn
+      1: 'ರವಿ',    // Sun
+      2: 'ಚಂದ್ರ', // Moon
+      3: 'ಕುಜ',    // Mars
+      4: 'ಬುಧ',    // Mercury
+      5: 'ಗುರು',   // Jupiter
+      6: 'ಶುಕ್ರ', // Venus
+    };
+    final pName = planetMap[remainder];
+    if (pName == null) return null;
+    return result.planets[pName]?.longitude;
+  }
+
+  /// ಪ್ರಧಾನ ಲೆಕ್ಕಾಚಾರ
+  static AshtamangalaDetails calculate({
+    required KundaliResult result,
+    required String ashtamangalaNumber,
+    required DateTime queryDateTime,
+    int? svarnaroodhaRashi,
+    int? sprashtangaNum,
+    int? prucchakaNakshatraIdx,
+    int? tamboolaNumber,
+  }) {
+    // ═══ ೧. ಅಷ್ಟಮಂಗಲ ಸಂಖ್ಯೆ ವಿಶ್ಲೇಷಣೆ ═══
+    final numStr = ashtamangalaNumber.trim();
+    int fullNum = int.tryParse(numStr) ?? 327;
+    if (fullNum <= 0) fullNum = 327;
+
+    // Extract and normalize digits (handles 0 and 9 gracefully)
+    final allDigits = <int>[];
+    for (int i = 0; i < numStr.length; i++) {
+      final d = int.tryParse(numStr[i]);
+      if (d != null) {
+        allDigits.add(_normalizeDigit(d));
+      }
+    }
+
+    // Ensure at least 3 digits
+    List<int> digits;
+    if (allDigits.isEmpty) {
+      digits = [3, 2, 7];
+    } else if (allDigits.length == 1) {
+      digits = [allDigits[0], allDigits[0], allDigits[0]];
+    } else if (allDigits.length == 2) {
+      digits = [allDigits[0], allDigits[1], allDigits[1]];
+    } else {
+      digits = allDigits.sublist(0, 3);
+    }
+
+    final d1 = digits[0];
+    final d2 = digits[1];
+    final d3 = digits[2];
+
+    // Digit-based lookups (index = digit - 1)
+    final grahaStr = '${_grahas[d1 - 1]}-${_grahas[d2 - 1]}-${_grahas[d3 - 1]}';
+    final yoniStr = '${_yonis[d1 - 1]}-${_yonis[d2 - 1]}-${_yonis[d3 - 1]}';
+    final jantuStr = '${_jantus[d1 - 1]}-${_jantus[d2 - 1]}-${_jantus[d3 - 1]}';
+    final bhutaStr = '${_panchabhutas[d1 - 1]}-${_panchabhutas[d2 - 1]}-${_panchabhutas[d3 - 1]}';
+
+    // ತಿಥಿ & ಪಕ್ಷ
+    int tRem = fullNum % 30;
+    if (tRem == 0) tRem = 30;
+    final isShukla = tRem <= 15;
+    final pakshaStr = isShukla ? 'ಶುಕ್ಲ ಪಕ್ಷ' : 'ಕೃಷ್ಣ ಪಕ್ಷ';
+    final tIdx = isShukla ? (tRem - 1) : (tRem - 16);
+    final tithiStr = (tIdx >= 0 && tIdx < _tithiNames.length)
+        ? (!isShukla && tIdx == 14 ? 'ಅಮಾವಾಸ್ಯೆ' : _tithiNames[tIdx])
+        : 'ಪಾಡ್ಯಮಿ';
+
+    // ನಕ್ಷತ್ರ
+    int nakRem = fullNum % 27;
+    if (nakRem == 0) nakRem = 27;
+    final nakStr = knNak[nakRem - 1];
+
+    // ವಾರ
+    int vRem = fullNum % 7;
+    if (vRem == 0) vRem = 7;
+    final varaStr = knVara[vRem - 1];
+
+    // ರಾಶಿ
+    int rRem = fullNum % 12;
+    if (rRem == 0) rRem = 12;
+    final rashiStr = knRashi[rRem - 1];
+
+    // ═══ ೨. ಧೂಮಾದಿ ಪಂಚಸ್ಫುಟ ═══
+    final sunLong = result.planets['ರವಿ']?.longitude ?? 0.0;
+    final dhoomaDeg = _norm(sunLong + 133.333333);
+    final vyatipataDeg = _norm(360 - dhoomaDeg);
+    final pariveshaDeg = _norm(vyatipataDeg + 180);
+    final indrachapaDeg = _norm(360 - pariveshaDeg);
+    final upaketuDeg = _norm(indrachapaDeg + 16.666667);
+
+    final dhoomaStr = formatRasiDMS(dhoomaDeg);
+    final vyatipataStr = formatRasiDMS(vyatipataDeg);
+    final pariveshaStr = formatRasiDMS(pariveshaDeg);
+    final indrachapaStr = formatRasiDMS(indrachapaDeg);
+    final upaketuStr = formatRasiDMS(upaketuDeg);
+
+    // ═══ ೩. ಚಂದ್ರ ಕ್ರಿಯಾ, ಅವಸ್ಥಾ, ವೇಲಾ ═══
+    final moonLong = result.planets['ಚಂದ್ರ']?.longitude ?? 0.0;
+    final nakSpan = 360.0 / 27.0; // 13.333... degrees = 800 arcminutes
+    final elapsedDegInNak = moonLong % nakSpan;
+    final elapsedMins = elapsedDegInNak * 60.0; // 0 to ~800
+
+    // ಚಂದ್ರ ಕ್ರಿಯಾ (60 divisions of 800 arcmin)
+    final kriyaIdx = (elapsedMins / (800.0 / 60.0)).floor().clamp(0, 59);
+    final kriyaStr = '${kriyaIdx + 1}. ${_chandraKriyas[kriyaIdx]}';
+
+    // ಚಂದ್ರ ಅವಸ್ಥಾ (12 divisions of 800 arcmin)
+    final avasthaIdx = (elapsedMins / (800.0 / 12.0)).floor().clamp(0, 11);
+    final avasthaStr = '${avasthaIdx + 1}. ${_chandraAvasthas[avasthaIdx]}';
+
+    // ಚಂದ್ರ ವೇಲಾ (36 divisions of 800 arcmin)
+    final velaIdx = (elapsedMins / (800.0 / 36.0)).floor().clamp(0, 35);
+    final velaStr = '${velaIdx + 1}. ${_chandraVelas[velaIdx]}';
+
+    // ═══ ೪. ಪಂಚಸೂತ್ರ ಲೆಕ್ಕಾಚಾರ (Prashna Marga) ═══
+    final lagnaLong = result.planets['ಲಗ್ನ']?.longitude ?? 0.0;
+    final lagnaRashi = (lagnaLong / 30).floor() % 12;
+    final aroodhaRashi = svarnaroodhaRashi ?? ((rRem - 1) % 12);
+
+    // A. ಸಾಮಾನ್ಯ ಸೂತ್ರ - ಪೃಥ್ವೀ (Arudha & Lagna rashi modality)
+    final samanyaSutraStr = _evaluateModalityPair(
+      _getModality(aroodhaRashi),
+      _getModality(lagnaRashi),
+    );
+
+    // B. ಅಧಿಪ ಸೂತ್ರ - ಜಲ (Lords of Arudha & Lagna)
+    final lordArudha = _rashiLords[aroodhaRashi];
+    final lordLagna = _rashiLords[lagnaRashi];
+    final adhipaSutraStr = _evaluatePlanetaryRelation(lordArudha, lordLagna);
+
+    // C. ಅಂಶ ಸೂತ್ರ - ಅಗ್ನಿ (Navamsha of Lagna & Arudha)
+    // Lagna navamsha: from actual lagna longitude
+    final lagnaNavamsha = ((lagnaLong % 360) / (360.0 / 108.0)).floor() % 12;
+    // Arudha navamsha: use arudha rashi start + lagna's degree-within-sign as proxy
+    final arudhaDeg = aroodhaRashi * 30.0 + (lagnaLong % 30.0);
+    final arudhaNavamsha = ((arudhaDeg % 360) / (360.0 / 108.0)).floor() % 12;
+    final amshaSutraStr = _evaluateModalityPair(
+      _getModality(arudhaNavamsha),
+      _getModality(lagnaNavamsha),
+    );
+
+    // D. ನಕ್ಷತ್ರ ಸೂತ್ರ - ವಾಯು (Count from Lagna Nakshatra to target Nakshatra % 3)
+    final lagnaNakIdx = (lagnaLong / nakSpan).floor() % 27;
+    final targetNakIdx = prucchakaNakshatraIdx ?? (moonLong / nakSpan).floor() % 27;
+    final dist = (targetNakIdx - lagnaNakIdx + 27) % 27 + 1;
+    final nakRem3 = dist % 3;
+    final nakshatraSutraStr = (nakRem3 == 1) ? 'ಜೀವ' : (nakRem3 == 2 ? 'ರೋಗ' : 'ಮೃತ್ಯು');
+
+    // E. ಮಹಾ ಸೂತ್ರ - ಆಕಾಶ (Arudha Rashi & 10th from Arudha: Lunar/Solar classification)
+    // Prasna Marga Ch.6: Lunar signs = {0,1,2,3,8,9,11}, Solar signs = {4,5,6,7,10}
+    final tenthFromArudha = (aroodhaRashi + 9) % 12;
+    const lunarSigns = {0, 1, 2, 3, 8, 9, 11}; // ಮೇಷ,ವೃಷಭ,ಮಿಥುನ,ಕರ್ಕ,ಧನು,ಮಕರ,ಮೀನ
+    final isArudhaLunar = lunarSigns.contains(aroodhaRashi);
+    final isTenthLunar = lunarSigns.contains(tenthFromArudha);
+
+    String mahaSutraStr;
+    if (isArudhaLunar && isTenthLunar) {
+      mahaSutraStr = 'ಜೀವ';   // Both Lunar = Jeeva
+    } else if (!isArudhaLunar && !isTenthLunar) {
+      mahaSutraStr = 'ಮೃತ್ಯು'; // Both Solar = Mrityu
+    } else {
+      mahaSutraStr = 'ರೋಗ';   // Mixed = Roga
+    }
+
+    // ═══ ೫. ತ್ರಿಸ್ಫುಟಾದಿ ಗಣಿತ (from advSphutas, already computed in calculator.dart) ═══
+    final advS = result.advSphutas;
+    final trisphutatStr = formatRasiDMS(advS['ತ್ರಿಸ್ಫುಟ'] ?? 0);
+    final chatusphutatStr = formatRasiDMS(advS['ಚತುಃಸ್ಫುಟ'] ?? 0);
+    final panchasphutatStr = formatRasiDMS(advS['ಪಂಚಸ್ಫುಟ'] ?? 0);
+    final pranaStr = formatRasiDMS(advS['ಪ್ರಾಣ'] ?? 0);
+    final dehaStr = formatRasiDMS(advS['ದೇಹ'] ?? 0);
+    final mrityuStr = formatRasiDMS(advS['ಮೃತ್ಯು'] ?? 0);
+    final sookshmaTriStr = formatRasiDMS(advS['ಸೂಕ್ಷ್ಮ ತ್ರಿ.'] ?? 0);
+    final rudraStr = formatRasiDMS(advS['ರುದ್ರ'] ?? 0);
+    final maheswaraStr = formatRasiDMS(advS['ಮಹೇಶ್ವರ'] ?? 0);
+    final brahmaStr = formatRasiDMS(advS['ಬ್ರಹ್ಮ'] ?? 0);
+    final vishnuStr = formatRasiDMS(advS['ವಿಷ್ಣು'] ?? 0);
+    final yamaghantaStr = formatRasiDMS(advS['ಯಮಘಂಟ'] ?? 0);
+
+    // ═══ ೬. ವಿಶೇಷ ಪ್ರಶ್ನೆ ಸ್ಫುಟಗಳು (Devaprasna / Prashna Marga) ═══
+    final S = sunLong;
+    final M = moonLong;
+    final L = lagnaLong;
+    final J = result.planets['ಗುರು']?.longitude ?? 0.0;
+    final V = result.planets['ಶುಕ್ರ']?.longitude ?? 0.0;
+    final Ma = result.planets['ಕುಜ']?.longitude ?? 0.0;
+    final Sa = result.planets['ಶನಿ']?.longitude ?? 0.0;
+    final Md = result.planets['ಮಾಂದಿ']?.longitude ?? 0.0;
+    final Me = result.planets['ಬುಧ']?.longitude ?? 0.0;
+
+    // Bhava cusps (0-indexed: bhavas[0]=1st house, bhavas[3]=4th, etc.)
+    final bhavas = result.bhavas;
+    final bhava4 = bhavas.length > 3 ? bhavas[3] : L; // 4th cusp
+    final bhava7 = bhavas.length > 6 ? bhavas[6] : _norm(L + 180); // 7th cusp
+    final bhava9 = bhavas.length > 8 ? bhavas[8] : _norm(L + 240); // 9th cusp
+    final bhava10 = bhavas.length > 9 ? bhavas[9] : _norm(L + 270); // 10th cusp
+
+    // ಬಿಂಬ ಸ್ಫುಟ — Simplified (Trisphuta-based): L + M + Md
+    final bimbaDeg = _norm(L + M + Md);
+    final bimbaSphutaStr = formatRasiDMS(bimbaDeg);
+
+    // ಬಿಂಬ ಸ್ಫುಟ — Devaprasna (5-factor): Jupiter + Lagna + Lord1 + Lord5 + Lord8
+    final lord1Name = _rashiLords[lagnaRashi];
+    final rashi5 = (lagnaRashi + 4) % 12;
+    final rashi8 = (lagnaRashi + 7) % 12;
+    final lord5Name = _rashiLords[rashi5];
+    final lord8Name = _rashiLords[rashi8];
+    final lord1Long = result.planets[lord1Name]?.longitude ?? 0.0;
+    final lord5Long = result.planets[lord5Name]?.longitude ?? 0.0;
+    final lord8Long = result.planets[lord8Name]?.longitude ?? 0.0;
+    final bimbaDevaprasnaDeg = _norm(J + L + lord1Long + lord5Long + lord8Long);
+    final bimbaDevaprasnaStr = formatRasiDMS(bimbaDevaprasnaDeg);
+
+    // ಪಕ್ಷಾಂತರ ಬಿಂಬ ಸ್ಫುಟ (Paksha correction)
+    final pakshantaraBimbaDeg = isShukla ? _norm(bimbaDeg + S) : _norm(bimbaDeg + M);
+    final pakshantaraBimbaSphutaStr = formatRasiDMS(pakshantaraBimbaDeg);
+
+    // ಯಮ ಕಂಟಕ = L + J (Jupiter's segment point)
+    final yamaKantakaStr = formatRasiDMS(_norm(L + J));
+
+    // ಕಾಲ ಸ್ಫುಟ = L + S + Md (Time destruction point)
+    final kalaSphutaStr = formatRasiDMS(_norm(L + S + Md));
+
+    // ಅರ್ಧ ಪ್ರಹಾರ ಸ್ಫುಟ = L + Me + Md (Mercury's segment upagraha, Prashna Marga)
+    final ardhaPraharaStr = formatRasiDMS(_norm(L + Me + Md));
+
+    // ಭೂತೋದಯ = rising Pancha Bhuta per PM Ch.16 (6deg blocks, odd/even sign)
+    final bhutodayaStr = _getBhutodaya(lagnaLong);
+
+    // ಆರೂಢ ಸ್ಫುಟ = Arudha rashi + Lagna's degree-within-sign
+    final arudhaSphutaDeg = _norm(aroodhaRashi * 30.0 + (L % 30.0));
+    final arudhaSphutaStr = formatRasiDMS(arudhaSphutaDeg);
+
+    // ವೀಥಿ ಸ್ಫುಟ = M + Md (Path point — modern/simplified method)
+    final vithiSphutaStr = formatRasiDMS(_norm(M + Md));
+
+    // ವೀಥಿ ರಾಶಿ — Classical Sun-based (Prashna Marga Ch. 8, Stanzas 47-50)
+    final sunRashi = (S / 30).floor() % 12;
+    int vithiRashiIdx;
+    if ([1, 2, 3, 4].contains(sunRashi)) {
+      vithiRashiIdx = 0; // ಮೇಷ (Sun in Vrishabha/Mithuna/Karka/Simha)
+    } else if ([7, 8, 9, 10].contains(sunRashi)) {
+      vithiRashiIdx = 2; // ಮಿಥುನ (Sun in Vrischika/Dhanu/Makara/Kumbha)
+    } else {
+      vithiRashiIdx = 1; // ವೃಷಭ (Sun in Kanya/Tula/Meena/Mesha)
+    }
+    final vithiRasiStr = knRashi[vithiRashiIdx];
+
+    // ಛತ್ರ ಸ್ಫುಟ — Modern: L + M + Md + S
+    final chattraSphutaStr = formatRasiDMS(_norm(L + M + Md + S));
+
+    // ಛತ್ರ ಸ್ಫುಟ — Classical (PM Ch.8): Count Arudha→Lagna, then from Vithi Rasi
+    final arudhaToLagnaCount = (lagnaRashi - aroodhaRashi + 12) % 12;
+    final chattraRashiIdx = (vithiRashiIdx + arudhaToLagnaCount) % 12;
+    final chattraDegClassical = _norm(chattraRashiIdx * 30.0 + (L % 30.0));
+    final chattraSphutaClassicalStr = formatRasiDMS(chattraDegClassical);
+
+    // ಲಗ್ನ ರವಿ ಯೋಗ = L + S
+    final lagnaRaviYogaStr = formatRasiDMS(_norm(L + S));
+
+    // ಸಾನ್ನಿಧ್ಯ ಸ್ಫುಟ = L + J + S (Divine presence)
+    final sannidhyaStr = formatRasiDMS(_norm(L + J + S));
+
+    // ಚೈತನ್ಯ ಸ್ಫುಟ = L + S + M + J (Consciousness)
+    final chaitanyaStr = formatRasiDMS(_norm(L + S + M + J));
+
+    // ಚಲನ ಸ್ಫುಟ = L + Ma + S (Motion)
+    final chalanaStr = formatRasiDMS(_norm(L + Ma + S));
+
+    // ಕಾರಣ ಸ್ಫುಟ = L + Sa + Md (Cause)
+    final karanaStr = formatRasiDMS(_norm(L + Sa + Md));
+
+    // ಪ್ರಾಸಾದ ಸ್ಫುಟ = L + Ma + Sa (Temple structure)
+    final prasadaDeg = _norm(L + Ma + Sa);
+    final prasadaStr = formatRasiDMS(prasadaDeg);
+
+    // ಪಕ್ಷಾಂತರ ಪ್ರಾಸಾದ ಸ್ಫುಟ
+    final pakshantaraPrasadaDeg = isShukla ? _norm(prasadaDeg + S) : _norm(prasadaDeg + M);
+    final pakshantaraPrasadaStr = formatRasiDMS(pakshantaraPrasadaDeg);
+
+    // ಆಂಗಣ ಸ್ಫುಟ = L + 4th cusp + Md (Courtyard)
+    final anganaStr = formatRasiDMS(_norm(L + bhava4 + Md));
+
+    // ಮುಖ ಮಂಡಪ ಸ್ಫುಟ = L + 7th cusp + M (Front hall)
+    final mukhaMandapaStr = formatRasiDMS(_norm(L + bhava7 + M));
+
+    // ದೀಪ ಸ್ಫುಟ = L + S + Md (Lamp = light)
+    final deepaStr = formatRasiDMS(_norm(L + S + Md));
+
+    // ಆಚಾರ್ಯ ಸ್ಫುಟ = L + J + 9th cusp (Priest/Guru)
+    final acharyaDeg = _norm(L + J + bhava9);
+    final acharyaStr = formatRasiDMS(acharyaDeg);
+
+    // ಪಕ್ಷಾಂತರ ಆಚಾರ್ಯ ಸ್ಫುಟ
+    final pakshantaraAcharyaDeg = isShukla ? _norm(acharyaDeg + S) : _norm(acharyaDeg + M);
+    final pakshantaraAcharyaStr = formatRasiDMS(pakshantaraAcharyaDeg);
+
+    // ದೇವಲಕ ಸ್ಫುಟ = L + Sa + M (Temple attendant)
+    final devalakaStr = formatRasiDMS(_norm(L + Sa + M));
+
+    // ಧ್ವಜ ಸ್ಫುಟ = L + 10th cusp + Ma (Flagstaff)
+    final dhvajaStr = formatRasiDMS(_norm(L + bhava10 + Ma));
+
+    // ═══ ೭. ಪಂಚಸೂತ್ರ ಹೆಚ್ಚುವರಿ ═══
+
+    // ಬೀಜ ಸ್ಫುಟ:ಜೀವಾಧಿಷ್ಠಿತ = S + V + J (Beeja/Seed)
+    final beejaSphutaJeevaStr = formatRasiDMS(advS['ಬೀಜ'] ?? _norm(S + V + J));
+
+    // ಬೀಜ ಸ್ಫುಟ:ಜೀವೇಂದು ಕ್ಷಿತಿಜ = M + Ma + J (Kshetra/Field)
+    final beejaSphutaKshetraStr = formatRasiDMS(advS['ಕ್ಷೇತ್ರ'] ?? _norm(M + Ma + J));
+
+    // ದಿನ ಸಪ್ತ ಭಾಗ: Day divided into 7 parts based on Vara
+    final varaIdx = (vRem - 1) % 7; // 0-based
+    final dinaSaptaStr = _saptaBhagaPhala[varaIdx];
+
+    // ದಿನ ಅಷ್ಟ ಭಾಗ: Day divided into 8 parts, planet of current segment
+    final ashtaIdx = (vRem - 1) % 8; // Use vara-based rotation
+    final dinaAshtaStr = _ashtaBhagaPlanets[ashtaIdx];
+
+    // ದಿನಾಷ್ಟ ಭಾಗ ಫಲ: Result for the ashta bhaga planet
+    final dinaAshtaPhalaStr = _ashtaBhagaPhala[ashtaIdx];
+
+    // ತಾಂಬೂಲ ಗ್ರಹ: Prashna Marga Pancheekarana Prakriya (Ch. 7)
+    // Formula: (T × 10 + 1) mod 7 → remainder maps to weekday-order planet
+    // Rem 1=Ravi, 2=Chandra, 3=Kuja, 4=Budha, 5=Guru, 6=Shukra, 0(7)=Shani
+    const _tamboolaGrahaNames = [
+      'ಶನಿ',    // 0 (remainder 7) — Saturn
+      'ರವಿ',    // 1 — Sun
+      'ಚಂದ್ರ', // 2 — Moon
+      'ಕುಜ',    // 3 — Mars
+      'ಬುಧ',    // 4 — Mercury
+      'ಗುರು',   // 5 — Jupiter
+      'ಶುಕ್ರ', // 6 — Venus
+    ];
+    String tamboolaStr;
+    String tamboolaLagnaStr = '';
+    if (tamboolaNumber != null && tamboolaNumber > 0) {
+      final tRemainder = ((tamboolaNumber * 10) + 1) % 7;
+      tamboolaStr = _tamboolaGrahaNames[tRemainder];
+      // Tamboola Lagna = Rashi where Tamboola Graha is placed at query time
+      final tamboolaGrahaLong = _getTamboolaGrahaLongitude(
+        tRemainder, result,
+      );
+      if (tamboolaGrahaLong != null) {
+        final tLagnaRashi = (tamboolaGrahaLong / 30).floor() % 12;
+        tamboolaLagnaStr = knRashi[tLagnaRashi];
+      }
+    } else {
+      // Fallback: use first digit of ashtamangala number
+      tamboolaStr = _grahas[(d1 - 1).clamp(0, 7)];
+    }
+
+    // ಸಂತಾನ ತಿಥಿಸ್ಫುಟ: three variants
+    // a. ಪಂಚಾಗ್ಗಶಿನ = (M - S) × 5 mod 360
+    final santanaPanchagga = formatRasiDMS(_norm((M - S) * 5));
+    // b. ಚಂದ್ರಸ್ಪತ್ಯಾ = M + V + J
+    final santanaChandra = formatRasiDMS(_norm(M + V + J));
+    // c. ರವೀಂದುಶುಕ್ರ = S + M + V
+    final santanaRavindu = formatRasiDMS(_norm(S + M + V));
+
+    // ═══ ೭ᵃ. ದೇಹ-ಪ್ರಾಣ-ಮೃತ್ಯು ತುಲನೆ (Prashna Marga Ch.5, St.17-23) ═══
+    final dehaDeg = advS['ದೇಹ'] ?? 0.0;
+    final pranaDeg = advS['ಪ್ರಾಣ'] ?? 0.0;
+    final mrityuDeg = advS['ಮೃತ್ಯು'] ?? 0.0;
+    String dehaPranaTulane;
+    if (dehaDeg >= pranaDeg && dehaDeg >= mrityuDeg) {
+      dehaPranaTulane = 'ದೇಹ ಪ್ರಬಲ — ಆರೋಗ್ಯ/ಚೇತರಿಕೆ ಸೂಚನೆ';
+    } else if (mrityuDeg >= dehaDeg && mrityuDeg >= pranaDeg) {
+      dehaPranaTulane = 'ಮೃತ್ಯು ಪ್ರಬಲ — ಅಪಾಯ/ಎಚ್ಚರಿಕೆ';
+    } else {
+      dehaPranaTulane = 'ಪ್ರಾಣ ಪ್ರಬಲ — ರೋಗ ಉಳಿಯುವ ಸೂಚನೆ';
+    }
+
+    // ═══ ೭ᵇ. ಅಂಕ ವಿಶ್ಲೇಷಣೆ: ಭೂತ-ವರ್ತಮಾನ-ಭವಿಷ್ಯ (PM Ch.7, St.1-2) ═══
+    // d1=hundreds=past, d2=tens=present, d3=units=future
+    // Each digit maps to a graha (1=Ravi..8=Rahu) with karakatva
+    const digitGrahaKarakatva = {
+      1: 'ರವಿ — ಅಧಿಕಾರ/ಪಿತೃ/ಆರೋಗ್ಯ',
+      2: 'ಕುಜ — ಭೂಮಿ/ಸೋದರ/ಶೌರ್ಯ',
+      3: 'ಗುರು — ಜ್ಞಾನ/ಸಂತಾನ/ಧರ್ಮ',
+      4: 'ಬುಧ — ವಿದ್ಯೆ/ವ್ಯಾಪಾರ/ವಾಕ್',
+      5: 'ಶುಕ್ರ — ಸುಖ/ಕಲೆ/ವಿವಾಹ',
+      6: 'ಶನಿ — ಕಷ್ಟ/ದೀರ್ಘರೋಗ/ಸೇವಕ',
+      7: 'ಚಂದ್ರ — ಮನಸ್ಸು/ಮಾತೃ/ಜಲ',
+      8: 'ರಾಹು — ವಿದೇಶ/ಭಯ/ವಿಷ',
+    };
+    final digitPast = digitGrahaKarakatva[d1] ?? '';
+    final digitPresent = digitGrahaKarakatva[d2] ?? '';
+    final digitFuture = digitGrahaKarakatva[d3] ?? '';
+
+    // ═══ ೭ᶜ. ಗ್ರಹ ÷ ೯ — ನವಗ್ರಹ (PM Ch.7, St.5) ═══
+    int nRem = fullNum % 9;
+    if (nRem == 0) nRem = 9;
+    const navagrahaNames = [
+      'ರವಿ', 'ಚಂದ್ರ', 'ಕುಜ', 'ಬುಧ', 'ಗುರು',
+      'ಶುಕ್ರ', 'ಶನಿ', 'ರಾಹು', 'ಕೇತು'
+    ];
+    final navagrahaStr = navagrahaNames[nRem - 1];
+
+    // ═══ ೭ᵈ. ಪಂಚಭೂತ ÷ ೫ (PM Ch.7, St.15) ═══
+    int bRem = fullNum % 5;
+    if (bRem == 0) bRem = 5;
+    const bhutaNames5 = ['ಅಗ್ನಿ', 'ಪೃಥ್ವಿ', 'ಆಕಾಶ', 'ವಾಯು', 'ಜಲ'];
+    final bhutaFromNumStr = bhutaNames5[bRem - 1];
+
+    // ═══ ೭ᵉ. ಕಾಲ ಹೋರಾ (PM Ch.4, St.30-35) ═══
+    // Hora order: Sun(0), Venus(1), Mercury(2), Moon(3), Saturn(4), Jupiter(5), Mars(6)
+    // First hora of each weekday: Sun=0, Mon=3, Tue=6, Wed=2, Thu=5, Fri=1, Sat=4
+    const weekdayHoraStart = [0, 3, 6, 2, 5, 1, 4]; // Sun=1..Sat=7 → index 0..6
+    const horaLords = ['ರವಿ', 'ಶುಕ್ರ', 'ಬುಧ', 'ಚಂದ್ರ', 'ಶನಿ', 'ಗುರು', 'ಕುಜ'];
+    // queryDateTime.weekday: 1=Mon..7=Sun → convert to 0=Sun..6=Sat
+    final wdIdx = queryDateTime.weekday == 7 ? 0 : queryDateTime.weekday;
+    // Hora number from sunrise (approximate: 6 AM as sunrise proxy)
+    final hoursSinceSunrise = (queryDateTime.hour - 6 + 24) % 24;
+    final horaNumber = hoursSinceSunrise; // Each hora ≈ 1 hour for simplicity
+    final horaIdx = (weekdayHoraStart[wdIdx] + horaNumber) % 7;
+    final kalaHoraStr = horaLords[horaIdx];
+
+    // ═══ ೭ᶠ. ಆರೂಢ ಅವಸ್ಥಾ (PM Ch.5, St.5-15) ═══
+    // Evaluate Arudha rashi lord's planetary state
+    final arudhaLord = _rashiLords[aroodhaRashi];
+    final arudhaLordLong = result.planets[arudhaLord]?.longitude ?? 0.0;
+    final arudhaLordRashi = (arudhaLordLong / 30).floor() % 12;
+
+    // Exaltation rashis (planet → rashi index)
+    const exaltRashi = {
+      'ರವಿ': 0,     // Mesha
+      'ಚಂದ್ರ': 1,  // Vrishabha
+      'ಕುಜ': 9,     // Makara
+      'ಬುಧ': 5,     // Kanya
+      'ಗುರು': 3,    // Karka
+      'ಶುಕ್ರ': 11,  // Meena
+      'ಶನಿ': 6,     // Tula
+    };
+    // Debilitation is 7th from exaltation
+    const debilRashi = {
+      'ರವಿ': 6,     // Tula
+      'ಚಂದ್ರ': 7,  // Vrischika
+      'ಕುಜ': 3,     // Karka
+      'ಬುಧ': 11,    // Meena
+      'ಗುರು': 9,    // Makara
+      'ಶುಕ್ರ': 5,   // Kanya
+      'ಶನಿ': 0,     // Mesha
+    };
+
+    // Own sign check
+    bool isOwnSign = false;
+    for (int ri = 0; ri < 12; ri++) {
+      if (_rashiLords[ri] == arudhaLord && ri == arudhaLordRashi) {
+        isOwnSign = true;
+        break;
+      }
+    }
+
+    // Combustion check (within ~6° of Sun for most planets)
+    final distFromSun = ((arudhaLordLong - S).abs() % 360);
+    final isCombust = arudhaLord != 'ರವಿ' && (distFromSun < 6.0 || distFromSun > 354.0);
+
+    // Retrograde check
+    final arudhaLordPlanet = result.planets[arudhaLord];
+    final isRetro = (arudhaLordPlanet?.speed ?? 0.0) < 0;
+
+    String arudhaAvasthaStr;
+    if (exaltRashi[arudhaLord] == arudhaLordRashi) {
+      arudhaAvasthaStr = 'ದೀಪ್ತ (ಉಚ್ಚ) — ಅತ್ಯುತ್ತಮ';
+    } else if (isOwnSign) {
+      arudhaAvasthaStr = 'ಸ್ವಸ್ಥ (ಸ್ವಕ್ಷೇತ್ರ) — ಶುಭ';
+    } else if (debilRashi[arudhaLord] == arudhaLordRashi) {
+      arudhaAvasthaStr = 'ದೀನ (ನೀಚ) — ಅಶುಭ';
+    } else if (isCombust) {
+      arudhaAvasthaStr = 'ವಿಕಲ (ಅಸ್ತ) — ಅಶುಭ';
+    } else if (isRetro) {
+      arudhaAvasthaStr = 'ಮುದಿತ (ವಕ್ರ) — ಮಿಶ್ರ';
+    } else {
+      // Check if in friend's/enemy's sign
+      final signLord = _rashiLords[arudhaLordRashi];
+      if (_naturalFriends[arudhaLord]?.contains(signLord) ?? false) {
+        arudhaAvasthaStr = 'ಶಾಂತ (ಮಿತ್ರಕ್ಷೇತ್ರ) — ಮಧ್ಯಮ';
+      } else if (_naturalEnemies[arudhaLord]?.contains(signLord) ?? false) {
+        arudhaAvasthaStr = 'ದುಃಖಿ (ಶತ್ರುಕ್ಷೇತ್ರ) — ಅಶುಭ';
+      } else {
+        arudhaAvasthaStr = 'ಶಾಂತ (ಸಮಕ್ಷೇತ್ರ) — ಸಾಮಾನ್ಯ';
+      }
+    }
+
+    // ═══ ೭ᵍ. ಸ್ಪೃಷ್ಟಾಂಗ ದೋಷ (PM Ch.4, St.47-50) ═══
+    // Check if malefics (Mars, Saturn, Rahu, Ketu) aspect or conjoin sprashtanga rashi
+    String sprashtangaDoshaStr = '';
+    if (sprashtangaNum != null) {
+      final spRashi = (sprashtangaNum - 1) % 12;
+      final maleficPlanets = {
+        'ಕುಜ': Ma, 'ಶನಿ': Sa,
+        'ರಾಹು': result.planets['ರಾಹು']?.longitude ?? 0.0,
+        'ಕೇತು': result.planets['ಕೇತು']?.longitude ?? 0.0,
+      };
+      final doshaList = <String>[];
+      for (final entry in maleficPlanets.entries) {
+        final pRashi = (entry.value / 30).floor() % 12;
+        // Conjunction
+        if (pRashi == spRashi) {
+          doshaList.add('${entry.key} ಯುತಿ');
+          continue;
+        }
+        // Aspect check: 7th aspect (all planets), plus Mars(4,8), Saturn(3,10), Rahu/Ketu(5,9)
+        final diff = (pRashi - spRashi + 12) % 12;
+        bool aspects = diff == 6; // 7th aspect (universal)
+        if (entry.key == 'ಕುಜ') aspects = aspects || diff == 3 || diff == 7;
+        if (entry.key == 'ಶನಿ') aspects = aspects || diff == 2 || diff == 9;
+        if (aspects) {
+          doshaList.add('${entry.key} ದೃಷ್ಟಿ');
+        }
+      }
+      sprashtangaDoshaStr = doshaList.isEmpty ? 'ದೋಷ ಇಲ್ಲ' : doshaList.join(', ');
+    } else {
+      sprashtangaDoshaStr = 'ಸ್ಪೃಷ್ಟಾಂಗ ಇಲ್ಲ';
+    }
+
+    // ═══ ೮. ತ್ರಿಸ್ಫುಟ ದಶಾ (Vimshottari scaled to 365-day cycle) ═══
+    // In Prashna, Trisphuta Dasha compresses 120-year Vimshottari into 365 days.
+    // Scale: 1 Vimshottari-year = 365/120 ≈ 3.0417 days
+    final trisphutatDeg = advS['ತ್ರಿಸ್ಫುಟ'] ?? 0.0;
+    final triNakIdx = (trisphutatDeg / nakSpan).floor() % 27;
+    final triNakPerc = (trisphutatDeg % nakSpan) / nakSpan; // fraction elapsed
+    final triNakStr = knNak[triNakIdx];
+
+    // Compute 365-day Trisphuta Dasha
+    final trisphutaDashaList = _calcTrisphutaDasha(
+      queryDateTime, triNakIdx, triNakPerc,
+    );
+
+    // Balance string: dasha lord + remaining days-hours-minutes
+    final triDashaLordIdx = triNakIdx % 9;
+    final triTotalDays = dashaYears[triDashaLordIdx] * 365.0 / 120.0;
+    final triRemainingDays = triTotalDays * (1 - triNakPerc);
+    final triBalD = triRemainingDays.floor();
+    final triBalHFrac = (triRemainingDays - triBalD) * 24;
+    final triBalH = triBalHFrac.floor();
+    final triBalMin = ((triBalHFrac - triBalH) * 60).round();
+    final triBalStr =
+        '${dashaLords[triDashaLordIdx]} ${triBalD}ದಿ ${triBalH}ಗಂ ${triBalMin}ನಿ';
+
+    // ═══ ೯. ಪ್ರಶ್ನೆ ಸಮಯ ದೋಷಗಳು ═══
+    final doshas = _computePrashnaDoshas(
+      result: result,
+      queryDateTime: queryDateTime,
+      lagnaLong: L,
+      moonLong: M,
+      sunLong: S,
+      lagnaRashi: lagnaRashi,
+      prucchakaNakshatraIdx: prucchakaNakshatraIdx,
+    );
+
+    return AshtamangalaDetails(
+      ashtamangalaNumber: fullNum.toString(),
+      graha: grahaStr,
+      yoni: yoniStr,
+      jantu: jantuStr,
+      panchabhuta: bhutaStr,
+      paksha: pakshaStr,
+      tithi: tithiStr,
+      nakshatra: nakStr,
+      vara: varaStr,
+      rashi: rashiStr,
+      dhooma: dhoomaStr,
+      vyatipata: vyatipataStr,
+      parivesha: pariveshaStr,
+      indrachapa: indrachapaStr,
+      upaketu: upaketuStr,
+      chandraKriya: kriyaStr,
+      chandraAvastha: avasthaStr,
+      chandraVela: velaStr,
+      samanyaSutra: samanyaSutraStr,
+      adhipaSutra: adhipaSutraStr,
+      amshaSutra: amshaSutraStr,
+      nakshatraSutra: nakshatraSutraStr,
+      mahaSutra: mahaSutraStr,
+      // New: Trisphutadi
+      trisphuta: trisphutatStr,
+      chatusphuta: chatusphutatStr,
+      panchasphuta: panchasphutatStr,
+      pranaSphuta: pranaStr,
+      dehaSphuta: dehaStr,
+      mrityuSphuta: mrityuStr,
+      sookshmaTrisphuta: sookshmaTriStr,
+      rudraSphuta: rudraStr,
+      maheswaraSphuta: maheswaraStr,
+      brahmaSphuta: brahmaStr,
+      vishnuSphuta: vishnuStr,
+      yamaghantaSphuta: yamaghantaStr,
+      // New: Vishesha Prashne Sphutas
+      bimbaSphuta: bimbaSphutaStr,
+      pakshantaraBimbaSphuta: pakshantaraBimbaSphutaStr,
+      yamaKantaka: yamaKantakaStr,
+      kalaSphuta: kalaSphutaStr,
+      ardhaPraharaSphuta: ardhaPraharaStr,
+      bhutodaya: bhutodayaStr,
+      arudhaSphuta: arudhaSphutaStr,
+      vithiSphuta: vithiSphutaStr,
+      chattraSphuta: chattraSphutaStr,
+      lagnaRaviYoga: lagnaRaviYogaStr,
+      sannidhyaSphuta: sannidhyaStr,
+      chaitanyaSphuta: chaitanyaStr,
+      chalanaSphuta: chalanaStr,
+      karanaSphuta: karanaStr,
+      prasadaSphuta: prasadaStr,
+      pakshantaraPrasadaSphuta: pakshantaraPrasadaStr,
+      anganaSphuta: anganaStr,
+      mukhaMandapaSphuta: mukhaMandapaStr,
+      deepaSphuta: deepaStr,
+      acharyaSphuta: acharyaStr,
+      pakshantaraAcharyaSphuta: pakshantaraAcharyaStr,
+      devalakaSphuta: devalakaStr,
+      dhvajaSphuta: dhvajaStr,
+      bimbaSphutaDevaprasna: bimbaDevaprasnaStr,
+      vithiRasi: vithiRasiStr,
+      chattraSphutaClassical: chattraSphutaClassicalStr,
+      // New: Panchasutra additions
+      beejaSphutaJeeva: beejaSphutaJeevaStr,
+      beejaSphutaKshetra: beejaSphutaKshetraStr,
+      dinaSaptaBhaga: dinaSaptaStr,
+      dinaAshtaBhaga: dinaAshtaStr,
+      dinaAshtaBhagaPhala: dinaAshtaPhalaStr,
+      tamboolaGraha: tamboolaStr,
+      tamboolaLagna: tamboolaLagnaStr,
+      santanaTithiPanchagga: santanaPanchagga,
+      santanaTithiChandra: santanaChandra,
+      santanaTithiRavindu: santanaRavindu,
+      // Additional Prashna Marga
+      dehaPranaMrityuTulane: dehaPranaTulane,
+      digitPastAnalysis: digitPast,
+      digitPresentAnalysis: digitPresent,
+      digitFutureAnalysis: digitFuture,
+      navagrahaFromNumber: navagrahaStr,
+      panchabhutaFromNumber: bhutaFromNumStr,
+      kalaHora: kalaHoraStr,
+      arudhaAvastha: arudhaAvasthaStr,
+      sprashtangaDosha: sprashtangaDoshaStr,
+      // ತ್ರಿಸ್ಫುಟ ದಶಾ
+      trisphutaDashas: trisphutaDashaList,
+      trisphutaNakshatra: triNakStr,
+      trisphutaDashaBalance: triBalStr,
+      // ಪ್ರಶ್ನೆ ಸಮಯ ದೋಷಗಳು
+      prashnaDoshas: doshas,
+    );
+  }
+
+  /// ═══ ಪ್ರಶ್ನೆ ಸಮಯ ದೋಷಗಳು (24 Prashna Time Dosha Checks) ═══
+  /// Based on Kerala Prashna Shastra / Prashna Marga
+  static Map<String, String> _computePrashnaDoshas({
+    required KundaliResult result,
+    required DateTime queryDateTime,
+    required double lagnaLong,
+    required double moonLong,
+    required double sunLong,
+    required int lagnaRashi,
+    int? prucchakaNakshatraIdx,
+  }) {
+    final doshas = <String, String>{};
+    final panchang = result.panchang;
+    final tIdx = panchang.tithiIndex; // 0-29
+    final moonRashi = (moonLong / 30).floor() % 12;
+    const nakSpan = 360.0 / 27.0; // 13.333... degrees
+    final moonNakIdx = (moonLong / nakSpan).floor() % 27;
+    final moonNakPada = ((moonLong % nakSpan) / (nakSpan / 4)).floor(); // 0-3
+
+    // Rahu/Ketu longitudes
+    final rahuLong = result.planets['ರಾಹು']?.longitude ?? 0.0;
+    final ketuLong = result.planets['ಕೇತು']?.longitude ?? 0.0;
+    final rahuRashi = (rahuLong / 30).floor() % 12;
+    final ketuRashi = (ketuLong / 30).floor() % 12;
+    final mandiLong = result.planets['ಮಾಂದಿ']?.longitude ?? 0.0;
+    final mandiRashi = (mandiLong / 30).floor() % 12;
+    final marsLong = result.planets['ಕುಜ']?.longitude ?? 0.0;
+    final satLong = result.planets['ಶನಿ']?.longitude ?? 0.0;
+
+    // ೧. ಗಂಡಾಂತ — Moon at water→fire sign junction (last/first 3°20')
+    {
+      final degInSign = moonLong % 30;
+      // Water sign endings: Karka(3)→Simha(4), Vrischika(7)→Dhanu(8), Meena(11)→Mesha(0)
+      final isWaterEnd = [3, 7, 11].contains(moonRashi) && degInSign > 26.6667;
+      final isFireStart = [0, 4, 8].contains(moonRashi) && degInSign < 3.3333;
+      doshas['ಗಂಡಾಂತ'] = (isWaterEnd || isFireStart) ? 'ಇದೆ' : '-';
+    }
+
+    // ೨. ಉಷ್ಣ ಶಿಖಾ — Moon in specific inauspicious nakshatra padas
+    // Ashlesha(8)-4, Jyeshtha(17)-4, Revati(26)-4, Ardra(5)-1, Moola(18)-1, Ashwini(0)-1
+    {
+      final isUshnaShikha =
+          (moonNakIdx == 8 && moonNakPada == 3) ||  // ಆಶ್ಲೇಷ-4
+          (moonNakIdx == 17 && moonNakPada == 3) || // ಜ್ಯೇಷ್ಠ-4
+          (moonNakIdx == 26 && moonNakPada == 3) || // ರೇವತಿ-4
+          (moonNakIdx == 5 && moonNakPada == 0) ||  // ಆರಿದ್ರಾ-1
+          (moonNakIdx == 18 && moonNakPada == 0) || // ಮೂಲ-1
+          (moonNakIdx == 0 && moonNakPada == 0);    // ಅಶ್ವಿನಿ-1
+      doshas['ಉಷ್ಣ ಶಿಖಾ'] = isUshnaShikha ? 'ಇದೆ' : '-';
+    }
+
+    // ೩. ವಿಷ — Visha Ghati check (from panchanga data)
+    {
+      doshas['ವಿಷ'] = panchang.vishaPraghati.isNotEmpty ? panchang.vishaPraghati : '-';
+    }
+
+    // ೪. ಅಷ್ಟಮಿ — Tithi is Ashtami (tithiIndex 7 or 22)
+    doshas['ಅಷ್ಟಮಿ'] = (tIdx == 7 || tIdx == 22) ? 'ಇದೆ' : '-';
+
+    // ೫. ವಿಷ್ಟಿ ಕರಣ — Bhadra/Vishti karana
+    {
+      final karana = panchang.karana;
+      final isVishti = karana.contains('ವಿಷ್ಟಿ') || karana.contains('ಭದ್ರ') || karana.contains('ಭದ್ರಾ');
+      doshas['ವಿಷ್ಟಿ ಕರಣ'] = isVishti ? 'ಇದೆ' : '-';
+    }
+
+    // ೬. ರಿಕ್ತ ತಿಥಿ — Chaturthi(3,18), Navami(8,23), Chaturdashi(13,28)
+    doshas['ರಿಕ್ತ ತಿಥಿ'] = [3, 8, 13, 18, 23, 28].contains(tIdx) ? 'ಇದೆ' : '-';
+
+    // ೭. ಸ್ಥಿರ ಕರಣ — Fixed karanas: Shakuni, Chatushpada, Naga, Kimstughna
+    {
+      final k = panchang.karana;
+      final isFixed = k.contains('ಶಕುನಿ') || k.contains('ಚತುಷ್ಪಾದ') ||
+                      k.contains('ನಾಗ') || k.contains('ಕಿಂಸ್ತುಘ್ನ');
+      doshas['ಸ್ಥಿರ ಕರಣ'] = isFixed ? 'ಇದೆ' : '-';
+    }
+
+    // ೮. ತಿಥಿ ಸಂಧಿ — Moon-Sun distance near multiple of 12° (within ±0.5°)
+    {
+      final dist = (moonLong - sunLong + 360) % 360;
+      final rem12 = dist % 12;
+      final isSandhi = rem12 < 0.5 || rem12 > 11.5;
+      doshas['ತಿಥಿ ಸಂಧಿ'] = isSandhi ? 'ಇದೆ' : '-';
+    }
+
+    // ೯. ನಕ್ಷತ್ರ ಸಂಧಿ — Moon near nakshatra boundary
+    {
+      final rem = moonLong % nakSpan;
+      doshas['ನಕ್ಷತ್ರ ಸಂಧಿ'] = (rem < 0.5 || rem > nakSpan - 0.5) ? 'ಇದೆ' : '-';
+    }
+
+    // ೧೦. ರಾಶಿ ಸಂಧಿ — Moon near rashi boundary
+    {
+      final rem = moonLong % 30;
+      doshas['ರಾಶಿ ಸಂಧಿ'] = (rem < 1 || rem > 29) ? 'ಇದೆ' : '-';
+    }
+
+    // ೧೧. ಅಂಶ ಸಂಧಿ — Moon near navamsha boundary (3°20' = 3.333...)
+    {
+      final navSpan = 30.0 / 9.0; // 3.333...
+      final rem = moonLong % navSpan;
+      doshas['ಅಂಶ ಸಂಧಿ'] = (rem < 0.25 || rem > navSpan - 0.25) ? 'ಇದೆ' : '-';
+    }
+
+    // ೧೨. ಗುಳಿಕೋದಯ — Mandi in Lagna rashi
+    doshas['ಗುಳಿಕೋದಯ'] = (mandiRashi == lagnaRashi) ? 'ಇದೆ' : '-';
+
+    // ೧೩. ಸಾರ್ಪಶಿರ — Rahu in Lagna or Moon conjunct Rahu/Ketu
+    {
+      final rahuInLagna = rahuRashi == lagnaRashi;
+      final moonConjRahu = (moonRashi == rahuRashi);
+      final moonConjKetu = (moonRashi == ketuRashi);
+      if (rahuInLagna || moonConjRahu || moonConjKetu) {
+        final parts = <String>[];
+        if (rahuInLagna) parts.add('ರಾಹು ಲಗ್ನದಲ್ಲಿ');
+        if (moonConjRahu) parts.add('ಚಂದ್ರ-ರಾಹು ಯುತಿ');
+        if (moonConjKetu) parts.add('ಚಂದ್ರ-ಕೇತು ಯುತಿ');
+        doshas['ಸಾರ್ಪಶಿರ'] = parts.join(', ');
+      } else {
+        doshas['ಸಾರ್ಪಶಿರ'] = '-';
+      }
+    }
+
+    // ೧೪. ವಿಕಾರಗಳು — Composite check
+    {
+      final vikaras = <String>[];
+      // ದುರ್ಮೂರ್ತಿ: 8th(7,22)/14th(13,28)/30th(29) tithi
+      if ([7, 13, 22, 28, 29].contains(tIdx)) vikaras.add('ದುರ್ಮೂರ್ತಿ');
+      // ಗೇಹ ವಿಕಾರ: malefic in 4th house
+      final bhava4Rashi = (lagnaRashi + 3) % 12;
+      final marsRashi = (marsLong / 30).floor() % 12;
+      final satRashi = (satLong / 30).floor() % 12;
+      if (marsRashi == bhava4Rashi || satRashi == bhava4Rashi ||
+          rahuRashi == bhava4Rashi || ketuRashi == bhava4Rashi) {
+        vikaras.add('ಗೇಹ ವಿಕಾರ');
+      }
+      doshas['ವಿಕಾರಗಳು'] = vikaras.isNotEmpty ? vikaras.join(', ') : '-';
+    }
+
+    // ೧೫. ಮೃತ್ಯು ಯೋಗ — Vara + Nakshatra death combinations
+    {
+      // Sun=0: Magha(9), Mon=1: Vishakha(15), Tue=2: Swati(14),
+      // Wed=3: Dhanishtha(22), Thu=4: Purvashadha(19), Fri=5: Bharani(1), Sat=6: Revati(26)
+      const mrityuNak = [9, 15, 14, 22, 19, 1, 26];
+      final varaStr = panchang.vara;
+      int varaIdx = -1;
+      for (int i = 0; i < knVara.length; i++) {
+        if (varaStr.contains(knVara[i])) { varaIdx = i; break; }
+      }
+      if (varaIdx >= 0 && varaIdx < 7 && moonNakIdx == mrityuNak[varaIdx]) {
+        doshas['ಮೃತ್ಯು ಯೋಗ'] = 'ಇದೆ (${knVara[varaIdx]}+${knNak[moonNakIdx]})';
+      } else {
+        doshas['ಮೃತ್ಯು ಯೋಗ'] = '-';
+      }
+    }
+
+    // ೧೬. ದಗ್ಧ ಯೋಗ — Vara + Tithi burnt combinations
+    {
+      // Sun=0: 12th, Mon=1: 11th, Tue=2: 5th, Wed=3: 3rd,
+      // Thu=4: 6th, Fri=5: 8th, Sat=6: 9th (tithi within paksha, 1-based)
+      const dagdhaTithi = [12, 11, 5, 3, 6, 8, 9]; // 1-based within-paksha
+      final varaStr = panchang.vara;
+      int varaIdx = -1;
+      for (int i = 0; i < knVara.length; i++) {
+        if (varaStr.contains(knVara[i])) { varaIdx = i; break; }
+      }
+      final tithiInPaksha = (tIdx % 15) + 1; // 1-15
+      if (varaIdx >= 0 && varaIdx < 7 && tithiInPaksha == dagdhaTithi[varaIdx]) {
+        doshas['ದಗ್ಧ ಯೋಗ'] = 'ಇದೆ';
+      } else {
+        doshas['ದಗ್ಧ ಯೋಗ'] = '-';
+      }
+    }
+
+    // ೧೭. ಪಾಪ ದೃಷ್ಟಿ — Malefics aspecting Lagna (7th aspect to Lagna rashi)
+    {
+      final opp = (lagnaRashi + 6) % 12; // 7th from Lagna
+      final aspects = <String>[];
+      if ((marsLong / 30).floor() % 12 == opp) aspects.add('ಕುಜ');
+      if ((satLong / 30).floor() % 12 == opp) aspects.add('ಶನಿ');
+      if (rahuRashi == opp) aspects.add('ರಾಹು');
+      if (ketuRashi == opp) aspects.add('ಕೇತು');
+      doshas['ಪಾಪ ದೃಷ್ಟಿ'] = aspects.isNotEmpty ? aspects.join(', ') : '-';
+    }
+
+    // ೧೮. ಪಾಪ ಉದಯ — Natural malefic in Lagna rashi
+    {
+      final malInLagna = <String>[];
+      if ((marsLong / 30).floor() % 12 == lagnaRashi) malInLagna.add('ಕುಜ');
+      if ((satLong / 30).floor() % 12 == lagnaRashi) malInLagna.add('ಶನಿ');
+      if (rahuRashi == lagnaRashi) malInLagna.add('ರಾಹು');
+      if (ketuRashi == lagnaRashi) malInLagna.add('ಕೇತು');
+      doshas['ಪಾಪ ಉದಯ'] = malInLagna.isNotEmpty ? malInLagna.join(', ') : '-';
+    }
+
+    // ೧೯. ತ್ರಯೋದಶಿ — Tithi is Trayodashi: tithiIndex 12 or 27
+    doshas['ತ್ರಯೋದಶಿ'] = (tIdx == 12 || tIdx == 27) ? 'ಇದೆ' : '-';
+
+    // ೨೦. ಪ್ರದೋಷ — Evening twilight (within ~1.5 hours before sunset)
+    {
+      // Parse sunset time from panchanga
+      final sunsetStr = panchang.sunset;
+      bool isPradosha = false;
+      final parts = sunsetStr.split(':');
+      if (parts.length >= 2) {
+        final sunsetH = int.tryParse(parts[0]) ?? 18;
+        final sunsetM = int.tryParse(parts[1]) ?? 0;
+        final sunsetMin = sunsetH * 60 + sunsetM;
+        final queryMin = queryDateTime.hour * 60 + queryDateTime.minute;
+        // Pradosha = within 90 minutes before sunset
+        isPradosha = queryMin >= (sunsetMin - 90) && queryMin <= sunsetMin;
+      }
+      doshas['ಪ್ರದೋಷ'] = isPradosha ? 'ಇದೆ' : '-';
+    }
+
+    // ೨೧. ರವಿ ದೃಷ್ಟಿ — Sun aspecting Lagna (Sun in 7th from Lagna)
+    {
+      final sunRashi = (sunLong / 30).floor() % 12;
+      final oppLagna = (lagnaRashi + 6) % 12;
+      doshas['ರವಿ ದೃಷ್ಟಿ'] = (sunRashi == oppLagna) ? 'ಇದೆ' : '-';
+    }
+
+    // ೨೨. ಸಂಕ್ರಾಂತಿ — Sun near rashi boundary
+    {
+      final rem = sunLong % 30;
+      doshas['ಸಂಕ್ರಾಂತಿ'] = (rem < 1 || rem > 29) ? 'ಇದೆ' : '-';
+    }
+
+    // ೨೩. ತಾರಾನುಕೂಲ — Tara compatibility (from pruchaka nakshatra to prashna Moon nakshatra)
+    {
+      const taraNames = [
+        'ಜನ್ಮ', 'ಸಂಪತ್', 'ವಿಪತ್', 'ಕ್ಷೇಮ', 'ಪ್ರತ್ಯರಿ',
+        'ಸಾಧಕ', 'ವಧ', 'ಮಿತ್ರ', 'ಪರಮಮಿತ್ರ'
+      ];
+      if (prucchakaNakshatraIdx != null) {
+        final dist = (moonNakIdx - prucchakaNakshatraIdx + 27) % 27;
+        final taraIdx = dist % 9;
+        doshas['ತಾರಾನುಕೂಲ'] = taraNames[taraIdx];
+      } else {
+        doshas['ತಾರಾನುಕೂಲ'] = '-';
+      }
+    }
+
+    // ೨೪. ಜನ್ಮಾಷ್ಟಮ — Moon in 8th rashi from pruchaka's rashi
+    {
+      if (prucchakaNakshatraIdx != null) {
+        // Derive pruchaka rashi from their nakshatra (each nak = 13.333° → rashi)
+        final pruchakaRashi = ((prucchakaNakshatraIdx * nakSpan) / 30).floor() % 12;
+        final eighthRashi = (pruchakaRashi + 7) % 12;
+        doshas['ಜನ್ಮಾಷ್ಟಮ'] = (moonRashi == eighthRashi) ? 'ಇದೆ' : '-';
+      } else {
+        doshas['ಜನ್ಮಾಷ್ಟಮ'] = '-';
+      }
+    }
+
+    return doshas;
+  }
+
+  /// Trisphuta Dasha: Vimshottari compressed into a 365-day cycle.
+  /// 1 Vim-year = 365/120 ≈ 3.0417 days. Uses minute-precision Duration.
+  static List<DashaEntry> _calcTrisphutaDasha(
+    DateTime queryDate, int nIdx, double perc,
+  ) {
+    const double scale = 365.0 / 120.0; // days per Vimshottari-year
+    final List<DashaEntry> result = [];
+    DateTime cur = queryDate;
+    final si = nIdx % 9;
+
+    for (int i = 0; i < 9; i++) {
+      final im = (si + i) % 9;
+      final yMul = (i == 0) ? (1 - perc) : 1.0;
+      final mdMinutes = (dashaYears[im] * yMul * scale * 24 * 60).round();
+      final mdEnd = cur.add(Duration(minutes: mdMinutes));
+
+      final List<DashaEntry> antars = [];
+      DateTime cad = cur;
+      final totalMdY = dashaYears[im].toDouble();
+
+      if (i == 0) {
+        // First mahadasha — find which bhukti the query falls into
+        final elapsedY = totalMdY * perc;
+        double cumY = 0;
+
+        for (int j = 0; j < 9; j++) {
+          final ia = (im + j) % 9;
+          final fullAdY = totalMdY * dashaYears[ia] / 120.0;
+          final nextCum = cumY + fullAdY;
+
+          if (nextCum <= elapsedY) {
+            cumY = nextCum;
+            continue; // This bhukti fully elapsed — skip
+          }
+
+          double adY;
+          if (cumY < elapsedY) {
+            // Partially elapsed
+            adY = fullAdY * (1 - (elapsedY - cumY) / fullAdY);
+          } else {
+            adY = fullAdY;
+          }
+          cumY = nextCum;
+
+          final adMin = (adY * scale * 24 * 60).round();
+          if (adMin <= 0) continue;
+          final ae = cad.add(Duration(minutes: adMin));
+
+          // Pratyantara dashas
+          final prats = _buildPratyantara(cad, ae, im, ia, scale);
+
+          antars.add(DashaEntry(
+            lord: dashaLords[ia], start: cad, end: ae,
+            antardashas: prats,
+          ));
+          cad = ae;
+        }
+      } else {
+        // Full mahadasha — all antardashas complete
+        for (int j = 0; j < 9; j++) {
+          final ia = (im + j) % 9;
+          final adY = totalMdY * dashaYears[ia] / 120.0;
+          final adMin = (adY * scale * 24 * 60).round();
+          if (adMin <= 0) continue;
+          final ae = cad.add(Duration(minutes: adMin));
+
+          final prats = _buildPratyantara(cad, ae, im, ia, scale);
+
+          antars.add(DashaEntry(
+            lord: dashaLords[ia], start: cad, end: ae,
+            antardashas: prats,
+          ));
+          cad = ae;
+        }
+      }
+
+      result.add(DashaEntry(
+        lord: dashaLords[im], start: cur, end: mdEnd,
+        antardashas: antars,
+      ));
+      cur = mdEnd;
+    }
+    return result;
+  }
+
+  /// Build pratyantara (sub-sub) dashas within an antardasha.
+  static List<DashaEntry> _buildPratyantara(
+    DateTime adStart, DateTime adEnd, int mdIdx, int adIdx, double scale,
+  ) {
+    final List<DashaEntry> prats = [];
+    DateTime cpd = adStart;
+    final totalMdY = dashaYears[mdIdx].toDouble();
+
+    for (int k = 0; k < 9; k++) {
+      final ip = (adIdx + k) % 9;
+      final pdY = (totalMdY * dashaYears[adIdx] * dashaYears[ip]) /
+          (120.0 * 120.0);
+      final pdMin = (pdY * scale * 24 * 60).round();
+      if (pdMin <= 0) continue;
+      final pe = cpd.add(Duration(minutes: pdMin));
+      prats.add(DashaEntry(lord: dashaLords[ip], start: cpd, end: pe));
+      cpd = pe;
+    }
+    return prats;
+  }
+}
