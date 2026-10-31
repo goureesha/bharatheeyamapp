@@ -1,4 +1,4 @@
-﻿package com.bharatheeyam.app
+package com.bharatheeyam.app
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -42,7 +42,7 @@ class GhatiWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        private const val WIDGET_SIZE = 400
+        private const val WIDGET_SIZE = 240
 
         fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
             val views = RemoteViews(context.packageName, R.layout.ghati_widget_layout)
@@ -64,11 +64,8 @@ class GhatiWidgetProvider : AppWidgetProvider() {
                 val elapsedHours = nowHour - sunriseHour
                 val ghati = elapsedHours * (60.0 / 24.0)
 
-                // Draw clock with safe bitmap size
-                val displayMetrics = context.resources.displayMetrics
-                val widgetSize = minOf(WIDGET_SIZE, (displayMetrics.widthPixels * 0.8).toInt())
-                val safeSize = maxOf(widgetSize, 200)
-                val bitmap = drawClock(ghati, safeSize)
+                // Fixed 240px bitmap â€” stays well under Binder IPC 1 MB limit
+                val bitmap = drawClock(ghati, WIDGET_SIZE)
                 views.setImageViewBitmap(R.id.ghati_clock_image, bitmap)
 
                 // Digital display
@@ -93,7 +90,7 @@ class GhatiWidgetProvider : AppWidgetProvider() {
                     val cal2 = Calendar.getInstance()
                     val nowH2 = cal2.get(Calendar.HOUR_OF_DAY) + cal2.get(Calendar.MINUTE) / 60.0 + cal2.get(Calendar.SECOND) / 3600.0
                     val ghati2 = (nowH2 - sunriseHour) * (60.0 / 24.0)
-                    val fallbackBitmap = drawClock(ghati2, 300)
+                    val fallbackBitmap = drawClock(ghati2, WIDGET_SIZE)
                     views.setImageViewBitmap(R.id.ghati_clock_image, fallbackBitmap)
                     val gh2 = ghati2.toInt() % 60
                     val viT2 = (ghati2 - ghati2.toInt()) * 60

@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ghati_widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="4dp"
     android:background="@android:color/transparent">
 
     <ImageView
         android:id="@+id/ghati_clock_image"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/ghati_text"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
         android:contentDescription="Vedic Ghati Clock" />
@@ -19,10 +20,9 @@
         android:id="@+id/ghati_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:gravity="center"
         android:textColor="#FFFFFF"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:fontFamily="monospace"
         android:textStyle="bold"
         android:paddingTop="4dp"
@@ -30,4 +30,4 @@
         android:background="#CC0F0F1A"
         android:text="0 ಘ : 00 ವಿ : 00 ಅ" />
 
-</RelativeLayout>
+</LinearLayout>
