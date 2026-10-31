@@ -153,7 +153,9 @@ class GhatiWidgetProvider : AppWidgetProvider() {
 
                 // Segment fill
                 val fillPaint = Paint().apply {
-                    color = (baseColor and 0x00FFFFFF) or (if (isLagna) 0xA6000000.toInt() else 0x33000000.toInt())
+                    // Set alpha: lagna=166 (0xA6), others=51 (0x33)
+                    val alpha = if (isLagna) 0xA6 else 0x33
+                    color = (alpha shl 24) or (baseColor and 0x00FFFFFF)
                     style = Paint.Style.FILL
                     isAntiAlias = true
                 }
@@ -161,7 +163,6 @@ class GhatiWidgetProvider : AppWidgetProvider() {
                 val innerOval = RectF(cx - innerRashi, cy - innerRashi, cx + innerRashi, cy + innerRashi)
                 val path = Path().apply {
                     val sa = Math.toRadians(startDeg.toDouble())
-                    val ea = Math.toRadians((startDeg + 30f).toDouble())
                     moveTo((cx + innerRashi * cos(sa)).toFloat(), (cy + innerRashi * sin(sa)).toFloat())
                     arcTo(oval, startDeg, 30f)
                     arcTo(innerOval, startDeg + 30f, -30f)
@@ -171,7 +172,7 @@ class GhatiWidgetProvider : AppWidgetProvider() {
 
                 // Segment border
                 val borderPaint = Paint().apply {
-                    color = if (isLagna) 0xFFFFD700.toInt() else (baseColor and 0x00FFFFFF) or 0x66000000.toInt()
+                    color = if (isLagna) 0xFFFFD700.toInt() else (0x66 shl 24) or (baseColor and 0x00FFFFFF)
                     style = Paint.Style.STROKE
                     strokeWidth = if (isLagna) 2.5f else 0.8f
                     isAntiAlias = true
