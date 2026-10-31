@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
@@ -257,7 +257,9 @@ Future<void> _writeSunriseForWidget() async {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('sunrise_hour24', sunriseH24);
-    debugPrint('Widget sunrise_hour24 written: $sunriseH24');
+    final lagnaLong = result.planets['ಲಗ್ನ']?.longitude ?? 0;
+    await prefs.setInt('lagna_rashi_index', (lagnaLong / 30).floor() % 12);
+    debugPrint('Widget sunrise_hour24 written: $sunriseH24, lagna_rashi: ${(lagnaLong/30).floor()%12}');
   } catch (e) {
     debugPrint('Widget sunrise write failed: $e');
   }

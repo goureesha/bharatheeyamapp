@@ -72,9 +72,10 @@ class _VedicClockScreenState extends State<VedicClockScreen> {
       _initialized = true;
     });
 
-    // Save sunrise for native widget
+    // Save sunrise + lagna rashi for native widget
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('sunrise_hour24', _sunriseHour24);
+    await prefs.setInt('lagna_rashi_index', (_lagnaLong / 30).floor() % 12);
 
     // Recalculate lagna every 2 minutes
     _lagnaTimer = Timer.periodic(const Duration(minutes: 2), (_) async {
@@ -87,7 +88,11 @@ class _VedicClockScreenState extends State<VedicClockScreen> {
         ayanamsaMode: 'lahiri', trueNode: true,
       );
       if (r != null && mounted) {
-        setState(() => _lagnaLong = r.planets['ಲಗ್ನ']?.longitude ?? 0);
+        final newLagna = r.planets['ಲಗ್ನ']?.longitude ?? 0;
+        setState(() => _lagnaLong = newLagna);
+        // Keep widget in sync
+        final p2 = await SharedPreferences.getInstance();
+        await p2.setInt('lagna_rashi_index', (newLagna / 30).floor() % 12);
       }
     });
   }
@@ -228,6 +233,9 @@ class _GhatiClockPainter extends CustomPainter {
     final innerRashi = R * 0.92;
     final midRashi = (outerR + innerRashi) / 2;
 
+    // Current lagna rashi index (0=Mesha … 11=Meena)
+    final lagnaRashiIdx = (lagnaLong / 30).floor() % 12;
+
     for (int i = 0; i < 12; i++) {
       final sa = _d2r(i * 30.0 + rashiOffset - 90);
       const sw = 30 * pi / 180;
@@ -236,13 +244,41 @@ class _GhatiClockPainter extends CustomPainter {
         ..arcTo(Rect.fromCircle(center: center, radius: outerR), sa, sw, false)
         ..arcTo(Rect.fromCircle(center: center, radius: innerRashi), sa + sw, -sw, false)
         ..close();
-      canvas.drawPath(p, Paint()..color = _rashiColors[i].withOpacity(0.25));
-      canvas.drawPath(p, Paint()..color = _rashiColors[i].withOpacity(0.5)..style = PaintingStyle.stroke..strokeWidth = 0.8);
+
+      final isLagna = (i == lagnaRashiIdx);
+      // Fill: lagna segment is bright, others are dim
+      canvas.drawPath(p, Paint()..color = _rashiColors[i].withOpacity(isLagna ? 0.65 : 0.20));
+      // Border: lagna segment gets thick gold border, others get thin coloured border
+      if (isLagna) {
+        canvas.drawPath(p, Paint()
+          ..color = const Color(0xFFFFD700)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5);
+      } else {
+        canvas.drawPath(p, Paint()
+          ..color = _rashiColors[i].withOpacity(0.4)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.8);
+      }
 
       final la = _d2r(i * 30.0 + 15 + rashiOffset - 90);
+      // Lagna label is white+bold, others are semi-transparent
       _txt(canvas, tr(knRashi[i]), cx + midRashi * cos(la), cy + midRashi * sin(la),
-        Colors.white.withOpacity(0.9), outerR * 0.055, true);
+        isLagna ? Colors.white : Colors.white.withOpacity(0.65),
+        outerR * (isLagna ? 0.062 : 0.052), isLagna);
     }
+
+    // Lagna pointer — small gold triangle on the inner edge of the lagna segment
+    final lagnaA = _d2r(lagnaRashiIdx * 30.0 + 15 + rashiOffset - 90);
+    final ptrR = innerRashi - 1;
+    final ptrSize = R * 0.04;
+    final ptrPath = Path()
+      ..moveTo(cx + ptrR * cos(lagnaA), cy + ptrR * sin(lagnaA))
+      ..lineTo(cx + (ptrR + ptrSize) * cos(lagnaA - 0.12), cy + (ptrR + ptrSize) * sin(lagnaA - 0.12))
+      ..lineTo(cx + (ptrR + ptrSize) * cos(lagnaA + 0.12), cy + (ptrR + ptrSize) * sin(lagnaA + 0.12))
+      ..close();
+    canvas.drawPath(ptrPath, Paint()..color = const Color(0xFFFFD700));
+    canvas.drawPath(ptrPath, Paint()..color = const Color(0xFFFFFFFF)..style = PaintingStyle.stroke..strokeWidth = 0.8);
 
     canvas.drawCircle(center, innerRashi, Paint()..color = const Color(0xFFD4AF37).withOpacity(0.3)..style = PaintingStyle.stroke..strokeWidth = 1);
 
