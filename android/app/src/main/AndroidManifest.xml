@@ -1,4 +1,4 @@
-﻿<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -39,20 +39,13 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.bharatheeyam.CLOCK_UPDATE" />
+                <action android:name="com.bharatheeyam.GHATI_TICK" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/ghati_widget_info" />
         </receiver>
 
-        <receiver
-            android:name=".GhatiWidgetUpdateService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.bharatheeyam.GHATI_TICK" />
-            </intent-filter>
-        </receiver>
     </application>
     <queries>
         <intent>
