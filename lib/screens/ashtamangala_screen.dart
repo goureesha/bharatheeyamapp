@@ -1845,26 +1845,26 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   tilePadding: const EdgeInsets.symmetric(horizontal: 12),
-                  title: Row(
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (isCurrent)
-                        Container(
-                          width: 8, height: 8,
-                          margin: const EdgeInsets.only(right: 6),
-                          decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-                        ),
-                      Expanded(
-                        child: Text(
-                          '${trAll(md.lord)} ಮಹಾದಶಾ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 13,
-                            color: isCurrent ? kPurple2 : kText,
+                      Row(
+                        children: [
+                          if (isCurrent)
+                            Container(
+                              width: 8, height: 8,
+                              margin: const EdgeInsets.only(right: 6),
+                              decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+                            ),
+                          Text(
+                            '${trAll(md.lord)} ಮಹಾದಶಾ',
+                            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: isCurrent ? kPurple2 : kText),
                           ),
-                        ),
+                        ],
                       ),
+                      const SizedBox(height: 2),
                       Text(
-                        '${_fmtDt(md.start)} – ${_fmtDt(md.end)}',
+                        '${_fmtDt(md.start)} \u2013 ${_fmtDt(md.end)}',
                         style: TextStyle(fontSize: 11, color: kMuted),
                       ),
                     ],
@@ -1876,26 +1876,26 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
                       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                       child: ExpansionTile(
                         tilePadding: const EdgeInsets.only(left: 28, right: 12),
-                        title: Row(
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (adCurrent)
-                              Container(
-                                width: 6, height: 6,
-                                margin: const EdgeInsets.only(right: 6),
-                                decoration: BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
-                              ),
-                            Expanded(
-                              child: Text(
-                                '${trAll(ad.lord)} ಭುಕ್ತಿ',
-                                style: TextStyle(
-                                  fontWeight: adCurrent ? FontWeight.w700 : FontWeight.w500,
-                                  fontSize: 12,
-                                  color: adCurrent ? kPurple2 : kText,
+                            Row(
+                              children: [
+                                if (adCurrent)
+                                  Container(
+                                    width: 6, height: 6,
+                                    margin: const EdgeInsets.only(right: 6),
+                                    decoration: BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
+                                  ),
+                                Text(
+                                  '${trAll(ad.lord)} ಭುಕ್ತಿ',
+                                  style: TextStyle(fontWeight: adCurrent ? FontWeight.w700 : FontWeight.w500, fontSize: 13, color: adCurrent ? kPurple2 : kText),
                                 ),
-                              ),
+                              ],
                             ),
+                            const SizedBox(height: 2),
                             Text(
-                              '${_fmtDt(ad.start)} – ${_fmtDt(ad.end)}',
+                              '${_fmtDt(ad.start)} \u2013 ${_fmtDt(ad.end)}',
                               style: TextStyle(fontSize: 10, color: kMuted),
                             ),
                           ],
@@ -1909,26 +1909,26 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
                               color: pdCurrent ? kPurple2.withValues(alpha: 0.08) : null,
                               border: Border(bottom: BorderSide(color: kBorder.withValues(alpha: 0.3))),
                             ),
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (pdCurrent)
-                                  Container(
-                                    width: 5, height: 5,
-                                    margin: const EdgeInsets.only(right: 5),
-                                    decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-                                  ),
-                                Expanded(
-                                  child: Text(
-                                    '${trAll(pd.lord)} ಪ್ರತ್ಯಂತರ',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: pdCurrent ? FontWeight.w600 : FontWeight.normal,
-                                      color: pdCurrent ? kPurple2 : kText,
+                                Row(
+                                  children: [
+                                    if (pdCurrent)
+                                      Container(
+                                        width: 5, height: 5,
+                                        margin: const EdgeInsets.only(right: 5),
+                                        decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                                      ),
+                                    Text(
+                                      '${trAll(pd.lord)} ಪ್ರತ್ಯಂತರ',
+                                      style: TextStyle(fontSize: 12, fontWeight: pdCurrent ? FontWeight.w600 : FontWeight.normal, color: pdCurrent ? kPurple2 : kText),
                                     ),
-                                  ),
+                                  ],
                                 ),
+                                const SizedBox(height: 2),
                                 Text(
-                                  '${_fmtDt(pd.start)} – ${_fmtDt(pd.end)}',
+                                  '${_fmtDt(pd.start)} \u2013 ${_fmtDt(pd.end)}',
                                   style: TextStyle(fontSize: 10, color: kMuted),
                                 ),
                               ],
