@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
@@ -1027,7 +1027,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
   int _selectedAvIdx = 0; // 0=SAV, 1-7 = individual planet BAV
 
   // ಬಳಕೆದಾರರು ಕೇಳಿದ ೫ ಟ್ಯಾಬ್‌ಗಳು
-  static const _tabs = ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಅಷ್ಟಮಂಗಲ', 'ತ್ರಿಸ್ಫುಟ ದಶಾ', 'ಅಷ್ಟಕವರ್ಗ', 'ಷೋಡಶವರ್ಗ', 'ಫಲಾದೇಶ', 'ಆಧಾರ'];
+  static const _tabs = ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಅಷ್ಟಮಂಗಲ', 'ತ್ರಿಸ್ಫುಟ ದಶಾ', 'ಅಷ್ಟಕವರ್ಗ', 'ಷೋಡಶವರ್ಗ', 'ಷಡ್ಬಲ', 'ಫಲಾದೇಶ', 'ಆಧಾರ'];
 
   // ೧೬ ಪಾರಾಶರಿ ಷೋಡಶವರ್ಗ ಕುಂಡಲಿಗಳು + ಭಾವ ಕುಂಡಲಿ
   static const List<Map<String, dynamic>> _shodashaVargaCharts = [
@@ -2291,6 +2291,468 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
       ),
     );
   }
+  // ═══════════════════════════════════════════
+  // ಷಡ್ಬಲ ಟ್ಯಾಬ್ (Shadbala + Ishta/Kashta Bala)
+  // ═══════════════════════════════════════════
+  Widget _buildShadbalaTab() {
+    final shadbala = widget.result.shadbala;
+    if (shadbala.isEmpty) {
+      return Center(
+        child: Text(
+          'ಷಡ್ಬಲ ಮಾಹಿತಿ ಲಭ್ಯವಿಲ್ಲ',
+          style: TextStyle(fontSize: 16, color: kMuted),
+        ),
+      );
+    }
+
+    final pKeysEng = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
+    final pKeysKn = ['ರವಿ', 'ಚಂದ್ರ', 'ಕುಜ', 'ಬುಧ', 'ಗುರು', 'ಶುಕ್ರ', 'ಶನಿ'];
+    // Symbols for each planet
+    final pSymbols = ['☉', '☽', '♂', '☿', '♃', '♀', '♄'];
+    // Colors for each planet
+    final pColors = [
+      const Color(0xFFE65100), // Sun - deep orange
+      const Color(0xFF1565C0), // Moon - blue
+      const Color(0xFFC62828), // Mars - red
+      const Color(0xFF2E7D32), // Mercury - green
+      const Color(0xFFE6A817), // Jupiter - golden
+      const Color(0xFFAD1457), // Venus - pink
+      const Color(0xFF37474F), // Saturn - dark gray
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      children: [
+        // Title
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 12, top: 4),
+            child: Column(
+              children: [
+                const Text(
+                  'ಷಡ್ಬಲ ವಿವರ',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFFE67E22)),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'ಸ್ಥಾನ, ದಿಕ್, ಕಾಲ, ಚೇಷ್ಟ, ನೈಸರ್ಗಿಕ, ದೃಕ್ ಬಲಗಳು',
+                  style: TextStyle(fontSize: 12, color: kMuted),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // ──────────── 1. SHADBALA TABLE ────────────
+        _sectionLabel('⚖️ ಷಡ್ಬಲ (ರೂಪಗಳಲ್ಲಿ)', kPurple2),
+        const SizedBox(height: 8),
+        Card(
+          elevation: 1,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columnSpacing: 14,
+                horizontalMargin: 10,
+                headingRowColor: WidgetStateProperty.all(kPurple2.withValues(alpha: 0.08)),
+                columns: [
+                  DataColumn(label: Text('ಗ್ರಹ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: kPurple2))),
+                  DataColumn(label: Text('ಸ್ಥಾನ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  DataColumn(label: Text('ದಿಕ್', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  DataColumn(label: Text('ಕಾಲ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  DataColumn(label: Text('ಚೇಷ್ಟ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  DataColumn(label: Text('ನೈಸರ್ಗಿಕ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  DataColumn(label: Text('ದೃಕ್', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  DataColumn(label: Text('ಒಟ್ಟು', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Color(0xFFE67E22)))),
+                  DataColumn(label: Text('ಅರ್ಹತೆ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  DataColumn(label: Text('ಸ್ಥಿತಿ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                ],
+                rows: List.generate(pKeysEng.length, (i) {
+                  final eKey = pKeysEng[i];
+                  final data = shadbala[eKey] ?? {};
+                  final isStrong = data['IsStrong'] ?? false;
+                  final totalVal = (data['Total'] ?? 0.0) as double;
+                  final reqVal = (data['Required'] ?? 0.0) as double;
+
+                  return DataRow(
+                    cells: [
+                      DataCell(Text('${pSymbols[i]} ${pKeysKn[i]}', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: pColors[i]))),
+                      DataCell(Text(((data['Sthana'] ?? 0.0) as double).toStringAsFixed(2), style: const TextStyle(fontSize: 11))),
+                      DataCell(Text(((data['Dik'] ?? 0.0) as double).toStringAsFixed(2), style: const TextStyle(fontSize: 11))),
+                      DataCell(Text(((data['Kala'] ?? 0.0) as double).toStringAsFixed(2), style: const TextStyle(fontSize: 11))),
+                      DataCell(Text(((data['Cheshta'] ?? 0.0) as double).toStringAsFixed(2), style: const TextStyle(fontSize: 11))),
+                      DataCell(Text(((data['Naisargika'] ?? 0.0) as double).toStringAsFixed(2), style: const TextStyle(fontSize: 11))),
+                      DataCell(Text(((data['Drik'] ?? 0.0) as double).toStringAsFixed(2), style: const TextStyle(fontSize: 11))),
+                      DataCell(Text(totalVal.toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12))),
+                      DataCell(Text(reqVal.toStringAsFixed(1), style: TextStyle(color: kMuted, fontSize: 11))),
+                      DataCell(
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: isStrong ? Colors.green.withValues(alpha: 0.12) : Colors.red.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            isStrong ? 'ಬಲಶಾಲಿ' : 'ದುರ್ಬಲ',
+                            style: TextStyle(
+                              color: isStrong ? Colors.green.shade700 : Colors.red.shade700,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // ──────────── 2. ISHTA BALA & KASHTA BALA ────────────
+        _sectionLabel('✨ ಇಷ್ಟ ಬಲ ಮತ್ತು ಕಷ್ಟ ಬಲ', kTeal),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            'ಇಷ್ಟ ಬಲ = ಗ್ರಹದ ಶುಭಫಲ ಶಕ್ತಿ  |  ಕಷ್ಟ ಬಲ = ಗ್ರಹದ ಕಷ್ಟ/ಅಶುಭ ಶಕ್ತಿ',
+            style: TextStyle(fontSize: 11, color: kMuted, height: 1.3),
+          ),
+        ),
+        Card(
+          elevation: 1,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columnSpacing: 16,
+                horizontalMargin: 12,
+                headingRowColor: WidgetStateProperty.all(kTeal.withValues(alpha: 0.08)),
+                columns: [
+                  DataColumn(label: Text('ಗ್ರಹ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: kTeal))),
+                  DataColumn(label: Text('ಉಚ್ಚ ಬಲ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  DataColumn(label: Text('ಚೇಷ್ಟ ಬಲ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  DataColumn(label: Text('ಇಷ್ಟ ಬಲ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.green.shade700))),
+                  DataColumn(label: Text('ಕಷ್ಟ ಬಲ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.red.shade700))),
+                  DataColumn(label: Text('ಫಲಿತಾಂಶ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                ],
+                rows: List.generate(pKeysEng.length, (i) {
+                  final eKey = pKeysEng[i];
+                  final data = shadbala[eKey] ?? {};
+                  final totalRupas = (data['Total'] ?? 0.0) as double;
+                  final reqRupas = (data['Required'] ?? 0.0) as double;
+
+                  // Uchcha Bala = Sthana Bala component (already in Rupas)
+                  final uchchaBala = (data['Sthana'] ?? 0.0) as double;
+                  // Cheshta Bala
+                  final cheshtaBala = (data['Cheshta'] ?? 0.0) as double;
+
+                  // Ishta Bala = sqrt(Uchcha Bala * Cheshta Bala) (Parashari formula)
+                  final ishtaBala = _sqrtSafe(uchchaBala * cheshtaBala);
+                  // Kashta Bala = sqrt((1 - Uchcha Bala) * (1 - Cheshta Bala))
+                  // Using complement: max possible is 1.0 rupa for each component
+                  final kashtaBala = _sqrtSafe((1.0 - uchchaBala.clamp(0.0, 1.0)) * (1.0 - cheshtaBala.clamp(0.0, 1.0)));
+
+                  // Verdict: Ishta > Kashta means beneficial
+                  final isBeneficial = ishtaBala > kashtaBala;
+
+                  return DataRow(
+                    cells: [
+                      DataCell(Text('${pSymbols[i]} ${pKeysKn[i]}', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: pColors[i]))),
+                      DataCell(Text(uchchaBala.toStringAsFixed(2), style: const TextStyle(fontSize: 11))),
+                      DataCell(Text(cheshtaBala.toStringAsFixed(2), style: const TextStyle(fontSize: 11))),
+                      DataCell(Text(ishtaBala.toStringAsFixed(2), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Colors.green.shade700))),
+                      DataCell(Text(kashtaBala.toStringAsFixed(2), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Colors.red.shade700))),
+                      DataCell(
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: isBeneficial ? Colors.green.withValues(alpha: 0.12) : Colors.red.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            isBeneficial ? 'ಶುಭ' : 'ಅಶುಭ',
+                            style: TextStyle(
+                              color: isBeneficial ? Colors.green.shade700 : Colors.red.shade700,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // ──────────── 3. STRENGTH RANKING ────────────
+        _sectionLabel('🏆 ಬಲ ಕ್ರಮ (ಬಲವಂತರಿಂದ ದುರ್ಬಲರ ವರೆಗೆ)', kOrange2),
+        const SizedBox(height: 8),
+        Builder(
+          builder: (context) {
+            // Sort planets by total shadbala descending
+            final sorted = List.generate(pKeysEng.length, (i) => i);
+            sorted.sort((a, b) {
+              final aTotal = ((shadbala[pKeysEng[a]] ?? {})['Total'] ?? 0.0) as double;
+              final bTotal = ((shadbala[pKeysEng[b]] ?? {})['Total'] ?? 0.0) as double;
+              return bTotal.compareTo(aTotal);
+            });
+
+            final maxTotal = ((shadbala[pKeysEng[sorted.first]] ?? {})['Total'] ?? 1.0) as double;
+
+            return Column(
+              children: sorted.asMap().entries.map((entry) {
+                final rank = entry.key + 1;
+                final idx = entry.value;
+                final eKey = pKeysEng[idx];
+                final data = shadbala[eKey] ?? {};
+                final totalVal = (data['Total'] ?? 0.0) as double;
+                final isStrong = data['IsStrong'] ?? false;
+                final fraction = maxTotal > 0 ? totalVal / maxTotal : 0.0;
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 24,
+                        child: Text(
+                          rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : '$rank.',
+                          style: TextStyle(fontSize: rank <= 3 ? 16 : 12, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 60,
+                        child: Text('${pSymbols[idx]} ${pKeysKn[idx]}', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: pColors[idx])),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            Container(
+                              height: 22,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                            FractionallySizedBox(
+                              widthFactor: fraction.clamp(0.0, 1.0),
+                              child: Container(
+                                height: 22,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: isStrong
+                                        ? [Colors.green.shade300, Colors.green.shade600]
+                                        : [Colors.red.shade200, Colors.red.shade400],
+                                  ),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                            ),
+                            Positioned.fill(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    '${totalVal.toStringAsFixed(2)} ರೂಪ',
+                                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+
+        const SizedBox(height: 20),
+
+        // ──────────── 4. INDIVIDUAL BALA CARDS ────────────
+        _sectionLabel('📊 ಗ್ರಹವಾರು ಬಲ ವಿವರ', kPurple2),
+        const SizedBox(height: 8),
+        ...List.generate(pKeysEng.length, (i) {
+          final eKey = pKeysEng[i];
+          final data = shadbala[eKey] ?? {};
+          final isStrong = data['IsStrong'] ?? false;
+          final totalVal = (data['Total'] ?? 0.0) as double;
+          final reqVal = (data['Required'] ?? 0.0) as double;
+
+          final components = [
+            {
+              'name': 'ಸ್ಥಾನ ಬಲ',
+              'nameEn': 'Sthana Bala',
+              'value': (data['Sthana'] ?? 0.0) as double,
+              'desc': 'ಉಚ್ಚ, ಕೇಂದ್ರಾದಿ, ಸಪ್ತವರ್ಗಜ',
+              'color': const Color(0xFF1565C0),
+            },
+            {
+              'name': 'ದಿಕ್ ಬಲ',
+              'nameEn': 'Dik Bala',
+              'value': (data['Dik'] ?? 0.0) as double,
+              'desc': 'ದಿಕ್ಕಿನ ಬಲ (ಲಗ್ನದಿಂದ ದೂರ)',
+              'color': const Color(0xFF2E7D32),
+            },
+            {
+              'name': 'ಕಾಲ ಬಲ',
+              'nameEn': 'Kala Bala',
+              'value': (data['Kala'] ?? 0.0) as double,
+              'desc': 'ನತೋನ್ನತ, ಪಕ್ಷ, ಅಯನ, ವಾರ, ಹೋರಾ',
+              'color': const Color(0xFFE65100),
+            },
+            {
+              'name': 'ಚೇಷ್ಟ ಬಲ',
+              'nameEn': 'Cheshta Bala',
+              'value': (data['Cheshta'] ?? 0.0) as double,
+              'desc': 'ಗತಿ ಬಲ (ವಕ್ರ, ಮಂದ, ಸಾಮಾನ್ಯ)',
+              'color': const Color(0xFFC62828),
+            },
+            {
+              'name': 'ನೈಸರ್ಗಿಕ ಬಲ',
+              'nameEn': 'Naisargika Bala',
+              'value': (data['Naisargika'] ?? 0.0) as double,
+              'desc': 'ಸ್ವಾಭಾವಿಕ ಶಕ್ತಿ (ಸ್ಥಿರ)',
+              'color': const Color(0xFF6A1B9A),
+            },
+            {
+              'name': 'ದೃಕ್ ಬಲ',
+              'nameEn': 'Drik Bala',
+              'value': (data['Drik'] ?? 0.0) as double,
+              'desc': 'ದೃಷ್ಟಿ ಬಲ (ಗ್ರಹ ದೃಷ್ಟಿ)',
+              'color': const Color(0xFF00838F),
+            },
+          ];
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Planet header
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: pColors[i].withValues(alpha: 0.1),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(9),
+                      topRight: Radius.circular(9),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Text('${pSymbols[i]} ${pKeysKn[i]}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: pColors[i])),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: isStrong ? Colors.green.withValues(alpha: 0.15) : Colors.red.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${totalVal.toStringAsFixed(2)} / ${reqVal.toStringAsFixed(1)} ರೂಪ',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: isStrong ? Colors.green.shade700 : Colors.red.shade700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Bala components with mini bars
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    children: components.map((comp) {
+                      final val = comp['value'] as double;
+                      final maxBar = 2.0; // Max expected Rupas for a single component
+                      final barFraction = (val / maxBar).clamp(0.0, 1.0);
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 90,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(comp['name'] as String, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: comp['color'] as Color)),
+                                  Text(comp['desc'] as String, style: TextStyle(fontSize: 9, color: kMuted)),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    height: 16,
+                                    decoration: BoxDecoration(
+                                      color: (comp['color'] as Color).withValues(alpha: 0.08),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  FractionallySizedBox(
+                                    widthFactor: barFraction,
+                                    child: Container(
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: (comp['color'] as Color).withValues(alpha: 0.6),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            SizedBox(
+                              width: 38,
+                              child: Text(val.toStringAsFixed(2), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700), textAlign: TextAlign.right),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  double _sqrtSafe(double v) => v > 0 ? math.sqrt(v) : 0.0;
+
   Widget _buildAadharaTab() {
     // Flatten sections into a list for lazy rendering.
     // Each item is either a String (section header) or a ShlokaRef (card).
@@ -2984,6 +3446,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
                       _buildTrisphutaDashaTab(),
                       _buildAshtakaVargaTab(),
                       _buildShodashaVargaTab(),
+                      _buildShadbalaTab(),
                       _buildPhalaTab(),
                       _buildAadharaTab(),
                     ],
