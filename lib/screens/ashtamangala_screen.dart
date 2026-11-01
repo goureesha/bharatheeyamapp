@@ -2415,12 +2415,12 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
         const SizedBox(height: 20),
 
         // ──────────── 2. ISHTA BALA & KASHTA BALA ────────────
-        _sectionLabel('✨ ಇಷ್ಟ ಬಲ ಮತ್ತು ಕಷ್ಟ ಬಲ', kTeal),
+        _sectionLabel('✨ ಇಷ್ಟ ಫಲ ಮತ್ತು ಕಷ್ಟ ಫಲ', kTeal),
         const SizedBox(height: 4),
         Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: Text(
-            'ಇಷ್ಟ ಬಲ = ಗ್ರಹದ ಶುಭಫಲ ಶಕ್ತಿ  |  ಕಷ್ಟ ಬಲ = ಗ್ರಹದ ಕಷ್ಟ/ಅಶುಭ ಶಕ್ತಿ',
+            'ಇಷ್ಟ ಫಲ = √(ಉಚ್ಚ ಬಲ × ಚೇಷ್ಟ ಬಲ) → ಶುಭ ಫಲ  |  ಕಷ್ಟ ಫಲ = √((60−ಉಚ್ಚ) × (60−ಚೇಷ್ಟ)) → ಅಶುಭ ಫಲ  [ವಿರೂಪಗಳಲ್ಲಿ]',
             style: TextStyle(fontSize: 11, color: kMuted, height: 1.3),
           ),
         ),
@@ -2439,37 +2439,30 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
                   DataColumn(label: Text('ಗ್ರಹ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: kTeal))),
                   DataColumn(label: Text('ಉಚ್ಚ ಬಲ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
                   DataColumn(label: Text('ಚೇಷ್ಟ ಬಲ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                  DataColumn(label: Text('ಇಷ್ಟ ಬಲ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.green.shade700))),
-                  DataColumn(label: Text('ಕಷ್ಟ ಬಲ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.red.shade700))),
+                  DataColumn(label: Text('ಇಷ್ಟ ಫಲ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.green.shade700))),
+                  DataColumn(label: Text('ಕಷ್ಟ ಫಲ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.red.shade700))),
                   DataColumn(label: Text('ಫಲಿತಾಂಶ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
                 ],
                 rows: List.generate(pKeysEng.length, (i) {
                   final eKey = pKeysEng[i];
                   final data = shadbala[eKey] ?? {};
-                  final totalRupas = (data['Total'] ?? 0.0) as double;
-                  final reqRupas = (data['Required'] ?? 0.0) as double;
-
-                  // Uchcha Bala = Sthana Bala component (already in Rupas)
-                  final uchchaBala = (data['Sthana'] ?? 0.0) as double;
-                  // Cheshta Bala
-                  final cheshtaBala = (data['Cheshta'] ?? 0.0) as double;
-
-                  // Ishta Bala = sqrt(Uchcha Bala * Cheshta Bala) (Parashari formula)
-                  final ishtaBala = _sqrtSafe(uchchaBala * cheshtaBala);
-                  // Kashta Bala = sqrt((1 - Uchcha Bala) * (1 - Cheshta Bala))
-                  // Using complement: max possible is 1.0 rupa for each component
-                  final kashtaBala = _sqrtSafe((1.0 - uchchaBala.clamp(0.0, 1.0)) * (1.0 - cheshtaBala.clamp(0.0, 1.0)));
+                  // Raw Virupas from shadbala calculator (0-60 scale)
+                  final uchchaBala = (data['UchchaBalaVirupas'] ?? 0.0) as double;
+                  final cheshtaBala = (data['CheshtaBalaVirupas'] ?? 0.0) as double;
+                  // Precomputed Ishta/Kashta Phala (Surya Siddhanta formula, in Virupas)
+                  final ishtaPhala = (data['IshtaPhala'] ?? 0.0) as double;
+                  final kashtaPhala = (data['KashtaPhala'] ?? 0.0) as double;
 
                   // Verdict: Ishta > Kashta means beneficial
-                  final isBeneficial = ishtaBala > kashtaBala;
+                  final isBeneficial = ishtaPhala > kashtaPhala;
 
                   return DataRow(
                     cells: [
                       DataCell(Text('${pSymbols[i]} ${pKeysKn[i]}', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: pColors[i]))),
                       DataCell(Text(uchchaBala.toStringAsFixed(2), style: const TextStyle(fontSize: 11))),
                       DataCell(Text(cheshtaBala.toStringAsFixed(2), style: const TextStyle(fontSize: 11))),
-                      DataCell(Text(ishtaBala.toStringAsFixed(2), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Colors.green.shade700))),
-                      DataCell(Text(kashtaBala.toStringAsFixed(2), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Colors.red.shade700))),
+                      DataCell(Text(ishtaPhala.toStringAsFixed(2), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Colors.green.shade700))),
+                      DataCell(Text(kashtaPhala.toStringAsFixed(2), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Colors.red.shade700))),
                       DataCell(
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -2751,7 +2744,6 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
     );
   }
 
-  double _sqrtSafe(double v) => v > 0 ? math.sqrt(v) : 0.0;
 
   Widget _buildAadharaTab() {
     // Flatten sections into a list for lazy rendering.

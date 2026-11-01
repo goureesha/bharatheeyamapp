@@ -34,6 +34,7 @@ class ShadbalaLogic {
     };
 
     Map<String, double> sthanaBala = {};
+    Map<String, double> rawUchchaBala = {}; // Raw Uchcha Bala in Virupas (for Ishta/Kashta Phala)
     for (var p in planets) {
       double pos = longitudes[p] ?? 0.0;
       double uchcha = uchchaDegrees[p] ?? 0.0;
@@ -41,6 +42,7 @@ class ShadbalaLogic {
       if (dist > 180) dist = 360 - dist;
       // Uchchabala = (180 - distance) / 3
       double uchchaBala = (180.0 - dist) / 3.0;
+      rawUchchaBala[p] = uchchaBala; // Store raw value (0-60 Virupas)
       
       // Kendradi Bala (approximation based on distance from Ascendant)
       double houseDist = (pos - ascendant).abs();
@@ -171,6 +173,19 @@ class ShadbalaLogic {
       double req = benchmarks[p] ?? 0.0;
       bool isStrong = totalRupas >= req;
 
+      // Ishta Phala & Kashta Phala (Surya Siddhanta / Parashari)
+      // Uses raw Uchcha Bala and Cheshta Bala in Virupas (0-60)
+      double rawUchcha = rawUchchaBala[p] ?? 0.0;
+      double rawCheshta = cheshta; // Already in Virupas
+      double ishtaPhala = sqrt(rawUchcha * rawCheshta);
+      double kashtaPhala = sqrt((60.0 - rawUchcha) * (60.0 - rawCheshta));
+
+      // Subha Phala = Ishta Phala × Sthana Bala Ratio
+      // Ashubha Phala = Kashta Phala × (1 - Sthana Bala Ratio)
+      double sthanRatio = (sthana / 150.0).clamp(0.0, 1.0); // Approx max sthana ~150
+      double subhaPhala = ishtaPhala * sthanRatio;
+      double ashubhaPhala = kashtaPhala * (1.0 - sthanRatio);
+
       finalShadbala[p] = {
         'Sthana': sthana / 60.0,
         'Dik': dik / 60.0,
@@ -181,6 +196,15 @@ class ShadbalaLogic {
         'Total': totalRupas,
         'Required': req,
         'IsStrong': isStrong,
+        // Raw Virupas for Ishta/Kashta computation
+        'UchchaBalaVirupas': rawUchcha,
+        'CheshtaBalaVirupas': rawCheshta,
+        // Ishta Phala & Kashta Phala (Virupas)
+        'IshtaPhala': ishtaPhala,
+        'KashtaPhala': kashtaPhala,
+        // Subha & Ashubha Phala
+        'SubhaPhala': subhaPhala,
+        'AshubhaPhala': ashubhaPhala,
       };
     }
 
