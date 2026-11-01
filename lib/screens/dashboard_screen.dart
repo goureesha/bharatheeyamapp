@@ -1650,8 +1650,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                               _LazyTab(builder: (_) => _buildYogaTab()),
                               _LazyTab(builder: (_) => _buildPredictionTab()),
                               _LazyTab(builder: (_) => _buildGocharTab()),
-                              _LazyTab(builder: (_) => _buildNotesTab()),
-                              _LazyTab(builder: (_) => _buildJanmaPatrikeTab()),
+                              _LazyTab(builder: (_) => _buildNotesTab(), liveRebuild: true),
+                              _LazyTab(builder: (_) => _buildJanmaPatrikeTab(), liveRebuild: true),
               _LazyTab(builder: (_) => _buildAvakahadaTab()),
                             ],
                           ),
@@ -1681,8 +1681,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   _LazyTab(builder: (_) => _buildYogaTab()),
                                   _LazyTab(builder: (_) => _buildPredictionTab()),
                                   _LazyTab(builder: (_) => _buildGocharTab()),
-                                  _LazyTab(builder: (_) => _buildNotesTab()),
-                                  _LazyTab(builder: (_) => _buildJanmaPatrikeTab()),
+                                  _LazyTab(builder: (_) => _buildNotesTab(), liveRebuild: true),
+                                  _LazyTab(builder: (_) => _buildJanmaPatrikeTab(), liveRebuild: true),
                   _LazyTab(builder: (_) => _buildAvakahadaTab()),
                                 ],
                               ),
@@ -6094,7 +6094,11 @@ class _GocharSegment {
 // ─────────────────────────────────────────────────────────────────────────────
 class _LazyTab extends StatefulWidget {
   final WidgetBuilder builder;
-  const _LazyTab({required this.builder});
+  /// When true, the tab rebuilds every time the parent calls setState
+  /// instead of caching the widget tree. Use for interactive tabs like
+  /// Janma Patrike that have form controls, radio buttons, checkboxes etc.
+  final bool liveRebuild;
+  const _LazyTab({required this.builder, this.liveRebuild = false});
 
   @override
   State<_LazyTab> createState() => _LazyTabState();
@@ -6137,6 +6141,10 @@ class _LazyTabState extends State<_LazyTab>
           child: CircularProgressIndicator(strokeWidth: 2),
         ),
       );
+    }
+    // For liveRebuild tabs, always call the builder (no caching)
+    if (widget.liveRebuild) {
+      return widget.builder(context);
     }
     // Build (and cache) the real content on first ready frame
     _child ??= widget.builder(context);
