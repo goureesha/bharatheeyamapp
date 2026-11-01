@@ -2292,12 +2292,23 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
     );
   }
   Widget _buildAadharaTab() {
-    return SingleChildScrollView(
+    // Flatten sections into a list for lazy rendering.
+    // Each item is either a String (section header) or a ShlokaRef (card).
+    final List<dynamic> flatItems = [];
+    for (final section in AshtamangalaShlokaData.allSections.entries) {
+      flatItems.add(section.key); // String = section header
+      for (final ref in section.value) {
+        flatItems.add(ref); // ShlokaRef = card
+      }
+    }
+
+    return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
+      itemCount: flatItems.length + 2, // +1 header, +1 bottom spacer
+      itemBuilder: (context, index) {
+        // First item: the title header
+        if (index == 0) {
+          return Center(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 12, top: 4),
               child: Column(
@@ -2314,38 +2325,42 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
                 ],
               ),
             ),
-          ),
-          ...AshtamangalaShlokaData.allSections.entries.map((section) {
-            return Column(
+          );
+        }
+        // Last item: bottom spacer
+        if (index == flatItems.length + 1) {
+          return const SizedBox(height: 20);
+        }
+
+        final item = flatItems[index - 1];
+        if (item is String) {
+          // Section header
+          return Padding(
+            padding: EdgeInsets.only(top: index > 1 ? 12 : 0),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _sectionLabel('📖 ${section.key}', kPurple2),
+                _sectionLabel('📖 ${item}', kPurple2),
                 const SizedBox(height: 4),
-                ...section.value.map((ref) => _buildShlokaCard(ref)),
-                const SizedBox(height: 12),
               ],
-            );
-          }),
-          const SizedBox(height: 20),
-        ],
-      ),
+            ),
+          );
+        } else {
+          // Shloka card (lazily built)
+          return _buildShlokaCard(item as ShlokaRef);
+        }
+      },
     );
   }
 
   Widget _buildShlokaCard(ShlokaRef ref) {
-    return Container(
+    return RepaintBoundary(
+      child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(9),
@@ -2441,6 +2456,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
             ),
           ],
         ),
+      ),
       ),
     );
   }
