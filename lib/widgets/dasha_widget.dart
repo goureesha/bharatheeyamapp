@@ -38,13 +38,11 @@ class _MahaBlock extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: ExpansionTile(
-          title: Row(children: [
-            Text(appPlanetNames[md.lord] ?? tr(md.lord), style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16)),
-            const Spacer(),
-            Text(fmt(md.end), style: TextStyle(
-              color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600)),
-          ]),
+          title: Text(appPlanetNames[md.lord] ?? tr(md.lord), style: TextStyle(
+            color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16),
+            overflow: TextOverflow.ellipsis, maxLines: 1),
+          subtitle: Text(fmt(md.end), style: TextStyle(
+            color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
           iconColor: Colors.white,
           collapsedIconColor: Colors.white,
           children: md.antardashas.map((ad) => _AntarBlock(ad: ad, fmt: fmt)).toList(),
@@ -73,9 +71,10 @@ class _AntarBlock extends StatelessWidget {
           title: Row(children: [
             Container(width: 4, height: 24, color: const Color(0xFFFF9933),
               margin: const EdgeInsets.only(right: 10)),
-            Text(appPlanetNames[ad.lord] ?? tr(ad.lord), style: TextStyle(
-              color: kOrange2, fontWeight: FontWeight.w900, fontSize: 15)),
-            const Spacer(),
+            Flexible(child: Text(appPlanetNames[ad.lord] ?? tr(ad.lord), style: TextStyle(
+              color: kOrange2, fontWeight: FontWeight.w900, fontSize: 15),
+              overflow: TextOverflow.ellipsis, maxLines: 1)),
+            const SizedBox(width: 8),
             Text(fmt(ad.end), style: TextStyle(
               color: kMuted, fontSize: 12, fontWeight: FontWeight.w600)),
           ]),
@@ -111,9 +110,10 @@ class _PratyantaraBlock extends StatelessWidget {
           title: Row(children: [
             Container(width: 3, height: 18, color: const Color(0xFF81E6D9),
               margin: const EdgeInsets.only(right: 10)),
-            Text(appPlanetNames[pd.lord] ?? tr(pd.lord), style: TextStyle(
-              color: kTeal, fontWeight: FontWeight.w800, fontSize: 14)),
-            const Spacer(),
+            Flexible(child: Text(appPlanetNames[pd.lord] ?? tr(pd.lord), style: TextStyle(
+              color: kTeal, fontWeight: FontWeight.w800, fontSize: 14),
+              overflow: TextOverflow.ellipsis, maxLines: 1)),
+            const SizedBox(width: 8),
             Text(fmt(pd.end), style: TextStyle(
               color: kMuted, fontSize: 12, fontWeight: FontWeight.w600)),
           ]),

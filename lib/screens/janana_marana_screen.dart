@@ -345,7 +345,7 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
               optionsBuilder: (v) {
                 if (v.text.length < 2) return const Iterable<String>.empty();
                 final q = v.text.toLowerCase();
-                return offlinePlaces.where((p) => p.toLowerCase().contains(q)).take(10);
+                return offlinePlaces.keys.where((p) => p.toLowerCase().contains(q)).take(10);
               },
               onSelected: (val) {
                 _placeCtrl.text = val;
