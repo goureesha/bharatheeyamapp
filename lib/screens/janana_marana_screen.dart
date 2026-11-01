@@ -180,6 +180,9 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
       final moonSunDiff = (moonLon - sunLon + 360.0) % 360.0;
       final moonSunApprox = (moonSunDiff % 12.0) / 12.0;
 
+      // Sun nakshatra index for Kala Dosha calculation
+      final sunNakIdx = knNak.indexOf(p.suryaNakshatra).clamp(0, 26);
+
       final input = DoshaInput(
         nakshatraIndex: p.nakshatraIndex,
         pada: moonInfo?.pada ?? 1,
@@ -193,6 +196,7 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
         lagnaLongitude: lagnaLon,
         yogaIndex: knYoga.indexOf(p.yoga).clamp(0, 26),
         karanaString: p.karana,
+        sunNakshatraIndex: sunNakIdx,
       );
 
       final doshas = analyzeJananaMaranaDosha(input);

@@ -47,6 +47,7 @@ class DoshaInput {
   final double lagnaLongitude; // sidereal degrees (0-360)
   final int yogaIndex;         // 0-26
   final String karanaString;   // raw karana name from PanchangData
+  final int sunNakshatraIndex; // 0-26 (for Kala Dosha calculation)
 
   const DoshaInput({
     required this.nakshatraIndex,
@@ -61,6 +62,7 @@ class DoshaInput {
     this.lagnaLongitude = 0.0,
     required this.yogaIndex,
     this.karanaString = '',
+    this.sunNakshatraIndex = 0,
   });
 }
 
@@ -119,6 +121,16 @@ List<DoshaResult> analyzeJananaMaranaDosha(DoshaInput input) {
 
   // ── GROUP 6: Combined panchanga ──
   _checkTripadaDosha(input, doshas);
+
+  // ── GROUP 7: Marana doshas ──
+  _checkPanchakaDosha(input, doshas);
+  _checkTripadaNakshatra(input, doshas);
+  _checkDwipadaNakshatra(input, doshas);
+  _checkTithiDoshaMarana(input, doshas);
+  _checkVaraDoshaMarana(input, doshas);
+  _checkDwipushkaraYoga(input, doshas);
+  _checkTripushkaraYoga(input, doshas);
+  _checkKalaDosha(input, doshas);
 
   return doshas;
 }
@@ -700,4 +712,251 @@ void _checkTripadaDosha(DoshaInput input, List<DoshaResult> doshas) {
       details: {'count': '$count', 'elements': badElements.join(', ')},
     ));
   }
+}
+
+// ═══════════════════════════════════════════════════════════
+// MARANA DOSHAS
+// ═══════════════════════════════════════════════════════════
+
+// ── M1. PANCHAKA DOSHA (ಧನಿಷ್ಠಾದಿ ಪಂಚಕ ದೋಷ)
+// Moon in 5 nakshatras: Dhanishtha(22) 2nd half,
+// Satabhisha(23), Purvabhadra(24), Uttarabhadra(25), Revati(26)
+// ─────────────────────────────────────────────────────────
+void _checkPanchakaDosha(DoshaInput input, List<DoshaResult> doshas) {
+  bool found = false;
+  String nakName = '';
+
+  // Dhanishtha 2nd half: padas 3-4
+  if (input.nakshatraIndex == 22 && input.pada >= 3) {
+    found = true;
+    nakName = '${knNak[22]} (3-4 ಪಾದ)';
+  } else if (input.nakshatraIndex >= 23 && input.nakshatraIndex <= 26) {
+    found = true;
+    nakName = knNak[input.nakshatraIndex];
+  }
+
+  if (found) {
+    // Severity based on nakshatra within Panchaka
+    final severity = input.nakshatraIndex == 23   // Satabhisha: Roga Panchaka
+        ? DoshaSeverity.tivra
+        : input.nakshatraIndex == 24              // Purvabhadra: Agni Panchaka
+            ? DoshaSeverity.tivra
+            : DoshaSeverity.madhyama;
+
+    doshas.add(DoshaResult(
+      id: 'panchakaDosha',
+      nameKn: 'ಧನಿಷ್ಠಾದಿ ಪಂಚಕ ದೋಷ',
+      nameEn: 'Dhanishthadi Panchaka Dosha',
+      severity: severity,
+      descriptionKn: 'ಧನಿಷ್ಠಾದ ಉತ್ತರಾರ್ಧದಿಂದ ರೇವತಿಯ ಅಂತ್ಯದವರೆಗೆ. ಜನ್ಮ ನಕ್ಷತ್ರ: $nakName.',
+      descriptionEn: 'Moon in Panchaka zone (Dhanishtha 2nd half to end of Revati). Star: $nakName.',
+      remedyKn: 'ಪಂಚಕ ಶಾಂತಿ ಪೂಜೆ, ಪಂಚಕ ನಕ್ಷತ್ರ ಅಧಿದೇವತೆ ಅರ್ಚನೆ ಮಾಡಬೇಕು.',
+      remedyEn: 'Panchaka Shanti Puja and worship of Panchaka nakshatra deities.',
+      details: {'nakshatra': nakName},
+    ));
+  }
+}
+
+// ── M2. TRIPADA NAKSHATRA DOSHA (ತ್ರಿಪಾದ ನಕ್ಷತ್ರ ದೋಷ)
+// Moon in a Tripada nakshatra AND on the 3-pada side
+// Tripada nakshatras (3 padas in one sign, 1 in the next):
+//   Kritika(2): padas 2-4 in Taurus (3-pada side)
+//   Punarvasu(6): padas 1-3 in Gemini (3-pada side)
+//   Uttara Phalguni(11): padas 2-4 in Virgo (3-pada side)
+//   Vishakha(15): padas 1-3 in Libra (3-pada side)
+//   Uttarashadha(20): padas 2-4 in Capricorn (3-pada side)
+//   Purva Bhadrapada(24): padas 1-3 in Aquarius (3-pada side)
+// ─────────────────────────────────────────────────────────
+void _checkTripadaNakshatra(DoshaInput input, List<DoshaResult> doshas) {
+  // Map: nakshatra index → list of padas that are the "3-pada side"
+  const tripadaMap = <int, List<int>>{
+    2:  [2, 3, 4],  // Kritika: 3 padas in Taurus
+    6:  [1, 2, 3],  // Punarvasu: 3 padas in Gemini
+    11: [2, 3, 4],  // Uttara Phalguni: 3 padas in Virgo
+    15: [1, 2, 3],  // Vishakha: 3 padas in Libra
+    20: [2, 3, 4],  // Uttarashadha: 3 padas in Capricorn
+    24: [1, 2, 3],  // Purva Bhadrapada: 3 padas in Aquarius
+  };
+
+  if (!tripadaMap.containsKey(input.nakshatraIndex)) return;
+  if (!tripadaMap[input.nakshatraIndex]!.contains(input.pada)) return;
+
+  final nakName = knNak[input.nakshatraIndex];
+  doshas.add(DoshaResult(
+    id: 'tripadaNakshatra',
+    nameKn: 'ತ್ರಿಪಾದ ನಕ್ಷತ್ರ ದೋಷ',
+    nameEn: 'Tripada Nakshatra Dosha',
+    severity: DoshaSeverity.madhyama,
+    descriptionKn: 'ಚಂದ್ರನ ಪಾದವು ತ್ರಿಪಾದ ನಕ್ಷತ್ರ $nakName ದ 3-ಪಾದದ ಬದಿಯಲ್ಲಿದೆ. ಪಾದ ${input.pada}.',
+    descriptionEn: 'Moon\'s pada is on the 3-pada side of Tripada nakshatra $nakName. Pada ${input.pada}.',
+    remedyKn: 'ತ್ರಿಪಾದ ನಕ್ಷತ್ರ ಶಾಂತಿ, ನಕ್ಷತ್ರ ಅಧಿದೇವತೆ ಅರ್ಚನೆ ಮಾಡಬೇಕು.',
+    remedyEn: 'Tripada Nakshatra Shanti and worship of nakshatra deity.',
+    details: {'nakshatra': nakName, 'pada': '${input.pada}'},
+  ));
+}
+
+// ── M3. DWIPADA NAKSHATRA (ದ್ವಿಪಾದ ನಕ್ಷತ್ರ)
+// Moon in nakshatras split equally 2-2 across rashi boundary:
+//   Mrigashira(4): 2 padas in Taurus, 2 in Gemini
+//   Chitra(13): 2 padas in Virgo, 2 in Libra
+//   Dhanishtha(22): 2 padas in Capricorn, 2 in Aquarius
+// ─────────────────────────────────────────────────────────
+void _checkDwipadaNakshatra(DoshaInput input, List<DoshaResult> doshas) {
+  const dwipadaNaks = {4, 13, 22};
+
+  if (!dwipadaNaks.contains(input.nakshatraIndex)) return;
+
+  final nakName = knNak[input.nakshatraIndex];
+  doshas.add(DoshaResult(
+    id: 'dwipadaNakshatra',
+    nameKn: 'ದ್ವಿಪಾದ ನಕ್ಷತ್ರ ದೋಷ',
+    nameEn: 'Dwipada Nakshatra Dosha',
+    severity: DoshaSeverity.saumya,
+    descriptionKn: 'ಚಂದ್ರನ ನಕ್ಷತ್ರ $nakName ರಾಶಿ ಗಡಿಯಲ್ಲಿ ಸಮಾನವಾಗಿ (2-2) ವಿಭಜನೆಯಾಗುತ್ತದೆ.',
+    descriptionEn: 'Moon\'s nakshatra $nakName is equally split (2-2) at rashi boundary.',
+    remedyKn: 'ದ್ವಿಪಾದ ನಕ್ಷತ್ರ ಶಾಂತಿ ಮಾಡಬೇಕು.',
+    remedyEn: 'Dwipada Nakshatra Shanti recommended.',
+    details: {'nakshatra': nakName},
+  ));
+}
+
+// ── M4. TITHI DOSHA (ತಿಥಿ ದೋಷ — Marana specific)
+// Dwitiya(1,16), Saptami(6,21), Dwadashi(11,26)
+// ─────────────────────────────────────────────────────────
+void _checkTithiDoshaMarana(DoshaInput input, List<DoshaResult> doshas) {
+  const doshaBaseTithis = {1, 6, 11}; // Dwitiya, Saptami, Dwadashi (base index within 15)
+  final baseTithi = input.tithiIndex % 15;
+
+  if (!doshaBaseTithis.contains(baseTithi)) return;
+
+  final tithiName = knTithi[input.tithiIndex];
+  doshas.add(DoshaResult(
+    id: 'tithiDoshaMarana',
+    nameKn: 'ತಿಥಿ ದೋಷ',
+    nameEn: 'Tithi Dosha (Marana)',
+    severity: DoshaSeverity.madhyama,
+    descriptionKn: 'ದ್ವಿತೀಯಾ, ಸಪ್ತಮಿ ಅಥವಾ ದ್ವಾದಶಿ ತಿಥಿ. ಜನ್ಮ ತಿಥಿ: $tithiName.',
+    descriptionEn: 'Birth on Dwitiya, Saptami, or Dwadashi tithi. Birth tithi: $tithiName.',
+    remedyKn: 'ತಿಥಿ ಶಾಂತಿ ಪೂಜೆ, ತಿಥಿ ಅಧಿದೇವತೆ ಅರ್ಚನೆ ಮಾಡಬೇಕು.',
+    remedyEn: 'Tithi Shanti Puja and worship of tithi deity.',
+    details: {'tithi': tithiName},
+  ));
+}
+
+// ── M5. VARA DOSHA (ವಾರ ದೋಷ — Marana specific)
+// Sunday(0), Tuesday(2), Saturday(6)
+// ─────────────────────────────────────────────────────────
+void _checkVaraDoshaMarana(DoshaInput input, List<DoshaResult> doshas) {
+  const doshaVaras = {0, 2, 6}; // Sun, Tue, Sat
+
+  if (!doshaVaras.contains(input.varaIndex)) return;
+
+  final varaName = knVara[input.varaIndex];
+  doshas.add(DoshaResult(
+    id: 'varaDoshaMarana',
+    nameKn: 'ವಾರ ದೋಷ',
+    nameEn: 'Vara Dosha (Marana)',
+    severity: DoshaSeverity.madhyama,
+    descriptionKn: 'ಭಾನುವಾರ, ಮಂಗಳವಾರ ಅಥವಾ ಶನಿವಾರ ವಾರ. ಜನ್ಮ ವಾರ: $varaName.',
+    descriptionEn: 'Birth on Sunday, Tuesday, or Saturday. Birth vara: $varaName.',
+    remedyKn: 'ವಾರ ಶಾಂತಿ, ವಾರ ಅಧಿಪತಿ ಗ್ರಹ ಶಾಂತಿ ಮಾಡಬೇಕು.',
+    remedyEn: 'Vara Shanti and worship of vara lord recommended.',
+    details: {'vara': varaName},
+  ));
+}
+
+// ── M6. DWIPUSHKARA YOGA (ದ್ವಿಪುಷ್ಕರ ಯೋಗ)
+// Tithi dosha + Vara dosha + Dwipada nakshatra (all 3 together)
+// Doubles misfortune — events repeat twice
+// ─────────────────────────────────────────────────────────
+void _checkDwipushkaraYoga(DoshaInput input, List<DoshaResult> doshas) {
+  const doshaBaseTithis = {1, 6, 11};
+  const doshaVaras = {0, 2, 6};
+  const dwipadaNaks = {4, 13, 22};
+
+  final baseTithi = input.tithiIndex % 15;
+  final hasTithiDosha = doshaBaseTithis.contains(baseTithi);
+  final hasVaraDosha = doshaVaras.contains(input.varaIndex);
+  final hasDwipadaNak = dwipadaNaks.contains(input.nakshatraIndex);
+
+  if (!(hasTithiDosha && hasVaraDosha && hasDwipadaNak)) return;
+
+  doshas.add(DoshaResult(
+    id: 'dwipushkaraYoga',
+    nameKn: 'ದ್ವಿಪುಷ್ಕರ ಯೋಗ',
+    nameEn: 'Dwipushkara Yoga',
+    severity: DoshaSeverity.tivra,
+    descriptionKn: 'ತಿಥಿ/ವಾರ ದೋಷದೊಂದಿಗೆ ದ್ವಿಪಾದ ನಕ್ಷತ್ರ. ${knTithi[input.tithiIndex]} + ${knVara[input.varaIndex]} + ${knNak[input.nakshatraIndex]}. ದುರ್ಘಟನೆ ಎರಡು ಬಾರಿ ಪುನರಾವರ್ತನೆ.',
+    descriptionEn: 'Tithi dosha + Vara dosha + Dwipada nakshatra together. ${knTithi[input.tithiIndex]} + ${knVara[input.varaIndex]} + ${knNak[input.nakshatraIndex]}. Misfortune doubles.',
+    remedyKn: 'ದ್ವಿಪುಷ್ಕರ ಶಾಂತಿ, ನವಗ್ರಹ ಹೋಮ, ಮೃತ್ಯುಂಜಯ ಜಪ 11,000 ಬಾರಿ ಮಾಡಬೇಕು.',
+    remedyEn: 'Dwipushkara Shanti, Navagraha Homa, and Mrityunjaya Japa 11,000 times.',
+    details: {'tithi': knTithi[input.tithiIndex], 'vara': knVara[input.varaIndex], 'nakshatra': knNak[input.nakshatraIndex]},
+  ));
+}
+
+// ── M7. TRIPUSHKARA YOGA (ತ್ರಿಪುಷ್ಕರ ಯೋಗ)
+// Tithi dosha + Vara dosha + Tripada nakshatra (3-pada side)
+// Triples misfortune — events repeat three times
+// ─────────────────────────────────────────────────────────
+void _checkTripushkaraYoga(DoshaInput input, List<DoshaResult> doshas) {
+  const doshaBaseTithis = {1, 6, 11};
+  const doshaVaras = {0, 2, 6};
+  const tripadaMap = <int, List<int>>{
+    2:  [2, 3, 4],
+    6:  [1, 2, 3],
+    11: [2, 3, 4],
+    15: [1, 2, 3],
+    20: [2, 3, 4],
+    24: [1, 2, 3],
+  };
+
+  final baseTithi = input.tithiIndex % 15;
+  final hasTithiDosha = doshaBaseTithis.contains(baseTithi);
+  final hasVaraDosha = doshaVaras.contains(input.varaIndex);
+  final isTripadaNak = tripadaMap.containsKey(input.nakshatraIndex) &&
+      tripadaMap[input.nakshatraIndex]!.contains(input.pada);
+
+  if (!(hasTithiDosha && hasVaraDosha && isTripadaNak)) return;
+
+  doshas.add(DoshaResult(
+    id: 'tripushkaraYoga',
+    nameKn: 'ತ್ರಿಪುಷ್ಕರ ಯೋಗ',
+    nameEn: 'Tripushkara Yoga',
+    severity: DoshaSeverity.tivra,
+    descriptionKn: 'ತಿಥಿ ದೋಷ, ವಾರ ದೋಷ ಮತ್ತು ತ್ರಿಪಾದ ನಕ್ಷತ್ರ ಒಟ್ಟಿಗೆ. ${knTithi[input.tithiIndex]} + ${knVara[input.varaIndex]} + ${knNak[input.nakshatraIndex]} ಪಾದ ${input.pada}. ದುರ್ಘಟನೆ ಮೂರು ಬಾರಿ.',
+    descriptionEn: 'Tithi dosha + Vara dosha + Tripada nakshatra (3-pada side). ${knTithi[input.tithiIndex]} + ${knVara[input.varaIndex]} + ${knNak[input.nakshatraIndex]} pada ${input.pada}. Misfortune triples.',
+    remedyKn: 'ತ್ರಿಪುಷ್ಕರ ಶಾಂತಿ ಅತ್ಯಗತ್ಯ, ನವಗ್ರಹ ಹೋಮ, ಮೃತ್ಯುಂಜಯ ಜಪ 21,000 ಬಾರಿ ಮಾಡಬೇಕು.',
+    remedyEn: 'Tripushkara Shanti essential, Navagraha Homa, and Mrityunjaya Japa 21,000 times.',
+    details: {'tithi': knTithi[input.tithiIndex], 'vara': knVara[input.varaIndex], 'nakshatra': knNak[input.nakshatraIndex], 'pada': '${input.pada}'},
+  ));
+}
+
+// ── M8. KALA DOSHA / KALA MRITYU (ಕಾಲ ದೋಷ)
+// Count from Sun's nakshatra to Moon's nakshatra.
+// Certain counts are Kala Mrityu positions:
+// From classical texts: count = 5, 14, 19, 22 (Kala Mrityu zone)
+// ─────────────────────────────────────────────────────────
+void _checkKalaDosha(DoshaInput input, List<DoshaResult> doshas) {
+  // Count: 1-indexed, from Sun nak to Moon nak inclusive
+  final count = ((input.nakshatraIndex - input.sunNakshatraIndex + 27) % 27) + 1;
+
+  // Classical Kala Mrityu positions (nakshatra distance from Sun to Moon)
+  const kalaMrityuCounts = {5, 14, 19, 22};
+
+  if (!kalaMrityuCounts.contains(count)) return;
+
+  final sunNakName = knNak[input.sunNakshatraIndex];
+  final moonNakName = knNak[input.nakshatraIndex];
+
+  doshas.add(DoshaResult(
+    id: 'kalaDosha',
+    nameKn: 'ಕಾಲ ದೋಷ (ಕಾಲ ಮೃತ್ಯು ಪ್ರವೇಶ)',
+    nameEn: 'Kala Dosha (Kala Mrityu)',
+    severity: count == 22 || count == 5 ? DoshaSeverity.tivra : DoshaSeverity.madhyama,
+    descriptionKn: 'ಸೂರ್ಯನ ನಕ್ಷತ್ರ ($sunNakName) ದಿಂದ ಚಂದ್ರನ ನಕ್ಷತ್ರ ($moonNakName) ದವರೆಗೆ ಎಣಿಸಿ = $count/27, ಕಾಲ ಮೃತ್ಯು ಸ್ಥಾನ.',
+    descriptionEn: 'Count from Sun\'s nakshatra ($sunNakName) to Moon\'s nakshatra ($moonNakName) = $count/27. Kala Mrityu position.',
+    remedyKn: 'ಕಾಲ ಮೃತ್ಯು ಶಾಂತಿ, ಮಹಾ ಮೃತ್ಯುಂಜಯ ಹೋಮ, ಅಯುಷ್ಯ ಸೂಕ್ತ ಪಾರಾಯಣ ಮಾಡಬೇಕು.',
+    remedyEn: 'Kala Mrityu Shanti, Maha Mrityunjaya Homa, and Ayushya Sukta recitation.',
+    details: {'sunNak': sunNakName, 'moonNak': moonNakName, 'count': '$count/27'},
+  ));
 }
