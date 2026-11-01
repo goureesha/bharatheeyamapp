@@ -32,6 +32,9 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
   bool _geoLoading = false;
   String _geoStatus = '';
 
+  // ── Filter state ──
+  DoshaType _selectedType = DoshaType.janana;
+
   // ── Result state ──
   KundaliResult? _result;
   List<DoshaResult>? _doshas;
@@ -257,6 +260,11 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
       'chandraRashi': {'kn': 'ಚಂದ್ರ ರಾಶಿ', 'hi': 'चंद्र राशि', 'en': 'Moon Sign'},
       'lagna': {'kn': 'ಲಗ್ನ', 'hi': 'लग्न', 'en': 'Lagna'},
       'karana': {'kn': 'ಕರಣ', 'hi': 'करण', 'en': 'Karana'},
+      'janana': {'kn': 'ಜನನ ದೋಷ', 'hi': 'जनन दोष', 'ta': 'ஜனன தோஷம்', 'te': 'జనన దోషం', 'ml': 'ജനന ദോഷം', 'en': 'Janana Dosha'},
+      'marana': {'kn': 'ಮರಣ ದೋಷ', 'hi': 'मरण दोष', 'ta': 'மரண தோஷம்', 'te': 'మరణ దోషం', 'ml': 'മരണ ദോഷം', 'en': 'Marana Dosha'},
+      'allDoshas': {'kn': 'ಎಲ್ಲಾ ದೋಷಗಳು', 'hi': 'सभी दोष', 'ta': 'அனைத்து தோஷம்', 'te': 'అన్ని దోషాలు', 'ml': 'എല്ലാ ദോഷങ്ങളും', 'en': 'All Doshas'},
+      'jananaCount': {'kn': 'ಜನನ', 'hi': 'जनन', 'ta': 'ஜனன', 'te': 'జనన', 'ml': 'ജനന', 'en': 'Janana'},
+      'maranaCount': {'kn': 'ಮರಣ', 'hi': 'मरण', 'ta': 'மரண', 'te': 'మరణ', 'ml': 'മരണ', 'en': 'Marana'},
     };
     final lang = AppLocale.current;
     final entry = m[key];
@@ -300,6 +308,8 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
                   if (_doshas != null && _summary != null) ...[
                     const SizedBox(height: 24),
                     _buildPanchangaSummaryCard(),
+                    const SizedBox(height: 16),
+                    _buildTypeToggle(),
                     const SizedBox(height: 16),
                     _buildDoshaResults(),
                   ],
@@ -499,10 +509,93 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
     );
   }
 
+  Widget _buildTypeToggle() {
+    final doshas = _doshas!;
+    final jCount = doshas.where((d) => d.type == DoshaType.janana).length;
+    final mCount = doshas.where((d) => d.type == DoshaType.marana).length;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: kCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: kBorder),
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        children: [
+          _toggleBtn(
+            label: _ls('jananaCount'),
+            count: jCount,
+            icon: Icons.child_care,
+            color: const Color(0xFF7C3AED),
+            selected: _selectedType == DoshaType.janana,
+            onTap: () => setState(() => _selectedType = DoshaType.janana),
+          ),
+          _toggleBtn(
+            label: _ls('maranaCount'),
+            count: mCount,
+            icon: Icons.warning_amber_rounded,
+            color: const Color(0xFFDC2626),
+            selected: _selectedType == DoshaType.marana,
+            onTap: () => setState(() => _selectedType = DoshaType.marana),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _toggleBtn({
+    required String label,
+    required int count,
+    required IconData icon,
+    required Color color,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          decoration: BoxDecoration(
+            color: selected ? color : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: selected ? Colors.white : color, size: 22),
+              const SizedBox(height: 4),
+              Text(label, style: TextStyle(
+                fontSize: 13, fontWeight: FontWeight.w800,
+                color: selected ? Colors.white : color,
+              )),
+              const SizedBox(height: 2),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: selected ? Colors.white.withOpacity(0.25) : color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text('$count', style: TextStyle(
+                  fontSize: 12, fontWeight: FontWeight.w900,
+                  color: selected ? Colors.white : color,
+                )),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDoshaResults() {
     final doshas = _doshas!;
 
-    if (doshas.isEmpty) {
+    // Filter by selected type
+    final filtered = doshas.where((d) => d.type == _selectedType).toList();
+
+    if (filtered.isEmpty) {
       return AppCard(
         margin: EdgeInsets.zero,
         child: Padding(
@@ -519,7 +612,7 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
     }
 
     // Sort: tivra first, then madhyama, then saumya
-    final sorted = List<DoshaResult>.from(doshas)..sort((a, b) => a.severity.index.compareTo(b.severity.index));
+    final sorted = List<DoshaResult>.from(filtered)..sort((a, b) => a.severity.index.compareTo(b.severity.index));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -528,7 +621,7 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
           children: [
             Icon(Icons.warning_amber_rounded, color: kOrange, size: 22),
             const SizedBox(width: 8),
-            Text('${_ls('doshasFound')} (${doshas.length})', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kOrange)),
+            Text('${_ls('doshasFound')} (${filtered.length})', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kOrange)),
           ],
         ),
         const SizedBox(height: 12),

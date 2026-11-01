@@ -5,6 +5,9 @@
 
 import '../constants/strings.dart';
 
+/// Category of dosha
+enum DoshaType { janana, marana }
+
 /// Severity levels for doshas
 enum DoshaSeverity { tivra, madhyama, saumya }
 
@@ -19,6 +22,7 @@ class DoshaResult {
   final String remedyKn;
   final String remedyEn;
   final Map<String, String> details;
+  final DoshaType type;
 
   const DoshaResult({
     required this.id,
@@ -30,6 +34,7 @@ class DoshaResult {
     required this.remedyKn,
     required this.remedyEn,
     this.details = const {},
+    this.type = DoshaType.janana,
   });
 }
 
@@ -753,7 +758,8 @@ void _checkPanchakaDosha(DoshaInput input, List<DoshaResult> doshas) {
       remedyKn: 'ಪಂಚಕ ಶಾಂತಿ ಪೂಜೆ, ಪಂಚಕ ನಕ್ಷತ್ರ ಅಧಿದೇವತೆ ಅರ್ಚನೆ ಮಾಡಬೇಕು.',
       remedyEn: 'Panchaka Shanti Puja and worship of Panchaka nakshatra deities.',
       details: {'nakshatra': nakName},
-    ));
+    )      type: DoshaType.marana,
+    );
   }
 }
 
@@ -792,7 +798,8 @@ void _checkTripadaNakshatra(DoshaInput input, List<DoshaResult> doshas) {
     remedyKn: 'ತ್ರಿಪಾದ ನಕ್ಷತ್ರ ಶಾಂತಿ, ನಕ್ಷತ್ರ ಅಧಿದೇವತೆ ಅರ್ಚನೆ ಮಾಡಬೇಕು.',
     remedyEn: 'Tripada Nakshatra Shanti and worship of nakshatra deity.',
     details: {'nakshatra': nakName, 'pada': '${input.pada}'},
-  ));
+  )      type: DoshaType.marana,
+    );
 }
 
 // ── M3. DWIPADA NAKSHATRA (ದ್ವಿಪಾದ ನಕ್ಷತ್ರ)
@@ -817,7 +824,8 @@ void _checkDwipadaNakshatra(DoshaInput input, List<DoshaResult> doshas) {
     remedyKn: 'ದ್ವಿಪಾದ ನಕ್ಷತ್ರ ಶಾಂತಿ ಮಾಡಬೇಕು.',
     remedyEn: 'Dwipada Nakshatra Shanti recommended.',
     details: {'nakshatra': nakName},
-  ));
+  )      type: DoshaType.marana,
+    );
 }
 
 // ── M4. TITHI DOSHA (ತಿಥಿ ದೋಷ — Marana specific)
@@ -840,7 +848,8 @@ void _checkTithiDoshaMarana(DoshaInput input, List<DoshaResult> doshas) {
     remedyKn: 'ತಿಥಿ ಶಾಂತಿ ಪೂಜೆ, ತಿಥಿ ಅಧಿದೇವತೆ ಅರ್ಚನೆ ಮಾಡಬೇಕು.',
     remedyEn: 'Tithi Shanti Puja and worship of tithi deity.',
     details: {'tithi': tithiName},
-  ));
+  )      type: DoshaType.marana,
+    );
 }
 
 // ── M5. VARA DOSHA (ವಾರ ದೋಷ — Marana specific)
@@ -862,7 +871,8 @@ void _checkVaraDoshaMarana(DoshaInput input, List<DoshaResult> doshas) {
     remedyKn: 'ವಾರ ಶಾಂತಿ, ವಾರ ಅಧಿಪತಿ ಗ್ರಹ ಶಾಂತಿ ಮಾಡಬೇಕು.',
     remedyEn: 'Vara Shanti and worship of vara lord recommended.',
     details: {'vara': varaName},
-  ));
+  )      type: DoshaType.marana,
+    );
 }
 
 // ── M6. DWIPUSHKARA YOGA (ದ್ವಿಪುಷ್ಕರ ಯೋಗ)
@@ -891,7 +901,8 @@ void _checkDwipushkaraYoga(DoshaInput input, List<DoshaResult> doshas) {
     remedyKn: 'ದ್ವಿಪುಷ್ಕರ ಶಾಂತಿ, ನವಗ್ರಹ ಹೋಮ, ಮೃತ್ಯುಂಜಯ ಜಪ 11,000 ಬಾರಿ ಮಾಡಬೇಕು.',
     remedyEn: 'Dwipushkara Shanti, Navagraha Homa, and Mrityunjaya Japa 11,000 times.',
     details: {'tithi': knTithi[input.tithiIndex], 'vara': knVara[input.varaIndex], 'nakshatra': knNak[input.nakshatraIndex]},
-  ));
+  )      type: DoshaType.marana,
+    );
 }
 
 // ── M7. TRIPUSHKARA YOGA (ತ್ರಿಪುಷ್ಕರ ಯೋಗ)
@@ -928,7 +939,8 @@ void _checkTripushkaraYoga(DoshaInput input, List<DoshaResult> doshas) {
     remedyKn: 'ತ್ರಿಪುಷ್ಕರ ಶಾಂತಿ ಅತ್ಯಗತ್ಯ, ನವಗ್ರಹ ಹೋಮ, ಮೃತ್ಯುಂಜಯ ಜಪ 21,000 ಬಾರಿ ಮಾಡಬೇಕು.',
     remedyEn: 'Tripushkara Shanti essential, Navagraha Homa, and Mrityunjaya Japa 21,000 times.',
     details: {'tithi': knTithi[input.tithiIndex], 'vara': knVara[input.varaIndex], 'nakshatra': knNak[input.nakshatraIndex], 'pada': '${input.pada}'},
-  ));
+  )      type: DoshaType.marana,
+    );
 }
 
 // ── M8. KALA DOSHA / KALA MRITYU (ಕಾಲ ದೋಷ)
@@ -958,5 +970,6 @@ void _checkKalaDosha(DoshaInput input, List<DoshaResult> doshas) {
     remedyKn: 'ಕಾಲ ಮೃತ್ಯು ಶಾಂತಿ, ಮಹಾ ಮೃತ್ಯುಂಜಯ ಹೋಮ, ಅಯುಷ್ಯ ಸೂಕ್ತ ಪಾರಾಯಣ ಮಾಡಬೇಕು.',
     remedyEn: 'Kala Mrityu Shanti, Maha Mrityunjaya Homa, and Ayushya Sukta recitation.',
     details: {'sunNak': sunNakName, 'moonNak': moonNakName, 'count': '$count/27'},
-  ));
+  )      type: DoshaType.marana,
+    );
 }
