@@ -220,6 +220,7 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
         _doshas = doshas;
         _summary = summary;
         _loading = false;
+        _selectedType = DoshaType.janana; // always start on janana
       });
     } catch (e) {
       setState(() => _loading = false);
@@ -513,30 +514,29 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
     final doshas = _doshas!;
     final jCount = doshas.where((d) => d.type == DoshaType.janana).length;
     final mCount = doshas.where((d) => d.type == DoshaType.marana).length;
+    final isJanana = _selectedType == DoshaType.janana;
 
     return Container(
       decoration: BoxDecoration(
         color: kCard,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: kBorder),
       ),
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(3),
       child: Row(
         children: [
           _toggleBtn(
             label: _ls('jananaCount'),
             count: jCount,
-            icon: Icons.child_care,
-            color: const Color(0xFF7C3AED),
-            selected: _selectedType == DoshaType.janana,
+            activeColor: kPurple2,
+            selected: isJanana,
             onTap: () => setState(() => _selectedType = DoshaType.janana),
           ),
           _toggleBtn(
             label: _ls('maranaCount'),
             count: mCount,
-            icon: Icons.warning_amber_rounded,
-            color: const Color(0xFFDC2626),
-            selected: _selectedType == DoshaType.marana,
+            activeColor: kOrange,
+            selected: !isJanana,
             onTap: () => setState(() => _selectedType = DoshaType.marana),
           ),
         ],
@@ -547,8 +547,7 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
   Widget _toggleBtn({
     required String label,
     required int count,
-    required IconData icon,
-    required Color color,
+    required Color activeColor,
     required bool selected,
     required VoidCallback onTap,
   }) {
@@ -556,30 +555,30 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
           decoration: BoxDecoration(
-            color: selected ? color : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
+            color: selected ? activeColor.withOpacity(0.12) : Colors.transparent,
+            borderRadius: BorderRadius.circular(9),
+            border: selected ? Border.all(color: activeColor.withOpacity(0.4), width: 1.5) : null,
           ),
-          child: Column(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: selected ? Colors.white : color, size: 22),
-              const SizedBox(height: 4),
               Text(label, style: TextStyle(
-                fontSize: 13, fontWeight: FontWeight.w800,
-                color: selected ? Colors.white : color,
+                fontSize: 14, fontWeight: FontWeight.w800,
+                color: selected ? activeColor : kMuted,
               )),
-              const SizedBox(height: 2),
+              const SizedBox(width: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
-                  color: selected ? Colors.white.withOpacity(0.25) : color.withOpacity(0.12),
+                  color: selected ? activeColor : kMuted.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text('$count', style: TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.w900,
-                  color: selected ? Colors.white : color,
+                  fontSize: 11, fontWeight: FontWeight.w900,
+                  color: selected ? Colors.white : kMuted,
                 )),
               ),
             ],
