@@ -3151,6 +3151,19 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
                               ),
                             );
                           }
+                          if (row == 2 && col == 1) {
+                            // Blank centre spacer — flex:2 keeps Makara & Simha at quarter-width
+                            return Expanded(
+                              flex: 2,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFF5F5),
+                                  border: Border.all(color: kBorder, width: 0.5),
+                                ),
+                              ),
+                            );
+                          }
+                          // col==2 already consumed by flex:2 above — skip
                           return const SizedBox.shrink();
                         }
                         return Expanded(child: rashiCell(ri));
