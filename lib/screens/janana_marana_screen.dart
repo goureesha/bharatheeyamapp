@@ -659,7 +659,6 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
     final isKn = AppLocale.current == 'kn' || AppLocale.current == 'hi' || AppLocale.current == 'ta' || AppLocale.current == 'te' || AppLocale.current == 'ml';
     final name = isKn ? d.nameKn : d.nameEn;
     final desc = isKn ? d.descriptionKn : d.descriptionEn;
-    final remedy = isKn ? d.remedyKn : d.remedyEn;
 
     return AppCard(
       margin: EdgeInsets.zero,
@@ -696,33 +695,7 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Text(desc, style: TextStyle(fontSize: 13, color: kText, height: 1.5)),
           ),
-          // Remedy
-          Container(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: kGreen.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: kGreen.withOpacity(0.2)),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.healing, color: kGreen, size: 18),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(_ls('remedy'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: kGreen)),
-                      const SizedBox(height: 4),
-                      Text(remedy, style: TextStyle(fontSize: 12, color: kText, height: 1.4)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const SizedBox(height: 8),
         ],
       ),
     );
