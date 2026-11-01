@@ -463,10 +463,10 @@ class _AshtamangalaScreenState extends State<AshtamangalaScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             children: [
-              AppCard(
+              AppCard(margin: const EdgeInsets.symmetric(vertical: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1214,12 +1214,12 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ವಿವರ ಕಾರ್ಡ್
-          AppCard(
+          AppCard(margin: const EdgeInsets.symmetric(vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1256,7 +1256,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
 
           // ── 📋 ಪಂಚಾಂಗ (೫ ಅಂಗ) ──
           _sectionLabel('📋 ಪಂಚಾಂಗ ವಿವರ', kPurple2),
-          AppCard(
+          AppCard(margin: const EdgeInsets.symmetric(vertical: 8),
             padding: EdgeInsets.zero,
             child: Column(
               children: [
@@ -1280,7 +1280,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
 
           // ── ☀️ ರವಿ ವಿವರ ──
           _sectionLabel('☀️ ರವಿ ವಿವರ', Colors.orange),
-          AppCard(
+          AppCard(margin: const EdgeInsets.symmetric(vertical: 8),
             padding: EdgeInsets.zero,
             child: Column(
               children: [
@@ -1299,7 +1299,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
 
           // ── 🌙 ಚಂದ್ರ ವಿವರ ──
           _sectionLabel('🌙 ಚಂದ್ರ ವಿವರ', Colors.blue),
-          AppCard(
+          AppCard(margin: const EdgeInsets.symmetric(vertical: 8),
             padding: EdgeInsets.zero,
             child: Column(
               children: [
@@ -1339,10 +1339,10 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
       final chartSize = (screenWidth - 32).clamp(280.0, 480.0);
 
       return SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           children: [
-            AppCard(
+            AppCard(margin: const EdgeInsets.symmetric(vertical: 8),
               child: Column(
                 children: [
                   SizedBox(
@@ -1507,13 +1507,13 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
     ];
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── ಗ್ರಹ ಸ್ಫುಟ ──
           _sectionLabel('🪐 ಗ್ರಹ ಸ್ಫುಟ', kPurple2),
-          AppCard(
+          AppCard(margin: const EdgeInsets.symmetric(vertical: 8),
             padding: EdgeInsets.zero,
             child: Column(
               children: [
@@ -1549,7 +1549,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
 
           // ── ಉಪಗ್ರಹ ಮತ್ತು ವಿಶೇಷ ಸ್ಫುಟಗಳು ──
           _sectionLabel('✨ ಉಪಗ್ರಹ ಮತ್ತು ಇತರ ಸ್ಫುಟಗಳು', kTeal),
-          AppCard(
+          AppCard(margin: const EdgeInsets.symmetric(vertical: 8),
             padding: EdgeInsets.zero,
             child: Column(
               children: [
@@ -1818,12 +1818,12 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── ಸಾರಾಂಶ (Summary) ──
-          AppCard(
+          AppCard(margin: const EdgeInsets.symmetric(vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1839,7 +1839,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
           _sectionLabel('📋 ಮಹಾದಶಾ ವಿವರ', kPurple2),
           ...d.trisphutaDashas.map((md) {
             final isCurrent = now.isAfter(md.start) && now.isBefore(md.end);
-            return AppCard(
+            return AppCard(margin: const EdgeInsets.symmetric(vertical: 8),
               padding: EdgeInsets.zero,
               child: Theme(
                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -1956,7 +1956,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
   Widget _buildPhalaTab() {
     final d = _ashtamangalaDetails;
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -2321,7 +2321,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
     ];
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       children: [
         // Title
         Center(
@@ -2765,7 +2765,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: flatItems.length + 2, // +1 header, +1 bottom spacer
       itemBuilder: (context, index) {
         // First item: the title header
@@ -3081,7 +3081,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -3297,7 +3297,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
 
     Widget dCell(String text) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Text(text, style: TextStyle(fontSize: 12, color: kText), textAlign: TextAlign.center),
       );
     }
@@ -3357,7 +3357,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
     const shodHeaders = ['D4', 'D7', 'D10', 'D16', 'D20', 'D24', 'D27', 'D40', 'D45', 'D60'];
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

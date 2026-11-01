@@ -4161,13 +4161,14 @@ class AppHeader extends StatelessWidget {
 class AppCard extends StatelessWidget {
   final Widget child;
   final EdgeInsets? padding;
-  const AppCard({super.key, required this.child, this.padding});
+  final EdgeInsets? margin;
+  const AppCard({super.key, required this.child, this.padding, this.margin});
 
   @override
   Widget build(BuildContext context) {
     final isTanjore = AppThemes.isTanjore;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: padding ?? const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: kCard,
