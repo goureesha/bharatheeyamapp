@@ -186,6 +186,21 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
       // Sun nakshatra index for Kala Dosha calculation
       final sunNakIdx = knNak.indexOf(p.suryaNakshatra).clamp(0, 26);
 
+      // Build planet rashi map for Panchamarishta analysis
+      final planetRashiMap = <String, int>{};
+      // Map Kannada planet names to keys
+      const planetKeyMap = {
+        'ರವಿ': 'ravi', 'ಚಂದ್ರ': 'chandra', 'ಕುಜ': 'kuja',
+        'ಬುಧ': 'budha', 'ಗುರು': 'guru', 'ಶುಕ್ರ': 'shukra',
+        'ಶನಿ': 'shani', 'ರಾಹು': 'rahu', 'ಕೇತು': 'ketu',
+      };
+      for (final entry in planetKeyMap.entries) {
+        final info = result.planets[entry.key];
+        if (info != null) {
+          planetRashiMap[entry.value] = info.rashiIndex;
+        }
+      }
+
       final input = DoshaInput(
         nakshatraIndex: p.nakshatraIndex,
         pada: moonInfo?.pada ?? 1,
@@ -200,6 +215,7 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
         yogaIndex: knYoga.indexOf(p.yoga).clamp(0, 26),
         karanaString: p.karana,
         sunNakshatraIndex: sunNakIdx,
+        planetRashis: planetRashiMap,
       );
 
       final doshas = analyzeJananaMaranaDosha(input);

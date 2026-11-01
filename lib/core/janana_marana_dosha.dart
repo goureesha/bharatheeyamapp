@@ -54,6 +54,14 @@ class DoshaInput {
   final String karanaString;   // raw karana name from PanchangData
   final int sunNakshatraIndex; // 0-26 (for Kala Dosha calculation)
 
+  // Planet rashi indices for Panchamarishta calculation
+  // Keys: 'ravi','chandra','kuja','budha','guru','shukra','shani','rahu','ketu'
+  // Values: 0-11 (0=Mesha, 11=Meena)
+  final Map<String, int> planetRashis;
+
+  // Moon speed/waning: true if Krishna Paksha (waning) — tithiIndex >= 15
+  // Already derivable from tithiIndex, but explicit for clarity
+
   const DoshaInput({
     required this.nakshatraIndex,
     required this.pada,
@@ -68,6 +76,7 @@ class DoshaInput {
     required this.yogaIndex,
     this.karanaString = '',
     this.sunNakshatraIndex = 0,
+    this.planetRashis = const {},
   });
 }
 
@@ -126,6 +135,13 @@ List<DoshaResult> analyzeJananaMaranaDosha(DoshaInput input) {
 
   // ── GROUP 6: Combined panchanga ──
   _checkTripadaDosha(input, doshas);
+
+  // ── GROUP 6B: Panchamarishta Janana Doshas ──
+  _checkChandraArishta(input, doshas);
+  _checkPapaKartariArishta(input, doshas);
+  _checkKendraPapaArishta(input, doshas);
+  _checkBalarishta(input, doshas);
+  _checkLagneshDusthanaArishta(input, doshas);
 
   // ── GROUP 7: Marana doshas ──
   _checkPanchakaDosha(input, doshas);
@@ -972,4 +988,232 @@ void _checkKalaDosha(DoshaInput input, List<DoshaResult> doshas) {
     details: {'sunNak': sunNakName, 'moonNak': moonNakName, 'count': '$count/27'},
     type: DoshaType.marana,
   ));
+}
+
+// ═══════════════════════════════════════════════════════════
+// PANCHAMARISHTA JANANA DOSHAS (ಪಂಚಮಾರಿಷ್ಟ ಜನನ ದೋಷಗಳು)
+// Five classical Arishtas (dangers) for newborn children.
+// Ref: Brihat Jataka Ch.5, Jataka Parijata, Prasna Marga
+// ═══════════════════════════════════════════════════════════
+
+/// Helper: house number (1-12) of a planet from lagna
+int _houseFrom(int planetRashi, int lagnaRashi) {
+  return ((planetRashi - lagnaRashi + 12) % 12) + 1;
+}
+
+/// Helper: is this rashi occupied by any of the given planets?
+bool _rashiHasAny(Map<String, int> planetRashis, int rashi, List<String> planets) {
+  for (final p in planets) {
+    if (planetRashis[p] == rashi) return true;
+  }
+  return false;
+}
+
+// Lagna lords: Mesha=Kuja, Vrishabha=Shukra, Mithuna=Budha, Karkata=Chandra,
+// Simha=Ravi, Kanya=Budha, Tula=Shukra, Vrischika=Kuja, Dhanu=Guru,
+// Makara=Shani, Kumbha=Shani, Meena=Guru
+const _lagnaLords = <int, String>{
+  0: 'kuja', 1: 'shukra', 2: 'budha', 3: 'chandra',
+  4: 'ravi', 5: 'budha', 6: 'shukra', 7: 'kuja',
+  8: 'guru', 9: 'shani', 10: 'shani', 11: 'guru',
+};
+
+const _malefics = ['ravi', 'kuja', 'shani', 'rahu', 'ketu'];
+const _benefics = ['guru', 'shukra', 'budha']; // Budha as natural benefic
+
+// ── P1. CHANDRA ARISHTA (ಚಂದ್ರ ಅರಿಷ್ಟ) ──
+// Moon in 6th, 8th, or 12th house from Lagna = Dusthana placement
+// Indicates health risks and vulnerability for the newborn.
+// Ref: Brihat Jataka 5.1, Jataka Parijata 3.60
+// ──────────────────────────────────────────────────
+void _checkChandraArishta(DoshaInput input, List<DoshaResult> doshas) {
+  final moonHouse = _houseFrom(input.moonRashiIndex, input.lagnaRashiIndex);
+  if (moonHouse != 6 && moonHouse != 8 && moonHouse != 12) return;
+
+  final rashiName = knRashi[input.moonRashiIndex];
+  final lagnaName = knRashi[input.lagnaRashiIndex];
+
+  doshas.add(DoshaResult(
+    id: 'chandraArishta',
+    nameKn: 'ಚಂದ್ರ ಅರಿಷ್ಟ (ಪಂಚಮಾರಿಷ್ಟ ೧)',
+    nameEn: 'Chandra Arishta (Panchamarishta 1)',
+    severity: moonHouse == 8 ? DoshaSeverity.tivra : DoshaSeverity.madhyama,
+    descriptionKn: 'ಚಂದ್ರನು ಲಗ್ನದಿಂದ ${moonHouse}ನೇ ಭಾವದಲ್ಲಿ (ದುಸ್ಥಾನ) ಇದ್ದಾನೆ. ಲಗ್ನ: $lagnaName, ಚಂದ್ರ ರಾಶಿ: $rashiName. ಶಿಶುವಿನ ಆರೋಗ್ಯಕ್ಕೆ ಅಪಾಯ ಸೂಚನೆ.',
+    descriptionEn: 'Moon is in the ${moonHouse}th house (dusthana) from Lagna. Lagna: $lagnaName, Moon Rashi: $rashiName. Indicates health vulnerability for the newborn.',
+    remedyKn: 'ಚಂದ್ರ ಶಾಂತಿ ಪೂಜೆ, ದುರ್ಗಾ ಸಪ್ತಶತೀ ಪಾರಾಯಣ, ಶ್ವೇತ ವಸ್ತ್ರ ದಾನ ಮಾಡಬೇಕು.',
+    remedyEn: 'Chandra Shanti Puja, Durga Saptashati recitation, and donation of white cloth.',
+    details: {'moonHouse': '$moonHouse', 'lagnaRashi': lagnaName, 'moonRashi': rashiName},
+  ));
+}
+
+// ── P2. PAPA KARTARI ARISHTA (ಪಾಪ ಕರ್ತರಿ ಅರಿಷ್ಟ) ──
+// Lagna hemmed between malefics — malefics in both 2nd and 12th houses
+// from Lagna. Creates a "scissors" of inauspiciousness around the ascendant.
+// Ref: Brihat Jataka 5.3, Jataka Parijata 3.62
+// ──────────────────────────────────────────────────
+void _checkPapaKartariArishta(DoshaInput input, List<DoshaResult> doshas) {
+  if (input.planetRashis.isEmpty) return;
+
+  final lagnaR = input.lagnaRashiIndex;
+  final house2Rashi = (lagnaR + 1) % 12;
+  final house12Rashi = (lagnaR + 11) % 12;
+
+  final maleficIn2 = _rashiHasAny(input.planetRashis, house2Rashi, _malefics);
+  final maleficIn12 = _rashiHasAny(input.planetRashis, house12Rashi, _malefics);
+
+  if (!(maleficIn2 && maleficIn12)) return;
+
+  // Find which malefics are there
+  final in2 = _malefics.where((p) => input.planetRashis[p] == house2Rashi).toList();
+  final in12 = _malefics.where((p) => input.planetRashis[p] == house12Rashi).toList();
+
+  final in2Names = in2.map((p) => _planetKnName(p)).join(', ');
+  final in12Names = in12.map((p) => _planetKnName(p)).join(', ');
+
+  doshas.add(DoshaResult(
+    id: 'papaKartariArishta',
+    nameKn: 'ಪಾಪ ಕರ್ತರಿ ಅರಿಷ್ಟ (ಪಂಚಮಾರಿಷ್ಟ ೨)',
+    nameEn: 'Papa Kartari Arishta (Panchamarishta 2)',
+    severity: DoshaSeverity.tivra,
+    descriptionKn: 'ಲಗ್ನದ ಎರಡೂ ಬದಿ ಪಾಪ ಗ್ರಹಗಳಿವೆ (ಪಾಪ ಕರ್ತರಿ). 2ನೇ ಭಾವ: $in2Names, 12ನೇ ಭಾವ: $in12Names. ಶಿಶುವಿಗೆ ಅಪಾಯ.',
+    descriptionEn: 'Lagna hemmed by malefics (Papa Kartari). 2nd house: $in2Names, 12th house: $in12Names. Danger to the newborn.',
+    remedyKn: 'ನವಗ್ರಹ ಶಾಂತಿ ಹೋಮ, ಮಹಾ ಮೃತ್ಯುಂಜಯ ಜಪ, ಆಯುಷ್ಯ ಹೋಮ ಮಾಡಬೇಕು.',
+    remedyEn: 'Navagraha Shanti Homa, Maha Mrityunjaya Japa, and Ayushya Homa.',
+    details: {'house2Malefics': in2Names, 'house12Malefics': in12Names},
+  ));
+}
+
+// ── P3. KENDRA PAPA ARISHTA (ಕೇಂದ್ರ ಪಾಪ ಅರಿಷ್ಟ) ──
+// All natural malefics (Mars, Saturn, Rahu) in kendras (1,4,7,10)
+// with no natural benefic (Jupiter, Venus) in kendra.
+// Ref: Brihat Jataka 5.5, Prasna Marga
+// ──────────────────────────────────────────────────
+void _checkKendraPapaArishta(DoshaInput input, List<DoshaResult> doshas) {
+  if (input.planetRashis.isEmpty) return;
+
+  final lagnaR = input.lagnaRashiIndex;
+  final kendraRashis = {lagnaR, (lagnaR + 3) % 12, (lagnaR + 6) % 12, (lagnaR + 9) % 12};
+
+  // Check key malefics: Mars, Saturn, Rahu in kendras
+  final keyMalefics = ['kuja', 'shani', 'rahu'];
+  final maleficsInKendra = keyMalefics.where((p) {
+    final r = input.planetRashis[p];
+    return r != null && kendraRashis.contains(r);
+  }).toList();
+
+  // Need at least 2 key malefics in kendra for this dosha
+  if (maleficsInKendra.length < 2) return;
+
+  // Check if any benefic is also in kendra (mitigates)
+  final beneficInKendra = _benefics.any((p) {
+    final r = input.planetRashis[p];
+    return r != null && kendraRashis.contains(r);
+  });
+
+  if (beneficInKendra) return; // benefic in kendra cancels
+
+  final maleficNames = maleficsInKendra.map((p) => _planetKnName(p)).join(', ');
+
+  doshas.add(DoshaResult(
+    id: 'kendraPapaArishta',
+    nameKn: 'ಕೇಂದ್ರ ಪಾಪ ಅರಿಷ್ಟ (ಪಂಚಮಾರಿಷ್ಟ ೩)',
+    nameEn: 'Kendra Papa Arishta (Panchamarishta 3)',
+    severity: maleficsInKendra.length >= 3 ? DoshaSeverity.tivra : DoshaSeverity.madhyama,
+    descriptionKn: 'ಕೇಂದ್ರ ಸ್ಥಾನಗಳಲ್ಲಿ (1/4/7/10) ಪಾಪ ಗ್ರಹಗಳಿವೆ: $maleficNames. ಶುಭ ಗ್ರಹ ಕೇಂದ್ರದಲ್ಲಿ ಇಲ್ಲ. ಬಾಲಾರಿಷ್ಟ ಸೂಚನೆ.',
+    descriptionEn: 'Malefics in kendras (1/4/7/10): $maleficNames, with no benefic in kendra. Indicates Balarishta.',
+    remedyKn: 'ಗುರು ಶಾಂತಿ, ಶುಕ್ರ ಶಾಂತಿ, ನವಗ್ರಹ ಹೋಮ ಮತ್ತು ಆಯುಷ್ಯ ಸೂಕ್ತ ಪಾರಾಯಣ.',
+    remedyEn: 'Guru Shanti, Shukra Shanti, Navagraha Homa, and Ayushya Sukta recitation.',
+    details: {'maleficsInKendra': maleficNames, 'count': '${maleficsInKendra.length}'},
+  ));
+}
+
+// ── P4. BALARISHTA YOGA (ಬಾಲಾರಿಷ್ಟ ಯೋಗ) ──
+// Waning Moon (Krishna Paksha) conjunct a malefic (same rashi),
+// without benefic aspect (no benefic in kendra from Moon).
+// Ref: Brihat Jataka 5.2, Hora Sara
+// ──────────────────────────────────────────────────
+void _checkBalarishta(DoshaInput input, List<DoshaResult> doshas) {
+  if (input.planetRashis.isEmpty) return;
+
+  // Waning Moon = Krishna Paksha (tithiIndex 15-29)
+  final isWaning = input.tithiIndex >= 15;
+  if (!isWaning) return;
+
+  final moonR = input.moonRashiIndex;
+
+  // Check if any malefic is conjunct Moon (same rashi)
+  final conjunctMalefics = _malefics.where((p) {
+    if (p == 'ravi') return false; // Sun conjunction = Amavasya, handled separately
+    return input.planetRashis[p] == moonR;
+  }).toList();
+
+  if (conjunctMalefics.isEmpty) return;
+
+  // Check if any benefic is in kendra from Moon (mitigates)
+  final moonKendras = {moonR, (moonR + 3) % 12, (moonR + 6) % 12, (moonR + 9) % 12};
+  final beneficProtection = _benefics.any((p) {
+    final r = input.planetRashis[p];
+    return r != null && moonKendras.contains(r);
+  });
+
+  if (beneficProtection) return; // benefic in Moon's kendra cancels
+
+  final maleficNames = conjunctMalefics.map((p) => _planetKnName(p)).join(', ');
+
+  doshas.add(DoshaResult(
+    id: 'balarishta',
+    nameKn: 'ಬಾಲಾರಿಷ್ಟ ಯೋಗ (ಪಂಚಮಾರಿಷ್ಟ ೪)',
+    nameEn: 'Balarishta Yoga (Panchamarishta 4)',
+    severity: conjunctMalefics.contains('shani') ? DoshaSeverity.tivra : DoshaSeverity.madhyama,
+    descriptionKn: 'ಕೃಷ್ಣ ಪಕ್ಷದ ಕ್ಷೀಣ ಚಂದ್ರನು ಪಾಪ ಗ್ರಹದೊಂದಿಗೆ ಸಂಯೋಗ: $maleficNames. ಶುಭ ಗ್ರಹ ರಕ್ಷಣೆ ಇಲ್ಲ. ಶಿಶುವಿನ ಆಯುಷ್ಯಕ್ಕೆ ಅಪಾಯ.',
+    descriptionEn: 'Waning Moon (Krishna Paksha) conjunct malefic: $maleficNames, without benefic protection. Risk to infant longevity.',
+    remedyKn: 'ಚಂದ್ರ ಶಾಂತಿ, ಮೃತ್ಯುಂಜಯ ಜಪ 11,000, ಆಯುಷ್ಯ ಹೋಮ, ಶ್ವೇತ ಗೋ ದಾನ ಮಾಡಬೇಕು.',
+    remedyEn: 'Chandra Shanti, Mrityunjaya Japa 11,000, Ayushya Homa, and white cow donation.',
+    details: {'malefics': maleficNames, 'paksha': 'ಕೃಷ್ಣ ಪಕ್ಷ'},
+  ));
+}
+
+// ── P5. LAGNESH DUSTHANA ARISHTA (ಲಗ್ನೇಶ ದುಸ್ಥಾನ ಅರಿಷ್ಟ) ──
+// Lagna lord placed in 6th, 8th, or 12th house.
+// Weakens the native's vitality from birth.
+// Ref: Jataka Parijata 3.65, Brihat Jataka 5.6
+// ──────────────────────────────────────────────────
+void _checkLagneshDusthanaArishta(DoshaInput input, List<DoshaResult> doshas) {
+  if (input.planetRashis.isEmpty) return;
+
+  final lagnaR = input.lagnaRashiIndex;
+  final lordKey = _lagnaLords[lagnaR];
+  if (lordKey == null) return;
+
+  final lordRashi = input.planetRashis[lordKey];
+  if (lordRashi == null) return;
+
+  final lordHouse = _houseFrom(lordRashi, lagnaR);
+  if (lordHouse != 6 && lordHouse != 8 && lordHouse != 12) return;
+
+  final lordName = _planetKnName(lordKey);
+  final lagnaName = knRashi[lagnaR];
+  final lordRashiName = knRashi[lordRashi];
+
+  doshas.add(DoshaResult(
+    id: 'lagneshDusthanaArishta',
+    nameKn: 'ಲಗ್ನೇಶ ದುಸ್ಥಾನ ಅರಿಷ್ಟ (ಪಂಚಮಾರಿಷ್ಟ ೫)',
+    nameEn: 'Lagnesh Dusthana Arishta (Panchamarishta 5)',
+    severity: lordHouse == 8 ? DoshaSeverity.tivra : DoshaSeverity.madhyama,
+    descriptionKn: 'ಲಗ್ನೇಶ $lordName ($lagnaName ಲಗ್ನಕ್ಕೆ) ${lordHouse}ನೇ ಭಾವದಲ್ಲಿ ($lordRashiName) ಇದ್ದಾನೆ — ದುಸ್ಥಾನ ಸ್ಥಿತಿ. ಜಾತಕನ ಜೀವನ ಶಕ್ತಿ ದುರ್ಬಲ.',
+    descriptionEn: 'Lagna lord $lordName (for $lagnaName lagna) is in ${lordHouse}th house ($lordRashiName) — dusthana placement. Weakens native\'s vitality.',
+    remedyKn: 'ಲಗ್ನೇಶ ಗ್ರಹ ಶಾಂತಿ, ಆಯುಷ್ಯ ಸೂಕ್ತ, ಮಹಾ ಮೃತ್ಯುಂಜಯ ಜಪ ಮಾಡಬೇಕು.',
+    remedyEn: 'Lagna lord planetary Shanti, Ayushya Sukta, and Maha Mrityunjaya Japa.',
+    details: {'lagnesh': lordName, 'lagnaRashi': lagnaName, 'lordHouse': '$lordHouse', 'lordRashi': lordRashiName},
+  ));
+}
+
+/// Planet key to Kannada name
+String _planetKnName(String key) {
+  const map = {
+    'ravi': 'ರವಿ', 'chandra': 'ಚಂದ್ರ', 'kuja': 'ಕುಜ',
+    'budha': 'ಬುಧ', 'guru': 'ಗುರು', 'shukra': 'ಶುಕ್ರ',
+    'shani': 'ಶನಿ', 'rahu': 'ರಾಹು', 'ketu': 'ಕೇತು',
+  };
+  return map[key] ?? key;
 }
