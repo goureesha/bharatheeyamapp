@@ -19,6 +19,7 @@ import 'vastu_screen.dart';
 import 'muhurta_screen.dart';
 import 'reverse_kundali_screen.dart';
 import 'ashtamangala_screen.dart';
+import 'janana_marana_screen.dart';
 import '../services/tester_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -80,6 +81,10 @@ class _HomeScreenState extends State<HomeScreen> {
       }),
       _Section(AppLocale.isHindi ? 'अष्टमंगल' : 'ಅಷ್ಟಮಂಗಲ', 'Ashtamangala', Icons.auto_fix_high, AppThemes.isTanjore ? const Color(0xFFCDA434) : const Color(0xFFE67E22), () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const AshtamangalaScreen()));
+      }),
+
+      _Section(AppLocale.isHindi ? 'जनन/मरण दोष' : 'ಜನನ/ಮರಣ ದೋಷ', 'Janana Marana', Icons.child_care, AppThemes.isTanjore ? const Color(0xFFCDA434) : const Color(0xFFE74C3C), () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const JananaMaranaScreen()));
       }),
 
       _Section(AppLocale.l('settings'), 'Settings', Icons.settings, kMuted, () {
