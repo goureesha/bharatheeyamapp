@@ -2950,11 +2950,6 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
             borderRadius: BorderRadius.circular(9),
             child: Column(
               children: [
-                // Solid orange top banner
-                Container(
-                  height: 32,
-                  color: const Color(0xFFF6B042),
-                ),
                 ...rows.asMap().entries.map((entry) {
                   final idx = entry.key;
                   final r = entry.value;
