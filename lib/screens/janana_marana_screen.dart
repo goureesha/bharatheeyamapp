@@ -171,16 +171,28 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
       final moonInfo = result.planets['ಚಂದ್ರ'];
       final lagnaInfo = result.planets['ಲಗ್ನ'];
 
+      // Sun and Moon longitudes for tithi percent calculation
+      final moonLon = moonInfo?.longitude ?? 0.0;
+      final lagnaLon = lagnaInfo?.longitude ?? 0.0;
+      final sunInfo = result.planets['ರವಿ'];
+      final sunLon = sunInfo?.longitude ?? 0.0;
+      // Tithi percent: fraction elapsed within current 12° Moon-Sun block
+      final moonSunDiff = (moonLon - sunLon + 360.0) % 360.0;
+      final moonSunApprox = (moonSunDiff % 12.0) / 12.0;
+
       final input = DoshaInput(
         nakshatraIndex: p.nakshatraIndex,
         pada: moonInfo?.pada ?? 1,
         nakPercent: p.nakPercent,
         tithiIndex: p.tithiIndex,
+        tithiPercent: moonSunApprox,
         varaIndex: varaIdx >= 0 ? varaIdx : 0,
         moonRashiIndex: moonInfo?.rashiIndex ?? 0,
-        moonLongitude: moonInfo?.longitude ?? 0.0,
+        moonLongitude: moonLon,
         lagnaRashiIndex: lagnaInfo?.rashiIndex ?? 0,
+        lagnaLongitude: lagnaLon,
         yogaIndex: knYoga.indexOf(p.yoga).clamp(0, 26),
+        karanaString: p.karana,
       );
 
       final doshas = analyzeJananaMaranaDosha(input);
@@ -191,6 +203,7 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
         pada: '${moonInfo?.pada ?? "-"}',
         vara: p.vara,
         yoga: p.yoga,
+        karana: p.karana,
         chandraRashi: p.chandraRashi,
         lagnaRashi: lagnaInfo?.rashi ?? '-',
       );
@@ -239,6 +252,7 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
       'yoga': {'kn': 'ಯೋಗ', 'hi': 'ಯೋಗ', 'en': 'Yoga'},
       'chandraRashi': {'kn': 'ಚಂದ್ರ ರಾಶಿ', 'hi': 'चंद्र राशि', 'en': 'Moon Sign'},
       'lagna': {'kn': 'ಲಗ್ನ', 'hi': 'लग्न', 'en': 'Lagna'},
+      'karana': {'kn': 'ಕರಣ', 'hi': 'करण', 'en': 'Karana'},
     };
     final lang = AppLocale.current;
     final entry = m[key];
@@ -438,10 +452,10 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
     final s = _summary!;
     final rows = [
       [_ls('tithi'), translateKn(s.tithi)],
-      [_ls('nakshatra'), translateKn(s.nakshatra)],
-      [_ls('pada'), s.pada],
+      [_ls('nakshatra'), '${translateKn(s.nakshatra)} (${_ls("pada")} ${s.pada})'],
       [_ls('vara'), translateKn(s.vara)],
       [_ls('yoga'), translateKn(s.yoga)],
+      [_ls('karana'), translateKn(s.karana)],
       [_ls('chandraRashi'), translateKn(s.chandraRashi)],
       [_ls('lagna'), translateKn(s.lagnaRashi)],
     ];
