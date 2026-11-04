@@ -59,7 +59,7 @@ class TransitCalculator {
     double high = curJd;
     for (int i = 0; i < 20; i++) {
       final mid = (low + high) / 2;
-      final pos = Ephemeris.calcAll(mid, 'lahiri', true);
+      final pos = Ephemeris.calcAll(mid, 'lahiri', false /* mean node */);
       if (!pos.containsKey(engPlanet)) break;
       final lng = pos[engPlanet]![0];
       final rIdx = (lng / 30).floor() % 12;
@@ -110,7 +110,7 @@ class TransitCalculator {
     
     // Pre-fill state for Dec 31 (year-1) 12:00 PM UTC
     final jdStartBase = Sweph.swe_julday(year - 1, 12, 31, 12.0, CalendarType.SE_GREG_CAL);
-    final basePos = Ephemeris.calcAll(jdStartBase, 'lahiri', true);
+    final basePos = Ephemeris.calcAll(jdStartBase, 'lahiri', false /* mean node */);
     final baseSunLng = basePos['Sun']![0];
     
     final planetsToCheck = {
@@ -177,7 +177,7 @@ class TransitCalculator {
        
        // Calculate at 12:00 PM UTC (~5:30 PM IST) to represent the day
        final jd = Sweph.swe_julday(currentDate.year, currentDate.month, currentDate.day, 12.0, CalendarType.SE_GREG_CAL);
-       final pos = Ephemeris.calcAll(jd, 'lahiri', true);
+       final pos = Ephemeris.calcAll(jd, 'lahiri', false /* mean node */);
        final sunLng = pos['Sun']![0];
        
        for (final p in planetsToCheck.keys) {

@@ -104,7 +104,7 @@ class TransitCache {
   static Future<void> _saveToDisk(int year, TransitData data) async {
     try {
       final dir = await _cacheDir;
-      final file = File('${dir.path}/transit_$year.json');
+      final file = File('${dir.path}/transit_v2_$year.json');
       final json = _transitDataToJson(data);
       await file.writeAsString(jsonEncode(json));
     } catch (_) {
@@ -115,7 +115,7 @@ class TransitCache {
   static Future<TransitData?> _loadFromDisk(int year) async {
     try {
       final dir = await _cacheDir;
-      final file = File('${dir.path}/transit_$year.json');
+      final file = File('${dir.path}/transit_v2_$year.json');
       if (!await file.exists()) return null;
       final content = await file.readAsString();
       final json = jsonDecode(content) as Map<String, dynamic>;
