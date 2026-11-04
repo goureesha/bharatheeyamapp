@@ -4538,6 +4538,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     // Build guru & shani segments from transit events
     List<_GocharSegment> guruSegments = [];
     List<_GocharSegment> shaniSegments = [];
+    List<_GocharSegment> kujaSegments = [];
 
     if (_gocharData != null) {
       final guruTransits = _gocharData!.transits.where((t) => t.planetName == 'jupiter').toList();
@@ -4546,6 +4547,8 @@ class _DashboardScreenState extends State<DashboardScreen>
       // Build segments for guru
       guruSegments = _buildSegments(guruTransits, _gocharYear, 'jupiter', moonRashi);
       shaniSegments = _buildSegments(shaniTransits, _gocharYear, 'saturn', moonRashi);
+      final kujaTransits = _gocharData!.transits.where((t) => t.planetName == 'mars').toList();
+      kujaSegments = _buildSegments(kujaTransits, _gocharYear, 'mars', moonRashi);
     }
 
     return SingleChildScrollView(
@@ -4642,11 +4645,96 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ));
               }),
             ])),
+            const SizedBox(height: 12),
+
+            // ── KUJA GOCHAR (Kuja Dosha) ──
+            Text(_kujaL('head'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kTeal)),
+            const SizedBox(height: 6),
+            AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Text('${_kujaL('title')} — $_gocharYear', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: kPurple1)),
+              const SizedBox(height: 4),
+              Text(_kujaL('rule'), style: TextStyle(fontSize: 11, color: kMuted)),
+              const SizedBox(height: 12),
+              ...kujaSegments.map((seg) {
+                final house = houseFromMoon(seg.rashiIdx);
+                final isGood = house == 3 || house == 6 || house == 11;
+                final isDosha = const {1, 2, 4, 7, 8, 12}.contains(house);
+                String label;
+                Color color;
+                if (isGood) {
+                  label = '✅ ${trAll('ಅನುಕೂಲ')}';
+                  color = Colors.green.shade700;
+                } else if (house == 8) {
+                  label = '💀 ${_kujaL('ashtama')}';
+                  color = Colors.red.shade700;
+                } else if (isDosha) {
+                  label = '🔥 ${_kujaL('dosha')}';
+                  color = Colors.red.shade700;
+                } else {
+                  label = '⚡ ${trAll('ಪ್ರತಿಕೂಲ')}';
+                  color = Colors.orange.shade800;
+                }
+                return Padding(padding: const EdgeInsets.only(bottom: 8), child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: color.withOpacity(0.3)),
+                  ),
+                  child: Row(children: [
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('${rashiNames[seg.rashiIdx]} (${trAll('ಭಾವ')} $house)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kText)),
+                      Text('${seg.fromDate} → ${seg.toDate}', style: TextStyle(fontSize: 11, color: kMuted)),
+                    ])),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                      child: Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color)),
+                    ),
+                  ]),
+                ));
+              }),
+            ])),
           ],
           const SizedBox(height: 32),
         ],
       )),
     );
+  }
+
+  /// Localized strings for the Kuja Gochara section
+  String _kujaL(String key) {
+    const m = <String, Map<String, String>>{
+      'head': {
+        'kn': 'ಕುಜ ಗೋಚಾರ / ಕುಜ ದೋಷ', 'en': 'Kuja Gochara / Kuja Dosha',
+        'hi': 'मंगल गोचर / मंगल दोष', 'ta': 'செவ்வாய் கோசாரம் / செவ்வாய் தோஷம்',
+        'te': 'కుజ గోచారం / కుజ దోషం', 'ml': 'ചൊവ്വ ഗോചരം / ചൊവ്വാ ദോഷം',
+      },
+      'title': {
+        'kn': 'ಕುಜ ಗೋಚಾರ', 'en': 'Kuja (Mars) Transit',
+        'hi': 'मंगल गोचर', 'ta': 'செவ்வாய் கோசாரம்',
+        'te': 'కుజ గోచారం', 'ml': 'ചൊവ്വ ഗോചരം',
+      },
+      'rule': {
+        'kn': 'ಜನ್ಮ ರಾಶಿಯಿಂದ 3, 6, 11 ಅನುಕೂಲ • 1, 2, 4, 7, 8, 12 ಕುಜ ದೋಷ',
+        'en': 'From Janma Rashi: 3, 6, 11 favourable • 1, 2, 4, 7, 8, 12 Kuja Dosha',
+        'hi': 'जन्म राशि से: 3, 6, 11 शुभ • 1, 2, 4, 7, 8, 12 मंगल दोष',
+        'ta': 'ஜென்ம ராசியிலிருந்து: 3, 6, 11 நன்மை • 1, 2, 4, 7, 8, 12 செவ்வாய் தோஷம்',
+        'te': 'జన్మ రాశి నుండి: 3, 6, 11 అనుకూలం • 1, 2, 4, 7, 8, 12 కుజ దోషం',
+        'ml': 'ജന്മ രാശിയിൽ നിന്ന്: 3, 6, 11 അനുകൂലം • 1, 2, 4, 7, 8, 12 ചൊവ്വാ ദോഷം',
+      },
+      'dosha': {
+        'kn': 'ಕುಜ ದೋಷ', 'en': 'Kuja Dosha', 'hi': 'मंगल दोष',
+        'ta': 'செவ்வாய் தோஷம்', 'te': 'కుజ దోషం', 'ml': 'ചൊവ്വാ ദോഷം',
+      },
+      'ashtama': {
+        'kn': 'ಅಷ್ಟಮ ಕುಜ', 'en': 'Ashtama Kuja', 'hi': 'अष्टम मंगल',
+        'ta': 'அஷ்டம செவ்வாய்', 'te': 'అష్టమ కుజుడు', 'ml': 'അഷ്ടമ ചൊവ്വ',
+      },
+    };
+    final entry = m[key];
+    if (entry == null) return key;
+    return entry[AppLocale.current] ?? entry['kn']!;
   }
 
   /// Build position segments from transit events for a planet
@@ -4661,7 +4749,9 @@ class _DashboardScreenState extends State<DashboardScreen>
       try {
         final jd = Sweph.swe_julday(year, 7, 1, 12.0, CalendarType.SE_GREG_CAL);
         Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
-        final body = planetName == 'jupiter' ? HeavenlyBody.SE_JUPITER : HeavenlyBody.SE_SATURN;
+        final body = planetName == 'jupiter'
+            ? HeavenlyBody.SE_JUPITER
+            : planetName == 'mars' ? HeavenlyBody.SE_MARS : HeavenlyBody.SE_SATURN;
         final pos = Sweph.swe_calc_ut(jd, body, SwephFlag.SEFLG_SWIEPH);
         final ayn = Sweph.swe_get_ayanamsa(jd);
         final sid = (pos.longitude - ayn + 360) % 360;
