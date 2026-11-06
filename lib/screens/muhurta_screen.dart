@@ -218,7 +218,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
           year: d.year, month: d.month, day: d.day,
           hourUtcOffset: LocationService.tzOffset, hour24: srHour,
           lat: LocationService.lat, lon: LocationService.lon,
-          ayanamsaMode: 'lahiri', trueNode: true,
+          ayanamsaMode: 'lahiri', trueNode: false,
         );
         if (kr == null) continue;
 
@@ -334,7 +334,7 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         if (_allowedLagnas.contains(curRashi)) {
           // Get planet positions at window midpoint
           final midJd = (windowStartJd + windowEndJd) / 2.0;
-          final positions = Ephemeris.calcAll(midJd, 'lahiri', true);
+          final positions = Ephemeris.calcAll(midJd, 'lahiri', false);
           final Map<String, int> planetRashis = {};
           for (final e in positions.entries) {
             final kn = engToKn[e.key];

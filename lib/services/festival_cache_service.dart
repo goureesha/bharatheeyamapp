@@ -140,7 +140,7 @@ class FestivalCacheService {
           hour24: h24,
           lat: _lat, lon: _lon,
           ayanamsaMode: 'lahiri',
-          trueNode: true,
+          trueNode: false,
         );
         if (res != null) {
           final events = EventCalculator.getEventsForPanchang(res.panchang);
@@ -180,7 +180,7 @@ class FestivalCacheService {
             hour24: h24v,
             lat: _lat, lon: _lon,
             ayanamsaMode: 'lahiri',
-            trueNode: true,
+            trueNode: false,
           );
           if (res != null) {
             final events = EventCalculator.getEventsForPanchang(res.panchang);

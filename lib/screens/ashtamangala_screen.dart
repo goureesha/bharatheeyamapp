@@ -265,7 +265,7 @@ class _AshtamangalaScreenState extends State<AshtamangalaScreen> {
         year: _dob.year, month: _dob.month, day: _dob.day,
         hourUtcOffset: tzOffset, hour24: localHour,
         lat: lat, lon: lon,
-        ayanamsaMode: 'lahiri', trueNode: true,
+        ayanamsaMode: 'lahiri', trueNode: false,
       );
 
       if (result != null && mounted) {

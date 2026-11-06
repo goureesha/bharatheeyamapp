@@ -128,7 +128,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         lat: LocationService.lat, 
         lon: LocationService.lon,
         ayanamsaMode: 'lahiri',
-        trueNode: true,
+        trueNode: false,
       );
       if (mounted) setState(() {
         _selectedDayResult = result;
@@ -1081,7 +1081,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
         hourUtcOffset: LocationService.tzOffset,
         hour24: hour24,
         lat: LocationService.lat, lon: LocationService.lon,
-        ayanamsaMode: 'lahiri', trueNode: true,
+        ayanamsaMode: 'lahiri', trueNode: false,
       );
       if (kr == null) return;
 
@@ -1254,7 +1254,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           hourUtcOffset: LocationService.tzOffset,
           hour24: hour24,
           lat: LocationService.lat, lon: LocationService.lon,
-          ayanamsaMode: 'lahiri', trueNode: true,
+          ayanamsaMode: 'lahiri', trueNode: false,
         );
 
         if (kr != null) {
@@ -1446,7 +1446,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             hourUtcOffset: LocationService.tzOffset,
             hour24: hour24,
             lat: LocationService.lat, lon: LocationService.lon,
-            ayanamsaMode: 'lahiri', trueNode: true,
+            ayanamsaMode: 'lahiri', trueNode: false,
           );
           if (kr == null) continue;
           final pan = kr.panchang;
@@ -3091,7 +3091,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       hour24: startParts['hour24'] + (startParts['minute'] / 60.0),
       lat: lat, lon: lon,
       ayanamsaMode: 'lahiri',
-      trueNode: true,
+      trueNode: false,
     );
 
     // Compute kundali for END time
@@ -3101,7 +3101,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
       hour24: endParts['hour24'] + (endParts['minute'] / 60.0),
       lat: lat, lon: lon,
       ayanamsaMode: 'lahiri',
-      trueNode: true,
+      trueNode: false,
     );
 
     if (startResult != null && mounted) {
@@ -3134,7 +3134,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
           lat: lat,
           lon: lon,
           tz: tz,
-          extraInfo: {'ayanamsa': 'lahiri', 'nodeMode': 'true'},
+          extraInfo: {'ayanamsa': 'lahiri', 'nodeMode': 'mean'},
           initialExtraPersons: extraPersons,
           onSave: (notes, aroodhas, janmaIdx, {bool isNew = true}) {},
         ),
@@ -3382,7 +3382,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
 
         // ── Recalculate planet positions at this window's midpoint ──
         final midJd = (windowStartJd + windowEndJd) / 2.0;
-        final freshPositions = Ephemeris.calcAll(midJd, 'lahiri', true);
+        final freshPositions = Ephemeris.calcAll(midJd, 'lahiri', false);
 
         // Build per-window planet rashi map from fresh sidereal longitudes
         final Map<String, int> windowPlanetRashis = {};
@@ -3448,7 +3448,7 @@ class _TaranukoolaScreenState extends State<TaranukoolaScreen> with SingleTicker
             if (bh != null && bh.ascmc.length >= 2) {
               final cusps = calcSripathiBhavaCusps(bh.ascmc[0] as double, bh.ascmc[1] as double, ayn);
               // Recalculate planet positions at this exact moment
-              final pos = Ephemeris.calcAll(scanJd, 'lahiri', true);
+              final pos = Ephemeris.calcAll(scanJd, 'lahiri', false);
 
               // Helper: check if all planets in list are NOT in target bhava
               bool isClear(List<String> planets, int targetHouse) {

@@ -614,7 +614,7 @@ class _ReverseKundaliScreenState extends State<ReverseKundaliScreen> {
   Future<List<Map<String, dynamic>>> _searchDates() async {
     final results = <Map<String, dynamic>>[];
     final ayanamsa = 'lahiri';
-    const trueNode = true;
+    const trueNode = false; // mean node
 
     // Map: index in _planets → key in Ephemeris.calcAll result
     const ephKeys = ['Saturn', 'Jupiter', 'Rahu', 'Ketu', 'Sun', 'Moon', 'Mars', 'Mercury', 'Venus'];

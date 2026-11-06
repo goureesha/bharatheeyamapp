@@ -155,7 +155,7 @@ class _JananaMaranaScreenState extends State<JananaMaranaScreen> {
       final result = await AstroCalculator.calculate(
         year: _dob.year, month: _dob.month, day: _dob.day,
         hourUtcOffset: tzOffset, hour24: localHour,
-        lat: lat, lon: lon, ayanamsaMode: 'lahiri', trueNode: true,
+        lat: lat, lon: lon, ayanamsaMode: 'lahiri', trueNode: false,
       );
 
       if (result == null) {

@@ -551,7 +551,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       final result = await AstroCalculator.calculate(
         year: dob.year, month: dob.month, day: dob.day,
         hourUtcOffset: p.tzOffset, hour24: localHour,
-        lat: p.lat, lon: p.lon, ayanamsaMode: 'lahiri', trueNode: true,
+        lat: p.lat, lon: p.lon, ayanamsaMode: 'lahiri', trueNode: false,
       );
       if (result == null) {
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ ${AppLocale.l('calcFailed')}'), backgroundColor: Colors.red));
@@ -791,7 +791,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   final result = await AstroCalculator.calculate(
                     year: dob.year, month: dob.month, day: dob.day,
                     hourUtcOffset: tz, hour24: localHour,
-                    lat: lat, lon: lon, ayanamsaMode: 'lahiri', trueNode: true,
+                    lat: lat, lon: lon, ayanamsaMode: 'lahiri', trueNode: false,
                   );
                   
                   if (result == null) {
@@ -1305,7 +1305,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         final result = await AstroCalculator.calculate(
           year: dob.year, month: dob.month, day: dob.day,
           hourUtcOffset: p.tzOffset, hour24: localHour,
-          lat: p.lat, lon: p.lon, ayanamsaMode: 'lahiri', trueNode: true,
+          lat: p.lat, lon: p.lon, ayanamsaMode: 'lahiri', trueNode: false,
         );
         if (result != null) {
           newEntries.add(PersonEntry(

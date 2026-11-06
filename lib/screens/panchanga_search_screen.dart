@@ -224,7 +224,7 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
           year: date.year, month: date.month, day: date.day,
           hourUtcOffset: tz, hour24: 12.0,
           lat: lat, lon: lon,
-          ayanamsaMode: 'lahiri', trueNode: true,
+          ayanamsaMode: 'lahiri', trueNode: false,
         );
         if (noonResult == null) continue;
         final noonP = noonResult.panchang;
@@ -253,7 +253,7 @@ class _PanchangaSearchScreenState extends State<PanchangaSearchScreen> {
             year: date.year, month: date.month, day: date.day,
             hourUtcOffset: tz, hour24: midH24,
             lat: lat, lon: lon,
-            ayanamsaMode: 'lahiri', trueNode: true,
+            ayanamsaMode: 'lahiri', trueNode: false,
           );
           if (timeResult != null) p = timeResult.panchang;
           tithiNotAvailable = (_absoluteTithiIndex != null && p.tithiIndex != _absoluteTithiIndex);

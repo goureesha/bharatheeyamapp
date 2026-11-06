@@ -53,7 +53,7 @@ class _VedicClockScreenState extends State<VedicClockScreen> {
     final result = await AstroCalculator.calculate(
       year: y, month: m, day: d,
       hourUtcOffset: LocationService.tzOffset, hour24: hour24, lat: _lat, lon: _lon,
-      ayanamsaMode: 'lahiri', trueNode: true,
+      ayanamsaMode: 'lahiri', trueNode: false,
     );
 
     if (result == null || !mounted) return;
@@ -85,7 +85,7 @@ class _VedicClockScreenState extends State<VedicClockScreen> {
       final r = await AstroCalculator.calculate(
         year: n.year, month: n.month, day: n.day,
         hourUtcOffset: LocationService.tzOffset, hour24: h, lat: _lat, lon: _lon,
-        ayanamsaMode: 'lahiri', trueNode: true,
+        ayanamsaMode: 'lahiri', trueNode: false,
       );
       if (r != null && mounted) {
         final newLagna = r.planets['ಲಗ್ನ']?.longitude ?? 0;

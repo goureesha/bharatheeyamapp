@@ -304,12 +304,12 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       final brideR = await AstroCalculator.calculate(
         year: _bDob.year, month: _bDob.month, day: _bDob.day,
         hourUtcOffset: bTz, hour24: bH24 + _bMinute / 60.0,
-        lat: bLat, lon: bLon, ayanamsaMode: 'lahiri', trueNode: true,
+        lat: bLat, lon: bLon, ayanamsaMode: 'lahiri', trueNode: false,
       );
       final groomR = await AstroCalculator.calculate(
         year: _gDob.year, month: _gDob.month, day: _gDob.day,
         hourUtcOffset: gTz, hour24: gH24 + _gMinute / 60.0,
-        lat: gLat, lon: gLon, ayanamsaMode: 'lahiri', trueNode: true,
+        lat: gLat, lon: gLon, ayanamsaMode: 'lahiri', trueNode: false,
       );
 
       if (brideR == null || groomR == null) {
@@ -449,7 +449,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       final result = await AstroCalculator.calculate(
         year: dob.year, month: dob.month, day: dob.day,
         hourUtcOffset: tz, hour24: h24 + minute / 60.0,
-        lat: lat, lon: lon, ayanamsaMode: 'lahiri', trueNode: true,
+        lat: lat, lon: lon, ayanamsaMode: 'lahiri', trueNode: false,
       );
 
       if (result == null) {
@@ -646,7 +646,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         final jd = Sweph.swe_julday(dt.year, dt.month, dt.day, 12.0, CalendarType.SE_GREG_CAL);
         Sweph.swe_set_sid_mode(SiderealMode.SE_SIDM_LAHIRI);
         final ayn = Sweph.swe_get_ayanamsa(jd);
-        final positions = Ephemeris.calcAll(jd, 'lahiri', true);
+        final positions = Ephemeris.calcAll(jd, 'lahiri', false);
         final jupLon = positions['Jupiter']?[0] ?? 0.0;
         final jupRashi = (jupLon / 30.0).floor() % 12;
         

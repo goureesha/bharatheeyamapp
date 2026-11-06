@@ -331,7 +331,7 @@ class AstroCalculator {
     double low = jd - 1.2, high = jd + 1.2;
     for (int i = 0; i < 20; i++) {
       final mid = (low + high) / 2;
-      final planets = Ephemeris.calcAll(mid, ayanamsaMode, true);
+      final planets = Ephemeris.calcAll(mid, ayanamsaMode, false);
       final mDeg = normDeg(planets['Moon']![0]);
       final diff = ((mDeg - targetDeg + 180) % 360) - 180;
       if (diff < 0) low = mid; else high = mid;
@@ -343,7 +343,7 @@ class AstroCalculator {
     double low = jd - 1.5, high = jd + 1.5;
     for (int i = 0; i < 20; i++) {
       final mid = (low + high) / 2;
-      final planets = Ephemeris.calcAll(mid, ayanamsaMode, true);
+      final planets = Ephemeris.calcAll(mid, ayanamsaMode, false);
       final mDeg = normDeg(planets['Moon']![0]);
       final sDeg = normDeg(planets['Sun']![0]);
       final tithiDeg = normDeg(mDeg - sDeg);
@@ -357,7 +357,7 @@ class AstroCalculator {
     double low = jd - 0.8, high = jd + 0.8;
     for (int i = 0; i < 20; i++) {
       final mid = (low + high) / 2;
-      final planets = Ephemeris.calcAll(mid, ayanamsaMode, true);
+      final planets = Ephemeris.calcAll(mid, ayanamsaMode, false);
       final mDeg = normDeg(planets['Moon']![0]);
       final sDeg = normDeg(planets['Sun']![0]);
       final tithiDeg = normDeg(mDeg - sDeg);
@@ -371,7 +371,7 @@ class AstroCalculator {
     double low = jd - 1.5, high = jd + 1.5;
     for (int i = 0; i < 20; i++) {
       final mid = (low + high) / 2;
-      final planets = Ephemeris.calcAll(mid, ayanamsaMode, true);
+      final planets = Ephemeris.calcAll(mid, ayanamsaMode, false);
       final mDeg = normDeg(planets['Moon']![0]);
       final sDeg = normDeg(planets['Sun']![0]);
       final yogaDeg = normDeg(mDeg + sDeg);

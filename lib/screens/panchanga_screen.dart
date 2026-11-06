@@ -81,7 +81,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
         hour24: hour24,
         lat: _lat, lon: _lon,
         ayanamsaMode: 'lahiri',
-        trueNode: true,
+        trueNode: false,
       );
 
       if (result != null && mounted) {
@@ -122,7 +122,7 @@ class _PanchangaScreenState extends State<PanchangaScreen> {
           year: d.year, month: d.month, day: d.day,
           hourUtcOffset: LocationService.tzOffset,
           hour24: h24, lat: _lat, lon: _lon,
-          ayanamsaMode: 'lahiri', trueNode: true,
+          ayanamsaMode: 'lahiri', trueNode: false,
         );
         if (result != null) {
           _panchangCache[key] = result.panchang;

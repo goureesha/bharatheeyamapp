@@ -241,7 +241,7 @@ Future<void> _writeSunriseForWidget() async {
       hourUtcOffset: LocationService.tzOffset,
       hour24: now.hour + now.minute / 60.0,
       lat: LocationService.lat, lon: LocationService.lon,
-      ayanamsaMode: 'lahiri', trueNode: true,
+      ayanamsaMode: 'lahiri', trueNode: false,
     );
     if (result == null) return;
 

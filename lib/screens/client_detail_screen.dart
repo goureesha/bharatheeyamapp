@@ -392,7 +392,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
         hour24: localHour,
         lat: m.lat, lon: m.lon,
         ayanamsaMode: 'lahiri',
-        trueNode: true,
+        trueNode: false,
       );
 
       await Future.delayed(const Duration(milliseconds: 300));

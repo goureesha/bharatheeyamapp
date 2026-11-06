@@ -559,7 +559,7 @@ class PanchangaCache {
           hourUtcOffset: tzOffset,
           hour24: hour24,
           lat: lat, lon: lon,
-          ayanamsaMode: 'lahiri', trueNode: true,
+          ayanamsaMode: 'lahiri', trueNode: false,
         );
 
         if (kr != null) {
