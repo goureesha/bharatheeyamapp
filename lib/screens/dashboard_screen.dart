@@ -6202,7 +6202,6 @@ class _LazyTab extends StatefulWidget {
 class _LazyTabState extends State<_LazyTab>
     with AutomaticKeepAliveClientMixin {
   bool _ready = false;  // true once post-frame callback has fired
-  Widget? _child;       // cached widget tree
 
   @override
   bool get wantKeepAlive => true;
@@ -6232,12 +6231,10 @@ class _LazyTabState extends State<_LazyTab>
         ),
       );
     }
-    // For liveRebuild tabs, always call the builder (no caching)
-    if (widget.liveRebuild) {
-      return widget.builder(context);
-    }
-    // Build (and cache) the real content on first ready frame
-    _child ??= widget.builder(context);
-    return _child!;
+    // Always rebuild from the builder so parent setState() calls
+    // (year switchers, toggles, chips, form fields) refresh the tab.
+    // Caching the widget tree here made every interactive tab look dead.
+    // AutomaticKeepAliveClientMixin still preserves scroll/element state.
+    return widget.builder(context);
   }
 }
