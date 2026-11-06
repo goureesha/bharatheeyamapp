@@ -1638,21 +1638,21 @@ class _DashboardScreenState extends State<DashboardScreen>
                           child: TabBarView(
                             controller: _tabCtrl,
                             children: [
-                              _LazyTab(builder: (_) => _buildPanchangTab()),
-                              _LazyTab(builder: (_) => _buildKundaliTab()),
-                              _LazyTab(builder: (_) => _buildSphutas()),
-                              _LazyTab(builder: (_) => _buildAroodhaTab()),
-                              _LazyTab(builder: (_) => _buildDashaTab()),
-                              _LazyTab(builder: (_) => _buildBhavaTab()),
-                              _LazyTab(builder: (_) => _buildGrahaShadvargaTab()),
-                              _LazyTab(builder: (_) => _buildShadbalaTab()),
-                              _LazyTab(builder: (_) => _buildAshtakaTab()),
-                              _LazyTab(builder: (_) => _buildYogaTab()),
-                              _LazyTab(builder: (_) => _buildPredictionTab()),
-                              _LazyTab(builder: (_) => _buildGocharTab()),
-                              _LazyTab(builder: (_) => _buildNotesTab(), liveRebuild: true),
-                              _LazyTab(builder: (_) => _buildJanmaPatrikeTab(), liveRebuild: true),
-              _LazyTab(builder: (_) => _buildAvakahadaTab()),
+                              _LazyTab(builder: (_) => _buildPanchangTab(), controller: _tabCtrl, index: 0),
+                              _LazyTab(builder: (_) => _buildKundaliTab(), controller: _tabCtrl, index: 1),
+                              _LazyTab(builder: (_) => _buildSphutas(), controller: _tabCtrl, index: 2),
+                              _LazyTab(builder: (_) => _buildAroodhaTab(), controller: _tabCtrl, index: 3),
+                              _LazyTab(builder: (_) => _buildDashaTab(), controller: _tabCtrl, index: 4),
+                              _LazyTab(builder: (_) => _buildBhavaTab(), controller: _tabCtrl, index: 5),
+                              _LazyTab(builder: (_) => _buildGrahaShadvargaTab(), controller: _tabCtrl, index: 6),
+                              _LazyTab(builder: (_) => _buildShadbalaTab(), controller: _tabCtrl, index: 7),
+                              _LazyTab(builder: (_) => _buildAshtakaTab(), controller: _tabCtrl, index: 8),
+                              _LazyTab(builder: (_) => _buildYogaTab(), controller: _tabCtrl, index: 9),
+                              _LazyTab(builder: (_) => _buildPredictionTab(), controller: _tabCtrl, index: 10),
+                              _LazyTab(builder: (_) => _buildGocharTab(), controller: _tabCtrl, index: 11),
+                              _LazyTab(builder: (_) => _buildNotesTab(), controller: _tabCtrl, index: 12),
+                              _LazyTab(builder: (_) => _buildJanmaPatrikeTab(), controller: _tabCtrl, index: 13),
+              _LazyTab(builder: (_) => _buildAvakahadaTab(), controller: _tabCtrl, index: 14),
                             ],
                           ),
                         ),
@@ -1669,21 +1669,21 @@ class _DashboardScreenState extends State<DashboardScreen>
                               TabBarView(
                                 controller: _tabCtrl,
                                 children: [
-                                  _LazyTab(builder: (_) => _buildPanchangTab()),
-                                  _LazyTab(builder: (_) => _buildKundaliTab()),
-                                  _LazyTab(builder: (_) => _buildSphutas()),
-                                  _LazyTab(builder: (_) => _buildAroodhaTab()),
-                                  _LazyTab(builder: (_) => _buildDashaTab()),
-                                  _LazyTab(builder: (_) => _buildBhavaTab()),
-                                  _LazyTab(builder: (_) => _buildGrahaShadvargaTab()),
-                                  _LazyTab(builder: (_) => _buildShadbalaTab()),
-                                  _LazyTab(builder: (_) => _buildAshtakaTab()),
-                                  _LazyTab(builder: (_) => _buildYogaTab()),
-                                  _LazyTab(builder: (_) => _buildPredictionTab()),
-                                  _LazyTab(builder: (_) => _buildGocharTab()),
-                                  _LazyTab(builder: (_) => _buildNotesTab(), liveRebuild: true),
-                                  _LazyTab(builder: (_) => _buildJanmaPatrikeTab(), liveRebuild: true),
-                  _LazyTab(builder: (_) => _buildAvakahadaTab()),
+                                  _LazyTab(builder: (_) => _buildPanchangTab(), controller: _tabCtrl, index: 0),
+                                  _LazyTab(builder: (_) => _buildKundaliTab(), controller: _tabCtrl, index: 1),
+                                  _LazyTab(builder: (_) => _buildSphutas(), controller: _tabCtrl, index: 2),
+                                  _LazyTab(builder: (_) => _buildAroodhaTab(), controller: _tabCtrl, index: 3),
+                                  _LazyTab(builder: (_) => _buildDashaTab(), controller: _tabCtrl, index: 4),
+                                  _LazyTab(builder: (_) => _buildBhavaTab(), controller: _tabCtrl, index: 5),
+                                  _LazyTab(builder: (_) => _buildGrahaShadvargaTab(), controller: _tabCtrl, index: 6),
+                                  _LazyTab(builder: (_) => _buildShadbalaTab(), controller: _tabCtrl, index: 7),
+                                  _LazyTab(builder: (_) => _buildAshtakaTab(), controller: _tabCtrl, index: 8),
+                                  _LazyTab(builder: (_) => _buildYogaTab(), controller: _tabCtrl, index: 9),
+                                  _LazyTab(builder: (_) => _buildPredictionTab(), controller: _tabCtrl, index: 10),
+                                  _LazyTab(builder: (_) => _buildGocharTab(), controller: _tabCtrl, index: 11),
+                                  _LazyTab(builder: (_) => _buildNotesTab(), controller: _tabCtrl, index: 12),
+                                  _LazyTab(builder: (_) => _buildJanmaPatrikeTab(), controller: _tabCtrl, index: 13),
+                  _LazyTab(builder: (_) => _buildAvakahadaTab(), controller: _tabCtrl, index: 14),
                                 ],
                               ),
                               // Floating expand button when bars are hidden
@@ -6184,33 +6184,41 @@ class _GocharSegment {
 // ─────────────────────────────────────────────────────────────────────────────
 class _LazyTab extends StatefulWidget {
   final WidgetBuilder builder;
-  /// When true, the tab rebuilds every time the parent calls setState
-  /// instead of caching the widget tree. Use for interactive tabs like
-  /// Janma Patrike that have form controls, radio buttons, checkboxes etc.
+  /// Tab controller + this tab's index. When provided, only the ACTIVE tab
+  /// rebuilds on parent setState(); hidden tabs keep their cached view and
+  /// refresh once when the user switches to them.
+  final TabController? controller;
+  final int index;
+  /// Kept for backward compatibility (no longer needed).
   final bool liveRebuild;
-  const _LazyTab({required this.builder, this.liveRebuild = false});
+  const _LazyTab({required this.builder, this.controller, this.index = -1, this.liveRebuild = false});
 
   @override
   State<_LazyTab> createState() => _LazyTabState();
 }
 
-// Defers first build to the frame AFTER the tab-switch animation completes.
-// This prevents the tab-switch from janking because heavy content (Kundali
-// charts, Yoga table, etc.) is not painted until the transition is done.
-// AutomaticKeepAliveClientMixin keeps the subtree alive once built so that
-// revisiting a tab never triggers a rebuild.
+// Defers first build to the frame AFTER the tab-switch animation completes,
+// keeps the subtree alive, and rebuilds only when this tab is visible.
 class _LazyTabState extends State<_LazyTab>
     with AutomaticKeepAliveClientMixin {
   bool _ready = false;  // true once post-frame callback has fired
+  Widget? _child;       // last built content
+  bool _dirty = true;   // parent changed since last build
 
   @override
   bool get wantKeepAlive => true;
 
+  bool get _isActive =>
+      widget.controller == null || widget.index < 0 || widget.controller!.index == widget.index;
+
+  void _onTabChanged() {
+    if (mounted && _dirty && _isActive) setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
-    // Schedule the actual build for the next frame so the tab-switch
-    // animation renders first without any jank.
+    widget.controller?.addListener(_onTabChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() => _ready = true);
@@ -6219,10 +6227,25 @@ class _LazyTabState extends State<_LazyTab>
   }
 
   @override
+  void didUpdateWidget(covariant _LazyTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?.removeListener(_onTabChanged);
+      widget.controller?.addListener(_onTabChanged);
+    }
+    _dirty = true; // parent rebuilt -> content may be stale
+  }
+
+  @override
+  void dispose() {
+    widget.controller?.removeListener(_onTabChanged);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context); // required by AutomaticKeepAliveClientMixin
     if (!_ready) {
-      // Show a lightweight placeholder during the tab switch animation
       return const Center(
         child: SizedBox(
           width: 24,
@@ -6231,10 +6254,12 @@ class _LazyTabState extends State<_LazyTab>
         ),
       );
     }
-    // Always rebuild from the builder so parent setState() calls
-    // (year switchers, toggles, chips, form fields) refresh the tab.
-    // Caching the widget tree here made every interactive tab look dead.
-    // AutomaticKeepAliveClientMixin still preserves scroll/element state.
-    return widget.builder(context);
+    // Rebuild only if visible (or never built). Hidden tabs reuse the cache
+    // and refresh via _onTabChanged when they become active.
+    if (_child == null || (_dirty && _isActive)) {
+      _child = widget.builder(context);
+      _dirty = false;
+    }
+    return _child!;
   }
 }
