@@ -1854,7 +1854,8 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: kText),
                   items: [
                     DropdownMenuItem(value: 0, child: Text(AppLocale.l('panchangaStandard'))),
-                    DropdownMenuItem(value: 1, child: Text(AppLocale.l('panchangaRajju'))),
+                    DropdownMenuItem(value: 1, child: Text(AppLocale.l('panchangaMogery'))),
+                    DropdownMenuItem(value: 2, child: Text(AppLocale.l('panchangaBaggona'))),
                   ],
                   onChanged: (v) => setState(() { _panchangaMode = v ?? 0; }),
                 ),
@@ -1885,7 +1886,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       );
     }
 
-    final isRajju = _panchangaMode == 1;
+    final isRajju = _panchangaMode >= 1;
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Table(columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1)}, children: [
         TableRow(
@@ -1946,7 +1947,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       );
     }
 
-    final isRajju = _panchangaMode == 1;
+    final isRajju = _panchangaMode >= 1;
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Table(columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1)}, children: [
         TableRow(
