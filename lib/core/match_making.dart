@@ -276,6 +276,7 @@ class MatchMakingLogic {
       'rajju': rajju,
       'nadi': nadi,
       'total': total,
+      'isLookup': true,
     };
   }
 
