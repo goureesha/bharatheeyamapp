@@ -513,6 +513,49 @@ class MatchMakingLogic {
     };
   }
 
+
+  /// Baggona (Vishvavsu) Panchanga - Ashta Koota total points lookup table
+  /// 27x27 grid: rows = bride nakshatra (0-26), cols = groom nakshatra (0-26)
+  /// Source: Pages 87-88 of Baggona/Vishvavsu Panchanga
+  static const List<List<double>> _baggonaTable = [
+    [36, 25, 21, 30, 26, 22, 24, 30, 17, 22, 30, 25, 25, 31, 21, 19, 29, 23, 17, 26, 30, 24, 30, 20, 15, 23, 29], // 0-Ashvini
+    [25, 36, 23, 21, 30, 26, 17, 25, 30, 24, 22, 30, 31, 25, 25, 21, 21, 29, 23, 17, 26, 30, 20, 28, 24, 13, 23], // 1-Bharani
+    [21, 23, 36, 25, 21, 30, 24, 17, 25, 30, 24, 22, 25, 31, 31, 25, 19, 21, 29, 23, 17, 26, 30, 20, 28, 24, 15], // 2-Krittika
+    [30, 21, 25, 36, 25, 21, 30, 26, 22, 24, 30, 17, 17, 25, 25, 31, 21, 19, 23, 29, 23, 17, 26, 30, 20, 28, 24], // 3-Rohini
+    [26, 30, 21, 25, 36, 25, 22, 30, 26, 17, 24, 30, 24, 17, 25, 25, 31, 21, 19, 23, 29, 23, 17, 26, 30, 20, 28], // 4-Mrigashira
+    [22, 26, 30, 21, 25, 36, 25, 22, 30, 24, 17, 24, 30, 24, 17, 25, 25, 31, 21, 19, 23, 29, 23, 17, 26, 30, 20], // 5-Aridra
+    [24, 17, 24, 30, 22, 25, 36, 25, 21, 30, 26, 22, 22, 24, 30, 17, 17, 25, 25, 31, 21, 19, 23, 29, 23, 17, 26], // 6-Punarvasu
+    [30, 25, 17, 26, 30, 22, 25, 36, 25, 21, 30, 26, 24, 22, 24, 30, 17, 17, 25, 25, 31, 21, 19, 23, 29, 23, 17], // 7-Pushya
+    [17, 30, 25, 22, 26, 30, 21, 25, 36, 25, 21, 30, 30, 24, 22, 24, 30, 17, 17, 25, 25, 31, 21, 19, 23, 29, 23], // 8-Ashlesha
+    [22, 24, 30, 24, 17, 24, 30, 21, 25, 36, 25, 21, 30, 26, 22, 22, 24, 30, 17, 17, 25, 25, 31, 21, 19, 23, 29], // 9-Magha
+    [30, 22, 24, 30, 24, 17, 26, 30, 21, 25, 36, 25, 21, 30, 26, 24, 22, 24, 30, 17, 17, 25, 25, 31, 21, 19, 23], // 10-P.Phalguni
+    [25, 30, 22, 17, 30, 24, 22, 26, 30, 21, 25, 36, 25, 21, 30, 26, 24, 22, 24, 30, 17, 17, 25, 25, 31, 21, 19], // 11-U.Phalguni
+    [25, 31, 25, 17, 24, 30, 22, 24, 30, 30, 21, 25, 36, 25, 21, 22, 26, 22, 24, 24, 30, 17, 17, 25, 25, 31, 21], // 12-Hasta
+    [31, 25, 31, 25, 17, 24, 24, 22, 24, 26, 30, 21, 25, 36, 25, 21, 22, 26, 26, 24, 24, 30, 17, 17, 25, 25, 31], // 13-Chitra
+    [21, 25, 31, 25, 25, 17, 30, 24, 22, 22, 26, 30, 21, 25, 36, 25, 21, 22, 30, 26, 24, 24, 30, 17, 17, 25, 25], // 14-Swati
+    [19, 21, 25, 31, 25, 25, 17, 30, 24, 24, 24, 26, 22, 21, 25, 36, 25, 21, 22, 30, 26, 22, 24, 30, 17, 17, 25], // 15-Vishakha
+    [29, 21, 19, 21, 31, 25, 17, 17, 30, 24, 22, 24, 26, 22, 21, 25, 36, 25, 21, 22, 30, 26, 22, 24, 30, 17, 17], // 16-Anuradha
+    [23, 29, 21, 19, 21, 31, 25, 17, 17, 30, 24, 22, 22, 26, 22, 21, 25, 36, 25, 21, 22, 30, 26, 22, 24, 30, 17], // 17-Jyeshtha
+    [17, 23, 29, 23, 19, 21, 25, 25, 17, 17, 30, 24, 24, 26, 30, 22, 21, 25, 36, 25, 21, 22, 30, 26, 22, 24, 30], // 18-Moola
+    [26, 17, 23, 29, 23, 19, 31, 25, 25, 17, 17, 30, 24, 24, 26, 30, 22, 21, 25, 36, 25, 21, 22, 30, 26, 22, 24], // 19-P.Shadha
+    [30, 26, 17, 23, 29, 23, 21, 31, 25, 25, 17, 17, 30, 24, 24, 26, 30, 22, 21, 25, 36, 25, 21, 22, 30, 26, 22], // 20-U.Shadha
+    [24, 30, 26, 17, 23, 29, 19, 21, 31, 25, 25, 17, 17, 30, 24, 22, 26, 30, 22, 21, 25, 36, 25, 21, 22, 30, 26], // 21-Shravana
+    [30, 20, 30, 26, 17, 23, 23, 19, 21, 31, 25, 25, 17, 17, 30, 24, 22, 26, 30, 22, 21, 25, 36, 25, 21, 22, 30], // 22-Dhanishtha
+    [20, 28, 20, 30, 26, 17, 29, 23, 19, 21, 31, 25, 25, 17, 17, 30, 24, 22, 26, 30, 22, 21, 25, 36, 25, 21, 22], // 23-Shatabhisha
+    [15, 24, 28, 20, 30, 26, 23, 29, 23, 19, 21, 31, 25, 25, 17, 17, 30, 24, 24, 26, 30, 22, 21, 25, 36, 25, 21], // 24-P.Bhadra
+    [23, 13, 24, 28, 20, 30, 17, 23, 29, 23, 19, 21, 31, 25, 25, 17, 17, 30, 24, 22, 26, 30, 22, 21, 25, 36, 25], // 25-U.Bhadra
+    [29, 23, 15, 24, 28, 20, 26, 17, 23, 29, 23, 19, 21, 31, 25, 25, 17, 17, 30, 24, 22, 26, 30, 22, 21, 25, 36], // 26-Revati
+  ];
+
+  /// Look up Baggona panchanga total koota points
+  static Map<String, dynamic> calculateCompatibilityBaggona(int bNak, int gNak) {
+    final total = _baggonaTable[bNak % 27][gNak % 27];
+    return {
+      'total': total,
+      'isLookup': true,
+    };
+  }
+
   /// Full compatibility analysis using KundaliResult data
   static Map<String, dynamic> calculateFullCompatibility({
     required int brideNakIdx,
@@ -539,9 +582,11 @@ class MatchMakingLogic {
     final bBhava = brideBhavaHouses ?? bridePlanetRashis;
     final gBhava = groomBhavaHouses ?? groomPlanetRashis;
     return {
-      'ashtaKoota': panchangaMode >= 1
-          ? calculateCompatibilityRajju(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx)
-          : calculateCompatibility(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
+      'ashtaKoota': panchangaMode == 2
+          ? calculateCompatibilityBaggona(brideNakIdx, groomNakIdx)
+          : panchangaMode == 1
+              ? calculateCompatibilityRajju(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx)
+              : calculateCompatibility(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
       'dvadashaKoota': calculateDvadashaKoota(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
       'brideKujaDosha': calculateKujaDosha(bBhava,
         bhavaFromChandra: brideBhavaFromChandra, bhavaFromShukra: brideBhavaFromShukra),

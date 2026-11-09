@@ -264,7 +264,11 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     if (_nBrideNak == null || _nGroomNak == null) return;
     final bRashi = _rashiFromNakPada(_nBrideNak!, _nBridePada ?? 0);
     final gRashi = _rashiFromNakPada(_nGroomNak!, _nGroomPada ?? 0);
-    final ashta = MatchMakingLogic.calculateCompatibility(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
+    final ashta = _panchangaMode == 2
+        ? MatchMakingLogic.calculateCompatibilityBaggona(_nBrideNak!, _nGroomNak!)
+        : _panchangaMode == 1
+            ? MatchMakingLogic.calculateCompatibilityRajju(bRashi, _nBrideNak!, gRashi, _nGroomNak!)
+            : MatchMakingLogic.calculateCompatibility(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
     final dvadasha = MatchMakingLogic.calculateDvadashaKoota(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
     final transits = _computeGuruTransits(bRashi, gRashi);
     setState(() {
@@ -623,7 +627,11 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   }
 
   void _calculateQuickKoota() {
-    final ashta = MatchMakingLogic.calculateCompatibility(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
+    final ashta = _panchangaMode == 2
+        ? MatchMakingLogic.calculateCompatibilityBaggona(_qBrideNak, _qGroomNak)
+        : _panchangaMode == 1
+            ? MatchMakingLogic.calculateCompatibilityRajju(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak)
+            : MatchMakingLogic.calculateCompatibility(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
     final dvadasha = MatchMakingLogic.calculateDvadashaKoota(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
     
     // Calculate Guru Bala transit windows for both bride and groom
@@ -1887,7 +1895,8 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       );
     }
 
-    final isRajju = _panchangaMode >= 1;
+    final isRajju = _panchangaMode == 1;
+    final isLookup = result['isLookup'] == true;
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Table(columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1)}, children: [
         TableRow(
@@ -1898,15 +1907,17 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
             Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('garishThaGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
           ],
         ),
-        if (!isRajju) row(AppLocale.l('varna'), result['varna'], 1)
-        else row(AppLocale.l('rajju'), result['rajju'], 1),
-        row(AppLocale.l('vashya'), result[isRajju ? 'vashya' : 'vashya'], 2),
-        row(isRajju ? AppLocale.l('dina') : AppLocale.l('tara'), result[isRajju ? 'dina' : 'tara'], 3),
-        row(AppLocale.l('yoni'), result['yoni'], 4),
-        row(isRajju ? AppLocale.l('rashyadhipati') : AppLocale.l('grahaMaitri'), result[isRajju ? 'rashyadhipati' : 'graha'], 5),
-        row(AppLocale.l('gana'), result['gana'], 6),
-        row(isRajju ? AppLocale.l('rashi') : AppLocale.l('bhakoot'), result[isRajju ? 'rashi' : 'bhakoot'], 7),
-        row(AppLocale.l('naadi'), result['nadi'], 8),
+        if (!isLookup) ...[
+          if (!isRajju) row(AppLocale.l('varna'), result['varna'], 1)
+          else row(AppLocale.l('rajju'), result['rajju'], 1),
+          row(AppLocale.l('vashya'), result[isRajju ? 'vashya' : 'vashya'], 2),
+          row(isRajju ? AppLocale.l('dina') : AppLocale.l('tara'), result[isRajju ? 'dina' : 'tara'], 3),
+          row(AppLocale.l('yoni'), result['yoni'], 4),
+          row(isRajju ? AppLocale.l('rashyadhipati') : AppLocale.l('grahaMaitri'), result[isRajju ? 'rashyadhipati' : 'graha'], 5),
+          row(AppLocale.l('gana'), result['gana'], 6),
+          row(isRajju ? AppLocale.l('rashi') : AppLocale.l('bhakoot'), result[isRajju ? 'rashi' : 'bhakoot'], 7),
+          row(AppLocale.l('naadi'), result['nadi'], 8),
+        ],
         TableRow(
           decoration: BoxDecoration(color: kPurple1.withOpacity(0.05)),
           children: [
