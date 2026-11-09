@@ -5070,6 +5070,144 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
               ),
 
+              // ── KUJA DOSHA (ಕುಜ ದೋಷ / ಮಾಂಗಲ್ಯ ದೋಷ) ──
+              // Mars in houses 1,2,4,7,8,12 from Lagna = Kuja Dosha
+              Builder(builder: (_) {
+                final kujaInfo = r.planets['\u0C95\u0CC1\u0C9C']; // ಕುಜ
+                final lagnaInfo = r.planets['\u0CB2\u0C97\u0CCD\u0CA8']; // ಲಗ್ನ
+                if (kujaInfo == null || lagnaInfo == null) return const SizedBox.shrink();
+                final kujaHouse = ((kujaInfo.rashiIndex - lagnaInfo.rashiIndex + 12) % 12) + 1;
+                const doshaHouses = {1, 2, 4, 7, 8, 12};
+                final hasDosha = doshaHouses.contains(kujaHouse);
+                final isKn = AppLocale.current == 'kn';
+
+                final kujaRashiName = trAll(knRashi[kujaInfo.rashiIndex]);
+                final lagnaRashiName = trAll(knRashi[lagnaInfo.rashiIndex]);
+
+                // Severity
+                String severity;
+                Color sevColor;
+                if (kujaHouse == 7 || kujaHouse == 8) {
+                  severity = isKn ? '\u0CA4\u0CC0\u0CB5\u0CCD\u0CB0' : 'Severe'; // ತೀವ್ರ
+                  sevColor = Colors.red;
+                } else if (kujaHouse == 1 || kujaHouse == 4) {
+                  severity = isKn ? '\u0CAE\u0CA7\u0CCD\u0CAF\u0CAE' : 'Moderate'; // ಮಧ್ಯಮ
+                  sevColor = Colors.orange;
+                } else if (hasDosha) {
+                  severity = isKn ? '\u0CB8\u0CCC\u0CAE\u0CCD\u0CAF' : 'Mild'; // ಸೌಮ್ಯ
+                  sevColor = Colors.amber.shade800;
+                } else {
+                  severity = '';
+                  sevColor = Colors.green;
+                }
+
+                // Cancellation checks
+                final venusInfo = r.planets['\u0CB6\u0CC1\u0C95\u0CCD\u0CB0']; // ಶುಕ್ರ
+                final guruInfo = r.planets['\u0C97\u0CC1\u0CB0\u0CC1']; // ಗುರು
+                bool cancelled = false;
+                String cancelReason = '';
+                if (hasDosha) {
+                  // Cancel 1: Jupiter aspects Mars (Jupiter in kendra from Mars)
+                  if (guruInfo != null) {
+                    final guruFromKuja = ((guruInfo.rashiIndex - kujaInfo.rashiIndex + 12) % 12) + 1;
+                    if (guruFromKuja == 1 || guruFromKuja == 4 || guruFromKuja == 7 || guruFromKuja == 10) {
+                      cancelled = true;
+                      cancelReason = isKn
+                        ? '\u0C97\u0CC1\u0CB0\u0CC1\u0CB5\u0CC1 \u0C95\u0CC1\u0C9C\u0CA8\u0CBF\u0C82\u0CA6 \u0C95\u0CC7\u0C82\u0CA6\u0CCD\u0CB0\u0CA6\u0CB2\u0CCD\u0CB2\u0CBF \u2014 \u0CA6\u0CCB\u0CB7 \u0CA8\u0CBF\u0CB5\u0CBE\u0CB0\u0CA3\u0CC6' // ಗುರುವು ಕುಜನಿಂದ ಕೇಂದ್ರದಲ್ಲಿ — ದೋಷ ನಿವಾರಣೆ
+                        : 'Jupiter in kendra from Mars — Dosha cancelled';
+                    }
+                  }
+                  // Cancel 2: Venus in kendra from Lagna
+                  if (!cancelled && venusInfo != null) {
+                    final venusHouse = ((venusInfo.rashiIndex - lagnaInfo.rashiIndex + 12) % 12) + 1;
+                    if (venusHouse == 1 || venusHouse == 4 || venusHouse == 7 || venusHouse == 10) {
+                      cancelled = true;
+                      cancelReason = isKn
+                        ? '\u0CB6\u0CC1\u0C95\u0CCD\u0CB0 \u0C95\u0CC7\u0C82\u0CA6\u0CCD\u0CB0\u0CA6\u0CB2\u0CCD\u0CB2\u0CBF \u2014 \u0CA6\u0CCB\u0CB7 \u0CA8\u0CBF\u0CB5\u0CBE\u0CB0\u0CA3\u0CC6' // ಶುಕ್ರ ಕೇಂದ್ರದಲ್ಲಿ — ದೋಷ ನಿವಾರಣೆ
+                        : 'Venus in kendra from Lagna — Dosha cancelled';
+                    }
+                  }
+                }
+
+                final cardColor = !hasDosha
+                    ? Colors.green
+                    : cancelled ? Colors.amber.shade700 : sevColor;
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: kCard,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: cardColor.withOpacity(0.4), width: 1.5),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        Icon(Icons.whatshot, size: 20, color: cardColor),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(
+                          isKn ? '\u0C95\u0CC1\u0C9C \u0CA6\u0CCB\u0CB7 (\u0CAE\u0CBE\u0C82\u0C97\u0CB2\u0CCD\u0CAF \u0CA6\u0CCB\u0CB7)' : 'Kuja Dosha (Manglik Dosha)', // ಕುಜ ದೋಷ (ಮಾಂಗಲ್ಯ ದೋಷ)
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: cardColor),
+                        )),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: cardColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            hasDosha
+                              ? (cancelled
+                                  ? (isKn ? '\u0CA8\u0CBF\u0CB5\u0CBE\u0CB0\u0CA3\u0CC6' : 'Cancelled') // ನಿವಾರಣೆ
+                                  : severity)
+                              : (isKn ? '\u0C87\u0CB2\u0CCD\u0CB2' : 'Absent'), // ಇಲ್ಲ
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: cardColor),
+                          ),
+                        ),
+                      ]),
+                      const SizedBox(height: 8),
+                      // Position info
+                      Text(
+                        isKn
+                          ? '\u0C95\u0CC1\u0C9C: $kujaRashiName (\u0CB2\u0C97\u0CCD\u0CA8\u0CA6\u0CBF\u0C82\u0CA6 ${kujaHouse}\u0CA8\u0CC7 \u0CAD\u0CBE\u0CB5)' // ಕುಜ: X (ಲಗ್ನದಿಂದ Yನೇ ಭಾವ)
+                          : 'Mars: $kujaRashiName (${kujaHouse}th house from Lagna)',
+                        style: TextStyle(fontSize: 12, color: kText),
+                      ),
+                      Text(
+                        isKn
+                          ? '\u0CB2\u0C97\u0CCD\u0CA8: $lagnaRashiName' // ಲಗ್ನ: X
+                          : 'Lagna: $lagnaRashiName',
+                        style: TextStyle(fontSize: 12, color: kMuted),
+                      ),
+                      if (hasDosha && !cancelled) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          isKn
+                            ? '\u0C95\u0CC1\u0C9C\u0CA8\u0CC1 ${kujaHouse}\u0CA8\u0CC7 \u0CAD\u0CBE\u0CB5\u0CA6\u0CB2\u0CCD\u0CB2\u0CBF\u0CA6\u0CCD\u0CA6\u0CBE\u0CA8\u0CC6 \u2014 \u0C95\u0CC1\u0C9C \u0CA6\u0CCB\u0CB7\u0CB5\u0CBF\u0CA6\u0CC6. \u0CB5\u0CBF\u0CB5\u0CBE\u0CB9\u0CA6\u0CB2\u0CCD\u0CB2\u0CBF \u0CB9\u0CCA\u0C82\u0CA6\u0CBE\u0CA3\u0CBF\u0C95\u0CC6 \u0C85\u0CB5\u0CB6\u0CCD\u0CAF.' // ಕುಜನು Xನೇ ಭಾವದಲ್ಲಿದ್ದಾನೆ — ಕುಜ ದೋಷವಿದೆ. ವಿವಾಹದಲ್ಲಿ ಹೊಂದಾಣಿಕೆ ಅವಶ್ಯ.
+                            : 'Mars is in the ${kujaHouse}th house — Kuja Dosha present. Compatibility check recommended for marriage.',
+                          style: TextStyle(fontSize: 12, color: Colors.red.shade700, height: 1.4),
+                        ),
+                      ],
+                      if (hasDosha && cancelled) ...[
+                        const SizedBox(height: 6),
+                        Text(cancelReason, style: TextStyle(fontSize: 12, color: Colors.amber.shade800, height: 1.4, fontWeight: FontWeight.w600)),
+                      ],
+                      if (!hasDosha) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          isKn
+                            ? '\u0C95\u0CC1\u0C9C\u0CA8\u0CC1 ${kujaHouse}\u0CA8\u0CC7 \u0CAD\u0CBE\u0CB5\u0CA6\u0CB2\u0CCD\u0CB2\u0CBF\u0CA6\u0CCD\u0CA6\u0CBE\u0CA8\u0CC6 \u2014 \u0C95\u0CC1\u0C9C \u0CA6\u0CCB\u0CB7\u0CB5\u0CBF\u0CB2\u0CCD\u0CB2.' // ಕುಜನು Xನೇ ಭಾವದಲ್ಲಿದ್ದಾನೆ — ಕುಜ ದೋಷವಿಲ್ಲ.
+                            : 'Mars is in the ${kujaHouse}th house — No Kuja Dosha.',
+                          style: TextStyle(fontSize: 12, color: Colors.green.shade700),
+                        ),
+                      ],
+                    ],
+                  ),
+                );
+              }),
+
               // Shubha yogas
               if (shubha.isNotEmpty) ...[
                 Padding(
