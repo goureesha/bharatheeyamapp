@@ -252,6 +252,34 @@ class MatchMakingLogic {
     };
   }
 
+  /// Ashta Koota with Rajju instead of Varna (used by some panchangas)
+  /// Kootas: Dina(3), Gana(6), Yoni(4), Rashi(7), Rashyadhipati(5), Vashya(2), Rajju(1), Nadi(8) = 36
+  static Map<String, dynamic> calculateCompatibilityRajju(int bRashi, int bNak, int gRashi, int gNak) {
+    double dina = getTaraScore(bNak, gNak);           // same as Tara
+    double gana = getGanaScore(bNak, gNak);
+    double yoni = getYoniScore(bNak, gNak);
+    double rashi = getBhakootScore(bRashi, gRashi);    // same as Bhakoot
+    double rashyadhipati = getGrahaMaitriScore(bRashi, gRashi);
+    double vashya = getVashyaScore(bRashi, gRashi);
+    double rajju = getRajjuScore(bNak, gNak);
+    double nadi = getNadiScore(bNak, gNak);
+
+    double total = dina + gana + yoni + rashi + rashyadhipati + vashya + rajju + nadi;
+
+    return {
+      'dina': dina,
+      'gana': gana,
+      'yoni': yoni,
+      'rashi': rashi,
+      'rashyadhipati': rashyadhipati,
+      'vashya': vashya,
+      'rajju': rajju,
+      'nadi': nadi,
+      'total': total,
+    };
+  }
+
+
   /// Dvadasha Koota: 12 kootas, max 40 points
   static Map<String, dynamic> calculateDvadashaKoota(int bRashi, int bNak, int gRashi, int gNak) {
     double varna = getVarnaScore(bRashi, gRashi);
@@ -505,12 +533,15 @@ class MatchMakingLogic {
     Map<String, int>? groomBhavaFromChandra,
     Map<String, int>? brideBhavaFromShukra,
     Map<String, int>? groomBhavaFromShukra,
+    int panchangaMode = 0,
   }) {
     // Use bhava houses for dosha if available, fallback to rashi-based
     final bBhava = brideBhavaHouses ?? bridePlanetRashis;
     final gBhava = groomBhavaHouses ?? groomPlanetRashis;
     return {
-      'ashtaKoota': calculateCompatibility(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
+      'ashtaKoota': panchangaMode == 1
+          ? calculateCompatibilityRajju(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx)
+          : calculateCompatibility(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
       'dvadashaKoota': calculateDvadashaKoota(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
       'brideKujaDosha': calculateKujaDosha(bBhava,
         bhavaFromChandra: brideBhavaFromChandra, bhavaFromShukra: brideBhavaFromShukra),

@@ -400,6 +400,8 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         brideBhavaHouses: bBhavaLagna, groomBhavaHouses: gBhavaLagna,
         brideBhavaFromChandra: bBhavaChandra, groomBhavaFromChandra: gBhavaChandra,
         brideBhavaFromShukra: bBhavaShukra, groomBhavaFromShukra: gBhavaShukra,
+      
+        panchangaMode: _panchangaMode,
       );
 
       setState(() {
@@ -566,6 +568,8 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       brideBhavaHouses: bBhavaLagna, groomBhavaHouses: gBhavaLagna,
       brideBhavaFromChandra: bBhavaChandra, groomBhavaFromChandra: gBhavaChandra,
       brideBhavaFromShukra: bBhavaShukra, groomBhavaFromShukra: gBhavaShukra,
+    
+      panchangaMode: _panchangaMode,
     );
 
     setState(() {
@@ -1828,6 +1832,40 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     ]);
   }
 
+
+  Widget _buildPanchangaSelector() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Icon(Icons.menu_book, color: kPurple2, size: 18),
+          const SizedBox(width: 8),
+          Text(AppLocale.l('panchangaSystem'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kText)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorder)),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int>(
+                  value: _panchangaMode,
+                  isExpanded: true,
+                  dropdownColor: kCard,
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: kText),
+                  items: [
+                    DropdownMenuItem(value: 0, child: Text(AppLocale.l('panchangaStandard'))),
+                    DropdownMenuItem(value: 1, child: Text(AppLocale.l('panchangaRajju'))),
+                  ],
+                  onChanged: (v) => setState(() { _panchangaMode = v ?? 0; }),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAshtaKootaTable(Map<String, dynamic> result) {
     final total = result['total'] as double;
     String verdict;
@@ -1847,6 +1885,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       );
     }
 
+    final isRajju = _panchangaMode == 1;
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Table(columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1)}, children: [
         TableRow(
@@ -1857,13 +1896,14 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
             Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('garishThaGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
           ],
         ),
-        row(AppLocale.l('varna'), result['varna'], 1),
-        row(AppLocale.l('vashya'), result['vashya'], 2),
-        row(AppLocale.l('tara'), result['tara'], 3),
+        if (!isRajju) row(AppLocale.l('varna'), result['varna'], 1)
+        else row(AppLocale.l('rajju'), result['rajju'], 1),
+        row(AppLocale.l('vashya'), result[isRajju ? 'vashya' : 'vashya'], 2),
+        row(isRajju ? AppLocale.l('dina') : AppLocale.l('tara'), result[isRajju ? 'dina' : 'tara'], 3),
         row(AppLocale.l('yoni'), result['yoni'], 4),
-        row(AppLocale.l('grahaMaitri'), result['graha'], 5),
+        row(isRajju ? AppLocale.l('rashyadhipati') : AppLocale.l('grahaMaitri'), result[isRajju ? 'rashyadhipati' : 'graha'], 5),
         row(AppLocale.l('gana'), result['gana'], 6),
-        row(AppLocale.l('bhakoot'), result['bhakoot'], 7),
+        row(isRajju ? AppLocale.l('rashi') : AppLocale.l('bhakoot'), result[isRajju ? 'rashi' : 'bhakoot'], 7),
         row(AppLocale.l('naadi'), result['nadi'], 8),
         TableRow(
           decoration: BoxDecoration(color: kPurple1.withOpacity(0.05)),
@@ -1906,6 +1946,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       );
     }
 
+    final isRajju = _panchangaMode == 1;
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Table(columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1)}, children: [
         TableRow(
@@ -1916,13 +1957,14 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
             Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('garishThaGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
           ],
         ),
-        row(AppLocale.l('varna'), result['varna'], 1),
-        row(AppLocale.l('vashya'), result['vashya'], 2),
-        row(AppLocale.l('tara'), result['tara'], 3),
+        if (!isRajju) row(AppLocale.l('varna'), result['varna'], 1)
+        else row(AppLocale.l('rajju'), result['rajju'], 1),
+        row(AppLocale.l('vashya'), result[isRajju ? 'vashya' : 'vashya'], 2),
+        row(isRajju ? AppLocale.l('dina') : AppLocale.l('tara'), result[isRajju ? 'dina' : 'tara'], 3),
         row(AppLocale.l('yoni'), result['yoni'], 4),
-        row(AppLocale.l('grahaMaitri'), result['graha'], 5),
+        row(isRajju ? AppLocale.l('rashyadhipati') : AppLocale.l('grahaMaitri'), result[isRajju ? 'rashyadhipati' : 'graha'], 5),
         row(AppLocale.l('gana'), result['gana'], 6),
-        row(AppLocale.l('bhakoot'), result['bhakoot'], 7),
+        row(isRajju ? AppLocale.l('rashi') : AppLocale.l('bhakoot'), result[isRajju ? 'rashi' : 'bhakoot'], 7),
         row(AppLocale.l('naadi'), result['nadi'], 8),
         row(AppLocale.l('mahendra'), result['mahendra'], 1),
         row(AppLocale.l('streeDeergha'), result['streeDeergha'], 1),
@@ -2010,6 +2052,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         ),
         if (_qResult != null) ...[
           const SizedBox(height: 16),
+          _buildPanchangaSelector(),
           _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
@@ -2300,6 +2343,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
 
         // ── Results ──
         if (_nResult != null) ...[
+          _buildPanchangaSelector(),
           const SizedBox(height: 16),
           _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
           Padding(
@@ -2572,7 +2616,8 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                           _buildPapaDoshaSection(fr),
                           _sectionHeader(AppLocale.l('grahaMaitriAmsha'), Icons.handshake, kPurple2),
                           _buildGrahaMaitriSection(fr),
-                          _sectionHeader('${AppLocale.l('shathaAshtaka')} & ${AppLocale.l('dvirdvadasha')}', Icons.compare_arrows, Colors.indigo),
+                          _buildPanchangaSelector(),
+                        _sectionHeader('${AppLocale.l('shathaAshtaka')} & ${AppLocale.l('dvirdvadasha')}', Icons.compare_arrows, Colors.indigo),
                           _buildShathaAshtakaDvirdvadashaSection(fr),
                           _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
                           Padding(
