@@ -4642,15 +4642,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ));
               }),
             ])),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
-                      child: Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color)),
-                    ),
-                  ]),
-                ));
-              }),
-            ])),
           ],
           const SizedBox(height: 32),
         ],
