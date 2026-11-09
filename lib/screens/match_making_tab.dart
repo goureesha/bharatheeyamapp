@@ -73,6 +73,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   KundaliResult? _groomResult;
   Map<String, dynamic>? _fullResult;
   int _kootaMode = 0; // 0 = Ashta Koota, 1 = Dvadasha Koota
+  int _panchangaMode = 0; // 0 = Standard, 1 = Mogery, 2 = Baggona
 
   // Multi-person lists
   final List<_MatchPerson> _varaList = [];

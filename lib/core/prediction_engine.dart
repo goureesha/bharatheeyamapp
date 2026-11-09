@@ -1,4 +1,5 @@
 import 'calculator.dart';
+import '../constants/strings.dart';
 import 'prediction_texts.dart';
 import 'prediction_texts_en.dart' hide dashaBhuktiPhalasEn;
 import 'prediction_texts_hi.dart' hide dashaBhuktiPhalasHi;
