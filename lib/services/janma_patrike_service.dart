@@ -1429,7 +1429,7 @@ class JanmaPatrikeService {
           // House header
           Row(
             children: [
-              Text('$qualityIcon ${b.bhavaNum}. ${b.bhavaName}',
+              Text('$qualityIcon ${b.bhavaNum}. ${b.bhavaName} \u2014 ${trAll(b.rashiName)}',
                 style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: t.primaryDark)),
               const Spacer(),
               Text(lordStr, style: TextStyle(fontSize: 9, color: Colors.black54)),

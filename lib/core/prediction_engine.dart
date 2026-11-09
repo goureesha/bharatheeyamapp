@@ -97,6 +97,7 @@ class PredictionResult {
 class BhavaPrediction {
   final int bhavaNum;              // 1-12
   final String bhavaName;          // e.g., 'ತನು'
+  final String rashiName;          // e.g., 'ಮೇಷ' — rashi of this bhava
   final String significations;     // key significations
   final String lordName;           // house lord planet name
   final int lordInHouse;           // which house the lord sits in
@@ -111,6 +112,7 @@ class BhavaPrediction {
   const BhavaPrediction({
     required this.bhavaNum,
     required this.bhavaName,
+    required this.rashiName,
     required this.significations,
     required this.lordName,
     required this.lordInHouse,
@@ -611,6 +613,7 @@ class PredictionEngine {
       bhavas.add(BhavaPrediction(
         bhavaNum: h,
         bhavaName: _bhavaInfo[h - 1].nameKn,
+        rashiName: knRashi[(lagnaRashi + h - 1) % 12],
         significations: _bhavaInfo[h - 1].significations,
         lordName: lord,
         lordInHouse: lordH,

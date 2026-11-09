@@ -4307,7 +4307,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             child: Center(child: Text('${b.bhavaNum}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: qualityColor))),
           ),
           title: Row(children: [
-            Expanded(child: Text(b.bhavaName, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kText))),
+            Expanded(child: Text('${b.bhavaName} — ${trAll(b.rashiName)}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: kText))),
             Icon(qualityIcon, color: qualityColor, size: 16),
           ]),
           subtitle: Text(b.significations, style: TextStyle(fontSize: 10, color: kMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
