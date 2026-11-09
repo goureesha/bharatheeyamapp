@@ -626,6 +626,73 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     );
   }
 
+  void _recalcFullMatch() {
+    if (_brideResult == null || _groomResult == null) return;
+    final brideR = _brideResult!;
+    final groomR = _groomResult!;
+
+    Map<String, int> extractRashis(r) {
+      final m = <String, int>{};
+      for (final e in r.planets.entries) m[e.key] = e.value.rashiIndex;
+      return m;
+    }
+    Map<String, int> extractBhavaHouses(r, {String? refPlanet}) {
+      final m = <String, int>{};
+      final refLon = refPlanet != null ? (r.planets[refPlanet]?.longitude ?? 0.0) : (r.planets['ಲಗ್ನ']?.longitude ?? 0.0);
+      final refRashi = (refLon / 30.0).floor() % 12;
+      final madhyas = List<double>.generate(12, (i) => ((refRashi + i) % 12) * 30.0 + 15.0);
+      final sandhis = List<double>.filled(12, 0);
+      for (int i = 0; i < 12; i++) {
+        final m1 = madhyas[i]; final m2 = madhyas[(i + 1) % 12];
+        final diff = ((m2 - m1) % 360 + 360) % 360;
+        sandhis[i] = (m1 + diff / 2.0) % 360.0;
+      }
+      for (final e in r.planets.entries) {
+        if (e.key == 'ಲಗ್ನ') continue;
+        final pLon = e.value.longitude;
+        int house = 1;
+        for (int i = 0; i < 12; i++) {
+          final start = sandhis[(i + 11) % 12]; final end = sandhis[i];
+          if (start < end) { if (pLon >= start && pLon < end) { house = i + 1; break; } }
+          else { if (pLon >= start || pLon < end) { house = i + 1; break; } }
+        }
+        m[e.key] = house;
+      }
+      return m;
+    }
+
+    final bRashis = extractRashis(brideR);
+    final gRashis = extractRashis(groomR);
+    final bBhavaLagna = extractBhavaHouses(brideR);
+    final gBhavaLagna = extractBhavaHouses(groomR);
+    final bBhavaChandra = extractBhavaHouses(brideR, refPlanet: 'ಚಂದ್ರ');
+    final gBhavaChandra = extractBhavaHouses(groomR, refPlanet: 'ಚಂದ್ರ');
+    final bBhavaShukra = extractBhavaHouses(brideR, refPlanet: 'ಶುಕ್ರ');
+    final gBhavaShukra = extractBhavaHouses(groomR, refPlanet: 'ಶುಕ್ರ');
+    final bLagnaRashi = brideR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
+    final gLagnaRashi = groomR.planets['ಲಗ್ನ']?.rashiIndex ?? 0;
+    final bMoonRashi = brideR.planets['ಚಂದ್ರ']?.rashiIndex ?? 0;
+    final gMoonRashi = groomR.planets['ಚಂದ್ರ']?.rashiIndex ?? 0;
+    final bNakIdx = brideR.panchang.nakshatraIndex;
+    final gNakIdx = groomR.panchang.nakshatraIndex;
+    final bNavLagna = MatchMakingLogic.navamshaRashi(brideR.planets['ಲಗ್ನ']?.longitude ?? 0);
+    final bNavMoon = MatchMakingLogic.navamshaRashi(brideR.planets['ಚಂದ್ರ']?.longitude ?? 0);
+    final gNavLagna = MatchMakingLogic.navamshaRashi(groomR.planets['ಲಗ್ನ']?.longitude ?? 0);
+    final gNavMoon = MatchMakingLogic.navamshaRashi(groomR.planets['ಚಂದ್ರ']?.longitude ?? 0);
+
+    final fullResult = MatchMakingLogic.calculateFullCompatibility(
+      brideNakIdx: bNakIdx, brideMoonRashi: bMoonRashi, brideLagnaRashi: bLagnaRashi, bridePlanetRashis: bRashis,
+      brideNavLagnaRashi: bNavLagna, brideNavMoonRashi: bNavMoon,
+      groomNakIdx: gNakIdx, groomMoonRashi: gMoonRashi, groomLagnaRashi: gLagnaRashi, groomPlanetRashis: gRashis,
+      groomNavLagnaRashi: gNavLagna, groomNavMoonRashi: gNavMoon,
+      brideBhavaHouses: bBhavaLagna, groomBhavaHouses: gBhavaLagna,
+      brideBhavaFromChandra: bBhavaChandra, groomBhavaFromChandra: gBhavaChandra,
+      brideBhavaFromShukra: bBhavaShukra, groomBhavaFromShukra: gBhavaShukra,
+      panchangaMode: _panchangaMode,
+    );
+    setState(() { _fullResult = fullResult; });
+  }
+
   void _calculateQuickKoota() {
     final ashta = _panchangaMode == 2
         ? MatchMakingLogic.calculateCompatibilityBaggona(_qBrideNak, _qGroomNak)
@@ -1866,7 +1933,13 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                     DropdownMenuItem(value: 1, child: Text(AppLocale.l('panchangaMogery'))),
                     DropdownMenuItem(value: 2, child: Text(AppLocale.l('panchangaBaggona'))),
                   ],
-                  onChanged: (v) => setState(() { _panchangaMode = v ?? 0; }),
+                  onChanged: (v) {
+                    setState(() { _panchangaMode = v ?? 0; });
+                    // Re-run active calculations with new panchanga mode
+                    if (_qResult != null) _calculateQuickKoota();
+                    if (_nResult != null) _calculateNamaaksharaKoota();
+                    _recalcFullMatch();
+                  },
                 ),
               ),
             ),
@@ -1895,8 +1968,8 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       );
     }
 
-    final isRajju = _panchangaMode == 1;
     final isLookup = result['isLookup'] == true;
+    final isRajju = !isLookup && result.containsKey('rajju');
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Table(columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1)}, children: [
         TableRow(
@@ -1959,7 +2032,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       );
     }
 
-    final isRajju = _panchangaMode >= 1;
+    final isRajju = result.containsKey('rajju');
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Table(columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1)}, children: [
         TableRow(
