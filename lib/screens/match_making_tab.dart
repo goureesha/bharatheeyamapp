@@ -2138,8 +2138,8 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         ),
         if (_qResult != null) ...[
           const SizedBox(height: 16),
-          _buildPanchangaSelector(),
           _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
+          _buildPanchangaSelector(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
             child: Row(children: [
@@ -2429,9 +2429,9 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
 
         // ── Results ──
         if (_nResult != null) ...[
-          _buildPanchangaSelector(),
           const SizedBox(height: 16),
           _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
+          _buildPanchangaSelector(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
             child: Row(children: [
@@ -2702,10 +2702,10 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                           _buildPapaDoshaSection(fr),
                           _sectionHeader(AppLocale.l('grahaMaitriAmsha'), Icons.handshake, kPurple2),
                           _buildGrahaMaitriSection(fr),
-                          _buildPanchangaSelector(),
                         _sectionHeader('${AppLocale.l('shathaAshtaka')} & ${AppLocale.l('dvirdvadasha')}', Icons.compare_arrows, Colors.indigo),
                           _buildShathaAshtakaDvirdvadashaSection(fr),
                           _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
+                          _buildPanchangaSelector(),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
                             child: Row(children: [
