@@ -1297,6 +1297,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
 
       // ── KOOTA TOGGLE + TABLE ──
       _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
+      _buildPanchangaSelector(),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
         child: Row(children: [
