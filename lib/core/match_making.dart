@@ -557,6 +557,15 @@ class MatchMakingLogic {
     };
   }
 
+  /// Look up Mogery panchanga total koota points (uses same table as Baggona)
+  static Map<String, dynamic> calculateCompatibilityMogery(int bNak, int gNak) {
+    final total = _baggonaTable[bNak % 27][gNak % 27];
+    return {
+      'total': total,
+      'isLookup': true,
+    };
+  }
+
   /// Full compatibility analysis using KundaliResult data
   static Map<String, dynamic> calculateFullCompatibility({
     required int brideNakIdx,
@@ -586,7 +595,7 @@ class MatchMakingLogic {
       'ashtaKoota': panchangaMode == 2
           ? calculateCompatibilityBaggona(brideNakIdx, groomNakIdx)
           : panchangaMode == 1
-              ? calculateCompatibilityRajju(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx)
+              ? calculateCompatibilityMogery(brideNakIdx, groomNakIdx)
               : calculateCompatibility(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
       'dvadashaKoota': calculateDvadashaKoota(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
       'brideKujaDosha': calculateKujaDosha(bBhava,

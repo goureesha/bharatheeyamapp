@@ -267,7 +267,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     final ashta = _panchangaMode == 2
         ? MatchMakingLogic.calculateCompatibilityBaggona(_nBrideNak!, _nGroomNak!)
         : _panchangaMode == 1
-            ? MatchMakingLogic.calculateCompatibilityRajju(bRashi, _nBrideNak!, gRashi, _nGroomNak!)
+            ? MatchMakingLogic.calculateCompatibilityMogery(_nBrideNak!, _nGroomNak!)
             : MatchMakingLogic.calculateCompatibility(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
     final dvadasha = MatchMakingLogic.calculateDvadashaKoota(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
     final transits = _computeGuruTransits(bRashi, gRashi);
@@ -697,7 +697,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     final ashta = _panchangaMode == 2
         ? MatchMakingLogic.calculateCompatibilityBaggona(_qBrideNak, _qGroomNak)
         : _panchangaMode == 1
-            ? MatchMakingLogic.calculateCompatibilityRajju(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak)
+            ? MatchMakingLogic.calculateCompatibilityMogery(_qBrideNak, _qGroomNak)
             : MatchMakingLogic.calculateCompatibility(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
     final dvadasha = MatchMakingLogic.calculateDvadashaKoota(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
     
