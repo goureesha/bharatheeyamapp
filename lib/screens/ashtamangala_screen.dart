@@ -87,6 +87,63 @@ class _AshtamangalaScreenState extends State<AshtamangalaScreen> {
     _tamboolaCtrl.addListener(_onInputChanged);
     _placeCtrl.addListener(_onInputChanged);
     _loadRecords();
+    // Show disclaimer dialog on first open
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showDisclaimerDialog());
+  }
+
+
+  void _showDisclaimerDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.info_outline, color: Color(0xFFE65100), size: 28),
+            const SizedBox(width: 10),
+            Expanded(child: Text('ಸೂಚನೆ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Color(0xFFE65100)))),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'ಈ ಅಷ್ಟಮಂಗಲ ಲೆಕ್ಕಾಚಾರಗಳ ಆಧಾರವನ್ನು \'ಆಧಾರ\' ಟ್ಯಾಬ್\u200cನಲ್ಲಿ ನೋಡಿ, ಪರಿಶೀಲಿಸಿ, ನಂತರ ಬಳಸಿ.',
+              style: TextStyle(fontSize: 14, height: 1.6),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              'ತಪ್ಪಿದ್ದಲ್ಲಿ ಅಥವಾ ಬೇರೆ ಲೆಕ್ಕಾಚಾರ ಬೇಕಿದ್ದಲ್ಲಿ ಸಂಪರ್ಕಿಸಿ:',
+              style: TextStyle(fontSize: 14, height: 1.5),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(Icons.person, size: 18, color: Color(0xFF4527A0)),
+                const SizedBox(width: 8),
+                Text('ಗೌರೀಶ ಭಟ್ ಮುಡೇಬೈಲ್', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Icon(Icons.phone, size: 18, color: Color(0xFF2E7D32)),
+                const SizedBox(width: 8),
+                Text('8762629847', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF2E7D32))),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('ಸರಿ, ಮುಂದುವರಿಸಿ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
