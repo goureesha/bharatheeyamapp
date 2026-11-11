@@ -2250,30 +2250,30 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
                         Expanded(child: Text(ref.kannadaArtha, style: const TextStyle(fontSize: 12, height: 1.4))),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    // Grantha reference
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: kPurple2.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.menu_book_rounded, size: 16, color: Color(0xFF7B1FA2)),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text.rich(
-                              TextSpan(children: [
-                                TextSpan(text: ref.adhyaya, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
-                                TextSpan(text: '  |  ', style: TextStyle(color: kMuted)),
-                                TextSpan(text: ref.stanza, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFE67E22))),
-                              ]),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+//                     const SizedBox(height: 8),
+//                     // Grantha reference
+//                     Container(
+//                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+//                       decoration: BoxDecoration(
+//                         color: kPurple2.withValues(alpha: 0.06),
+//                         borderRadius: BorderRadius.circular(6),
+//                       ),
+//                       child: Row(
+//                         children: [
+//                           const Icon(Icons.menu_book_rounded, size: 16, color: Color(0xFF7B1FA2)),
+//                           const SizedBox(width: 6),
+//                           Expanded(
+//                             child: Text.rich(
+//                               TextSpan(children: [
+//                                 TextSpan(text: ref.adhyaya, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+//                                 TextSpan(text: '  |  ', style: TextStyle(color: kMuted)),
+//                                 TextSpan(text: ref.stanza, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFE67E22))),
+//                               ]),
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
                   ] else ...[
                     Text(
                       fallbackArtha,
@@ -2875,30 +2875,30 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  // Book & Chapter info
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: kPurple2.withValues(alpha: 0.06),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.menu_book_rounded, size: 16, color: Color(0xFF7B1FA2)),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text.rich(
-                            TextSpan(children: [
-                              TextSpan(text: ref.adhyaya, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
-                              TextSpan(text: '  |  ', style: TextStyle(color: kMuted)),
-                              TextSpan(text: ref.stanza, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFE67E22))),
-                            ]),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+//                   const SizedBox(height: 8),
+//                   // Book & Chapter info
+//                   Container(
+//                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+//                     decoration: BoxDecoration(
+//                       color: kPurple2.withValues(alpha: 0.06),
+//                       borderRadius: BorderRadius.circular(6),
+//                     ),
+//                     child: Row(
+//                       children: [
+//                         const Icon(Icons.menu_book_rounded, size: 16, color: Color(0xFF7B1FA2)),
+//                         const SizedBox(width: 6),
+//                         Expanded(
+//                           child: Text.rich(
+//                             TextSpan(children: [
+//                               TextSpan(text: ref.adhyaya, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+//                               TextSpan(text: '  |  ', style: TextStyle(color: kMuted)),
+//                               TextSpan(text: ref.stanza, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFE67E22))),
+//                             ]),
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
                 ],
               ),
             ),
