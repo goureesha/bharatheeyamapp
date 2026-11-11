@@ -110,7 +110,7 @@ class _AshtamangalaScreenState extends State<AshtamangalaScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'ಈ ಅಷ್ಟಮಂಗಲ ಲೆಕ್ಕಾಚಾರಗಳ ಆಧಾರವನ್ನು \'ಆಧಾರ\' ಟ್ಯಾಬ್\u200cನಲ್ಲಿ ನೋಡಿ, ಪರಿಶೀಲಿಸಿ, ನಂತರ ಬಳಸಿ.',
+              'ಈ ಅಷ್ಟಮಂಗಲ ಲೆಕ್ಕಾಚಾರ ಪದ್ಧತಿಯನ್ನು \'ಲೆಕ್ಕಗಳು\' ಟ್ಯಾಬ್\u200cನಲ್ಲಿ ನೋಡಿ, ಪರಿಶೀಲಿಸಿ, ನಂತರ ಬಳಸಿ.',
               style: TextStyle(fontSize: 14, height: 1.6),
             ),
             const SizedBox(height: 14),
@@ -1084,7 +1084,7 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
   int _selectedAvIdx = 0; // 0=SAV, 1-7 = individual planet BAV
 
   // ಬಳಕೆದಾರರು ಕೇಳಿದ ೫ ಟ್ಯಾಬ್‌ಗಳು
-  static const _tabs = ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಅಷ್ಟಮಂಗಲ', 'ತ್ರಿಸ್ಫುಟ ದಶಾ', 'ಅಷ್ಟಕವರ್ಗ', 'ಷೋಡಶವರ್ಗ', 'ಷಡ್ಬಲ', 'ಫಲಾದೇಶ', 'ಆಧಾರ'];
+  static const _tabs = ['ಪಂಚಾಂಗ', 'ಕುಂಡಲಿ', 'ಸ್ಫುಟ', 'ಅಷ್ಟಮಂಗಲ', 'ತ್ರಿಸ್ಫುಟ ದಶಾ', 'ಅಷ್ಟಕವರ್ಗ', 'ಷೋಡಶವರ್ಗ', 'ಷಡ್ಬಲ', 'ಫಲಾದೇಶ', 'ಲೆಕ್ಕಗಳು'];
 
   // ೧೬ ಪಾರಾಶರಿ ಷೋಡಶವರ್ಗ ಕುಂಡಲಿಗಳು + ಭಾವ ಕುಂಡಲಿ
   static const List<Map<String, dynamic>> _shodashaVargaCharts = [
