@@ -73,7 +73,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   KundaliResult? _groomResult;
   Map<String, dynamic>? _fullResult;
   int _kootaMode = 0; // 0 = Ashta Koota, 1 = Dvadasha Koota
-  int _panchangaMode = 0; // 0 = Standard, 1 = Mogery, 2 = Baggona
+  int _panchangaMode = 1; // 1 = Mogeri, 2 = Baggona
 
   // Multi-person lists
   final List<_MatchPerson> _varaList = [];
@@ -1930,12 +1930,11 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                   dropdownColor: kCard,
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: kText),
                   items: [
-                    DropdownMenuItem(value: 0, child: Text(AppLocale.l('panchangaStandard'))),
                     DropdownMenuItem(value: 1, child: Text(AppLocale.l('panchangaMogery'))),
                     DropdownMenuItem(value: 2, child: Text(AppLocale.l('panchangaBaggona'))),
                   ],
                   onChanged: (v) {
-                    setState(() { _panchangaMode = v ?? 0; });
+                    setState(() { _panchangaMode = v ?? 1; });
                     // Re-run active calculations with new panchanga mode
                     if (_qResult != null) _calculateQuickKoota();
                     if (_nResult != null) _calculateNamaaksharaKoota();
