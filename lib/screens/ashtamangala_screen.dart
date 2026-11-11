@@ -2265,9 +2265,6 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
                           Expanded(
                             child: Text.rich(
                               TextSpan(children: [
-                                TextSpan(text: 'ಗ್ರಂಥ: ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: kPurple2)),
-                                TextSpan(text: ref.grantha, style: const TextStyle(fontSize: 11)),
-                                TextSpan(text: '  |  ', style: TextStyle(color: kMuted)),
                                 TextSpan(text: ref.adhyaya, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
                                 TextSpan(text: '  |  ', style: TextStyle(color: kMuted)),
                                 TextSpan(text: ref.stanza, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFE67E22))),
@@ -2893,9 +2890,6 @@ class _AshtamangalaDashboardScreenState extends State<AshtamangalaDashboardScree
                         Expanded(
                           child: Text.rich(
                             TextSpan(children: [
-                              TextSpan(text: 'ಗ್ರಂಥ: ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: kPurple2)),
-                              TextSpan(text: ref.grantha, style: const TextStyle(fontSize: 11)),
-                              TextSpan(text: '  |  ', style: TextStyle(color: kMuted)),
                               TextSpan(text: ref.adhyaya, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
                               TextSpan(text: '  |  ', style: TextStyle(color: kMuted)),
                               TextSpan(text: ref.stanza, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFE67E22))),
