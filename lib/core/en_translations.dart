@@ -1475,4 +1475,7 @@ const Map<String, String> enStrings = {
   'devata': 'Devata',
   'gana': 'Gana',
   'allPadas': 'All Padas',
+  'boyNames': 'Boy Names',
+  'girlNames': 'Girl Names',
+  'babyNamingNoNames': 'No name suggestions available for this letter',
 };

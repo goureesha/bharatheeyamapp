@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/common.dart';
 import '../constants/strings.dart';
+import '../constants/baby_names.dart';
 
 /// ──────────────────────────────────────────────────────────────
 /// Baby Naming (ನಾಮಕರಣ) Screen
@@ -259,8 +260,94 @@ class _BabyNamingScreenState extends State<BabyNamingScreen> {
             ],
           ),
         ),
+
+        // Name suggestions
+        const SizedBox(height: 14),
+        _buildNameSuggestions(syllable),
       ],
     ));
+  }
+
+  /// Build name suggestions for the selected syllable
+  Widget _buildNameSuggestions(String syllable) {
+    final entry = babyNameSuggestions[syllable];
+    if (entry == null) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: kBg, borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: kBorder),
+        ),
+        child: Text(AppLocale.l('babyNamingNoNames'),
+          style: TextStyle(fontSize: 12, color: kMuted, fontStyle: FontStyle.italic)),
+      );
+    }
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // Boy names
+      if (entry.boyNames.isNotEmpty) ...[ 
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF4299E1).withOpacity(0.08),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFF4299E1).withOpacity(0.3)),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Icon(Icons.male, size: 18, color: const Color(0xFF4299E1)),
+              const SizedBox(width: 6),
+              Text(AppLocale.l('boyNames'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: const Color(0xFF4299E1))),
+              const SizedBox(width: 6),
+              Text('(${entry.boyNames.length})', style: TextStyle(fontSize: 11, color: const Color(0xFF4299E1).withOpacity(0.6))),
+            ]),
+            const SizedBox(height: 8),
+            Wrap(spacing: 8, runSpacing: 6, children: entry.boyNames.map((name) =>
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: kCard, borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFF4299E1).withOpacity(0.2)),
+                ),
+                child: Text(name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
+              ),
+            ).toList()),
+          ]),
+        ),
+        const SizedBox(height: 10),
+      ],
+
+      // Girl names
+      if (entry.girlNames.isNotEmpty)
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFED64A6).withOpacity(0.08),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFED64A6).withOpacity(0.3)),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Icon(Icons.female, size: 18, color: const Color(0xFFED64A6)),
+              const SizedBox(width: 6),
+              Text(AppLocale.l('girlNames'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: const Color(0xFFED64A6))),
+              const SizedBox(width: 6),
+              Text('(${entry.girlNames.length})', style: TextStyle(fontSize: 11, color: const Color(0xFFED64A6).withOpacity(0.6))),
+            ]),
+            const SizedBox(height: 8),
+            Wrap(spacing: 8, runSpacing: 6, children: entry.girlNames.map((name) =>
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: kCard, borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFED64A6).withOpacity(0.2)),
+                ),
+                child: Text(name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText)),
+              ),
+            ).toList()),
+          ]),
+        ),
+    ]);
   }
 
   Widget _infoRow(IconData icon, String label, String value, Color color) {
