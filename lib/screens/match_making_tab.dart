@@ -264,15 +264,13 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     if (_nBrideNak == null || _nGroomNak == null) return;
     final bRashi = _rashiFromNakPada(_nBrideNak!, _nBridePada ?? 0);
     final gRashi = _rashiFromNakPada(_nGroomNak!, _nGroomPada ?? 0);
-    final ashta = _panchangaMode == 2
-        ? MatchMakingLogic.calculateCompatibilityBaggona(_nBrideNak!, _nGroomNak!, bRashi, gRashi)
-        : _panchangaMode == 1
-            ? MatchMakingLogic.calculateCompatibilityMogery(_nBrideNak!, _nGroomNak!, bRashi, gRashi)
-            : MatchMakingLogic.calculateCompatibility(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
+    final ashtaStd = MatchMakingLogic.calculateCompatibility(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
+    final ashtaMogeri = MatchMakingLogic.calculateCompatibilityMogery(_nBrideNak!, _nGroomNak!, bRashi, gRashi);
+    final ashtaBaggona = MatchMakingLogic.calculateCompatibilityBaggona(_nBrideNak!, _nGroomNak!, bRashi, gRashi);
     final dvadasha = MatchMakingLogic.calculateDvadashaKoota(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
     // Set koota result immediately, compute guru transits async
     setState(() {
-      _nResult = {'ashtaKoota': ashta, 'dvadashaKoota': dvadasha, 'brideRashi': bRashi, 'groomRashi': gRashi};
+      _nResult = {'ashtaKoota': ashtaStd, 'ashtaMogeri': ashtaMogeri, 'ashtaBaggona': ashtaBaggona, 'dvadashaKoota': dvadasha, 'brideRashi': bRashi, 'groomRashi': gRashi};
     });
     // Defer heavy guru transit computation to avoid blocking UI
     Future.microtask(() {
@@ -699,16 +697,14 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   }
 
   void _calculateQuickKoota() {
-    final ashta = _panchangaMode == 2
-        ? MatchMakingLogic.calculateCompatibilityBaggona(_qBrideNak, _qGroomNak, _qBrideRashi, _qGroomRashi)
-        : _panchangaMode == 1
-            ? MatchMakingLogic.calculateCompatibilityMogery(_qBrideNak, _qGroomNak, _qBrideRashi, _qGroomRashi)
-            : MatchMakingLogic.calculateCompatibility(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
+    final ashtaStd = MatchMakingLogic.calculateCompatibility(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
+    final ashtaMogeri = MatchMakingLogic.calculateCompatibilityMogery(_qBrideNak, _qGroomNak, _qBrideRashi, _qGroomRashi);
+    final ashtaBaggona = MatchMakingLogic.calculateCompatibilityBaggona(_qBrideNak, _qGroomNak, _qBrideRashi, _qGroomRashi);
     final dvadasha = MatchMakingLogic.calculateDvadashaKoota(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
     
     // Set koota result immediately, compute guru transits async
     setState(() {
-      _qResult = {'ashtaKoota': ashta, 'dvadashaKoota': dvadasha};
+      _qResult = {'ashtaKoota': ashtaStd, 'ashtaMogeri': ashtaMogeri, 'ashtaBaggona': ashtaBaggona, 'dvadashaKoota': dvadasha};
     });
     // Defer heavy guru transit computation to avoid blocking UI
     Future.microtask(() {
@@ -1305,51 +1301,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
 
       // ── KOOTA TOGGLE + TABLE ──
       _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
-      _buildPanchangaSelector(),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        child: Row(children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => _kootaMode = 0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: _kootaMode == 0 ? kPurple1 : kCard,
-                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
-                  border: Border.all(color: kPurple1),
-                ),
-                alignment: Alignment.center,
-                child: Text(AppLocale.l('ashtaKootaLabel'), style: TextStyle(
-                  fontWeight: FontWeight.w800, fontSize: 13,
-                  color: _kootaMode == 0 ? Colors.white : kPurple1,
-                )),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => _kootaMode = 1),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: _kootaMode == 1 ? kPurple1 : kCard,
-                  borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
-                  border: Border.all(color: kPurple1),
-                ),
-                alignment: Alignment.center,
-                child: Text(AppLocale.l('dvadashaKootaLabel'), style: TextStyle(
-                  fontWeight: FontWeight.w800, fontSize: 13,
-                  color: _kootaMode == 1 ? Colors.white : kPurple1,
-                )),
-              ),
-            ),
-          ),
-        ]),
-      ),
-      _kootaMode == 0
-        ? _buildAshtaKootaTable(fr['ashtaKoota'])
-        : _buildDvadashaKootaTable(fr['dvadashaKoota']),
+      _buildAllPanchangaResults(fr),
 
       // ── DASHA SANDHI ──
       _sectionHeader(AppLocale.l('dashaSandhi'), Icons.swap_horiz, Colors.deepPurple),
@@ -1958,6 +1910,106 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     );
   }
 
+
+  Widget _buildAllPanchangaResults(Map<String, dynamic> result) {
+    final ashtaStd = result['ashtaKoota'] as Map<String, dynamic>;
+    final ashtaMogeri = result['ashtaMogeri'] as int;
+    final ashtaBaggona = result['ashtaBaggona'] as int;
+    final dvadasha = result['dvadashaKoota'] as Map<String, dynamic>;
+    final stdTotal = ashtaStd['total'] as num;
+    final dvaTotal = dvadasha['total'] as num;
+    return Column(children: [
+      // ── Ashta Koota toggle + Dvadasha toggle ──
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        child: Row(children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _kootaMode = 0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: _kootaMode == 0 ? kPurple1 : kCard,
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
+                  border: Border.all(color: kPurple1),
+                ),
+                alignment: Alignment.center,
+                child: Text(AppLocale.l('ashtaKootaLabel'), style: TextStyle(
+                  fontWeight: FontWeight.w800, fontSize: 13,
+                  color: _kootaMode == 0 ? Colors.white : kPurple1,
+                )),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _kootaMode = 1),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: _kootaMode == 1 ? kPurple1 : kCard,
+                  borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
+                  border: Border.all(color: kPurple1),
+                ),
+                alignment: Alignment.center,
+                child: Text(AppLocale.l('dvadashaKootaLabel'), style: TextStyle(
+                  fontWeight: FontWeight.w800, fontSize: 13,
+                  color: _kootaMode == 1 ? Colors.white : kPurple1,
+                )),
+              ),
+            ),
+          ),
+        ]),
+      ),
+      if (_kootaMode == 0) ...[ 
+        // Show Standard ashta koota table
+        _buildAshtaKootaTable(ashtaStd),
+        const SizedBox(height: 12),
+        // Show Mogeri + Baggona totals
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: kCard, borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: kBorder),
+          ),
+          child: Column(children: [
+            Row(children: [
+              Icon(Icons.menu_book, size: 16, color: kPurple2),
+              const SizedBox(width: 8),
+              Text('\u0caa\u0c82\u0c9a\u0cbe\u0c82\u0c97 \u0cab\u0cb2\u0cbf\u0ca4\u0cbe\u0c82\u0cb6', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: kPurple2)),
+            ]),
+            const SizedBox(height: 10),
+            _panchangaResultRow('\u0cae\u0cca\u0c97\u0cc7\u0cb0\u0cbf', ashtaMogeri, 36, const Color(0xFF1565C0)),
+            const SizedBox(height: 6),
+            _panchangaResultRow('\u0cac\u0c97\u0ccd\u0c97\u0ccb\u0ca3', ashtaBaggona, 36, const Color(0xFF6A1B9A)),
+          ]),
+        ),
+      ] else ...[
+        _buildDvadashaKootaTable(dvadasha),
+      ],
+    ]);
+  }
+
+  Widget _panchangaResultRow(String name, int score, int max, Color color) {
+    final pct = score / max;
+    return Row(children: [
+      SizedBox(width: 70, child: Text(name, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: color))),
+      Expanded(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: LinearProgressIndicator(
+            value: pct,
+            minHeight: 18,
+            backgroundColor: color.withOpacity(0.1),
+            valueColor: AlwaysStoppedAnimation(color.withOpacity(0.7)),
+          ),
+        ),
+      ),
+      const SizedBox(width: 10),
+      Text('$score/$max', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: color)),
+    ]);
+  }
+
   Widget _buildAshtaKootaTable(Map<String, dynamic> result) {
     final total = result['total'] as double;
     String verdict;
@@ -2148,51 +2200,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         if (_qResult != null) ...[
           const SizedBox(height: 16),
           _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
-          _buildPanchangaSelector(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-            child: Row(children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _kootaMode = 0),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: _kootaMode == 0 ? kPurple1 : kCard,
-                      borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
-                      border: Border.all(color: kPurple1),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(AppLocale.l('ashtaKootaLabel'), style: TextStyle(
-                      fontWeight: FontWeight.w800, fontSize: 13,
-                      color: _kootaMode == 0 ? Colors.white : kPurple1,
-                    )),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _kootaMode = 1),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: _kootaMode == 1 ? kPurple1 : kCard,
-                      borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
-                      border: Border.all(color: kPurple1),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(AppLocale.l('dvadashaKootaLabel'), style: TextStyle(
-                      fontWeight: FontWeight.w800, fontSize: 13,
-                      color: _kootaMode == 1 ? Colors.white : kPurple1,
-                    )),
-                  ),
-                ),
-              ),
-            ]),
-          ),
-          _kootaMode == 0
-            ? _buildAshtaKootaTable(_qResult!['ashtaKoota'])
-            : _buildDvadashaKootaTable(_qResult!['dvadashaKoota']),
+          _buildAllPanchangaResults(_qResult!),
           const SizedBox(height: 16),
           // ── Vadhu (Bride) Guru Bala ──
           _sectionHeader('🔸 ವಧು ಗುರು ಬಲ (${trAll(knRashi[_qBrideRashi])})', Icons.female, kOrange),
@@ -2440,51 +2448,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         if (_nResult != null) ...[
           const SizedBox(height: 16),
           _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
-          _buildPanchangaSelector(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-            child: Row(children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _kootaMode = 0),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: _kootaMode == 0 ? kPurple1 : kCard,
-                      borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
-                      border: Border.all(color: kPurple1),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(AppLocale.l('ashtaKootaLabel'), style: TextStyle(
-                      fontWeight: FontWeight.w800, fontSize: 13,
-                      color: _kootaMode == 0 ? Colors.white : kPurple1,
-                    )),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _kootaMode = 1),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: _kootaMode == 1 ? kPurple1 : kCard,
-                      borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
-                      border: Border.all(color: kPurple1),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(AppLocale.l('dvadashaKootaLabel'), style: TextStyle(
-                      fontWeight: FontWeight.w800, fontSize: 13,
-                      color: _kootaMode == 1 ? Colors.white : kPurple1,
-                    )),
-                  ),
-                ),
-              ),
-            ]),
-          ),
-          _kootaMode == 0
-            ? _buildAshtaKootaTable(_nResult!['ashtaKoota'])
-            : _buildDvadashaKootaTable(_nResult!['dvadashaKoota']),
+          _buildAllPanchangaResults(_nResult!),
           const SizedBox(height: 16),
 
           // Guru Bala for Bride
@@ -2714,51 +2678,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                         _sectionHeader('${AppLocale.l('shathaAshtaka')} & ${AppLocale.l('dvirdvadasha')}', Icons.compare_arrows, Colors.indigo),
                           _buildShathaAshtakaDvirdvadashaSection(fr),
                           _sectionHeader(AppLocale.l('matchResult'), Icons.stars, kPurple1),
-                          _buildPanchangaSelector(),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-                            child: Row(children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => setState(() => _kootaMode = 0),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                      color: _kootaMode == 0 ? kPurple1 : kCard,
-                                      borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
-                                      border: Border.all(color: kPurple1),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(AppLocale.l('ashtaKootaLabel'), style: TextStyle(
-                                      fontWeight: FontWeight.w800, fontSize: 13,
-                                      color: _kootaMode == 0 ? Colors.white : kPurple1,
-                                    )),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => setState(() => _kootaMode = 1),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                      color: _kootaMode == 1 ? kPurple1 : kCard,
-                                      borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
-                                      border: Border.all(color: kPurple1),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(AppLocale.l('dvadashaKootaLabel'), style: TextStyle(
-                                      fontWeight: FontWeight.w800, fontSize: 13,
-                                      color: _kootaMode == 1 ? Colors.white : kPurple1,
-                                    )),
-                                  ),
-                                ),
-                              ),
-                            ]),
-                          ),
-                          _kootaMode == 0
-                            ? _buildAshtaKootaTable(fr['ashtaKoota'])
-                            : _buildDvadashaKootaTable(fr['dvadashaKoota']),
+                          _buildAllPanchangaResults(fr),
                           _sectionHeader(AppLocale.l('dashaSandhi'), Icons.swap_horiz, Colors.deepPurple),
                           _buildDashaSandhiSection(br, gr),
                           const SizedBox(height: 32),

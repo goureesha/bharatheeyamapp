@@ -834,11 +834,9 @@ class MatchMakingLogic {
     final bBhava = brideBhavaHouses ?? bridePlanetRashis;
     final gBhava = groomBhavaHouses ?? groomPlanetRashis;
     return {
-      'ashtaKoota': panchangaMode == 2
-          ? calculateCompatibilityBaggona(brideNakIdx, groomNakIdx, brideMoonRashi, groomMoonRashi)
-          : panchangaMode == 1
-              ? calculateCompatibilityMogery(brideNakIdx, groomNakIdx, brideMoonRashi, groomMoonRashi)
-              : calculateCompatibility(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
+      'ashtaKoota': calculateCompatibility(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
+      'ashtaMogeri': calculateCompatibilityMogery(brideNakIdx, groomNakIdx, brideMoonRashi, groomMoonRashi),
+      'ashtaBaggona': calculateCompatibilityBaggona(brideNakIdx, groomNakIdx, brideMoonRashi, groomMoonRashi),
       'dvadashaKoota': calculateDvadashaKoota(brideMoonRashi, brideNakIdx, groomMoonRashi, groomNakIdx),
       'brideKujaDosha': calculateKujaDosha(bBhava,
         bhavaFromChandra: brideBhavaFromChandra, bhavaFromShukra: brideBhavaFromShukra),
