@@ -1913,11 +1913,10 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
 
   Widget _buildAllPanchangaResults(Map<String, dynamic> result) {
     final ashtaStd = result['ashtaKoota'] as Map<String, dynamic>;
-    final ashtaMogeri = result['ashtaMogeri'] as int;
-    final ashtaBaggona = result['ashtaBaggona'] as int;
+    num _tot(dynamic v) => v is Map ? ((v['total'] as num?) ?? 0) : (v is num ? v : 0);
+    final ashtaMogeri = _tot(result['ashtaMogeri']);
+    final ashtaBaggona = _tot(result['ashtaBaggona']);
     final dvadasha = result['dvadashaKoota'] as Map<String, dynamic>;
-    final stdTotal = ashtaStd['total'] as num;
-    final dvaTotal = dvadasha['total'] as num;
     return Column(children: [
       // ── Ashta Koota toggle + Dvadasha toggle ──
       Padding(
@@ -1976,12 +1975,12 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
             Row(children: [
               Icon(Icons.menu_book, size: 16, color: kPurple2),
               const SizedBox(width: 8),
-              Text('\u0caa\u0c82\u0c9a\u0cbe\u0c82\u0c97 \u0cab\u0cb2\u0cbf\u0ca4\u0cbe\u0c82\u0cb6', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: kPurple2)),
+              Text('ಪಂಚಾಂಗ ಫಲಿತಾಂಶ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: kPurple2)),
             ]),
             const SizedBox(height: 10),
-            _panchangaResultRow('\u0cae\u0cca\u0c97\u0cc7\u0cb0\u0cbf', ashtaMogeri, 36, const Color(0xFF1565C0)),
+            _panchangaResultRow('ಮೊಗೇರಿ', ashtaMogeri, 36, const Color(0xFF1565C0)),
             const SizedBox(height: 6),
-            _panchangaResultRow('\u0cac\u0c97\u0ccd\u0c97\u0ccb\u0ca3', ashtaBaggona, 36, const Color(0xFF6A1B9A)),
+            _panchangaResultRow('ಬಗ್ಗೋಣ', ashtaBaggona, 36, const Color(0xFF6A1B9A)),
           ]),
         ),
       ] else ...[
@@ -1990,8 +1989,9 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
     ]);
   }
 
-  Widget _panchangaResultRow(String name, int score, int max, Color color) {
-    final pct = score / max;
+  Widget _panchangaResultRow(String name, num score, int max, Color color) {
+    final pct = (score / max).clamp(0.0, 1.0).toDouble();
+    final scoreStr = score == score.roundToDouble() ? score.toInt().toString() : score.toStringAsFixed(1);
     return Row(children: [
       SizedBox(width: 70, child: Text(name, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: color))),
       Expanded(
@@ -2006,7 +2006,7 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
         ),
       ),
       const SizedBox(width: 10),
-      Text('$score/$max', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: color)),
+      Text('$scoreStr/$max', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: color)),
     ]);
   }
 
