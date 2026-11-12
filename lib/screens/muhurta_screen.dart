@@ -164,6 +164,11 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
         ),
       );
 
+      // Filter out bad-tara muhoortas (Janma, Vipat, Pratyak, Vadha)
+      // Respects dosha bhanga (e.g., Amrita Siddhi) via check's `passed` field
+      final _taraChk = mResult.checks.where((c) => c.label == AppLocale.l('mTaraBala'));
+      if (_taraChk.isNotEmpty && !_taraChk.first.passed) continue;
+
       // Compute lagna windows
       List<Map<String, dynamic>> lagnaWindows = [];
       try {
@@ -258,6 +263,11 @@ class _MuhurtaScreenState extends State<MuhurtaScreen> {
             allowedVaras: _userVaras.toList(),
           ),
         );
+
+        // Filter out bad-tara muhoortas (Janma, Vipat, Pratyak, Vadha)
+        // Respects dosha bhanga (e.g., Amrita Siddhi) via check's `passed` field
+        final _taraChk2 = mResult.checks.where((c) => c.label == AppLocale.l('mTaraBala'));
+        if (_taraChk2.isNotEmpty && !_taraChk2.first.passed) continue;
 
         final allLagnaWindows = _scanLagnas(srSs[0], srSs[1]);
         final lagnaWindows = allLagnaWindows.where((w) {
