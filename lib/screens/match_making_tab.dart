@@ -2075,14 +2075,15 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
   }
 
   Widget _buildDvadashaKootaTable(Map<String, dynamic> result) {
-    final total = result['total'] as double;
+    final total = ((result['total'] as num?) ?? 0).toDouble();
     String verdict;
     Color verdictColor;
     if (total <= 20) { verdict = AppLocale.l('matchPoor'); verdictColor = Colors.red.shade700; }
     else if (total <= 28) { verdict = AppLocale.l('matchMedium'); verdictColor = Colors.orange.shade700; }
     else { verdict = AppLocale.l('matchGood'); verdictColor = Colors.green.shade700; }
 
-    TableRow row(String name, double pts, int max) {
+    TableRow row(String name, dynamic ptsRaw, int max) {
+      final pts = ((ptsRaw as num?) ?? 0).toDouble();
       return TableRow(
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kBorder))),
         children: [
@@ -2093,7 +2094,6 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
       );
     }
 
-    final isRajju = result.containsKey('rajju');
     return AppCard(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Table(columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1)}, children: [
         TableRow(
@@ -2104,14 +2104,13 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
             Padding(padding: const EdgeInsets.all(10), child: Text(AppLocale.l('garishThaGuna'), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
           ],
         ),
-        if (!isRajju) row(AppLocale.l('varna'), result['varna'], 1)
-        else row(AppLocale.l('rajju'), result['rajju'], 1),
-        row(AppLocale.l('vashya'), result[isRajju ? 'vashya' : 'vashya'], 2),
-        row(isRajju ? AppLocale.l('dina') : AppLocale.l('tara'), result[isRajju ? 'dina' : 'tara'], 3),
+        row(AppLocale.l('varna'), result['varna'], 1),
+        row(AppLocale.l('vashya'), result['vashya'], 2),
+        row(AppLocale.l('tara'), result['tara'], 3),
         row(AppLocale.l('yoni'), result['yoni'], 4),
-        row(isRajju ? AppLocale.l('rashyadhipati') : AppLocale.l('grahaMaitri'), result[isRajju ? 'rashyadhipati' : 'graha'], 5),
+        row(AppLocale.l('grahaMaitri'), result['graha'], 5),
         row(AppLocale.l('gana'), result['gana'], 6),
-        row(isRajju ? AppLocale.l('rashi') : AppLocale.l('bhakoot'), result[isRajju ? 'rashi' : 'bhakoot'], 7),
+        row(AppLocale.l('bhakoot'), result['bhakoot'], 7),
         row(AppLocale.l('naadi'), result['nadi'], 8),
         row(AppLocale.l('mahendra'), result['mahendra'], 1),
         row(AppLocale.l('streeDeergha'), result['streeDeergha'], 1),
