@@ -980,6 +980,7 @@ class AppLocale {
       'aaya1': 'ಧ್ವಜ', 'aaya2': 'ಧೂಮ್ರ', 'aaya3': 'ಸಿಂಹ', 'aaya4': 'ಶ್ವಾನ',
       'aaya5': 'ವೃಷಭ', 'aaya6': 'ಖರ', 'aaya7': 'ಗಜ', 'aaya8': 'ಧ್ವಾಂಕ್ಷ',
 
+      'babyNaming': 'ನಾಮಕರಣ', 'babyNamingDesc': 'ನಕ್ಷತ್ರ ಪಾದದ ಆಧಾರದ ಮೇಲೆ ಮಗುವಿನ ಹೆಸರಿನ ಮೊದಲ ಅಕ್ಷರವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ. ಪ್ರತಿ ನಕ್ಷತ್ರದ 4 ಪಾದಗಳಿಗೆ ನಿರ್ದಿಷ್ಟ ಅಕ್ಷರಗಳಿವೆ.', 'babyNamingSearch': 'ಅಕ್ಷರ ಹುಡುಕಿ', 'babyNamingHint': 'ಉದಾ: ಚ, ಮ, ಸ ...', 'babyNamingSelected': 'ಆಯ್ಕೆ ಮಾಡಿದ ಅಕ್ಷರ', 'babyNamingLetterSuffix': 'ಅಕ್ಷರದಿಂದ ಹೆಸರು ಇಡಿ', 'babyNamingNoMatch': 'ಈ ಅಕ್ಷರಕ್ಕೆ ಹೊಂದಾಣಿಕೆ ಸಿಗಲಿಲ್ಲ', 'nakshatraLabel': 'ನಕ್ಷತ್ರ', 'padaLabel': 'ಪಾದ', 'rashiLabel': 'ರಾಶಿ', 'dashaLord': 'ದಶಾ ನಾಥ', 'devata': 'ದೇವತೆ', 'gana': 'ಗಣ', 'allPadas': 'ಎಲ್ಲ ಪಾದಗಳು',
       'poojaLists': 'ಪೂಜಾ ಪಟ್ಟಿ', 'vastuLabel': 'ವಾಸ್ತು', 'reverseKundali': 'ರಿವರ್ಸ್ ಕುಂಡಲಿ',
 },
     'hi': {
@@ -1738,6 +1739,7 @@ class AppLocale {
       'aaya1': 'ध्वज', 'aaya2': 'धूम्र', 'aaya3': 'सिंह', 'aaya4': 'श्वान',
       'aaya5': 'वृषभ', 'aaya6': 'खर', 'aaya7': 'गज', 'aaya8': 'ध्वांक्ष',
 
+      'babyNaming': 'नामकरण', 'babyNamingDesc': 'नक्षत्र पाद के आधार पर शिशु के नाम का पहला अक्षर चुनें। प्रत्येक नक्षत्र के 4 पादों के लिए विशिष्ट अक्षर हैं।', 'babyNamingSearch': 'अक्षर खोजें', 'babyNamingHint': 'उदा: च, म, स ...', 'babyNamingSelected': 'चुना हुआ अक्षर', 'babyNamingLetterSuffix': 'अक्षर से नाम रखें', 'babyNamingNoMatch': 'इस अक्षर से कोई मिलान नहीं मिला', 'nakshatraLabel': 'नक्षत्र', 'padaLabel': 'पाद', 'rashiLabel': 'राशि', 'dashaLord': 'दशा नाथ', 'devata': 'देवता', 'gana': 'गण', 'allPadas': 'सभी पाद',
       'poojaLists': 'पूजा सूची', 'vastuLabel': 'वास्तु', 'reverseKundali': 'रिवर्स कुंडली',
 },
     'ta': {
@@ -2492,6 +2494,7 @@ class AppLocale {
       'aaya1': 'த்வஜம்', 'aaya2': 'தூம்ரம்', 'aaya3': 'சிம்மம்', 'aaya4': 'ச்வானம்',
       'aaya5': 'விருஷபம்', 'aaya6': 'கரம்', 'aaya7': 'கஜம்', 'aaya8': 'த்வாங்க்ஷம்',
 
+      'babyNaming': 'நாமகரணம்', 'babyNamingDesc': 'நட்சத்திர பாதத்தின் அடிப்படையில் குழந்தையின் பெயரின் முதல் எழுத்தைத் தேர்ந்தெடுக்கவும்.', 'babyNamingSearch': 'எழுத்தைத் தேடுங்கள்', 'babyNamingHint': 'எ.கா: ச, ம, ஸ ...', 'babyNamingSelected': 'தேர்ந்தெடுத்த எழுத்து', 'babyNamingLetterSuffix': 'எழுத்தில் பெயர் வையுங்கள்', 'babyNamingNoMatch': 'இந்த எழுத்துக்கு பொருத்தம் இல்லை', 'nakshatraLabel': 'நட்சத்திரம்', 'padaLabel': 'பாதம்', 'rashiLabel': 'ராசி', 'dashaLord': 'தசா நாதன்', 'devata': 'தேவதை', 'gana': 'கணம்', 'allPadas': 'அனைத்து பாதங்கள்',
       'poojaLists': 'பூஜை பட்டியல்', 'vastuLabel': 'வாஸ்து', 'reverseKundali': 'ரிவர்ஸ் குண்டலி',
 },
     'te': {
@@ -3246,6 +3249,7 @@ class AppLocale {
       'aaya1': 'ధ్వజం', 'aaya2': 'ధూమ్రం', 'aaya3': 'సింహం', 'aaya4': 'శ్వానం',
       'aaya5': 'వృషభం', 'aaya6': 'ఖరం', 'aaya7': 'గజం', 'aaya8': 'ధ్వాంక్షం',
 
+      'babyNaming': 'నామకరణం', 'babyNamingDesc': 'నక్షత్ర పాదం ఆధారంగా శిశువు పేరు యొక్క మొదటి అక్షరాన్ని ఎంచుకోండి.', 'babyNamingSearch': 'అక్షరం వెతకండి', 'babyNamingHint': 'ఉదా: చ, మ, స ...', 'babyNamingSelected': 'ఎంచుకున్న అక్షరం', 'babyNamingLetterSuffix': 'అక్షరంతో పేరు పెట్టండి', 'babyNamingNoMatch': 'ఈ అక్షరానికి సరిపోలిక లేదు', 'nakshatraLabel': 'నక్షత్రం', 'padaLabel': 'పాదం', 'rashiLabel': 'రాశి', 'dashaLord': 'దశా నాథుడు', 'devata': 'దేవత', 'gana': 'గణం', 'allPadas': 'అన్ని పాదాలు',
       'poojaLists': 'పూజ జాబితా', 'vastuLabel': 'వాస్తు', 'reverseKundali': 'రివర్స్ కుండలి',
 },
     'ml': {
@@ -4000,6 +4004,7 @@ class AppLocale {
       'aaya1': 'ധ്വജം', 'aaya2': 'ധൂമ്രം', 'aaya3': 'സിംഹം', 'aaya4': 'ശ്വാനം',
       'aaya5': 'വൃഷഭം', 'aaya6': 'ഖരം', 'aaya7': 'ഗജം', 'aaya8': 'ധ്വാങ്ക്ഷം',
 
+      'babyNaming': 'നാമകരണം', 'babyNamingDesc': 'നക്ഷത്ര പാദത്തിന്റെ അടിസ്ഥാനത്തിൽ കുഞ്ഞിന്റെ പേരിന്റെ ആദ്യ അക്ഷരം തിരഞ്ഞെടുക്കുക.', 'babyNamingSearch': 'അക്ഷരം തിരയുക', 'babyNamingHint': 'ഉദാ: ച, മ, സ ...', 'babyNamingSelected': 'തിരഞ്ഞെടുത്ത അക്ഷരം', 'babyNamingLetterSuffix': 'അക്ഷരത്തിൽ പേര് വയ്ക്കുക', 'babyNamingNoMatch': 'ഈ അക്ഷരത്തിന് പൊരുത്തം കണ്ടെത്തിയില്ല', 'nakshatraLabel': 'നക്ഷത്രം', 'padaLabel': 'പാദം', 'rashiLabel': 'രാശി', 'dashaLord': 'ദശാ നാഥൻ', 'devata': 'ദേവത', 'gana': 'ഗണം', 'allPadas': 'എല്ലാ പാദങ്ങളും',
       'poojaLists': 'പൂജാ പട്ടിക', 'vastuLabel': 'വാസ്തു', 'reverseKundali': 'റിവേഴ്സ് കുണ്ഡലി',
 },
     'en': enStrings,
