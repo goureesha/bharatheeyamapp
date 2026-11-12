@@ -270,10 +270,15 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
             ? MatchMakingLogic.calculateCompatibilityMogery(_nBrideNak!, _nGroomNak!, bRashi, gRashi)
             : MatchMakingLogic.calculateCompatibility(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
     final dvadasha = MatchMakingLogic.calculateDvadashaKoota(bRashi, _nBrideNak!, gRashi, _nGroomNak!);
-    final transits = _computeGuruTransits(bRashi, gRashi);
+    // Set koota result immediately, compute guru transits async
     setState(() {
       _nResult = {'ashtaKoota': ashta, 'dvadashaKoota': dvadasha, 'brideRashi': bRashi, 'groomRashi': gRashi};
-      _nGuruTransits = transits;
+    });
+    // Defer heavy guru transit computation to avoid blocking UI
+    Future.microtask(() {
+      if (!mounted) return;
+      final transits = _computeGuruTransits(bRashi, gRashi);
+      if (mounted) setState(() { _nGuruTransits = transits; });
     });
   }
 
@@ -701,12 +706,15 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
             : MatchMakingLogic.calculateCompatibility(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
     final dvadasha = MatchMakingLogic.calculateDvadashaKoota(_qBrideRashi, _qBrideNak, _qGroomRashi, _qGroomNak);
     
-    // Calculate Guru Bala transit windows for both bride and groom
-    final transits = _computeGuruTransits(_qBrideRashi, _qGroomRashi);
-    
+    // Set koota result immediately, compute guru transits async
     setState(() {
       _qResult = {'ashtaKoota': ashta, 'dvadashaKoota': dvadasha};
-      _guruTransits = transits;
+    });
+    // Defer heavy guru transit computation to avoid blocking UI
+    Future.microtask(() {
+      if (!mounted) return;
+      final transits = _computeGuruTransits(_qBrideRashi, _qGroomRashi);
+      if (mounted) setState(() { _guruTransits = transits; });
     });
   }
 
@@ -1934,11 +1942,12 @@ class _MatchMakingTabState extends State<MatchMakingTab> with TickerProviderStat
                     DropdownMenuItem(value: 2, child: Text(AppLocale.l('panchangaBaggona'))),
                   ],
                   onChanged: (v) {
-                    setState(() { _panchangaMode = v ?? 1; });
-                    // Re-run active calculations with new panchanga mode
+                    _panchangaMode = v ?? 1;
+                    // Batch: compute all, then single rebuild
                     if (_qResult != null) _calculateQuickKoota();
                     if (_nResult != null) _calculateNamaaksharaKoota();
                     _recalcFullMatch();
+                    if (mounted) setState(() {});
                   },
                 ),
               ),
