@@ -137,7 +137,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   final _jyotishiPhoneCtrl = TextEditingController();
   String _selectedThemeId = 'traditional';
   String _selectedGender = 'male';
-  List<bool> _pdfPageSelection = [true, true, true, true, true, true, true]; // 7 pages
+  List<bool> _pdfPageSelection = [true, true, true, true, true, true]; // 6 pages (Phala is separate)
   String _patrikeFormat = 'detailed'; // 'detailed' or 'traditional'
   bool _phalaDisclaimerShown = false; // show warning only once per session
 
@@ -5597,7 +5597,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ],
                 ),
                 const SizedBox(height: 8),
-                ...List.generate(7, (i) {
+                ...List.generate(6, (i) {
                   final pageNames = [
                     'ಜನನ ಪತ್ರಿಕಾ (Birth Details)',
                     'ವಿಂಶೋತ್ತರೀ ದಶಾ (Dasha)',
@@ -5605,7 +5605,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                     'ವರ್ಗ ಕುಂಡಲಿ (Varga Charts)',
                     'ಅಷ್ಟಕವರ್ಗ (Ashtakavarga)',
                     'ಷಡ್ಬಲ (Shadbala)',
-                    'ಫಲ (Predictions)',
                   ];
                   return CheckboxListTile(
                     value: _pdfPageSelection[i],
@@ -5872,6 +5871,143 @@ class _DashboardScreenState extends State<DashboardScreen>
                         );
                       }
                     },
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // ── Phala (Predictions) - Separate PDF ──
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange.shade200),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.auto_awesome, color: Colors.orange.shade700, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text('ಫಲ ಪತ್ರಿಕೆ (Predictions PDF)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.orange.shade800))),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text('ಭಾವ ಫಲ, ದಶಾ ಫಲ, ಭುಕ್ತಿ ಫಲ - ಪ್ರತ್ಯೇಕವಾಗಿ PDF ಮಾಡಿ', style: TextStyle(fontSize: 11, color: Colors.orange.shade600)),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange.shade700,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              icon: const Icon(Icons.print, size: 18),
+                              label: Text('ಫಲ Print', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+                              onPressed: () async {
+                                final dateStr = '${widget.dob.day.toString().padLeft(2,'0')}-${widget.dob.month.toString().padLeft(2,'0')}-${widget.dob.year}';
+                                final timeStr = '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}';
+                                final ud = UserDetails(
+                                  name: widget.name, dateStr: dateStr, timeStr: timeStr,
+                                  place: widget.place, lat: widget.lat, lon: widget.lon, tz: widget.tz,
+                                  fatherName: _fatherNameCtrl.text.trim(), motherName: _motherNameCtrl.text.trim(),
+                                  gotra: _gotraCtrl.text.trim(), jyotishiName: _jyotishiNameCtrl.text.trim(),
+                                  jyotishiPhone: _jyotishiPhoneCtrl.text.trim(),
+                                  jyotishiAddress: _tippaniAddressCtrl.text.trim(), gender: _selectedGender,
+                                );
+                                int cur = 0, tot = 0;
+                                StateSetter? dlgSt;
+                                showDialog(context: context, barrierDismissible: false, builder: (_) => StatefulBuilder(
+                                  builder: (ctx, setSt) {
+                                    dlgSt = setSt;
+                                    return Center(child: Container(
+                                      padding: const EdgeInsets.all(24),
+                                      decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)),
+                                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                                        CircularProgressIndicator(value: tot > 0 ? cur / tot : null, color: Colors.orange),
+                                        const SizedBox(height: 16),
+                                        Text(tot > 0 ? 'ಫಲ ಪತ್ರಿಕೆ ($cur/$tot)' : 'ಫಲ ಪತ್ರಿಕೆ...',
+                                          style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none)),
+                                      ]),
+                                    ));
+                                  },
+                                ));
+                                try {
+                                  await Future.delayed(const Duration(milliseconds: 80));
+                                  await JanmaPatrikeService.generatePhalaAndPrint(ud, widget.result,
+                                    theme: selectedTheme,
+                                    onProgress: (c, t) { cur = c; tot = t; dlgSt?.call(() {}); },
+                                  );
+                                  if (mounted) Navigator.of(context, rootNavigator: true).pop();
+                                } catch (e) {
+                                  if (mounted) Navigator.of(context, rootNavigator: true).pop();
+                                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('❌ $e'), backgroundColor: Colors.red));
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.orange.shade700,
+                                side: BorderSide(color: Colors.orange.shade400, width: 1.5),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              icon: const Icon(Icons.share, size: 18),
+                              label: Text('ಫಲ Share', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+                              onPressed: () async {
+                                final dateStr = '${widget.dob.day.toString().padLeft(2,'0')}-${widget.dob.month.toString().padLeft(2,'0')}-${widget.dob.year}';
+                                final timeStr = '${widget.hour.toString().padLeft(2,'0')}:${widget.minute.toString().padLeft(2,'0')} ${widget.ampm}';
+                                final ud = UserDetails(
+                                  name: widget.name, dateStr: dateStr, timeStr: timeStr,
+                                  place: widget.place, lat: widget.lat, lon: widget.lon, tz: widget.tz,
+                                  fatherName: _fatherNameCtrl.text.trim(), motherName: _motherNameCtrl.text.trim(),
+                                  gotra: _gotraCtrl.text.trim(), jyotishiName: _jyotishiNameCtrl.text.trim(),
+                                  jyotishiPhone: _jyotishiPhoneCtrl.text.trim(),
+                                  jyotishiAddress: _tippaniAddressCtrl.text.trim(), gender: _selectedGender,
+                                );
+                                int cur = 0, tot = 0;
+                                StateSetter? dlgSt;
+                                showDialog(context: context, barrierDismissible: false, builder: (_) => StatefulBuilder(
+                                  builder: (ctx, setSt) {
+                                    dlgSt = setSt;
+                                    return Center(child: Container(
+                                      padding: const EdgeInsets.all(24),
+                                      decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(16)),
+                                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                                        CircularProgressIndicator(value: tot > 0 ? cur / tot : null, color: Colors.orange),
+                                        const SizedBox(height: 16),
+                                        Text(tot > 0 ? 'ಫಲ ಪತ್ರಿಕೆ ($cur/$tot)' : 'ಫಲ ಪತ್ರಿಕೆ...',
+                                          style: TextStyle(color: kText, fontWeight: FontWeight.w700, fontSize: 14, decoration: TextDecoration.none)),
+                                      ]),
+                                    ));
+                                  },
+                                ));
+                                try {
+                                  await Future.delayed(const Duration(milliseconds: 80));
+                                  await JanmaPatrikeService.generatePhalaAndShare(ud, widget.result,
+                                    theme: selectedTheme,
+                                    onProgress: (c, t) { cur = c; tot = t; dlgSt?.call(() {}); },
+                                  );
+                                  if (mounted) Navigator.of(context, rootNavigator: true).pop();
+                                } catch (e) {
+                                  if (mounted) Navigator.of(context, rootNavigator: true).pop();
+                                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('❌ $e'), backgroundColor: Colors.red));
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],

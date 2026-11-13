@@ -338,6 +338,77 @@ class JanmaPatrikeService {
     await Printing.sharePdf(bytes: bytes, filename: '${user.name}_janmapatrike.pdf');
   }
 
+  /// Generate PDF containing ONLY Phala (prediction) pages
+  static Future<Uint8List> _generatePhalaPdfBytes(
+    UserDetails user,
+    KundaliResult result, {
+    PdfThemeConfig? theme,
+    void Function(int current, int total)? onProgress,
+  }) async {
+    theme ??= PdfThemes.traditional;
+    final controller = ScreenshotController();
+
+    const double pageWidth = 793.0;
+    const double pageHeight = 1122.0;
+    final targetSize = const Size(pageWidth, pageHeight);
+    const double kPixelRatio = 1.5;
+
+    final doc = pw.Document();
+    final prediction = PredictionEngine.analyze(result);
+    final phalaPageWidgets = _buildPhalaPages(user, result, prediction, theme);
+    final totalPages = phalaPageWidgets.length;
+    int currentPage = 0;
+
+    for (int i = 0; i < phalaPageWidgets.length; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      try {
+        final widget = _buildPageWrapper(
+          width: pageWidth, height: pageHeight, theme: theme,
+          child: phalaPageWidgets[i],
+        );
+        final bytes = await controller.captureFromWidget(
+          widget,
+          targetSize: targetSize,
+          pixelRatio: kPixelRatio,
+          delay: const Duration(milliseconds: 100),
+        );
+        doc.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            margin: pw.EdgeInsets.zero,
+            build: (pw.Context context) {
+              return pw.FullPage(
+                ignoreMargins: true,
+                child: pw.Image(pw.MemoryImage(bytes), fit: pw.BoxFit.contain),
+              );
+            },
+          ),
+        );
+      } catch (e) {
+        debugPrint('\u26a0\ufe0f Phala page capture failed: $e');
+      }
+      currentPage++;
+      onProgress?.call(currentPage, totalPages);
+      phalaPageWidgets[i] = const SizedBox();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    }
+
+    return doc.save();
+  }
+
+  static Future<void> generatePhalaAndPrint(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, void Function(int, int)? onProgress}) async {
+    final bytes = await _generatePhalaPdfBytes(user, result, theme: theme, onProgress: onProgress);
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => bytes,
+      name: '${user.name}_phala',
+    );
+  }
+
+  static Future<void> generatePhalaAndShare(UserDetails user, KundaliResult result, {PdfThemeConfig? theme, void Function(int, int)? onProgress}) async {
+    final bytes = await _generatePhalaPdfBytes(user, result, theme: theme, onProgress: onProgress);
+    await Printing.sharePdf(bytes: bytes, filename: '${user.name}_phala.pdf');
+  }
+
 
   static Widget _buildPageWrapper({
     required double width,
