@@ -230,37 +230,61 @@ class JanmaPatrikeService {
     const double pageWidth = 793.0;
     const double pageHeight = 1122.0;
     final targetSize = const Size(pageWidth, pageHeight);
-    // Reduced pixelRatio: 1.8 gives crisp A4 output with ~2× less memory than 2.5
-    const double kPixelRatio = 1.8;
+    // Pixel ratio 1.5: crisp A4 output with ~30% less memory than 1.8
+    const double kPixelRatio = 1.5;
 
-    final List<Uint8List?> allPageBytes = [];
+    // Build PDF document incrementally — add each page right after capture
+    // so captured image bytes can be GC'd immediately instead of holding
+    // 15+ large PNG buffers in memory simultaneously.
+    final doc = pw.Document();
+
+    // ── Pre-build phala page widgets once (avoid building twice) ──
+    List<Widget>? phalaPageWidgets;
+    if (pages.length > 6 && pages[6]) {
+      final prediction = PredictionEngine.analyze(result);
+      phalaPageWidgets = _buildPhalaPages(user, result, prediction, theme);
+    }
 
     // ── Count total pages upfront for progress reporting ──
     int totalPages = 0;
     for (int i = 0; i < 6; i++) {
       if (i < pages.length && pages[i]) totalPages++;
     }
-    if (pages.length > 6 && pages[6]) {
-      final prediction = PredictionEngine.analyze(result);
-      totalPages += _buildPhalaPages(user, result, prediction, theme).length;
-    }
+    if (phalaPageWidgets != null) totalPages += phalaPageWidgets.length;
     int currentPage = 0;
 
-    // ── Helper: capture one page with progress + event-loop yield ──
-    Future<Uint8List> capturePage(Widget widget) async {
-      // Yield to let UI thread update (dialog, etc.) before heavy render
-      await Future<void>.delayed(const Duration(milliseconds: 50));
-      final bytes = await controller.captureFromWidget(
-        widget,
-        targetSize: targetSize,
-        pixelRatio: kPixelRatio,
-        delay: const Duration(milliseconds: 50),
-      );
+    // ── Helper: capture one page, add to PDF, release memory ──
+    Future<void> captureAndAddPage(Widget widget) async {
+      // Yield to let UI thread update (progress dialog) before heavy render
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      try {
+        final bytes = await controller.captureFromWidget(
+          widget,
+          targetSize: targetSize,
+          pixelRatio: kPixelRatio,
+          delay: const Duration(milliseconds: 100),
+        );
+        // Add page to PDF immediately and let bytes be GC'd
+        doc.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            margin: pw.EdgeInsets.zero,
+            build: (pw.Context context) {
+              return pw.FullPage(
+                ignoreMargins: true,
+                child: pw.Image(pw.MemoryImage(bytes), fit: pw.BoxFit.contain),
+              );
+            },
+          ),
+        );
+      } catch (e) {
+        // Skip failed page instead of crashing entire PDF
+        debugPrint('\u26a0\ufe0f PDF page capture failed: $e');
+      }
       currentPage++;
       onProgress?.call(currentPage, totalPages);
-      // Yield again after capture so the event loop can breathe
-      await Future<void>.delayed(Duration.zero);
-      return bytes;
+      // Yield after capture so the event loop + GC can breathe
+      await Future<void>.delayed(const Duration(milliseconds: 50));
     }
 
     // Pages 1-6
@@ -281,40 +305,20 @@ class JanmaPatrikeService {
           width: pageWidth, height: pageHeight, theme: theme,
           child: pageBuilders[i](),
         );
-        allPageBytes.add(await capturePage(widget));
-      } else {
-        allPageBytes.add(null);
+        await captureAndAddPage(widget);
       }
     }
 
     // Page 7: Phala (Predictions) — can be many pages
-    if (pages.length > 6 && pages[6]) {
-      final prediction = PredictionEngine.analyze(result);
-      final phalaPages = _buildPhalaPages(user, result, prediction, theme);
-      for (final phalaPage in phalaPages) {
+    if (phalaPageWidgets != null) {
+      for (int i = 0; i < phalaPageWidgets.length; i++) {
         final widget = _buildPageWrapper(
           width: pageWidth, height: pageHeight, theme: theme,
-          child: phalaPage,
+          child: phalaPageWidgets[i],
         );
-        allPageBytes.add(await capturePage(widget));
-      }
-    }
-
-    final doc = pw.Document();
-    for (final bytes in allPageBytes) {
-      if (bytes != null) {
-        doc.addPage(
-          pw.Page(
-            pageFormat: PdfPageFormat.a4,
-            margin: pw.EdgeInsets.zero,
-            build: (pw.Context context) {
-              return pw.FullPage(
-                ignoreMargins: true,
-                child: pw.Image(pw.MemoryImage(bytes), fit: pw.BoxFit.contain),
-              );
-            },
-          ),
-        );
+        await captureAndAddPage(widget);
+        // Null out processed widget to free its tree
+        phalaPageWidgets[i] = const SizedBox();
       }
     }
 
