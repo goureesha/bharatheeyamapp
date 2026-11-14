@@ -4365,9 +4365,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  /// Mahadasha card with expandable bhukti list
+  /// Mahadasha card (flat, no expandable bhukti list)
 
-  /// â”€â”€ Dasha level names for recursive display â”€â”€
+  /// Dasha level names
   static const _dashaLevelKeys = ['mahadasha', 'antardasha', 'pratyantardasha', 'sookshmadasha', 'pranadasha'];
 
   /// Check if a DashaEntry is the current running period
@@ -4376,127 +4376,71 @@ class _DashboardScreenState extends State<DashboardScreen>
     return now.isAfter(entry.start) && now.isBefore(entry.end);
   }
 
-  /// Recursive dasha entry tile â€” works for all 5 levels
+  /// Mahadasha entry tile — shows only mahadasha phala, no bhukti sub-levels
   Widget _buildDashaEntryTile(DashaEntry entry, int level, PredictionResult prediction, String Function(String) _pl, {String? mdLord}) {
     final isCurrent = _isDashaCurrent(entry);
-    final levelKey = level < _dashaLevelKeys.length ? _dashaLevelKeys[level] : 'pranadasha';
-    final levelLabel = _pl(levelKey);
 
-    // Colors get progressively lighter at deeper levels
-    final bgOpacity = isCurrent ? 0.06 : (level == 0 ? 0.0 : 0.02 * level);
-    final borderOpacity = isCurrent ? 0.6 : 0.3;
-    final fontSize = (13.0 - level * 0.5).clamp(10.0, 13.0);
-    final dateFontSize = (10.0 - level * 0.3).clamp(8.0, 10.0);
-
-    final hasChildren = entry.antardashas.isNotEmpty;
-    final isLeaf = !hasChildren;
-
-    // Phala text for Mahadasha and Bhukti levels
+    // Only show Mahadasha phala (level 0)
     String? phala;
     String? shloka;
     if (level == 0) {
       final mdPred = prediction.allDashas.where((d) => d.lord == entry.lord).firstOrNull;
       phala = mdPred?.phala;
       shloka = mdPred?.shloka;
-    } else if (level == 1 && mdLord != null) {
-      final mdPred = prediction.allDashas.where((d) => d.lord == mdLord).firstOrNull;
-      final bkPred = mdPred?.bhuktis.where((b) => b.lord == entry.lord).firstOrNull;
-      phala = bkPred?.phala;
-      shloka = bkPred?.shloka;
     }
 
-    // Leaf nodes (Prana level or entries without children) â€” simple row
-    if (isLeaf) {
-      return Container(
-        margin: EdgeInsets.only(bottom: 2, left: level > 0 ? 4.0 : 0),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: isCurrent ? kOrange.withOpacity(0.08) : kBg.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(6),
-          border: isCurrent ? Border.all(color: kOrange.withOpacity(0.4)) : null,
-        ),
-        child: Row(children: [
-          if (isCurrent)
-            Icon(Icons.play_arrow, color: kOrange, size: 12)
-          else
-            Icon(Icons.circle, color: kMuted.withOpacity(0.3), size: 6),
-          const SizedBox(width: 6),
-          Text('${trAll(entry.lord)} $levelLabel', style: TextStyle(
-            fontSize: fontSize, fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
-            color: isCurrent ? kOrange : kText)),
-          const Spacer(),
-          Text('${_fmtDate(entry.start)} → ${_fmtDate(entry.end)}',
-            style: TextStyle(fontSize: dateFontSize, color: kMuted)),
-        ]),
-      );
-    }
-
-    // Expandable tile for levels with children
     return Container(
-      margin: EdgeInsets.only(bottom: level == 0 ? 6.0 : 3.0, left: level > 1 ? 4.0 : 0),
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isCurrent ? kOrange.withOpacity(bgOpacity) : kCard,
-        borderRadius: BorderRadius.circular(level == 0 ? 12 : 8),
+        color: isCurrent ? kOrange.withOpacity(0.06) : kCard,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isCurrent ? kOrange.withOpacity(borderOpacity) : kBorder.withOpacity(0.3 + level * 0.05),
-          width: isCurrent && level == 0 ? 1.5 : 1,
+          color: isCurrent ? kOrange.withOpacity(0.6) : kBorder.withOpacity(0.3),
+          width: isCurrent ? 1.5 : 1,
         ),
       ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          tilePadding: EdgeInsets.symmetric(horizontal: level == 0 ? 12 : 8, vertical: 0),
-          childrenPadding: EdgeInsets.fromLTRB(level == 0 ? 12 : 6, 0, level == 0 ? 12 : 6, level == 0 ? 12 : 6),
-          initiallyExpanded: isCurrent && level < 2, // auto-expand current MD and AD
-          leading: level == 0
-            ? Icon(isCurrent ? Icons.play_circle_fill : Icons.circle_outlined,
-                color: isCurrent ? kOrange : kPurple2, size: 22)
-            : (isCurrent
-                ? Icon(Icons.play_arrow, color: kOrange, size: 16)
-                : Icon(Icons.circle, color: kMuted.withOpacity(0.4), size: 8)),
-          title: Row(children: [
-            Expanded(child: Text('${trAll(entry.lord)} $levelLabel', style: TextStyle(
-              fontSize: fontSize, fontWeight: FontWeight.w800,
-              color: isCurrent ? kOrange : kText))),
-            if (isCurrent) ...[
-              const SizedBox(width: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                decoration: BoxDecoration(color: kOrange.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
-                child: Text(_pl('prasthuta'), style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: kOrange)),
-              ),
-            ],
-          ]),
-          subtitle: Text('${_fmtDate(entry.start)} → ${_fmtDate(entry.end)}',
-            style: TextStyle(fontSize: dateFontSize, color: kMuted)),
-          children: [
-            // Dasha/Bhukti phala text
-            if (phala != null && phala.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Text(phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5, fontWeight: FontWeight.w700)),
-              ),
-            if (shloka != null && shloka.isNotEmpty)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(8),
-                margin: const EdgeInsets.only(bottom: 8),
-                decoration: BoxDecoration(
-                  color: kPurple2.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: kPurple2.withOpacity(0.15)),
-                ),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Icon(Icons.menu_book, size: 14, color: kPurple2.withOpacity(0.5)),
-                  const SizedBox(width: 6),
-                  Expanded(child: Text(shloka, style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: kMuted, height: 1.5))),
-                ]),
-              ),
-            // Sub-level entries
-            ...entry.antardashas.map((sub) => _buildDashaEntryTile(sub, level + 1, prediction, _pl, mdLord: level == 0 ? entry.lord : null)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(isCurrent ? Icons.play_circle_fill : Icons.circle_outlined,
+              color: isCurrent ? kOrange : kPurple2, size: 22),
+          const SizedBox(width: 8),
+          Expanded(child: Text('${trAll(entry.lord)} ${_pl('mahadasha')}', style: TextStyle(
+            fontSize: 13, fontWeight: FontWeight.w800,
+            color: isCurrent ? kOrange : kText))),
+          if (isCurrent) ...[
+            const SizedBox(width: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(color: kOrange.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+              child: Text(_pl('prasthuta'), style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: kOrange)),
+            ),
           ],
-        ),
-      ),
+        ]),
+        const SizedBox(height: 4),
+        Text('${_fmtDate(entry.start)} → ${_fmtDate(entry.end)}',
+          style: TextStyle(fontSize: 10, color: kMuted)),
+        if (phala != null && phala.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(phala, style: TextStyle(fontSize: 12, color: kText, height: 1.5, fontWeight: FontWeight.w700)),
+        ],
+        if (shloka != null && shloka.isNotEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(8),
+            margin: const EdgeInsets.only(top: 6),
+            decoration: BoxDecoration(
+              color: kPurple2.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: kPurple2.withOpacity(0.15)),
+            ),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(Icons.menu_book, size: 14, color: kPurple2.withOpacity(0.5)),
+              const SizedBox(width: 6),
+              Expanded(child: Text(shloka, style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: kMuted, height: 1.5))),
+            ]),
+          ),
+      ]),
     );
   }
 
